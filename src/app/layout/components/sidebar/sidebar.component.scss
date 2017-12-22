@@ -145,3 +145,10 @@ $topnav-background-color: #222;
     position: absolute;
     bottom: 0px;
 }
+
+.common-items {
+    a {
+        padding-bottom: 0;
+        /* line-height: 0.2rem; */
+    }
+}

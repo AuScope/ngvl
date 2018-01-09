@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { ServerErrorRoutingModule } from './server-error-routing.module';
 import { ServerErrorComponent } from './server-error.component';
@@ -7,7 +8,8 @@ import { ServerErrorComponent } from './server-error.component';
 @NgModule({
   imports: [
     CommonModule,
-    ServerErrorRoutingModule
+    ServerErrorRoutingModule,
+    TranslateModule
   ],
   declarations: [ServerErrorComponent]
 })

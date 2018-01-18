@@ -5,12 +5,20 @@ import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { DatasetsMapComponent } from './datasets-map/datasets-map.component';
+import { DatasetsMenuComponent } from './datasets-menu/datasets-menu.component';
+
+
 @NgModule({
   imports: [
     CommonModule,
     PageHeaderModule,
-    DatasetsRoutingModule
+    DatasetsRoutingModule,
+    NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent]
+  declarations: [DatasetsComponent, DatasetsMapComponent, DatasetsMenuComponent]
 })
-export class DatasetsModule { }
+
+export class DatasetsModule {}

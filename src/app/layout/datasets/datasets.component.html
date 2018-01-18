@@ -1,6 +1,17 @@
-<div [@routerTransition]>
-  <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
-  <p>
-    Data works!
-  </p>
+<div [@routerTransition] class="container-fill">
+    <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
+    <!--<div class="datasets-container">-->
+        <div class="row">
+            <div class="col-lg-3">
+                <datasets-menu></datasets-menu>
+            </div>
+            <div class="col-lg-9">
+                <datasets-map></datasets-map>
+                <!--
+                <agm-map [latitude]="lat" [longitude]="lng">
+                </agm-map>
+                -->
+            </div>
+        </div>
+    <!--</div>-->
 </div>

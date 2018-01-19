@@ -58,12 +58,13 @@ export class DatasetsComponent implements OnInit {
 
 
     ngOnInit() {
+        /*
         let dataSelectPolygon = {
             draggable:true,
             editable:true,
             fillColor:"#acbcff"
         };
-
+        */
         let dataSelectRect = {
             draggable:true,
             editable:true,
@@ -72,13 +73,15 @@ export class DatasetsComponent implements OnInit {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: this.lat, lng: this.lng },
-            zoom: 4
+            zoom: 4,
+            mapTypeId: google.maps.MapTypeId.SATELLITE
         });
 
         this.drawingManager = new google.maps.drawing.DrawingManager({
-            drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            //drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
             drawingControl: true,
-            polygonOptions:dataSelectPolygon,
+            //polygonOptions:dataSelectPolygon,
             rectangleOptions:dataSelectRect,
             drawingControlOptions: {
                 position: google.maps.ControlPosition.TOP_RIGHT,
@@ -86,11 +89,11 @@ export class DatasetsComponent implements OnInit {
             }
         });
 
-        this.drawingManager.setMap(this.map);
-
         google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => this.drawingOverlayComplete(event));
         //google.maps.event.addListener(this.drawingManager, 'drawingmode_changed', (event) => this.clearDataSelection(event));
 
+        this.drawingManager.setMap(this.map);
+        this.drawingManager.setDrawingMode(null);
         this.drawingMode = DrawingMode.NONE;
     }
 
@@ -185,13 +188,13 @@ export class DatasetsComponent implements OnInit {
     drawingOverlayComplete(event) {
         // User is selecting data via rectangle or polygon
         if(this.drawingMode===DrawingMode.DATA_SELECTION) {
+            /*
             if(event.type==='rectangle') {
                 let rectBounds = event.overlay.bounds;
             } else if (event.type==='polygon') {
                 let poly = event.overlay.getPath().getArray();
                 //console.log('poly: ' + poly);
-            }
-            console.log("Set data object");
+            }*/
             this.selectDataObject = event.overlay;
         }
         // User was drawing bounds

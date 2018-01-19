@@ -1,17 +1,158 @@
 <div [@routerTransition] class="container-fill">
     <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
-    <!--<div class="datasets-container">-->
-        <div class="row">
-            <div class="col-lg-3">
-                <datasets-menu></datasets-menu>
-            </div>
-            <div class="col-lg-9">
-                <datasets-map></datasets-map>
-                <!--
-                <agm-map [latitude]="lat" [longitude]="lng">
-                </agm-map>
-                -->
-            </div>
+    <div class="row">
+        <!-- Datasets menu sidebar -->
+        <div class="col-lg-3">
+            <ngb-accordion #acc="ngbAccordion" activeIds="ngb-panel-0">
+                <ngb-panel title="Any Text">
+                    <ng-template ngbPanelContent>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" placeholder="e.g. Geophysics" name="search">
+                            <div class="input-group-btn input-group-apppend">
+                                <button class="btn btn-secondary" type="button">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Spatial Bounds">
+                    <ng-template ngbPanelContent>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" placeholder="Use the buttons on the right to enter bounds" [value]="spatialBoundsDisplay" readonly>
+                            <div class="input-group-btn input-group-apppend">
+                                <button class="btn btn-secondary" type="button" (click)="selectSpatialBounds('current')">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <button class="btn btn-secondary" type="button" (click)="selectSpatialBounds('draw')">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Keywords">
+                    <ng-template ngbPanelContent>
+                        <div class="input-group input-group-sm">
+                            <select class="form-control" placeholder="Keywords" name="keywords">
+                            </select>
+                            <div class="input-group-btn input-group-apppend">
+                                <button class="btn btn-secondary" type="button">
+                                    <i class="fa fa-plus-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Available Services">
+                    <ng-template ngbPanelContent>
+                        <!-- TODO: Populate from server -->
+                        <div class="card card-outline-secondary">
+                            <label>Gridded Data Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1">&nbsp;Web Coverage Service</label>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1">&nbsp;NetCDF Subset Service</label>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1">&nbsp;OPenNDAP Service</label>
+                            </div>
+                        </div>
+                        <div class="card card-outline-secondary">
+                            <label>Point/Line Data Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1">&nbsp;Web Feature Service</label>
+                            </div>
+                        </div>
+                        <div class="card card-outline-secondary">
+                            <label>Visualisation Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1">&nbsp;Web Map Service</label>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Publication Date">
+                    <ng-template ngbPanelContent>
+                        <div class="input-group input-group-sm">
+                            <label class="control-label w-25" for="date-from">From:</label>
+                            <input type="text" class="form-control" name="date-from" id="date-from">
+                            <div class="input-group-btn input-group-append">
+                                <button class="btn btn-secondary" type="button">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <label class="control-label w-25" for="date-to">To:</label>
+                            <input type="text" class="form-control" name="date-to" id="date-to">
+                            <div class="input-group-btn input-group-apppend">
+                                <button class="btn btn-secondary" type="button">
+                                    <i class="fa fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Available Registries">
+                    <ng-template ngbPanelContent>
+                        <!-- TODO: Populate from server -->
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" id="check1">
+                                </div>
+                            </div>
+                            <label for="check1">&nbsp;NCI Data Portal</label>
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="checkbox" id="check2">
+                                </div>
+                            </div>
+                            <label for="check2">&nbsp;SASS ANU Geonetwork</label>
+                        </div>
+                    </ng-template>
+                </ngb-panel>
+                <ngb-panel title="Search Results">
+                    <ng-template ngbPanelContent>
+                        <!-- TODO: Populate from server -->
+                        Search Results
+                    </ng-template>
+                </ngb-panel>
+            </ngb-accordion>
         </div>
-    <!--</div>-->
+        <!-- Datasets map main panel -->
+        <div class="col-lg-9">
+            <div id="map"></div>
+            {{polygon | json}}
+        </div>
+    </div>
 </div>

@@ -7,9 +7,6 @@ import { PageHeaderModule } from '../../shared';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { DatasetsMapComponent } from './datasets-map/datasets-map.component';
-import { DatasetsMenuComponent } from './datasets-menu/datasets-menu.component';
-
 
 @NgModule({
   imports: [
@@ -18,7 +15,7 @@ import { DatasetsMenuComponent } from './datasets-menu/datasets-menu.component';
     DatasetsRoutingModule,
     NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent, DatasetsMapComponent, DatasetsMenuComponent]
+  declarations: [DatasetsComponent]
 })
 
 export class DatasetsModule {}

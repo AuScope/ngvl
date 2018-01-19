@@ -5,6 +5,13 @@
     height: calc(100vh - 200px);
 }
 
+.drawing-button-panel {
+    z-index: 0;
+    position: absolute;
+    top: 5px;
+    right: 80px;
+}
+
 // Menu Styles
 ::ng-deep ngb-accordion > .card {
     margin-bottom: 8px;

@@ -28,10 +28,11 @@ declare let google: any;
  * 
  * TODO:
  * 
- * 1. Limit number of rectangles/polygons that can on screen.
+ * 1. Limit number of rectangles/polygons that can exist on map.
  * 2. User can modify rectangle/polygon but it has no effect on linked data
  *    (e.g. spatial bounds). We can disable editing or add another enum type.
- * 3. Can polygons even be used in the backend? May need to get rid of.
+ * 3. Have disabled polygons to match VGL. Can polygons even be used in the
+ *    backend? Can easily reinstate if useful.
  */
 export class DatasetsComponent implements OnInit {
 
@@ -43,8 +44,10 @@ export class DatasetsComponent implements OnInit {
     // GoogleMap objects
     map: any;
     drawingManager: any;
+    spatialBoundsRect: any;
+    selectDataObject: any;
 
-    // Requested map bounds
+    // Readable version of requested map bounds (UI)
     spatialBoundsDisplay: string = null;
 
     // Drawing mode
@@ -79,15 +82,60 @@ export class DatasetsComponent implements OnInit {
             rectangleOptions:dataSelectRect,
             drawingControlOptions: {
                 position: google.maps.ControlPosition.TOP_RIGHT,
-                drawingModes: [ 'polygon', 'rectangle' ]
+                drawingModes: [ /*'polygon', */'rectangle' ]
             }
         });
 
-        google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => this.drawingOverlayComplete(event));
-
         this.drawingManager.setMap(this.map);
+
+        google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => this.drawingOverlayComplete(event));
+        //google.maps.event.addListener(this.drawingManager, 'drawingmode_changed', (event) => this.clearDataSelection(event));
+
+        this.drawingMode = DrawingMode.NONE;
     }
 
+
+    /**
+     * Grab tool clicked
+     */
+    grabClicked() {
+    }
+
+
+    /**
+     * Draw tool clicked
+     */
+    drawClicked() {
+    }
+
+
+    /**
+     * Zoom tool clicked
+     */
+    zoomClicked() {
+    }
+
+
+    clearSpatialBounds() {
+        if(this.spatialBoundsRect) {
+            this.spatialBoundsRect.setMap(null);
+            this.spatialBoundsRect = null;
+        }
+    }
+
+
+    clearSelectDataObject() {
+        if(this.selectDataObject) {
+            this.selectDataObject.setMap(null);
+            this.selectDataObject = null;
+        }
+    }
+
+    clearDataSelection(event) {
+        if(this.drawingMode!=DrawingMode.SPATIAL_BOUNDS) {
+            this.clearSelectDataObject();
+        }
+    }
 
     /**
      * Update the spatial bounds text input with a formatted bounds string.
@@ -112,6 +160,9 @@ export class DatasetsComponent implements OnInit {
      * draw a rectangle on the map)
      */
     selectSpatialBounds(type) {
+        // Clear any existing bounds on map
+        this.clearSpatialBounds();
+
         // User to draw bounds on map
         if(type==='draw') {
             this.drawingMode = DrawingMode.SPATIAL_BOUNDS;
@@ -140,11 +191,15 @@ export class DatasetsComponent implements OnInit {
                 let poly = event.overlay.getPath().getArray();
                 //console.log('poly: ' + poly);
             }
+            console.log("Set data object");
+            this.selectDataObject = event.overlay;
         }
         // User was drawing bounds
         else if(this.drawingMode===DrawingMode.SPATIAL_BOUNDS) {
             this.updateSpatialBoundsDisplay(event.overlay.bounds);
+            this.spatialBoundsRect = event.overlay;
         }
+        // Rest drawing mode
         this.drawingManager.setDrawingMode(null);
         this.drawingMode = DrawingMode.NONE;
     }

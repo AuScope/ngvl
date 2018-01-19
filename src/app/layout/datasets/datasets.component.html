@@ -19,7 +19,7 @@
                 <ngb-panel title="Spatial Bounds">
                     <ng-template ngbPanelContent>
                         <div class="input-group input-group-sm">
-                            <input type="text" class="form-control" placeholder="Use the buttons on the right to enter bounds" [value]="spatialBoundsDisplay" readonly>
+                            <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsDisplay" readonly>
                             <div class="input-group-btn input-group-apppend">
                                 <button class="btn btn-secondary" type="button" (click)="selectSpatialBounds('current')">
                                     <i class="fa fa-eye"></i>
@@ -152,7 +152,18 @@
         <!-- Datasets map main panel -->
         <div class="col-lg-9">
             <div id="map"></div>
-            {{polygon | json}}
+            <!-- Custom drawing tools -->
+            <div class="drawing-button-panel">
+                <button class="btn btn-info btn-sm" type="button" (click)="grabClicked()">
+                    <i class="fa fa-hand-grab-o"></i>
+                </button>
+                <button class="btn btn-info btn-sm" type="button" (click)="zoomClicked()">
+                    <i class="fa fa-search-plus"></i>
+                </button>
+                <button class="btn btn-info btn-sm" type="button" (click)="drawClicked()">
+                    <i class="fa fa-edit"></i>
+                </button>
+            </div>
         </div>
     </div>
 </div>

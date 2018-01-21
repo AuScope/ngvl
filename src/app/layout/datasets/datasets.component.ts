@@ -6,7 +6,8 @@ import { routerTransition } from '../../router.animations';
 export enum DrawingMode {
     NONE = 0,
     SPATIAL_BOUNDS = 1,
-    DATA_SELECTION = 2
+    DATA_SELECTION = 2,
+    ZOOM = 4
 }
 
 
@@ -29,10 +30,10 @@ declare let google: any;
  * TODO:
  * 
  * 1. Limit number of rectangles/polygons that can exist on map.
- * 2. User can modify rectangle/polygon but it has no effect on linked data
+ * 2. User can edit/move rectangle/polygon but it has no effect on linked data
  *    (e.g. spatial bounds). We can disable editing or add another enum type.
  * 3. Have disabled polygons to match VGL. Can polygons even be used in the
- *    backend? Can easily reinstate if useful.
+ *    backend? Reinstate if useful.
  */
 export class DatasetsComponent implements OnInit {
 
@@ -45,7 +46,7 @@ export class DatasetsComponent implements OnInit {
     map: any;
     drawingManager: any;
     spatialBoundsRect: any;
-    selectDataObject: any;
+    selectDataRect: any;
 
     // Readable version of requested map bounds (UI)
     spatialBoundsDisplay: string = null;
@@ -74,13 +75,15 @@ export class DatasetsComponent implements OnInit {
         this.map = new google.maps.Map(document.getElementById('map'), {
             center: { lat: this.lat, lng: this.lng },
             zoom: 4,
-            mapTypeId: google.maps.MapTypeId.SATELLITE
+            mapTypeId: google.maps.MapTypeId.SATELLITE,
+            fullscreenControl: false,
+            streetViewControl: false
         });
 
         this.drawingManager = new google.maps.drawing.DrawingManager({
             //drawingMode: google.maps.drawing.OverlayType.POLYGON,
             drawingMode: google.maps.drawing.OverlayType.RECTANGLE,
-            drawingControl: true,
+            drawingControl: false,
             //polygonOptions:dataSelectPolygon,
             rectangleOptions:dataSelectRect,
             drawingControlOptions: {
@@ -90,6 +93,7 @@ export class DatasetsComponent implements OnInit {
         });
 
         google.maps.event.addListener(this.drawingManager, 'overlaycomplete', (event) => this.drawingOverlayComplete(event));
+        // XXX Custom draw tools better allow us to capture start drawing events
         //google.maps.event.addListener(this.drawingManager, 'drawingmode_changed', (event) => this.clearDataSelection(event));
 
         this.drawingManager.setMap(this.map);
@@ -102,6 +106,8 @@ export class DatasetsComponent implements OnInit {
      * Grab tool clicked
      */
     grabClicked() {
+        this.drawingMode = DrawingMode.NONE;
+        this.drawingManager.setDrawingMode(null);
     }
 
 
@@ -109,6 +115,11 @@ export class DatasetsComponent implements OnInit {
      * Draw tool clicked
      */
     drawClicked() {
+        if(this.drawingMode != DrawingMode.DATA_SELECTION) {
+            this.clearSelectDataRect();
+        }
+        this.drawingMode = DrawingMode.DATA_SELECTION;
+        this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
     }
 
 
@@ -116,8 +127,26 @@ export class DatasetsComponent implements OnInit {
      * Zoom tool clicked
      */
     zoomClicked() {
+        this.drawingMode = DrawingMode.ZOOM;
+        this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
     }
 
+
+    /**
+     * Clear any existing spatial, dataselect or zoom objects
+     */
+    /*
+    clearDrawObjects() {
+        if(this.spatialBoundsRect) {
+            this.spatialBoundsRect.setMap(null);
+            this.spatialBoundsRect = null;
+        }
+        if(this.selectDataRect) {
+            this.selectDataRect.setMap(null);
+            this.selectDataRect = null;
+        }
+    }
+    */
 
     clearSpatialBounds() {
         if(this.spatialBoundsRect) {
@@ -127,16 +156,10 @@ export class DatasetsComponent implements OnInit {
     }
 
 
-    clearSelectDataObject() {
-        if(this.selectDataObject) {
-            this.selectDataObject.setMap(null);
-            this.selectDataObject = null;
-        }
-    }
-
-    clearDataSelection(event) {
-        if(this.drawingMode!=DrawingMode.SPATIAL_BOUNDS) {
-            this.clearSelectDataObject();
+    clearSelectDataRect() {
+        if(this.selectDataRect) {
+            this.selectDataRect.setMap(null);
+            this.selectDataRect = null;
         }
     }
 
@@ -145,7 +168,7 @@ export class DatasetsComponent implements OnInit {
      * 
      * @param bounds bounds provided from the map or a drawn rectangle
      */
-    updateSpatialBoundsDisplay(bounds) {
+    updateSpatialBoundsUI(bounds) {
         let neLat = bounds.getNorthEast().lat().toFixed(4);
         let neLng = bounds.getNorthEast().lng().toFixed(4);
         let swLat = bounds.getSouthWest().lat().toFixed(4);
@@ -165,25 +188,26 @@ export class DatasetsComponent implements OnInit {
     selectSpatialBounds(type) {
         // Clear any existing bounds on map
         this.clearSpatialBounds();
-
         // User to draw bounds on map
-        if(type==='draw') {
+        if(type==='draw-bounds') {
             this.drawingMode = DrawingMode.SPATIAL_BOUNDS;
             this.drawingManager.setDrawingMode(google.maps.drawing.OverlayType.RECTANGLE);
         }
         // Get current map bounds
-        else if(type==='current') {
+        else if(type==='current-bounds') {
             this.drawingMode = DrawingMode.NONE;
             this.drawingManager.setDrawingMode(null);
-            this.updateSpatialBoundsDisplay(this.map.getBounds());
+            this.updateSpatialBoundsUI(this.map.getBounds());
         }
     }
 
 
     /**
      * Called after a user finishes drawing a polygon or rectangle on the map.
+     * May be called after drawing spatial bounds, drawing data selection area,
+     * or drawing the zoom rectangle.
      * 
-     * @param event The drawing event, either polygon or rectangle
+     * @param event The drawing event, will be either polygon or rectangle
      */
     drawingOverlayComplete(event) {
         // User is selecting data via rectangle or polygon
@@ -195,14 +219,22 @@ export class DatasetsComponent implements OnInit {
                 let poly = event.overlay.getPath().getArray();
                 //console.log('poly: ' + poly);
             }*/
-            this.selectDataObject = event.overlay;
+            this.selectDataRect = event.overlay;
+
+            // Select data
+            console.log("SELECT DATA");
         }
         // User was drawing bounds
         else if(this.drawingMode===DrawingMode.SPATIAL_BOUNDS) {
-            this.updateSpatialBoundsDisplay(event.overlay.bounds);
+            this.updateSpatialBoundsUI(event.overlay.bounds);
             this.spatialBoundsRect = event.overlay;
         }
-        // Rest drawing mode
+        // User has drawn zoom rectangle
+        else if(this.drawingMode===DrawingMode.ZOOM) {
+            this.map.fitBounds(event.overlay.bounds);
+            event.overlay.setMap(null);
+        }
+        // Reset drawing mode
         this.drawingManager.setDrawingMode(null);
         this.drawingMode = DrawingMode.NONE;
     }

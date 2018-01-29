@@ -1,9 +1,10 @@
 <div [@routerTransition] class="container-fill">
     <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
     <div class="row">
+        <!-- TODO: Create/use translation strings -->
         <!-- Datasets menu sidebar -->
         <div class="col-lg-3">
-            <ngb-accordion #acc="ngbAccordion" activeIds="ngb-panel-0">
+            <ngb-accordion #acc="ngbAccordion" activeIds="datasets-menu-accordion">
                 <ngb-panel title="Any Text">
                     <ng-template ngbPanelContent>
                         <div class="input-group input-group-sm">
@@ -21,10 +22,10 @@
                         <div class="input-group input-group-sm">
                             <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsDisplay" readonly>
                             <div class="input-group-btn input-group-apppend">
-                                <button class="btn btn-secondary" type="button" (click)="selectSpatialBounds('current-bounds')">
+                                <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Current Bounds" (click)="selectSpatialBounds('current-bounds')">
                                     <i class="fa fa-eye"></i>
                                 </button>
-                                <button class="btn btn-secondary" type="button" (click)="selectSpatialBounds('draw-bounds')">
+                                <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw Bounds" (click)="selectSpatialBounds('draw-bounds')">
                                     <i class="fa fa-edit"></i>
                                 </button>
                             </div>
@@ -154,16 +155,32 @@
             <div id="map"></div>
             <!-- Custom drawing tools -->
             <div class="drawing-button-panel">
-                <button class="btn btn-info btn-sm" type="button" (click)="grabClicked()">
+                <button class="btn btn-info btn-sm" type="button" data-toggle="tooltip" title="Grab" (click)="grabClicked()">
                     <i class="fa fa-hand-grab-o"></i>
                 </button>
-                <button class="btn btn-info btn-sm" type="button" (click)="zoomClicked()">
+                <button class="btn btn-info btn-sm" type="button" data-toggle="tooltip" title="Zoom" (click)="zoomClicked()">
                     <i class="fa fa-search-plus"></i>
                 </button>
-                <button class="btn btn-info btn-sm" type="button" (click)="drawClicked()">
+                <button class="btn btn-info btn-sm" type="button" data-toggle="tooltip" title="Select Data" (click)="drawClicked()">
                     <i class="fa fa-edit"></i>
                 </button>
             </div>
+            <!-- Active layers panel -->
+            <!-- TODO: Make title larger so it doesn't expand horizontally when clicked -->
+            <div class="active-layers-panel">
+                <ngb-accordion #acc="ngbAccordion" activeIds="active-layers-accordion">
+                    <ngb-panel title="Active Layers">
+                        <ng-template ngbPanelContent>
+                            Active layers will appear here
+                        </ng-template>
+                    </ngb-panel>
+                </ngb-accordion>
+            </div>
+            <!--
+            <div class="test-button">
+                <button class="btn" type="button" (click)="testButton()">Test</button>
+            </div>
+            -->
         </div>
     </div>
 </div>

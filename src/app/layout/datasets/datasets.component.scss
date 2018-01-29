@@ -8,6 +8,13 @@
 .drawing-button-panel {
     z-index: 0;
     position: absolute;
+    top: 48px;
+    right: 26px;
+}
+
+.active-layers-panel {
+    z-index: 0;
+    position: absolute;
     top: 8px;
     right: 26px;
 }

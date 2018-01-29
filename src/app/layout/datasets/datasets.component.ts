@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 
+import { Observable } from 'rxjs/Observable';
+
+import { CSWService } from './models/csw-service.model';
+import { VGLService } from './services/vgl.service';
+
+// XXX TESTING
+import { CSWServiceInterface } from './models/csw-service.model';
+
 
 // Drawing modes
 export enum DrawingMode {
@@ -25,7 +33,8 @@ declare let google: any;
 /**
  * BUGS:
  * 
- * 1. Drawing spatial bounds doesn't update the UI until it's clicked. Why?
+ * 1. Drawing spatial bounds doesn't update the UI until something is clicked.
+ *    Why?
  * 
  * TODO:
  * 
@@ -38,9 +47,9 @@ declare let google: any;
 export class DatasetsComponent implements OnInit {
 
     // Default map settings
-    lat: number = -24.994;
-    lng: number = 134.824;
-    zoom: number = 4;
+    private lat: number;
+    private lng: number;
+    private zoom: number;
 
     // GoogleMap objects
     map: any;
@@ -55,10 +64,16 @@ export class DatasetsComponent implements OnInit {
     drawingMode = DrawingMode.NONE;
 
 
-    constructor() {}
+    constructor(private vglService: VGLService) {
+        console.log("CONSTRUCT");
+    }
 
-
+ 
     ngOnInit() {
+        console.log("INIT");
+        this.lat = -24.994;
+        this.lng = 134.824;
+        this.zoom = 4;
         /*
         let dataSelectPolygon = {
             draggable:true,
@@ -133,21 +148,8 @@ export class DatasetsComponent implements OnInit {
 
 
     /**
-     * Clear any existing spatial, dataselect or zoom objects
+     * Remove the spatial bounds rectangle from the map
      */
-    /*
-    clearDrawObjects() {
-        if(this.spatialBoundsRect) {
-            this.spatialBoundsRect.setMap(null);
-            this.spatialBoundsRect = null;
-        }
-        if(this.selectDataRect) {
-            this.selectDataRect.setMap(null);
-            this.selectDataRect = null;
-        }
-    }
-    */
-
     clearSpatialBounds() {
         if(this.spatialBoundsRect) {
             this.spatialBoundsRect.setMap(null);
@@ -156,12 +158,16 @@ export class DatasetsComponent implements OnInit {
     }
 
 
+    /**
+     * Remove the data selection rectangle from the map
+     */
     clearSelectDataRect() {
         if(this.selectDataRect) {
             this.selectDataRect.setMap(null);
             this.selectDataRect = null;
         }
     }
+
 
     /**
      * Update the spatial bounds text input with a formatted bounds string.
@@ -186,7 +192,7 @@ export class DatasetsComponent implements OnInit {
      * draw a rectangle on the map)
      */
     selectSpatialBounds(type) {
-        // Clear any existing bounds on map
+        // Clear any existing drawn bounds on map
         this.clearSpatialBounds();
         // User to draw bounds on map
         if(type==='draw-bounds') {
@@ -222,7 +228,7 @@ export class DatasetsComponent implements OnInit {
             this.selectDataRect = event.overlay;
 
             // Select data
-            console.log("SELECT DATA");
+
         }
         // User was drawing bounds
         else if(this.drawingMode===DrawingMode.SPATIAL_BOUNDS) {
@@ -237,6 +243,31 @@ export class DatasetsComponent implements OnInit {
         // Reset drawing mode
         this.drawingManager.setDrawingMode(null);
         this.drawingMode = DrawingMode.NONE;
+    }
+
+
+    cswServices: CSWService[];
+
+
+    // TODO: Get rid of this XXX
+    testButton() {
+        /*
+        let cswServices = [];
+        this.vglService.testMethod().subscribe((services: Array<CSWService>) => {
+            cswServices = services;
+        });
+        */
+        let cswServices = [];
+        //this.vglService.getCSWServices().subscribe(response => {
+        this.vglService.getCSWServices().subscribe((response: CSWService[]) => {
+            for(let s of response) {
+                console.log(s.title);
+            }
+        }), err => {
+            console.log("Error retrieving CWS services: " + err.message);
+        };
+
+        //console.log("SSS: " + this.cswServices.length);
     }
 
 

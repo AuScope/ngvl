@@ -1,3 +1,7 @@
+import { environment } from '../../environments/environment';
+import { PortalCoreModule } from '../shared/modules/portal-core-ui/portal-core.module';
+import { KeysPipe } from '../shared/modules/portal-core-ui/uiutilities/pipes';
+import { PortalCorePipesModule } from '../shared/modules/portal-core-ui/uiutilities/portal-core.pipes.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
@@ -10,6 +14,7 @@ import { HeaderComponent } from './components/header/header.component';
 
 @NgModule({
     imports: [
+        PortalCorePipesModule,
         CommonModule,
         LayoutRoutingModule,
         TranslateModule,

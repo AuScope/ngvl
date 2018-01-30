@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
+import { OlMapComponent } from './openlayermap/olmap.component';
 
 @NgModule({
   imports: [
@@ -11,6 +12,7 @@ import { PageHeaderModule } from '../../shared';
     PageHeaderModule,
     DatasetsRoutingModule
   ],
-  declarations: [DatasetsComponent]
+  declarations: [DatasetsComponent, OlMapComponent],
+  bootstrap: [OlMapComponent]
 })
 export class DatasetsModule { }

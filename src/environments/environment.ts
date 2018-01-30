@@ -4,5 +4,8 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  getCSWRecordUrl: 'getKnownLayers.do',
+  portalBaseUrl: 'http://gis-dev-or.it.csiro.au:8080/VGL-Portal/',
+
 };

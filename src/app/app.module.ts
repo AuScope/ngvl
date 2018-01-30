@@ -1,3 +1,4 @@
+import { environment } from '../environments/environment';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
@@ -9,6 +10,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
+import { PortalCoreModule } from './shared/modules/portal-core-ui/portal-core.module';
+import { KeysPipe } from './shared/modules/portal-core-ui/uiutilities/pipes';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -19,6 +22,7 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
     imports: [
+        PortalCoreModule.forRoot(environment),
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,

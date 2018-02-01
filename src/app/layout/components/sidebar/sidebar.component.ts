@@ -5,6 +5,13 @@ import { LayerHandlerService } from '../../../shared/modules/portal-core-ui/serv
 import { OlMapService } from '../../../shared/modules/portal-core-ui/service/openlayermap/ol-map.service';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Bbox } from '../../../shared/modules/portal-core-ui/model/data/bbox.model';
+
+
+import olProj from 'ol/proj';
+
+
+
 
 @Component({
     selector: 'app-sidebar',
@@ -17,8 +24,19 @@ export class SidebarComponent implements OnInit {
   showMenu: string = '';
   cswRecords = [];
 
-  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,  private httpClient: HttpClient) {
+  // Datasets collapsable menus
+  anyTextIsCollapsed: boolean = true;
+  spatialBoundsIsCollapsed: boolean = true;
+  keywordsIsCollapsed: boolean = true;
+  servicesIsCollapsed: boolean = true;
+  pubDateIsCollapsed: boolean = true;
+  registriesIsCollapsed: boolean = true;
+  searchResultsIsCollapsed: boolean = true;
 
+  spatialBoundsText: string = "";
+
+
+  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,  private httpClient: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -41,6 +59,24 @@ export class SidebarComponent implements OnInit {
 
   public addCSWRecord(cswRecord: CSWRecordModel) {
     this.olMapService.addCSWRecord(cswRecord);
+  }
+
+  public showCSWRecordInformation(cswRecord: CSWRecordModel) {
+
+  }
+
+  public showCSWRecordBounds(cswRecord: CSWRecordModel) {
+    
+  }
+
+  public zoomToCSWRecordBounds(cswRecord: CSWRecordModel) {
+      if(cswRecord.geographicElements.length > 0) {
+        let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
+        const bbox: [number, number, number, number] =
+            [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+        const extent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+        this.olMapService.fitView(extent);
+      }
   }
 
   public drawBound() {

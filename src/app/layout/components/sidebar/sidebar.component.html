@@ -21,12 +21,199 @@
 		<div class="nested-menu">
 			<a class="list-group-item" [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" (click)="addExpandClass('pages')"> <span><i
 					class="fa fa-fw fa-map"></i>&nbsp; {{ 'Data' | translate }}</span>
-			</a>
+            </a>
+            <!-- TODO: Find all inline style definitions and move to CSS -->
 			<li class="nested" [class.expand]="showMenu === 'pages'">
-				<ul class="submenu">
-					<li *ngFor="let cswRecord of cswRecords"><a href="javascript:void(0)"><span><small>{{ cswRecord.name }}</small><button (click)="addCSWRecord(cswRecord)">add</button><button (click)="drawBound()">selectBounds</button></span></a>
-					</li>					
-				</ul>
+                <ul class="submenu" style="margin-right:2px;">
+                    <!-- Any text search -->
+                    <li>
+                        <a class="submenu" (click)="anyTextIsCollapsed = !anyTextIsCollapsed"><span>Any Text</span>
+                            <i *ngIf="anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="anyTextIsCollapsed">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="e.g. Geophysics" name="search">
+                                <div class="input-group-btn input-group-apppend">
+                                    <button class="btn btn-secondary" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Spatial bounds search -->
+                    <li>
+                        <a (click)="spatialBoundsIsCollapsed = !spatialBoundsIsCollapsed"><span>Spatial Bounds</span>
+                            <i *ngIf="spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="spatialBoundsIsCollapsed">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
+                                <div class="input-group-btn input-group-apppend">
+                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Use current map bounds">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw bounds">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>                        
+                        </div>
+                    </li>
+                    <!-- Keywords search -->
+                    <li>
+                        <a (click)="keywordsIsCollapsed = !keywordsIsCollapsed"><span>Keywords</span>
+                            <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="keywordsIsCollapsed">
+                            <div class="input-group input-group-sm">
+                                <select class="form-control" placeholder="Keywords" name="keywords">
+                                </select>
+                                <div class="input-group-btn input-group-apppend">
+                                    <button class="btn btn-secondary" type="button">
+                                        <i class="fa fa-plus-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Available services -->
+                    <li>
+                        <a (click)="servicesIsCollapsed = !servicesIsCollapsed"><span>Available Services</span>
+                            <i *ngIf="servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="servicesIsCollapsed">
+                            <div class="card card-outline-secondary">
+                                <label class="control-label medium">Gridded Data Services</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="check1">
+                                        </div>
+                                    </div>
+                                    <label class="control-label small" for="check1">&nbsp;Web Coverage Service</label>
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="check2">
+                                        </div>
+                                    </div>
+                                    <label class="control-label small" for="check2">&nbsp;NetCDF Subset Service</label>
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="check3">
+                                        </div>
+                                    </div>
+                                    <label class="control-label small" for="check3">&nbsp;OPenNDAP Service</label>
+                                </div>
+                            </div>
+                            <div class="card card-outline-secondary">
+                                <label>Point/Line Data Services</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="check4">
+                                        </div>
+                                    </div>
+                                    <label class="control-label small" for="check4">&nbsp;Web Feature Service</label>
+                                </div>
+                            </div>
+                            <div class="card card-outline-secondary">
+                                <label>Visualisation Services</label>
+                                <div class="input-group input-group-sm">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="check5">
+                                        </div>
+                                    </div>
+                                    <label class="control-label small" for="check5">&nbsp;Web Map Service</label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Publication date -->
+                    <li>
+                        <a style="color:white;" (click)="pubDateIsCollapsed = !pubDateIsCollapsed"><span>Publication Date</span>
+                            <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="pubDateIsCollapsed">
+                            <div class="input-group input-group-sm">
+                                <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
+                                <input type="text" class="form-control" name="date-from" id="date-from">
+                                <div class="input-group-btn input-group-append">
+                                    <button class="btn btn-secondary" type="button">
+                                        <i class="fa fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
+                                <input type="text" class="form-control" name="date-to" id="date-to">
+                                <div class="input-group-btn input-group-apppend">
+                                    <button class="btn btn-secondary" type="button">
+                                        <i class="fa fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Available registries -->
+                    <li>
+                        <a (click)="registriesIsCollapsed = !registriesIsCollapsed"><span>Available Registries</span>
+                            <i *ngIf="registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div [ngbCollapse]="registriesIsCollapsed">
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
+                                    </div>
+                                </div>
+                                <label for="check1" class="small" style="color:white;">&nbsp;NCI Data Portal</label>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check2">
+                                    </div>
+                                </div>
+                                <label for="check2" class="small" style="color:white;">&nbsp;SASS ANU Geonetwork</label>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Search results -->
+                    <li>
+                        <a (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">Search Results
+                            <span><i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i></span>
+                            <span><i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i></span>
+                        </a>
+                        <div [ngbCollapse]="searchResultsIsCollapsed">
+                            <li *ngFor="let cswRecord of cswRecords">
+                                <div class ="input-group input-group-sm" style="margin-bottom:2px;">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-sm" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(cswRecord)"><i class="fa fa-plus-circle"></i></button>
+                                    </span>
+                                    <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="showCSWRecordInformation(cswRecord)"><i class="fa fa-info-circle"></i></button>
+                                    </span>
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)" (dblclick)="zoomToCSWRecordBounds(cswRecord)"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                            </li>            
+                        </div>
+                    </li>
+                </ul>
 			</li>
 		</div>
 		<!-- <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">

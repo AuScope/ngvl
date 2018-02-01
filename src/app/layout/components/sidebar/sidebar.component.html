@@ -145,24 +145,33 @@
                             <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="pubDateIsCollapsed">
-                            <div class="input-group input-group-sm">
-                                <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
-                                <input type="text" class="form-control" name="date-from" id="date-from">
-                                <div class="input-group-btn input-group-append">
-                                    <button class="btn btn-secondary" type="button">
-                                        <i class="fa fa-calendar"></i>
-                                    </button>
+                            <!-- Form required for Datepicker -->
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
+                                        <input class="form-control" id="date-from" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="model-from" ngbDatepicker #dp_from="ngbDatepicker">
+                                        <div class="input-group-btn input-group-append">
+                                            <button class="btn btn-secondary" type="button" (click)="dp_from.toggle()">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="input-group input-group-sm">
-                                <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
-                                <input type="text" class="form-control" name="date-to" id="date-to">
-                                <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button">
-                                        <i class="fa fa-calendar"></i>
-                                    </button>
+                            </form>
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <div class="input-group input-group-sm">
+                                        <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
+                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="model-to" ngbDatepicker #dp_to="ngbDatepicker">
+                                        <div class="input-group-btn input-group-append">
+                                            <button class="btn btn-secondary" type="button" (click)="dp_to.toggle()">
+                                                <i class="fa fa-calendar"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </li>
                     <!-- Available registries -->

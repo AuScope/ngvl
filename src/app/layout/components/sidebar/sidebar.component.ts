@@ -10,9 +10,6 @@ import { Bbox } from '../../../shared/modules/portal-core-ui/model/data/bbox.mod
 
 import olProj from 'ol/proj';
 
-//import { NgbDatepicker } from '@ng-bootstrap/ng-bootstrap';
-
-
 
 @Component({
     selector: 'app-sidebar',
@@ -42,6 +39,15 @@ export class SidebarComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Test keyword search
+    /*
+    let serviceIds: string[] = ['cswNCI'];
+    this.cswSearchService.getFacetedKeywords(serviceIds).subscribe(data => {
+        console.log(data);
+        console.log("data[2]: " + data[2]);
+    });
+    */
+
     let httpParams = new HttpParams();
     httpParams = httpParams.append('start', '1');
     httpParams = httpParams.append('serviceId', 'cswNCI');

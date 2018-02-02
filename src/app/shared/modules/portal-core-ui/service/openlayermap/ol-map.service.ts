@@ -21,7 +21,6 @@ import { OlWMSService } from '../wms/ol-wms.service';
 import { Subject } from 'rxjs/Subject';
 
 
-
 /**
  * Wrapper class to provide all things related to the ol map such as adding layer or removing layer.
  */
@@ -104,7 +103,6 @@ export class OlMapService {
    }
 
 
-
   /**
    * Add layer to the wms
    * @param layer the layer to add to the map
@@ -124,6 +122,7 @@ export class OlMapService {
      }
    }
 
+
   /**
    * Add layer to the map. taking a short cut by wrapping the csw in a layerModel
    * @param layer the layer to add to the map
@@ -137,8 +136,9 @@ export class OlMapService {
         itemLayer.hidden = false;
         itemLayer.layerMode = 'NA';
         itemLayer.name = cswRecord.name;
-       this.addLayer(itemLayer, {});
+        this.addLayer(itemLayer, {});
    }
+
 
   /**
    * Remove layer from map
@@ -149,6 +149,18 @@ export class OlMapService {
       this.olMapObject.removeLayerById(layer.id);
       delete this.layerModelList[layer.id];
   }
+
+
+  /**
+   * Remove layer from map based on supplied ID
+   * @param layerId the ID of the layer to remove
+   */
+  public removeLayerById(layerId: string): void {
+    this.manageStateService.removeLayer(layerId);
+    this.olMapObject.removeLayerById(layerId);
+    delete this.layerModelList[layerId];
+  }
+
 
   /**
    * Retrieve the layer model given an id string
@@ -161,6 +173,18 @@ export class OlMapService {
       return null;
   }
 
+
+  /**
+   * Does the map contain the layer denoted by layerId?
+   * @param layerId the ID of the layer to check for
+   */
+  public layerExists(layerId: string): boolean {
+    if (layerId in this.layerModelList)
+        return true;
+    else return false;
+  }
+
+
   /**
    * Fit the map to the extent that is provided
    * @param extent An array of numbers representing an extent: [minx, miny, maxx, maxy]
@@ -169,6 +193,7 @@ export class OlMapService {
       this.olMapObject.getMap().getView().fit(extent);
   }
 
+
   /**
    * DrawBound
    * @returns a observable object that triggers an event when the user have completed the task
@@ -176,6 +201,7 @@ export class OlMapService {
   public drawBound(): Subject<olLayerVector> {
     return this.olMapObject.drawBox();
   }
+
 
   /**
     * Method for drawing a dot on the map.
@@ -193,6 +219,7 @@ export class OlMapService {
       return this.olMapObject.drawPolygon();
     }
 
+
   /**
    * remove a vector layer from the map
    * @param the vector layer to be removed
@@ -200,6 +227,5 @@ export class OlMapService {
   public removeVector(vector: olLayerVector) {
     this.olMapObject.removeVector(vector);
   }
-
 
 }

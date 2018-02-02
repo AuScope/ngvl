@@ -2,6 +2,7 @@ import { environment } from '../../../../environments/environment';
 import { CSWRecordModel } from '../../../shared/modules/portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from '../../../shared/modules/portal-core-ui/model/data/layer.model';
 import { LayerHandlerService } from '../../../shared/modules/portal-core-ui/service/cswrecords/layer-handler.service';
+import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { OlMapService } from '../../../shared/modules/portal-core-ui/service/openlayermap/ol-map.service';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
@@ -36,7 +37,8 @@ export class SidebarComponent implements OnInit {
   spatialBoundsText: string = "";
 
 
-  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,  private httpClient: HttpClient) {
+  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
+              private httpClient: HttpClient, private cswSearchService: CSWSearchService) {
   }
 
   ngOnInit(): void {
@@ -60,6 +62,12 @@ export class SidebarComponent implements OnInit {
   public addCSWRecord(cswRecord: CSWRecordModel) {
     this.olMapService.addCSWRecord(cswRecord);
   }
+
+
+  public removeCSWRecord(recordId: string): void {
+    this.olMapService.removeLayerById(recordId);
+  }
+
 
   public showCSWRecordInformation(cswRecord: CSWRecordModel) {
 
@@ -101,6 +109,7 @@ export class SidebarComponent implements OnInit {
       this.showMenu = element;
     }
   }
+
 }
 
 

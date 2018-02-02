@@ -87,54 +87,48 @@
                             <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="servicesIsCollapsed">
-                            <div class="card card-outline-secondary">
-                                <label class="control-label medium">Gridded Data Services</label>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" id="check1">
-                                        </div>
+                            <label class="control-label medium" style="color:white;">Gridded Data Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check1">
                                     </div>
-                                    <label class="control-label small" for="check1">&nbsp;Web Coverage Service</label>
                                 </div>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" id="check2">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check2">&nbsp;NetCDF Subset Service</label>
-                                </div>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" id="check3">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check3">&nbsp;OPenNDAP Service</label>
-                                </div>
+                                <label class="control-label small" for="check1" style="color:white;">&nbsp;Web Coverage Service</label>
                             </div>
-                            <div class="card card-outline-secondary">
-                                <label>Point/Line Data Services</label>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" id="check4">
-                                        </div>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check2">
                                     </div>
-                                    <label class="control-label small" for="check4">&nbsp;Web Feature Service</label>
                                 </div>
+                                <label class="control-label small" for="check2" style="color:white;">&nbsp;NetCDF Subset Service</label>
                             </div>
-                            <div class="card card-outline-secondary">
-                                <label>Visualisation Services</label>
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" id="check5">
-                                        </div>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check3">
                                     </div>
-                                    <label class="control-label small" for="check5">&nbsp;Web Map Service</label>
                                 </div>
+                                <label class="control-label small" for="check3" style="color:white;">&nbsp;OPenNDAP Service</label>
+                            </div>
+                            <label style="color:white;">Point/Line Data Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check4">
+                                    </div>
+                                </div>
+                                <label class="control-label small" for="check4" style="color:white;">&nbsp;Web Feature Service</label>
+                            </div>
+                            <label style="color:white;">Visualisation Services</label>
+                            <div class="input-group input-group-sm">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" id="check5">
+                                    </div>
+                                </div>
+                                <label class="control-label small" for="check5" style="color:white;">&nbsp;Web Map Service</label>
                             </div>
                         </div>
                     </li>
@@ -209,7 +203,8 @@
                             <li *ngFor="let cswRecord of cswRecords">
                                 <div class ="input-group input-group-sm" style="margin-bottom:2px;">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-sm" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(cswRecord)"><i class="fa fa-plus-circle"></i></button>
+                                        <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(cswRecord)"><i class="fa fa-plus-circle"></i></button>
+                                        <button *ngIf="olMapService.layerExists(cswRecord.id)"class="btn btn-sm" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(cswRecord.id)"><i class="fa fa-trash"></i></button>
                                     </span>
                                     <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
                                     <span class="input-group-btn">

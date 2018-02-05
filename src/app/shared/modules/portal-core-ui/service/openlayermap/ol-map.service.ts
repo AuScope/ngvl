@@ -1,6 +1,7 @@
 
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, Inject } from '@angular/core';
+import olExtent from 'ol/extent';
 import olLayerVector from 'ol/layer/vector';
 import olLayer from 'ol/layer/layer';
 import olFeature from 'ol/feature';
@@ -19,6 +20,7 @@ import { OlWFSService } from '../wfs/ol-wfs.service';
 import { OlMapObject } from './ol-map-object';
 import { OlWMSService } from '../wms/ol-wms.service';
 import { Subject } from 'rxjs/Subject';
+
 
 
 /**
@@ -216,8 +218,12 @@ export class OlMapService {
     * @returns the polygon coordinates string BS on which the polygon is drawn on.
     */
     public drawPolygon(): BehaviorSubject<olLayerVector> {
-      return this.olMapObject.drawPolygon();
+        return this.olMapObject.drawPolygon();
     }
+
+  public showBounds(extent: olExtent) {
+      this.olMapObject.showBounds(extent);
+  }
 
 
   /**

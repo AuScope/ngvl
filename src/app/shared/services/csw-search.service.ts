@@ -11,7 +11,15 @@ import { CSWRecordModel } from './../modules/portal-core-ui/model/data/cswrecord
 export class CSWSearchService {
 
     constructor(private httpClient: HttpClient, @Inject('env') private env) {
-        //this.getFacetedSearch(null, 10, null, null, null, null, null);
+        /* TEST
+        this.getFacetedSearch(null, 10, ['cswNCI'], null, null, null, null)
+            .subscribe(data => {
+                console.log(data);
+            },
+            error => {
+                console.log("CSW Search Error: " + error.message);
+            });
+        */
     }
 
 
@@ -22,7 +30,6 @@ export class CSWSearchService {
     getFacetedKeywords(serviceIDs: string[]): Observable<string[]> {
         let httpParams = new HttpParams();
         serviceIDs.forEach(id => {
-            //httpParams = httpParams.append('serviceId[]', id);
             httpParams = httpParams.append('serviceId', id);
         });
         console.log(httpParams.toString());
@@ -36,50 +43,58 @@ export class CSWSearchService {
 
 
     /**
-     * TODO: Map to specific object
+     * 
+     * @param start 
+     * @param limit 
+     * @param serviceId 
+     * @param field 
+     * @param value 
+     * @param type 
+     * @param comparison 
      */
-    getFacetedSearch(starts: number[], limit: number, serviceIds: string[],
-                     rawFields: string[], rawValues: string[],
-                     rawTypes: string[], rawComparisons: string[]): any {
+    getFacetedSearch(start: number[], limit: number, serviceId: string[],
+        field: string[], value: string[],
+        type: string[], comparison: string[]): Observable<CSWRecordModel[]> {
+
         let httpParams = new HttpParams();
         if(limit) {
             httpParams = httpParams.append('limit', limit.toString());
         }
-        if(starts) {
-            starts.forEach(s => {
-                httpParams = httpParams.append('starts', s.toString());
+        if(start) {
+            start.forEach(s => {
+                httpParams = httpParams.append('start', s.toString());
             });
         }
-        if(serviceIds) {
-            serviceIds.forEach(id => {
-                httpParams = httpParams.append('serviceIds', id);
+        if(serviceId) {
+            serviceId.forEach(id => {
+                httpParams = httpParams.append('serviceId', id);
             });
         }
-        if(rawFields) {
-            rawFields.forEach(f => {
-                httpParams = httpParams.append('rawFields', f);
+        if(field) {
+            field.forEach(f => {
+                httpParams = httpParams.append('field', f);
             });
         }
-        if(rawValues) {
-            rawValues.forEach(v => {
-                httpParams = httpParams.append('rawValues', v);
+        if(value) {
+            value.forEach(v => {
+                httpParams = httpParams.append('value', v);
             });
         }
-        if(rawTypes) {
-            rawTypes.forEach(t => {
-                httpParams = httpParams.append('rawTypes', t);
+        if(type) {
+            type.forEach(t => {
+                httpParams = httpParams.append('type', t);
             });
         }
-        if(rawComparisons) {
-            rawComparisons.forEach(c => {
-                httpParams = httpParams.append('rawComparisons', c);
+        if(comparison) {
+            comparison.forEach(c => {
+                httpParams = httpParams.append('comparison', c);
             });
         }
         return this.httpClient.post(this.env.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).map(response => {
-            return response['data'];
+            return response['data'].records;
         });
     }
 

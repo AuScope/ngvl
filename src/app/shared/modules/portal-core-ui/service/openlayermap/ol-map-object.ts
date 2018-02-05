@@ -19,6 +19,8 @@ import olGeomPoint from 'ol/geom/point';
 import olFeature from 'ol/feature';
 import olEasing from 'ol/easing';
 import olObservable from 'ol/observable';
+import olExtent from 'ol/extent';
+import olGeomPolygon from 'ol/geom/polygon';
 import { Subject } from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
@@ -270,6 +272,24 @@ export class OlMapObject {
      source.addFeature(feature);
 
     return vector;
+  }
+
+  /**
+   * 
+   * @param extent 
+   */
+  showBounds(extent: olExtent) {
+    const poly: olGeomPolygon = olGeomPolygon.fromExtent(extent);
+    const feature: olFeature = new olFeature(poly);
+    const source = new olSourceVector({wrapX: false});
+    source.addFeature(feature);
+    const vector = new olLayerVector({
+        source: source
+    });
+    this.map.addLayer(vector);
+    setTimeout(
+        this.map.removeLayer(vector),
+        3000);
   }
 
   /**

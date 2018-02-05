@@ -33,9 +33,9 @@
                         </a>
                         <div [ngbCollapse]="anyTextIsCollapsed">
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" placeholder="e.g. Geophysics" name="search">
+                                <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search" [(ngModel)]="anyTextValue">
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button">
+                                    <button class="btn btn-secondary" type="button" (click)="anyTextSearch()">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -194,6 +194,7 @@
                         </div>
                     </li>
                     <!-- Search results -->
+                    <!-- TODO : Paging of results (use factedSearch start/limit) -->
                     <li>
                         <a (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">Search Results
                             <span><i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i></span>
@@ -211,6 +212,7 @@
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="showCSWRecordInformation(cswRecord)"><i class="fa fa-info-circle"></i></button>
                                     </span>
                                     <span class="input-group-btn">
+                                        <!-- TODO: Delay required to stop dblclick registering as 2 single clicks -->
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)" (dblclick)="zoomToCSWRecordBounds(cswRecord)"><i class="fa fa-search"></i></button>
                                     </span>
                                 </div>

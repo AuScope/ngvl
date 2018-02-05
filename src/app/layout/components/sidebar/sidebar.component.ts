@@ -9,6 +9,7 @@ import { Component, OnInit } from '@angular/core';
 import { Bbox } from '../../../shared/modules/portal-core-ui/model/data/bbox.model';
 
 import olProj from 'ol/proj';
+import olExtent from 'ol/extent';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class SidebarComponent implements OnInit {
   searchResultsIsCollapsed: boolean = true;
 
   spatialBoundsText: string = "";
+  anyTextValue: string= "";
 
 
   constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
@@ -65,34 +67,91 @@ export class SidebarComponent implements OnInit {
     this.isActive = !this.isActive;
   }
 
+
+  /**
+   * TODO: Add loading spinner to results panel
+   */
+  public anyTextSearch() {
+      // TODO: Pagination, currently limited to 1st 10 results
+    if(this.anyTextValue) {
+        let httpParams = new HttpParams();
+        httpParams = httpParams.append('serviceId', 'cswNCI');
+        httpParams = httpParams.append('limit', '10');
+        httpParams = httpParams.append('field', 'anytext');
+        httpParams = httpParams.append('value', this.anyTextValue);
+        httpParams = httpParams.append('type', 'string');
+        httpParams = httpParams.append('comparison', 'eq');
+        this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
+        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+        responseType: 'json'
+        }).subscribe(response => {
+            this.cswRecords = response['data'].records;
+        });
+    }
+  }
+
+
+  /**
+   * 
+   * @param cswRecord 
+   */
   public addCSWRecord(cswRecord: CSWRecordModel) {
     this.olMapService.addCSWRecord(cswRecord);
   }
 
 
+  /**
+   * 
+   * @param recordId 
+   */
   public removeCSWRecord(recordId: string): void {
     this.olMapService.removeLayerById(recordId);
   }
 
 
+  /**
+   * 
+   * @param cswRecord 
+   */
   public showCSWRecordInformation(cswRecord: CSWRecordModel) {
 
   }
 
+
+  /**
+   * 
+   * @param cswRecord 
+   */
   public showCSWRecordBounds(cswRecord: CSWRecordModel) {
-    
+    if(cswRecord.geographicElements.length > 0) {
+        let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
+        const bbox: [number, number, number, number] =
+            [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+        const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+        //this.olMapService.fitView(extent);
+        this.olMapService.showBounds(extent);
+      }
   }
 
+
+  /**
+   * 
+   * @param cswRecord 
+   */
   public zoomToCSWRecordBounds(cswRecord: CSWRecordModel) {
       if(cswRecord.geographicElements.length > 0) {
         let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
         const bbox: [number, number, number, number] =
             [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
-        const extent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+        const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
         this.olMapService.fitView(extent);
       }
   }
 
+
+  /**
+   * 
+   */
   public drawBound() {
     this.olMapService.drawBound().subscribe((vector) => {
 
@@ -107,6 +166,7 @@ export class SidebarComponent implements OnInit {
 
     });
   }
+
 
   addExpandClass(element: any) {
     if (element === this.showMenu) {

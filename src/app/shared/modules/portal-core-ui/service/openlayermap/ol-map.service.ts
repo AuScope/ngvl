@@ -54,54 +54,53 @@ export class OlMapService {
     * @param pixel coordinates of clicked on pixel (units: pixels)
     */
    public mapClickHandler(pixel: number[]) {
-           // Convert pixel coords to map coords
-           const map = this.olMapObject.getMap();
-           const clickCoord = map.getCoordinateFromPixel(pixel);
-           const lonlat = olProj.transform(clickCoord, 'EPSG:3857', 'EPSG:4326');
-           const clickPoint = point(lonlat);
+        // Convert pixel coords to map coords
+        const map = this.olMapObject.getMap();
+        const clickCoord = map.getCoordinateFromPixel(pixel);
+        const lonlat = olProj.transform(clickCoord, 'EPSG:3857', 'EPSG:4326');
+        const clickPoint = point(lonlat);
 
-           // Compile a list of clicked on layers
-           // NOTO BENE: forEachLayerAtPixel() cannot be used because it causes CORS problems
-           const activeLayers = this.olMapObject.getLayers();
-           const clickedLayerList: olLayer[] = [];
-           const layerColl = map.getLayers();
-           const me = this;
-           layerColl.forEach(function(layer) {
-               for (const layerId in activeLayers) {
-                   for (const activeLayer of activeLayers[layerId]) {
-                       if (layer === activeLayer) {
-                           const layerModel = me.getLayerModel(layerId);
-                           if (!this.layerHandlerService.containsWMS(layerModel)) {
-                             continue;
-                           }
-                           for (const cswRecord of layerModel.cswRecords) {
-                               for (const bbox of cswRecord.geographicElements) {
-                                   const tBbox = [bbox.eastBoundLongitude, bbox.southBoundLatitude, bbox.westBoundLongitude, bbox.northBoundLatitude];
-                                   const poly = bboxPolygon(tBbox);
-                                   if (inside(clickPoint, poly) && !clickedLayerList.includes(activeLayer)) {
-                                     // Add to list of clicked layers
-                                     clickedLayerList.push(activeLayer);
-                                   }
-                               }
-                           }
-                       }
-                   }
-               }
-           }, me);
+        // Compile a list of clicked on layers
+        // NOTO BENE: forEachLayerAtPixel() cannot be used because it causes CORS problems
+        const activeLayers = this.olMapObject.getLayers();
+        const clickedLayerList: olLayer[] = [];
+        const layerColl = map.getLayers();
+        const me = this;
+        layerColl.forEach(function(layer) {
+            for (const layerId in activeLayers) {
+                for (const activeLayer of activeLayers[layerId]) {
+                    if (layer === activeLayer) {
+                        const layerModel = me.getLayerModel(layerId);
+                        if (!this.layerHandlerService.containsWMS(layerModel)) {
+                            continue;
+                        }
+                        for (const cswRecord of layerModel.cswRecords) {
+                            for (const bbox of cswRecord.geographicElements) {
+                                const tBbox = [bbox.eastBoundLongitude, bbox.southBoundLatitude, bbox.westBoundLongitude, bbox.northBoundLatitude];
+                                const poly = bboxPolygon(tBbox);
+                                if (inside(clickPoint, poly) && !clickedLayerList.includes(activeLayer)) {
+                                    // Add to list of clicked layers
+                                    clickedLayerList.push(activeLayer);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, me);
 
-           // Compile a list of clicked on features
-           const clickedFeatureList: olFeature[] = [];
-           const featureHit = map.forEachFeatureAtPixel(pixel, function(feature) {
-               clickedFeatureList.push(feature);
-           });
+        // Compile a list of clicked on features
+        const clickedFeatureList: olFeature[] = [];
+        const featureHit = map.forEachFeatureAtPixel(pixel, function(feature) {
+            clickedFeatureList.push(feature);
+        });
 
-           this.clickedLayerListBS.next({
-             clickedFeatureList: clickedFeatureList,
-             clickedLayerList: clickedLayerList,
-             pixel: pixel,
-             clickCoord: clickCoord
-           });
-
+        this.clickedLayerListBS.next({
+            clickedFeatureList: clickedFeatureList,
+            clickedLayerList: clickedLayerList,
+            pixel: pixel,
+            clickCoord: clickCoord
+        });
    }
 
 
@@ -220,6 +219,10 @@ export class OlMapService {
     public drawPolygon(): BehaviorSubject<olLayerVector> {
         return this.olMapObject.drawPolygon();
     }
+
+  getMapBounds(): olExtent {
+      return this.olMapObject.getMapBounds();
+  }
 
   public showBounds(extent: olExtent) {
       this.olMapObject.showBounds(extent);

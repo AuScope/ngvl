@@ -32,6 +32,7 @@ export class SidebarComponent implements OnInit {
   registriesIsCollapsed: boolean = true;
   searchResultsIsCollapsed: boolean = true;
 
+  spatialBounds: olExtent;
   spatialBoundsText: string = "";
   anyTextValue: string= "";
 
@@ -69,8 +70,46 @@ export class SidebarComponent implements OnInit {
 
 
   /**
+   * TODO: Add spinner to results panel
+   */
+  public facetedSearch() {
+    let httpParams = new HttpParams();
+    // TODO: Get proper service IDs and implement pagination (start/limit)
+    httpParams = httpParams.append('serviceId', 'cswNCI');
+    httpParams = httpParams.append('limit', '10');
+
+    if(this.anyTextValue) {
+        httpParams = httpParams.append('field', 'anytext');
+        httpParams = httpParams.append('value', this.anyTextValue);
+        httpParams = httpParams.append('type', 'string');
+        httpParams = httpParams.append('comparison', 'eq');
+    }
+
+    if(this.spatialBounds != null) {
+        httpParams = httpParams.append('field', 'bbox');
+        let boundsStr = '{"northBoundLatitude":'+this.spatialBounds[3]+
+                        ',"southBoundLatitude":'+this.spatialBounds[1]+
+                        ',"eastBoundLongitude":'+this.spatialBounds[2]+
+                        ',"westBoundLongitude":'+this.spatialBounds[0]+
+                        ',"crs":"EPSG:4326"}';
+        httpParams = httpParams.append('value', boundsStr);
+        httpParams = httpParams.append('type', 'bbox');
+        httpParams = httpParams.append('comparison', 'eq');
+    }
+
+    this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
+        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+        responseType: 'json'
+        }).subscribe(response => {
+            this.cswRecords = response['data'].records;
+        });
+  }
+
+
+  /**
    * TODO: Add loading spinner to results panel
    */
+  /*
   public anyTextSearch() {
       // TODO: Pagination, currently limited to 1st 10 results
     if(this.anyTextValue) {
@@ -89,6 +128,7 @@ export class SidebarComponent implements OnInit {
         });
     }
   }
+  */
 
 
   /**
@@ -128,7 +168,6 @@ export class SidebarComponent implements OnInit {
         const bbox: [number, number, number, number] =
             [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
         const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-        //this.olMapService.fitView(extent);
         this.olMapService.showBounds(extent);
       }
   }
@@ -165,6 +204,37 @@ export class SidebarComponent implements OnInit {
       });
 
     });
+  }
+
+
+  /**
+   * 
+   */
+  public drawSpatialBounds() {
+    this.olMapService.drawBound().subscribe((vector) => {
+        this.spatialBounds = olProj.transformExtent(vector.getSource().getExtent(), 'EPSG:3857', 'EPSG:4326');
+        this.updateSpatialBoundsText(this.spatialBounds);
+        this.facetedSearch();
+      });
+  }
+
+
+  /**
+   * 
+   */
+  public spatialBoundsFromMap() {
+    this.spatialBounds = olProj.transformExtent(this.olMapService.getMapBounds(), 'EPSG:3857', 'EPSG:4326');
+    this.updateSpatialBoundsText(this.spatialBounds);
+    this.facetedSearch();
+
+  }
+
+  public updateSpatialBoundsText(extent: olExtent) {
+    let w = extent[3].toFixed(4);
+    let n = extent[0].toFixed(4);
+    let s = extent[1].toFixed(4);
+    let e = extent[2].toFixed(4);
+    this.spatialBoundsText = w + ", " + n + " to " + s + ", " + e;
   }
 
 

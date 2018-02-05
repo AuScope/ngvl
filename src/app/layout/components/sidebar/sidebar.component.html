@@ -23,6 +23,7 @@
 					class="fa fa-fw fa-map"></i>&nbsp; {{ 'Data' | translate }}</span>
             </a>
             <!-- TODO: Find all inline style definitions and move to CSS -->
+            <!-- TODO: All translations -->
 			<li class="nested" [class.expand]="showMenu === 'pages'">
                 <ul class="submenu" style="margin-right:2px;">
                     <!-- Any text search -->
@@ -35,7 +36,7 @@
                             <div class="input-group input-group-sm">
                                 <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search" [(ngModel)]="anyTextValue">
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" (click)="anyTextSearch()">
+                                    <button class="btn btn-secondary" type="button" (click)="facetedSearch()">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -52,10 +53,10 @@
                             <div class="input-group input-group-sm">
                                 <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Use current map bounds">
+                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
                                         <i class="fa fa-eye"></i>
                                     </button>
-                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw bounds">
+                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
                                         <i class="fa fa-edit"></i>
                                     </button>
                                 </div>

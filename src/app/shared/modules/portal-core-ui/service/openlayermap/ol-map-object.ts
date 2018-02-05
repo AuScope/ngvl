@@ -133,7 +133,6 @@ export class OlMapObject {
 
       this.renderStatusService.resetLayer(id);
     }
-
   }
 
   /**
@@ -274,6 +273,15 @@ export class OlMapObject {
     return vector;
   }
 
+
+  /**
+   * 
+   */
+  getMapBounds(): olExtent {
+      return this.map.getView().calculateExtent(this.map.getSize());
+  }
+
+
   /**
    * 
    * @param extent 
@@ -283,13 +291,13 @@ export class OlMapObject {
     const feature: olFeature = new olFeature(poly);
     const source = new olSourceVector({wrapX: false});
     source.addFeature(feature);
-    const vector = new olLayerVector({
+    let vector = new olLayerVector({
         source: source
     });
     this.map.addLayer(vector);
-    setTimeout(
-        this.map.removeLayer(vector),
-        3000);
+    setTimeout(() => {
+        this.removeVector(vector);
+    }, 3000);
   }
 
   /**

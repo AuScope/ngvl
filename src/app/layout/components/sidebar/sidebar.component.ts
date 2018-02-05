@@ -21,7 +21,7 @@ export class SidebarComponent implements OnInit {
 
   isActive: boolean = false;
   showMenu: string = '';
-  cswRecords = [];
+  cswRecords: CSWRecordModel[] = [];
 
   // Datasets collapsable menus
   anyTextIsCollapsed: boolean = true;
@@ -32,9 +32,13 @@ export class SidebarComponent implements OnInit {
   registriesIsCollapsed: boolean = true;
   searchResultsIsCollapsed: boolean = true;
 
+  anyTextValue: string= "";
   spatialBounds: olExtent;
   spatialBoundsText: string = "";
-  anyTextValue: string= "";
+  dateTo: any=null;
+  dateFrom: any=null;
+
+  readonly DATE_PATTERN = "^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$";
 
 
   constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
@@ -71,8 +75,10 @@ export class SidebarComponent implements OnInit {
 
   /**
    * TODO: Add spinner to results panel
+   * TODO: Push this code to service and pass parameters
    */
   public facetedSearch() {
+    this.cswRecords = [];
     let httpParams = new HttpParams();
     // TODO: Get proper service IDs and implement pagination (start/limit)
     httpParams = httpParams.append('serviceId', 'cswNCI');
@@ -96,6 +102,19 @@ export class SidebarComponent implements OnInit {
         httpParams = httpParams.append('type', 'bbox');
         httpParams = httpParams.append('comparison', 'eq');
     }
+    
+    if(this.dateFrom != null && this.dateTo != null) {
+        httpParams = httpParams.append('field', 'datefrom');
+        httpParams = httpParams.append('field', 'dateto');
+        let fromDate = Date.parse(this.dateFrom.year + '-' + this.dateFrom.month + '-' + this.dateFrom.day);
+        let toDate = Date.parse(this.dateTo.year + '-' + this.dateTo.month + '-' + this.dateTo.day);
+        httpParams = httpParams.append('value', fromDate.toString());
+        httpParams = httpParams.append('value', toDate.toString());
+        httpParams = httpParams.append('type', 'date');
+        httpParams = httpParams.append('type', 'date');
+        httpParams = httpParams.append('comparison', 'gt');
+        httpParams = httpParams.append('comparison', 'lt');
+    }
 
     this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
         headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
@@ -104,31 +123,6 @@ export class SidebarComponent implements OnInit {
             this.cswRecords = response['data'].records;
         });
   }
-
-
-  /**
-   * TODO: Add loading spinner to results panel
-   */
-  /*
-  public anyTextSearch() {
-      // TODO: Pagination, currently limited to 1st 10 results
-    if(this.anyTextValue) {
-        let httpParams = new HttpParams();
-        httpParams = httpParams.append('serviceId', 'cswNCI');
-        httpParams = httpParams.append('limit', '10');
-        httpParams = httpParams.append('field', 'anytext');
-        httpParams = httpParams.append('value', this.anyTextValue);
-        httpParams = httpParams.append('type', 'string');
-        httpParams = httpParams.append('comparison', 'eq');
-        this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
-        headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-        responseType: 'json'
-        }).subscribe(response => {
-            this.cswRecords = response['data'].records;
-        });
-    }
-  }
-  */
 
 
   /**
@@ -235,6 +229,29 @@ export class SidebarComponent implements OnInit {
     let s = extent[1].toFixed(4);
     let e = extent[2].toFixed(4);
     this.spatialBoundsText = w + ", " + n + " to " + s + ", " + e;
+  }
+
+
+  /**
+   * 
+   */
+  publicationDateChanged() {
+      if(this.isValidDate(this.dateFrom) && this.isValidDate(this.dateTo)) {
+          console.log("DOING THE SEARCH");
+          this.facetedSearch();
+      }
+  }
+
+
+  /**
+   * TODO: Maybe switch event to lose focus, this will check after every key press.
+   *       Tried to use (change) but ngbDatepicker hijacks the event.
+   * @param date 
+   */
+  private isValidDate(date): boolean {
+      if(date && date.year && date.month)
+        return true;
+      return false;
   }
 
 

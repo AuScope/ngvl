@@ -134,6 +134,7 @@
                         </div>
                     </li>
                     <!-- Publication date -->
+                    <!-- TODO: Bring calendars to front, currently partially obscured under map -->
                     <li>
                         <a style="color:white;" (click)="pubDateIsCollapsed = !pubDateIsCollapsed"><span>Publication Date</span>
                             <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
@@ -145,7 +146,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-group-sm">
                                         <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
-                                        <input class="form-control" id="date-from" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="model-from" ngbDatepicker #dp_from="ngbDatepicker">
+                                        <!-- TODO: Validation -->
+                                        <input class="form-control" id="date-from" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" (ngModelChange)="publicationDateChanged()" ngbDatepicker #dp_from="ngbDatepicker">
                                         <div class="input-group-btn input-group-append">
                                             <button class="btn btn-secondary" type="button" (click)="dp_from.toggle()">
                                                 <i class="fa fa-calendar"></i>
@@ -158,7 +160,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-group-sm">
                                         <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
-                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="model-to" ngbDatepicker #dp_to="ngbDatepicker">
+                                        <!-- TODO: Validation -->
+                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()" ngbDatepicker #dp_to="ngbDatepicker">
                                         <div class="input-group-btn input-group-append">
                                             <button class="btn btn-secondary" type="button" (click)="dp_to.toggle()">
                                                 <i class="fa fa-calendar"></i>
@@ -268,6 +271,26 @@
       <a class="list-group-item">Page specific</a>
     </div>
 
+
+    <div class="modal fade" id="cswRecordModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                HELLOOOO
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
     <!-- <div class="logos">
          <img height="40px" src="/assets/images/CSIRO_Grad_RGB_lr.jpg">
          <img height="40px" src="/assets/images/auscope.jpg">

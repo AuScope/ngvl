@@ -1,4 +1,3 @@
-
 import { CSWRecordModel } from '../../model/data/cswrecord.model';
 import { Injectable, Inject } from '@angular/core';
 import olExtent from 'ol/extent';

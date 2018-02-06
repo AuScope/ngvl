@@ -21,8 +21,11 @@ import olEasing from 'ol/easing';
 import olObservable from 'ol/observable';
 import olExtent from 'ol/extent';
 import olGeomPolygon from 'ol/geom/polygon';
+import olControlZoom from 'ol/control/zoom';
 import { Subject } from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+
+import { OlMapZoomComponent } from './../../../../../layout/datasets/openlayermap/olmap.zoom.component';
 
 
 /**
@@ -37,11 +40,18 @@ export class OlMapObject {
 
   constructor(private renderStatusService: RenderStatusService) {
 
+    /*
+    const zoomControl = new olControlZoom({
+        //target: document.getElementById('map-zoom')
+    });
+    */
+
     const osm_layer: any = new olTile({
       source: new olOSM()
     });
     this.activeLayer = {};
     this.map = new olMap({
+      //controls: [zoomControl],
       controls: [],
       layers: [osm_layer],
       view: new olView({
@@ -61,6 +71,9 @@ export class OlMapObject {
         clickHandler(pixel);
       }
     });
+
+
+
 
   }
 

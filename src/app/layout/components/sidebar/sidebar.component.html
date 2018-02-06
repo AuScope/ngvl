@@ -273,7 +273,7 @@
 
     <!-- CSW Record modal -->
     <ng-template #cswRecordModal let-close="close">
-        <div class="modal-header">
+        <div class="modal-header" style="background: #EEE">
             <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
             <button type="button" class="close" (click)="close()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -299,14 +299,12 @@
                         <textarea class="form-control" rows="3" id="csw-abstract">{{ selectedCSWRecord.description }}</textarea>
                     </div>
                 </div>
-
                 <div class="form-group row">
                     <label class="col-2 col-form-label">More to come...</label>
                 </div>
-
             </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" style="background: #EEE">
             <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
         </div>    
     </ng-template>

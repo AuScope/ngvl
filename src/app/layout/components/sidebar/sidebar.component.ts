@@ -10,6 +10,7 @@ import { Bbox } from '../../../shared/modules/portal-core-ui/model/data/bbox.mod
 
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -22,6 +23,7 @@ export class SidebarComponent implements OnInit {
   isActive: boolean = false;
   showMenu: string = '';
   cswRecords: CSWRecordModel[] = [];
+  selectedCSWRecord = null;
 
   // Datasets collapsable menus
   anyTextIsCollapsed: boolean = true;
@@ -42,7 +44,8 @@ export class SidebarComponent implements OnInit {
 
 
   constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
-              private httpClient: HttpClient, private cswSearchService: CSWSearchService) {
+              private httpClient: HttpClient, private cswSearchService: CSWSearchService,
+              private modalService: NgbModal) {
   }
 
   ngOnInit(): void {
@@ -75,7 +78,6 @@ export class SidebarComponent implements OnInit {
 
   /**
    * TODO: Add spinner to results panel
-   * TODO: Push this code to service and pass parameters
    */
   public facetedSearch() {
     this.cswRecords = [];
@@ -147,8 +149,11 @@ export class SidebarComponent implements OnInit {
    * 
    * @param cswRecord 
    */
-  public showCSWRecordInformation(cswRecord: CSWRecordModel) {
-
+  public showCSWRecordInformation(cswRecordModal, cswRecord) {
+      if(cswRecord) {
+        this.selectedCSWRecord = cswRecord;
+        this.modalService.open(cswRecordModal);
+      }
   }
 
 

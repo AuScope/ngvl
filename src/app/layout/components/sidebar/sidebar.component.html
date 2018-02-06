@@ -213,14 +213,14 @@
                                     </span>
                                     <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
                                     <span class="input-group-btn">
-                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="showCSWRecordInformation(cswRecord)"><i class="fa fa-info-circle"></i></button>
+                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="showCSWRecordInformation(cswRecordModal, cswRecord)"><i class="fa fa-info-circle"></i></button>
                                     </span>
                                     <span class="input-group-btn">
                                         <!-- TODO: Delay required to stop dblclick registering as 2 single clicks -->
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)" (dblclick)="zoomToCSWRecordBounds(cswRecord)"><i class="fa fa-search"></i></button>
                                     </span>
                                 </div>
-                            </li>            
+                            </li>
                         </div>
                     </li>
                 </ul>
@@ -271,26 +271,45 @@
       <a class="list-group-item">Page specific</a>
     </div>
 
-
-    <div class="modal fade" id="cswRecordModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                HELLOOOO
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-            </div>
+    <!-- CSW Record modal -->
+    <ng-template #cswRecordModal let-close="close">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
+            <button type="button" class="close" (click)="close()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-    </div>
+        <div class="modal-body" style="margin-left:10px;margin-right:10px;">
+            <form>
+                <div class="form-group row">
+                    <label for="csw-source" class="col-2 col-form-label">Source</label>
+                    <div class="col-10">
+                        <a href="{{ selectedCSWRecord.recordInfoUrl }}" id="csw-source" class="form-control" target="_blank">Full metadata and downloads</a>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="csw-name" class="col-2 col-form-label">Title</label>
+                    <div class="col-10">
+                        <label id="csw-name" class="form-control">{{ selectedCSWRecord.name }}</label>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="csw-abstract" class="col-2 col-form-label">Abstract</label>
+                    <div class="col-10">
+                        <textarea class="form-control" rows="3" id="csw-abstract">{{ selectedCSWRecord.description }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">More to come...</label>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+        </div>    
+    </ng-template>
     <!-- <div class="logos">
          <img height="40px" src="/assets/images/CSIRO_Grad_RGB_lr.jpg">
          <img height="40px" src="/assets/images/auscope.jpg">

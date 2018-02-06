@@ -20,6 +20,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class SidebarComponent implements OnInit {
 
+  readonly CSW_RECORD_PAGE_LENGTH = 10;
+  currentCSWRecordPage: number = 1;
+
   isActive: boolean = false;
   showMenu: string = '';
   cswRecords: CSWRecordModel[] = [];
@@ -40,8 +43,6 @@ export class SidebarComponent implements OnInit {
   dateTo: any=null;
   dateFrom: any=null;
 
-  readonly DATE_PATTERN = "^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$";
-
 
   constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
               private httpClient: HttpClient, private cswSearchService: CSWSearchService,
@@ -57,7 +58,7 @@ export class SidebarComponent implements OnInit {
         console.log("data[2]: " + data[2]);
     });
     */
-
+    /* Initial test records
     let httpParams = new HttpParams();
     httpParams = httpParams.append('start', '1');
     httpParams = httpParams.append('serviceId', 'cswNCI');
@@ -69,6 +70,7 @@ export class SidebarComponent implements OnInit {
     }).subscribe(response => {
       this.cswRecords = response['data'].records;
     });
+    */
   }
 
   eventCalled() {
@@ -79,12 +81,15 @@ export class SidebarComponent implements OnInit {
   /**
    * TODO: Add spinner to results panel
    */
-  public facetedSearch() {
+  public facetedSearch(): void {
     this.cswRecords = [];
     let httpParams = new HttpParams();
     // TODO: Get proper service IDs and implement pagination (start/limit)
     httpParams = httpParams.append('serviceId', 'cswNCI');
-    httpParams = httpParams.append('limit', '10');
+    const start = ((this.currentCSWRecordPage - 1) * 10) + 1;
+    httpParams = httpParams.append('start', start.toString());
+    // Getting 1 more than desired length tells us if next page should be visible
+    httpParams = httpParams.append('limit', (this.CSW_RECORD_PAGE_LENGTH + 1).toString());
 
     if(this.anyTextValue) {
         httpParams = httpParams.append('field', 'anytext');
@@ -123,7 +128,39 @@ export class SidebarComponent implements OnInit {
         responseType: 'json'
         }).subscribe(response => {
             this.cswRecords = response['data'].records;
+            // TODO: Ensure results visible if dropwdown not expanded
         });
+  }
+
+
+  /**
+   * 
+   */
+  public resetFacetedSearch(): void {
+      this.currentCSWRecordPage = 1;
+      this.facetedSearch();
+  }
+
+
+  /**
+   * 
+   */
+  public previousResultsPage(): void {
+    if(this.currentCSWRecordPage != 1) {
+        this.currentCSWRecordPage -= 1;
+        this.facetedSearch();
+    }
+  }
+
+
+  /**
+   * 
+   */
+  public nextResultsPage(): void {
+    if(this.cswRecords.length == this.CSW_RECORD_PAGE_LENGTH + 1) {
+        this.currentCSWRecordPage += 1;
+        this.facetedSearch();
+    }
   }
 
 
@@ -131,7 +168,7 @@ export class SidebarComponent implements OnInit {
    * 
    * @param cswRecord 
    */
-  public addCSWRecord(cswRecord: CSWRecordModel) {
+  public addCSWRecord(cswRecord: CSWRecordModel): void {
     this.olMapService.addCSWRecord(cswRecord);
   }
 
@@ -149,7 +186,7 @@ export class SidebarComponent implements OnInit {
    * 
    * @param cswRecord 
    */
-  public showCSWRecordInformation(cswRecordModal, cswRecord) {
+  public showCSWRecordInformation(cswRecordModal, cswRecord): void {
       if(cswRecord) {
         this.selectedCSWRecord = cswRecord;
         this.modalService.open(cswRecordModal);
@@ -161,13 +198,13 @@ export class SidebarComponent implements OnInit {
    * 
    * @param cswRecord 
    */
-  public showCSWRecordBounds(cswRecord: CSWRecordModel) {
+  public showCSWRecordBounds(cswRecord: CSWRecordModel): void {
     if(cswRecord.geographicElements.length > 0) {
         let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
         const bbox: [number, number, number, number] =
             [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
         const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-        this.olMapService.showBounds(extent);
+        this.olMapService.displayBounds(extent);
       }
   }
 
@@ -176,7 +213,7 @@ export class SidebarComponent implements OnInit {
    * 
    * @param cswRecord 
    */
-  public zoomToCSWRecordBounds(cswRecord: CSWRecordModel) {
+  public zoomToCSWRecordBounds(cswRecord: CSWRecordModel): void {
       if(cswRecord.geographicElements.length > 0) {
         let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
         const bbox: [number, number, number, number] =
@@ -190,7 +227,7 @@ export class SidebarComponent implements OnInit {
   /**
    * 
    */
-  public drawBound() {
+  public drawBound(): void {
     this.olMapService.drawBound().subscribe((vector) => {
 
       const features = vector.getSource().getFeatures();
@@ -209,11 +246,11 @@ export class SidebarComponent implements OnInit {
   /**
    * 
    */
-  public drawSpatialBounds() {
+  public drawSpatialBounds(): void {
     this.olMapService.drawBound().subscribe((vector) => {
         this.spatialBounds = olProj.transformExtent(vector.getSource().getExtent(), 'EPSG:3857', 'EPSG:4326');
         this.updateSpatialBoundsText(this.spatialBounds);
-        this.facetedSearch();
+        this.resetFacetedSearch();
       });
   }
 
@@ -221,14 +258,14 @@ export class SidebarComponent implements OnInit {
   /**
    * 
    */
-  public spatialBoundsFromMap() {
+  public spatialBoundsFromMap(): void {
     this.spatialBounds = olProj.transformExtent(this.olMapService.getMapBounds(), 'EPSG:3857', 'EPSG:4326');
     this.updateSpatialBoundsText(this.spatialBounds);
-    this.facetedSearch();
+    this.resetFacetedSearch();
 
   }
 
-  public updateSpatialBoundsText(extent: olExtent) {
+  public updateSpatialBoundsText(extent: olExtent): void {
     let w = extent[3].toFixed(4);
     let n = extent[0].toFixed(4);
     let s = extent[1].toFixed(4);
@@ -240,10 +277,10 @@ export class SidebarComponent implements OnInit {
   /**
    * 
    */
-  publicationDateChanged() {
+  public publicationDateChanged(): void {
       if(this.isValidDate(this.dateFrom) && this.isValidDate(this.dateTo)) {
-          console.log("DOING THE SEARCH");
-          this.facetedSearch();
+          console.log("PubDate change - searching...");
+          this.resetFacetedSearch();
       }
   }
 

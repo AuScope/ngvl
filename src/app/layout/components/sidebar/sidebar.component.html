@@ -161,7 +161,7 @@
                                     <div class="input-group input-group-sm">
                                         <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
                                         <!-- TODO: Validation -->
-                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()" ngbDatepicker #dp_to="ngbDatepicker">
+                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()" ngbDatepicker #dp_to="ngbDatepicker" style="z-index:2000">
                                         <div class="input-group-btn input-group-append">
                                             <button class="btn btn-secondary" type="button" (click)="dp_to.toggle()">
                                                 <i class="fa fa-calendar"></i>
@@ -205,8 +205,10 @@
                             <span><i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i></span>
                         </a>
                         <div [ngbCollapse]="searchResultsIsCollapsed">
+                            <!-- TODO: Display  message if no current results -->
                             <li *ngFor="let cswRecord of cswRecords">
-                                <div class ="input-group input-group-sm" style="margin-bottom:2px;">
+                                <!-- Don't display the PAGE_LENGTH+1 result if it exists, we use it to see if there's a next page -->
+                                <div *ngIf="cswRecords.length<11 || cswRecord != cswRecords[CSW_RECORD_PAGE_LENGTH]" class ="input-group input-group-sm" style="margin-bottom:2px;">
                                     <span class="input-group-btn">
                                         <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map" (click)="addCSWRecord(cswRecord)"><i class="fa fa-plus-circle"></i></button>
                                         <button *ngIf="olMapService.layerExists(cswRecord.id)"class="btn btn-sm" data-toggle="tooltip" title="Remove layer from map" (click)="removeCSWRecord(cswRecord.id)"><i class="fa fa-trash"></i></button>
@@ -221,6 +223,14 @@
                                     </span>
                                 </div>
                             </li>
+                            <div *ngIf="cswRecords.length==0">
+                                <label style="color:white;">No records match the current filter(s)</label>
+                            </div>
+                            <div *ngIf="cswRecords.length>0">
+                                <button [disabled]="cswRecords.length<11" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page" (click)="nextResultsPage()"><i class="fa fa-arrow-circle-right"></i></button>
+                                <button [disabled]="currentCSWRecordPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Previous page" (click)="previousResultsPage()"><i class="fa fa-arrow-circle-left"></i></button>
+                                <label class="pull-right" style="color:white;">Page {{ currentCSWRecordPage }}&nbsp;</label>
+                            </div>
                         </div>
                     </li>
                 </ul>

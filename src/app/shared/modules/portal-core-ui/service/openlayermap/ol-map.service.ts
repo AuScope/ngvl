@@ -211,19 +211,29 @@ export class OlMapService {
     return this.olMapObject.drawDot(coord);
   }
 
-    /**
-    * Method for drawing a polygon on the map.
-    * @returns the polygon coordinates string BS on which the polygon is drawn on.
-    */
-    public drawPolygon(): BehaviorSubject<olLayerVector> {
-        return this.olMapObject.drawPolygon();
-    }
 
+  /**
+   * Method for drawing a polygon on the map.
+   * @returns the polygon coordinates string BS on which the polygon is drawn on.
+   */
+  public drawPolygon(): BehaviorSubject<olLayerVector> {
+     return this.olMapObject.drawPolygon();
+  }
+
+
+  /**
+   * 
+   */
   getMapBounds(): olExtent {
       return this.olMapObject.getMapBounds();
   }
 
-  public showBounds(extent: olExtent) {
+
+  /**
+   * 
+   * @param extent 
+   */
+  public displayBounds(extent: olExtent) {
       this.olMapObject.showBounds(extent);
   }
 

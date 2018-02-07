@@ -27,7 +27,7 @@ export class CSWSearchService {
      * Returns an array of keywords for specified service IDs
      * @param serviceIds an array of service IDs
      */
-    getFacetedKeywords(serviceIDs: string[]): Observable<string[]> {
+    public getFacetedKeywords(serviceIDs: string[]): Observable<string[]> {
         let httpParams = new HttpParams();
         serviceIDs.forEach(id => {
             httpParams = httpParams.append('serviceId', id);
@@ -52,7 +52,7 @@ export class CSWSearchService {
      * @param type 
      * @param comparison 
      */
-    getFacetedSearch(start: number[], limit: number, serviceId: string[],
+    public getFacetedSearch(start: number[], limit: number, serviceId: string[],
         field: string[], value: string[],
         type: string[], comparison: string[]): Observable<CSWRecordModel[]> {
 
@@ -95,6 +95,15 @@ export class CSWSearchService {
             responseType: 'json'
         }).map(response => {
             return response['data'].records;
+        });
+    }
+
+    public getAvailableRegistries(): Observable<any> {
+        return this.httpClient.post(this.env.portalBaseUrl + 'getFacetedCSWServices.do', {
+            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+            responseType: 'json'
+        }).map(response => {
+            return response['data'];
         });
     }
 

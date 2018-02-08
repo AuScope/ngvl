@@ -65,19 +65,6 @@ export class SidebarComponent implements OnInit {
             console.log("data[2]: " + data[2]);
         });
         */
-        /* Initial test records
-        let httpParams = new HttpParams();
-        httpParams = httpParams.append('start', '1');
-        httpParams = httpParams.append('serviceId', 'cswNCI');
-        httpParams = httpParams.append('limit', '10');
-    
-        this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
-          headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-          responseType: 'json'
-        }).subscribe(response => {
-          this.cswRecords = response['data'].records;
-        });
-        */
         // Load available registries
         this.cswSearchService.getAvailableRegistries().subscribe(data => {
             this.availableRegistries = data;
@@ -86,7 +73,9 @@ export class SidebarComponent implements OnInit {
                 registry.startIndex = 1;
                 registry.prevIndices = [];
             }
-            // Populate initial results
+            // Populate initial results (if thisisn't desired, add checks to
+            // facetedSearch to ensure at least 1 filter has been used or de-
+            // selecting a registry will populate results)
             this.facetedSearch();
         }, error => {
             // TODO: Proper error reporting
@@ -108,6 +97,19 @@ export class SidebarComponent implements OnInit {
         this.cswRecords = [];
         let httpParams = new HttpParams();
         httpParams = httpParams.append('limit', this.CSW_RECORD_PAGE_LENGTH.toString());
+
+        // Available registries and start
+        let registrySelected: boolean = false;
+        for (let registry of this.availableRegistries) {
+            if (registry.checked) {
+                registrySelected = true;
+                httpParams = httpParams.append('serviceId', registry.id);
+                httpParams = httpParams.append('start', registry.startIndex);
+            }
+        }
+        // If no registries are selected, there's nothing to search
+        if(!registrySelected)
+            return;
 
         // Any text search
         if (this.anyTextValue) {
@@ -143,19 +145,6 @@ export class SidebarComponent implements OnInit {
             httpParams = httpParams.append('comparison', 'gt');
             httpParams = httpParams.append('comparison', 'lt');
         }
-
-        // Available registries and start
-        let registrySelected: boolean = false;
-        for (let registry of this.availableRegistries) {
-            if (registry.checked) {
-                registrySelected = true;
-                httpParams = httpParams.append('serviceId', registry.id);
-                httpParams = httpParams.append('start', registry.startIndex);
-            }
-        }
-        // If no registries are selected, there's nothing to search
-        if(!registrySelected)
-            return;
 
         this.recordsLoading = true;
         this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
@@ -196,7 +185,7 @@ export class SidebarComponent implements OnInit {
     public hasNextResultsPage(): boolean {
         for(let registry of this.availableRegistries) {
             if(registry.startIndex != 0) {
-                return true
+                return true;
             }
         }
         return false;

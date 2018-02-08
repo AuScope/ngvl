@@ -234,7 +234,7 @@ export class OlMapService {
    * @param extent 
    */
   public displayBounds(extent: olExtent) {
-      this.olMapObject.showBounds(extent);
+      this.olMapObject.displayBounds(extent);
   }
 
 

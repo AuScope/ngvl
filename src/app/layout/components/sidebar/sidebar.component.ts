@@ -29,12 +29,12 @@ export class SidebarComponent implements OnInit {
     // Search results
     cswRecords: CSWRecordModel[] = [];
     selectedCSWRecord = null;
-    //startIndices = {};
+    recordsLoading = false;
 
     // Registry results
     availableRegistries: any = [];    // TODO: Registry model
 
-    // Datasets collapsable menus
+    // Collapsable menus
     anyTextIsCollapsed: boolean = true;
     spatialBoundsIsCollapsed: boolean = true;
     keywordsIsCollapsed: boolean = true;
@@ -78,8 +78,6 @@ export class SidebarComponent implements OnInit {
           this.cswRecords = response['data'].records;
         });
         */
-
-
         // Load available registries
         this.cswSearchService.getAvailableRegistries().subscribe(data => {
             this.availableRegistries = data;
@@ -152,6 +150,7 @@ export class SidebarComponent implements OnInit {
             }
         }
 
+        this.recordsLoading = true;
         this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
@@ -161,6 +160,7 @@ export class SidebarComponent implements OnInit {
                 registry.startIndex = response['data'].nextIndexes[registry.id];
             }
             this.cswRecords = response['data'].records;
+            this.recordsLoading = false;
             // TODO: Ensure results visible if drop-down not expanded
         });
     }

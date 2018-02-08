@@ -213,10 +213,16 @@
                                 <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                             </span>
                         </a>
-                        <div [ngbCollapse]="searchResultsIsCollapsed">
-                            <!-- TODO: Display  message if no current results -->
-                            <li *ngFor="let cswRecord of cswRecords">
-                                <div class="input-group input-group-sm" style="margin-bottom:2px;">
+                        <div [ngbCollapse]="searchResultsIsCollapsed" style="height:370px;position:relative;border-style:solid;border-color:#555">
+
+                            <div *ngIf="recordsLoading" class="records-spinner">
+                                    <div class="bounce1"></div>
+                                    <div class="bounce2"></div>
+                                    <div class="bounce3"></div>
+                            </div>
+
+                            <li *ngFor="let cswRecord of cswRecords" style="margin-top:2px;margin-right:2px;margin-left:2px;">
+                                <div class="input-group input-group-sm">
                                     <span class="input-group-btn">
                                         <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
                                             (click)="addCSWRecord(cswRecord)">
@@ -242,10 +248,12 @@
                                     </span>
                                 </div>
                             </li>
-                            <div *ngIf="cswRecords.length==0">
+                            
+                            <div *ngIf="cswRecords.length==0 && !recordsLoading" style="position:relative;top:30%;transform:translate(0,-10px);margin-right:4px;margin-left:10px;">
                                 <label style="color:white;">No records match the current filter(s)</label>
                             </div>
-                            <div *ngIf="cswRecords.length>0">
+
+                            <div *ngIf="cswRecords.length>0 || recordsLoading" style="position:absolute;bottom:0;right:2px;">
                                 <button [disabled]="!hasNextResultsPage()" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
                                     (click)="nextResultsPage()">
                                     <i class="fa fa-arrow-circle-right"></i>
@@ -256,6 +264,7 @@
                                 </button>
                                 <label class="pull-right" style="color:white;">Page {{ currentCSWRecordPage }}&nbsp;</label>
                             </div>
+
                         </div>
                     </li>
                 </ul>

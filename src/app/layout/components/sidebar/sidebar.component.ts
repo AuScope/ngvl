@@ -29,6 +29,7 @@ export class SidebarComponent implements OnInit {
     // Search results
     cswRecords: CSWRecordModel[] = [];
     selectedCSWRecord = null;
+    //startIndices = {};
 
     // Registry results
     availableRegistries: any = [];    // TODO: Registry model
@@ -77,11 +78,16 @@ export class SidebarComponent implements OnInit {
           this.cswRecords = response['data'].records;
         });
         */
+
+
         // Load available registries
         this.cswSearchService.getAvailableRegistries().subscribe(data => {
             this.availableRegistries = data;
-            for (let registry of data)
+            for (let registry of this.availableRegistries) {
                 registry.checked = true;
+                registry.startIndex = 1;
+                registry.prevIndices = [];
+            }
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -94,13 +100,14 @@ export class SidebarComponent implements OnInit {
 
 
     /**
+     * Search results based on the current faceted search panel values
+     * 
      * TODO: Add spinner to results panel
      */
     public facetedSearch(): void {
         this.cswRecords = [];
         let httpParams = new HttpParams();
-        // Getting 1 more than desired length tells us if next page should be visible
-        httpParams = httpParams.append('limit', (this.CSW_RECORD_PAGE_LENGTH + 1).toString());
+        httpParams = httpParams.append('limit', this.CSW_RECORD_PAGE_LENGTH.toString());
 
         // Any text search
         if (this.anyTextValue) {
@@ -138,11 +145,10 @@ export class SidebarComponent implements OnInit {
         }
 
         // Available registries and start
-        const start = ((this.currentCSWRecordPage - 1) * 10) + 1;
         for (let registry of this.availableRegistries) {
             if (registry.checked) {
                 httpParams = httpParams.append('serviceId', registry.id);
-                httpParams = httpParams.append('start', start.toString());
+                httpParams = httpParams.append('start', registry.startIndex);
             }
         }
 
@@ -150,8 +156,12 @@ export class SidebarComponent implements OnInit {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).subscribe(response => {
+            for(let registry of this.availableRegistries) {
+                registry.prevIndices.push(registry.startIndex);
+                registry.startIndex = response['data'].nextIndexes[registry.id];
+            }
             this.cswRecords = response['data'].records;
-            // TODO: Ensure results visible if dropwdown not expanded
+            // TODO: Ensure results visible if drop-down not expanded
         });
     }
 
@@ -161,7 +171,28 @@ export class SidebarComponent implements OnInit {
      */
     public resetFacetedSearch(): void {
         this.currentCSWRecordPage = 1;
+        // Reset registry start and previous indices
+        for(let registry of this.availableRegistries) {
+            registry.startIndex = 1;
+            registry.prevIndices = [];
+        }
         this.facetedSearch();
+    }
+
+
+    /**
+     * Are there more results to display?
+     * 
+     * @returns true if at least one registry has (nextIndex > 0), false
+     *          otherwise
+     */
+    public hasNextResultsPage(): boolean {
+        for(let registry of this.availableRegistries) {
+            if(registry.startIndex != 0) {
+                return true
+            }
+        }
+        return false;
     }
 
 
@@ -171,6 +202,12 @@ export class SidebarComponent implements OnInit {
     public previousResultsPage(): void {
         if (this.currentCSWRecordPage != 1) {
             this.currentCSWRecordPage -= 1;
+            for(let registry of this.availableRegistries) {
+                if(registry.prevIndices.length >= 2) {
+                    registry.startIndex = registry.prevIndices[registry.prevIndices.length - 2];
+                    registry.prevIndices.splice(registry.prevIndices.length - 2, 2);
+                }
+            }
             this.facetedSearch();
         }
     }
@@ -180,10 +217,8 @@ export class SidebarComponent implements OnInit {
      * 
      */
     public nextResultsPage(): void {
-        if (this.cswRecords.length == this.CSW_RECORD_PAGE_LENGTH + 1) {
-            this.currentCSWRecordPage += 1;
-            this.facetedSearch();
-        }
+        this.currentCSWRecordPage += 1;
+        this.facetedSearch();
     }
 
 

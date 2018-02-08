@@ -25,7 +25,7 @@
             </a>
             <!-- TODO: Find all inline style definitions and move to CSS -->
             <!-- TODO: All translations -->
-            <!-- TODO: run search on any input contents changing (e.g. after losing focus) -->
+            <!-- TODO: Run search on any input contents changing (e.g. after losing focus), also on ENTER -->
             <li class="nested" [class.expand]="showMenu === 'pages'">
                 <ul class="submenu" style="margin-right:2px;">
                     <!-- Any text search -->
@@ -40,7 +40,7 @@
                                 <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
                                     [(ngModel)]="anyTextValue">
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" (click)="facetedSearch()">
+                                    <button class="btn btn-secondary" type="button" (click)="resetFacetedSearch()">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -216,8 +216,7 @@
                         <div [ngbCollapse]="searchResultsIsCollapsed">
                             <!-- TODO: Display  message if no current results -->
                             <li *ngFor="let cswRecord of cswRecords">
-                                <!-- Don't display the PAGE_LENGTH+1 result if it exists, we only use it to see if there's a next page -->
-                                <div *ngIf="cswRecords.length<11 || cswRecord != cswRecords[CSW_RECORD_PAGE_LENGTH]" class="input-group input-group-sm" style="margin-bottom:2px;">
+                                <div class="input-group input-group-sm" style="margin-bottom:2px;">
                                     <span class="input-group-btn">
                                         <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
                                             (click)="addCSWRecord(cswRecord)">
@@ -247,7 +246,7 @@
                                 <label style="color:white;">No records match the current filter(s)</label>
                             </div>
                             <div *ngIf="cswRecords.length>0">
-                                <button [disabled]="cswRecords.length<11" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
+                                <button [disabled]="!hasNextResultsPage()" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
                                     (click)="nextResultsPage()">
                                     <i class="fa fa-arrow-circle-right"></i>
                                 </button>

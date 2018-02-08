@@ -86,6 +86,8 @@ export class SidebarComponent implements OnInit {
                 registry.startIndex = 1;
                 registry.prevIndices = [];
             }
+            // Populate initial results
+            this.facetedSearch();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -143,12 +145,17 @@ export class SidebarComponent implements OnInit {
         }
 
         // Available registries and start
+        let registrySelected: boolean = false;
         for (let registry of this.availableRegistries) {
             if (registry.checked) {
+                registrySelected = true;
                 httpParams = httpParams.append('serviceId', registry.id);
                 httpParams = httpParams.append('start', registry.startIndex);
             }
         }
+        // If no registries are selected, there's nothing to search
+        if(!registrySelected)
+            return;
 
         this.recordsLoading = true;
         this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {

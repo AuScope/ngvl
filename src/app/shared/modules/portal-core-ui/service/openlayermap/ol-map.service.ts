@@ -152,17 +152,6 @@ export class OlMapService {
 
 
   /**
-   * Remove layer from map based on supplied ID
-   * @param layerId the ID of the layer to remove
-   */
-  public removeLayerById(layerId: string): void {
-    this.manageStateService.removeLayer(layerId);
-    this.olMapObject.removeLayerById(layerId);
-    delete this.layerModelList[layerId];
-  }
-
-
-  /**
    * Retrieve the layer model given an id string
    * @param layerId layer's id string
    */
@@ -224,8 +213,8 @@ export class OlMapService {
   /**
    * 
    */
-  getMapBounds(): olExtent {
-      return this.olMapObject.getMapBounds();
+  getMapExtent(): olExtent {
+      return this.olMapObject.getMapExtent();
   }
 
 
@@ -233,8 +222,8 @@ export class OlMapService {
    * 
    * @param extent 
    */
-  public displayBounds(extent: olExtent) {
-      this.olMapObject.displayBounds(extent);
+  public displayExtent(extent: olExtent) {
+      this.olMapObject.displayExtent(extent);
   }
 
 

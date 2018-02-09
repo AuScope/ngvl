@@ -232,7 +232,7 @@ export class SidebarComponent implements OnInit {
      * @param recordId 
      */
     public removeCSWRecord(recordId: string): void {
-        this.olMapService.removeLayerById(recordId);
+        this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
     }
 
 
@@ -258,7 +258,7 @@ export class SidebarComponent implements OnInit {
             const bbox: [number, number, number, number] =
                 [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
             const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-            this.olMapService.displayBounds(extent);
+            this.olMapService.displayExtent(extent);
         }
     }
 
@@ -313,12 +313,17 @@ export class SidebarComponent implements OnInit {
      * 
      */
     public spatialBoundsFromMap(): void {
-        this.spatialBounds = olProj.transformExtent(this.olMapService.getMapBounds(), 'EPSG:3857', 'EPSG:4326');
+        this.spatialBounds = olProj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
         this.updateSpatialBoundsText(this.spatialBounds);
         this.resetFacetedSearch();
 
     }
 
+    
+    /**
+     * 
+     * @param extent 
+     */
     public updateSpatialBoundsText(extent: olExtent): void {
         let w = extent[3].toFixed(4);
         let n = extent[0].toFixed(4);

@@ -278,16 +278,16 @@ export class OlMapObject {
    * Return the extent of the entire map
    * @returns an olExtent object representing the bounds of the map
    */
-  getMapBounds(): olExtent {
+  getMapExtent(): olExtent {
       return this.map.getView().calculateExtent(this.map.getSize());
   }
 
 
   /**
-   * Display the bounds of an extent for 3 seconds
+   * Display an extent for 3 seconds
    * @param extent the olExtent to display on the map
    */
-  displayBounds(extent: olExtent) {
+  displayExtent(extent: olExtent) {
     const poly: olGeomPolygon = olGeomPolygon.fromExtent(extent);
     const feature: olFeature = new olFeature(poly);
     const source = new olSourceVector({wrapX: false});

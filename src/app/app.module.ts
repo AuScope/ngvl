@@ -10,8 +10,9 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
-import { PortalCoreModule } from './shared/modules/portal-core-ui/portal-core.module';
-import { KeysPipe } from './shared/modules/portal-core-ui/uiutilities/pipes';
+import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
+import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
+
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {

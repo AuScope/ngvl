@@ -1,5 +1,5 @@
-import { OlMapObject } from '../../../shared/modules/portal-core-ui/service/openlayermap/ol-map-object';
-import { OlMapService } from '../../../shared/modules/portal-core-ui/service/openlayermap/ol-map.service';
+import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
 
 @Component({

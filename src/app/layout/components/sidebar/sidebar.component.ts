@@ -1,12 +1,12 @@
 import { environment } from '../../../../environments/environment';
-import { CSWRecordModel } from '../../../shared/modules/portal-core-ui/model/data/cswrecord.model';
-import { LayerModel } from '../../../shared/modules/portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from '../../../shared/modules/portal-core-ui/service/cswrecords/layer-handler.service';
-import { CSWSearchService } from '../../../shared/services/csw-search.service';
-import { OlMapService } from '../../../shared/modules/portal-core-ui/service/openlayermap/ol-map.service';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { Bbox } from 'portal-core-ui/model/data/bbox.model';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Bbox } from '../../../shared/modules/portal-core-ui/model/data/bbox.model';
+import { CSWSearchService } from '../../../shared/services/csw-search.service';
 
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';

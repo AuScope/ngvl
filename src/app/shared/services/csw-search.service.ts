@@ -4,7 +4,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
-import { CSWRecordModel } from './../modules/portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 
 @Injectable()

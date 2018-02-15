@@ -65,4 +65,12 @@ export class OlMapLayersComponent {
         }
     }
 
+    /**
+     * 
+     * @param recordId 
+     */
+    public removeRecord(recordId: string): void {
+        this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
+    }
+
 }

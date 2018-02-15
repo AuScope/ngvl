@@ -1,12 +1,12 @@
 import { environment } from '../../../../environments/environment';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-//import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { Bbox } from 'portal-core-ui/model/data/bbox.model';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
+import { RecordModalContent } from '../../datasets/record.modal.component';
 
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
@@ -73,7 +73,7 @@ export class SidebarComponent implements OnInit {
                 registry.startIndex = 1;
                 registry.prevIndices = [];
             }
-            // Populate initial results (if thisisn't desired, add checks to
+            // Populate initial results (if this isn't desired, add checks to
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
             this.facetedSearch();
@@ -240,10 +240,11 @@ export class SidebarComponent implements OnInit {
      * 
      * @param cswRecord 
      */
-    public showCSWRecordInformation(cswRecordModal, cswRecord): void {
-        if (cswRecord) {
-            this.selectedCSWRecord = cswRecord;
-            this.modalService.open(cswRecordModal);
+    public displayRecord(cswRecord) {
+        if(cswRecord) {
+            const modelRef = this.modalService.open(RecordModalContent);
+            // TODO: DO we ever need to worry about other records?
+            modelRef.componentInstance.record = cswRecord;
         }
     }
 

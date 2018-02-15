@@ -1,0 +1,36 @@
+<!-- TODO: Styles to CSS -->
+<!-- TODO: Translations -->
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title" id="exampleModalLongTitle">CSW Record Information</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="margin-left:10px;margin-right:10px;">
+    <form>
+        <div class="form-group row">
+            <label for="csw-source" class="col-2 col-form-label">Source</label>
+            <div class="col-10">
+                <a href="{{ record.recordInfoUrl }}" id="csw-source" class="form-control" target="_blank">Full metadata and downloads</a>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="csw-name" class="col-2 col-form-label">Title</label>
+            <div class="col-10">
+                <label id="csw-name" class="form-control">{{ record.name }}</label>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="csw-abstract" class="col-2 col-form-label">Abstract</label>
+            <div class="col-10">
+                <textarea class="form-control" rows="3" id="csw-abstract">{{ record.description }}</textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-2 col-form-label">More to come...</label>
+        </div>
+    </form>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
+</div>

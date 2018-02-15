@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
-import { OlMapComponent } from './openlayermap/olmap.component';
 
+import { OlMapComponent } from './openlayermap/olmap.component';
 import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
 import { OlMapDataSelectComponent } from './openlayermap/olmap.select.data.component';
 import { OlMapLayersComponent } from './openlayermap/olmap.layers.component';

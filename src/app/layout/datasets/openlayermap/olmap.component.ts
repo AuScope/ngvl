@@ -16,9 +16,7 @@ export class OlMapComponent implements AfterViewInit {
 
 
 
-  constructor(public olMapObject: OlMapObject, private olMapService: OlMapService) {
-
-  }
+  constructor(public olMapObject: OlMapObject, private olMapService: OlMapService) { }
 
 
   // After view init the map target can be set!

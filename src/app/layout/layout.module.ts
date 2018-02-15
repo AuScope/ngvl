@@ -12,6 +12,7 @@ import { LayoutComponent } from './layout.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { CSWSearchService } from '../shared/services/csw-search.service';
+import { RecordModalContent } from './datasets/record.modal.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { CSWSearchService } from '../shared/services/csw-search.service';
         TranslateModule,
         NgbModule.forRoot()
     ],
-    declarations: [LayoutComponent, SidebarComponent, HeaderComponent],
-    providers: [CSWSearchService]
+    declarations: [LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent],
+    providers: [CSWSearchService],
+    entryComponents: [RecordModalContent]
 })
 export class LayoutModule {}

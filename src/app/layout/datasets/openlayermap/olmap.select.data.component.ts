@@ -4,11 +4,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-ol-map-select-data',
-  template: `
-    <button type="button" class="btn btn-sm btn-inverse active" (click)='selectDataClick()'>
-      <span class="fa fa-edit" aria-hidden="true"></span> {{buttonText}}</button>
-    `
-  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+  templateUrl: './olmap.select.data.component.html',
+  styleUrls: ['./olmap.select.data.component.scss']
 })
 
 export class OlMapDataSelectComponent {

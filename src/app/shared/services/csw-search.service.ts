@@ -10,17 +10,7 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 @Injectable()
 export class CSWSearchService {
 
-    constructor(private httpClient: HttpClient, @Inject('env') private env) {
-        /* TEST
-        this.getFacetedSearch(null, 10, ['cswNCI'], null, null, null, null)
-            .subscribe(data => {
-                console.log(data);
-            },
-            error => {
-                console.log("CSW Search Error: " + error.message);
-            });
-        */
-    }
+    constructor(private httpClient: HttpClient, @Inject('env') private env) { }
 
 
     /**

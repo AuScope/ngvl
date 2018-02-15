@@ -156,9 +156,9 @@
                                         <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
                                         <!-- TODO: Validation -->
                                         <input class="form-control" id="date-from" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" (ngModelChange)="publicationDateChanged()"
-                                            ngbDatepicker #dp_from="ngbDatepicker">
+                                            ngbDatepicker #df="ngbDatepicker">
                                         <div class="input-group-btn input-group-append">
-                                            <button class="btn btn-secondary" type="button" (click)="dp_from.toggle()">
+                                            <button class="btn btn-secondary" type="button" (click)="df.toggle()">
                                                 <i class="fa fa-calendar"></i>
                                             </button>
                                         </div>
@@ -171,9 +171,9 @@
                                         <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
                                         <!-- TODO: Validation -->
                                         <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()"
-                                            ngbDatepicker #dp_to="ngbDatepicker" style="z-index:2000">
+                                            ngbDatepicker #dt="ngbDatepicker">
                                         <div class="input-group-btn input-group-append">
-                                            <button class="btn btn-secondary" type="button" (click)="dp_to.toggle()">
+                                            <button class="btn btn-secondary" type="button" (click)="dt.toggle()">
                                                 <i class="fa fa-calendar"></i>
                                             </button>
                                         </div>

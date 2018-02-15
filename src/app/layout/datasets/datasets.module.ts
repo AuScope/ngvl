@@ -8,15 +8,19 @@ import { OlMapComponent } from './openlayermap/olmap.component';
 
 import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
 import { OlMapDataSelectComponent } from './openlayermap/olmap.select.data.component';
+import { OlMapLayersComponent } from './openlayermap/olmap.layers.component';
+
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
   imports: [
     CommonModule,
     PageHeaderModule,
-    DatasetsRoutingModule
+    DatasetsRoutingModule,
+    NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent, OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent],
-  bootstrap: [OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent]
+  declarations: [DatasetsComponent, OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent],
+  bootstrap: [OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent]
 })
 export class DatasetsModule { }

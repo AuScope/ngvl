@@ -153,6 +153,21 @@ $topnav-background-color: #222;
     }
 }
 
+// Datasets CSS below
+.btn {
+    cursor: pointer;
+}
+
+// TODO: Fix this, problem with datepicker z-index
+::ng-deep ngb-datepicker.dropdown-menu.ng-star-inserted {
+	z-index: 99999 !important;
+	position: fixed !important;
+	//margin-top: 300px;
+    //margin-left: 43px;
+    top: 546px !important;
+    left: 125px !important;
+}
+
 .records-spinner {
     position: relative;
     top: 50%;

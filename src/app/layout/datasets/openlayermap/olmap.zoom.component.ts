@@ -4,11 +4,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-ol-map-zoom',
-  template: `
-    <button type="button" class="btn btn-sm btn-inverse active" id="map-theme-text" (click)='zoomClick()'>
-      <span class="fa fa-search-plus fa-fw" aria-hidden="true"></span> {{buttonText}}</button>
-    `
-  // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
+  templateUrl: './olmap.zoom.component.html',
+  styleUrls: ['./olmap.zoom.component.scss']
 })
 
 export class OlMapZoomComponent {

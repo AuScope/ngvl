@@ -1,7 +1,7 @@
 import { environment } from '../../../../environments/environment';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
+//import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { Bbox } from 'portal-core-ui/model/data/bbox.model';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
@@ -51,7 +51,7 @@ export class SidebarComponent implements OnInit {
     dateFrom: any = null;
 
 
-    constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,
+    constructor(/*private layerHandlerService: LayerHandlerService, */private olMapService: OlMapService,
         private httpClient: HttpClient, private cswSearchService: CSWSearchService,
         private modalService: NgbModal) {
     }

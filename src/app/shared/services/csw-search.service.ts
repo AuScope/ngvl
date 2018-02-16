@@ -4,8 +4,6 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-
 
 @Injectable()
 export class CSWSearchService {
@@ -44,7 +42,7 @@ export class CSWSearchService {
      */
     public getFacetedSearch(start: number[], limit: number, serviceId: string[],
         field: string[], value: string[],
-        type: string[], comparison: string[]): Observable<CSWRecordModel[]> {
+        type: string[], comparison: string[]): Observable<any> {
 
         let httpParams = new HttpParams();
         if(limit) {
@@ -84,7 +82,8 @@ export class CSWSearchService {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).map(response => {
-            return response['data'].records;
+            //return response['data'].records;
+            return response['data'];
         });
     }
 

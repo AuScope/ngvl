@@ -26,6 +26,7 @@
             <!-- TODO: Find all inline style definitions and move to CSS -->
             <!-- TODO: All translations -->
             <!-- TODO: Run search on any input contents changing (e.g. after losing focus), also on ENTER -->
+            <!-- TODO: Original portal has X button on all facets to close panel and delete any entries -->
             <li class="nested" [class.expand]="showMenu === 'pages'">
                 <ul class="submenu" style="margin-right:2px;">
                     <!-- Any text search -->
@@ -40,7 +41,7 @@
                                 <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
                                     [(ngModel)]="anyTextValue">
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" (click)="resetFacetedSearch()">
+                                    <button class="btn btn-secondary" type="button" (click)="registryChanged()">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -76,15 +77,37 @@
                             <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="keywordsIsCollapsed">
-                            <div class="input-group input-group-sm">
-                                <select class="form-control" placeholder="Keywords" name="keywords">
-                                </select>
-                                <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button">
-                                        <i class="fa fa-plus-circle"></i>
-                                    </button>
+
+                            <!-- Previously selected keywords -->
+                            <!-- TODO: Update on change -->
+                            <li *ngFor="let keyword of selectedKeywords; index as i">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" [ngbTypeahead]="searchKeywords"
+                                        (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
+                                    <div class="input-group-btn input-group-apppend">
+                                        <button class="btn btn-secondary" type="button" (click)="removeKeyword(i)">
+                                            <i class="fa fa-minus-circle"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            </li>
+
+                            <!-- New keyword, always present -->
+                            <li>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" [ngbTypeahead]="searchKeywords"
+                                        (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
+                                    <div class="input-group-btn input-group-apppend">
+                                        <button class="btn btn-secondary" type="button" (click)="addOrUpdateKeyword(-1, value)" style="background-color:green;">
+                                            <i class="fa fa-plus-circle"></i>
+                                        </button>
+                                        <button *ngIf="selectedKeywords.length > 0" class="btn btn-secondary" type="button" (click)="removeKeyword(-1)" style="background-color:red;">
+                                            <i class="fa fa-minus-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>                            
+
                         </div>
                     </li>
                     <!-- Available services -->

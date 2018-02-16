@@ -12,6 +12,11 @@ import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { ViewChild } from '@angular/core';
+
 
 @Component({
     selector: 'app-sidebar',
@@ -43,12 +48,24 @@ export class SidebarComponent implements OnInit {
     registriesIsCollapsed: boolean = true;
     searchResultsIsCollapsed: boolean = true;
 
-    // Facted search parameters
+    // Faceted search parameters
     anyTextValue: string = "";
     spatialBounds: olExtent;
     spatialBoundsText: string = "";
     dateTo: any = null;
     dateFrom: any = null;
+    availableKeywords: string[] = [];
+    selectedKeywords: string[] = [];
+
+    @ViewChild('instance') typeahedInstance: NgbTypeahead;
+    focus$ = new Subject<string>();
+    click$ = new Subject<string>();
+    searchKeywords = (text$: Observable<string>) =>
+        text$
+        .debounceTime(200).distinctUntilChanged()
+        .merge(this.focus$)
+        .merge(this.click$.filter(() => !this.typeahedInstance.isPopupOpen()))
+        .map(term => (term === '' ? this.availableKeywords : this.availableKeywords.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10));
 
 
     constructor(/*private layerHandlerService: LayerHandlerService, */private olMapService: OlMapService,
@@ -57,14 +74,6 @@ export class SidebarComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Test keyword search
-        /*
-        let serviceIds: string[] = ['cswNCI'];
-        this.cswSearchService.getFacetedKeywords(serviceIds).subscribe(data => {
-            console.log(data);
-            console.log("data[2]: " + data[2]);
-        });
-        */
         // Load available registries
         this.cswSearchService.getAvailableRegistries().subscribe(data => {
             this.availableRegistries = data;
@@ -77,6 +86,7 @@ export class SidebarComponent implements OnInit {
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
             this.facetedSearch();
+            this.getFacetedKeywords();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -90,74 +100,105 @@ export class SidebarComponent implements OnInit {
 
     /**
      * Search results based on the current faceted search panel values
-     * 
-     * TODO: Add spinner to results panel
      */
     public facetedSearch(): void {
         this.cswRecords = [];
-        let httpParams = new HttpParams();
-        httpParams = httpParams.append('limit', this.CSW_RECORD_PAGE_LENGTH.toString());
+
+        // Limit
+        const limit = this.CSW_RECORD_PAGE_LENGTH;
 
         // Available registries and start
+        let serviceIds: string[] = [];
+        let starts: number[] = [];
         let registrySelected: boolean = false;
         for (let registry of this.availableRegistries) {
             if (registry.checked) {
                 registrySelected = true;
-                httpParams = httpParams.append('serviceId', registry.id);
-                httpParams = httpParams.append('start', registry.startIndex);
+                serviceIds.push(registry.id);
+                starts.push(registry.startIndex);
             }
         }
         // If no registries are selected, there's nothing to search
         if(!registrySelected)
             return;
 
+        let fields: string[] = [];
+        let values: string[] = [];
+        let types: string[] = [];
+        let comparisons: string[] = [];
+
         // Any text search
         if (this.anyTextValue) {
-            httpParams = httpParams.append('field', 'anytext');
-            httpParams = httpParams.append('value', this.anyTextValue);
-            httpParams = httpParams.append('type', 'string');
-            httpParams = httpParams.append('comparison', 'eq');
+            fields.push('anytext');
+            values.push(this.anyTextValue);
+            types.push('string');
+            comparisons.push('eq');
         }
 
         // Spatial bounds
         if (this.spatialBounds != null) {
-            httpParams = httpParams.append('field', 'bbox');
+            fields.push('bbox');
             let boundsStr = '{"northBoundLatitude":' + this.spatialBounds[3] +
                 ',"southBoundLatitude":' + this.spatialBounds[1] +
                 ',"eastBoundLongitude":' + this.spatialBounds[2] +
                 ',"westBoundLongitude":' + this.spatialBounds[0] +
                 ',"crs":"EPSG:4326"}';
-            httpParams = httpParams.append('value', boundsStr);
-            httpParams = httpParams.append('type', 'bbox');
-            httpParams = httpParams.append('comparison', 'eq');
+            values.push(boundsStr);
+            types.push('bbox');
+            comparisons.push('eq');
         }
 
         // Publication dates
         if (this.dateFrom != null && this.dateTo != null) {
-            httpParams = httpParams.append('field', 'datefrom');
-            httpParams = httpParams.append('field', 'dateto');
+            fields.push('datefrom');
+            fields.push('dateto');
             let fromDate = Date.parse(this.dateFrom.year + '-' + this.dateFrom.month + '-' + this.dateFrom.day);
             let toDate = Date.parse(this.dateTo.year + '-' + this.dateTo.month + '-' + this.dateTo.day);
-            httpParams = httpParams.append('value', fromDate.toString());
-            httpParams = httpParams.append('value', toDate.toString());
-            httpParams = httpParams.append('type', 'date');
-            httpParams = httpParams.append('type', 'date');
-            httpParams = httpParams.append('comparison', 'gt');
-            httpParams = httpParams.append('comparison', 'lt');
+            values.push(fromDate.toString());
+            values.push(toDate.toString());
+            types.push('date');
+            types.push('date');
+            comparisons.push('gt');
+            comparisons.push('lt');
         }
 
         this.recordsLoading = true;
-        this.httpClient.post(environment.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
-            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-            responseType: 'json'
-        }).subscribe(response => {
+        this.cswSearchService.getFacetedSearch(starts, limit, serviceIds, fields, values, types, comparisons)
+                .subscribe(response => {
             for(let registry of this.availableRegistries) {
                 registry.prevIndices.push(registry.startIndex);
-                registry.startIndex = response['data'].nextIndexes[registry.id];
+                registry.startIndex = response.nextIndexes[registry.id];
             }
-            this.cswRecords = response['data'].records;
+            this.cswRecords = response.records;
             this.recordsLoading = false;
-            // TODO: Ensure results visible if drop-down not expanded
+        }, error => {
+            // TODO: proper error reporting
+            console.log("Faceted search error: " + error.message);
+            this.recordsLoading = false;
+        });
+    }
+
+
+    /**
+     * 
+     */
+    public getFacetedKeywords(): void {
+        let registrySelected: boolean = false;
+        let serviceIds = [];
+        for (let registry of this.availableRegistries) {
+            if (registry.checked) {
+                registrySelected = true;
+                serviceIds.push(registry.id);
+            }
+        }
+        // If no registries are selected, there's nothing to search
+        if(!registrySelected)
+            return;
+        this.cswSearchService.getFacetedKeywords(serviceIds).subscribe(data => {
+            this.availableKeywords = data;
+        }, error => {
+            // TODO: Proper error reporting
+            console.log("Faceted keyword error: " + error.message);
         });
     }
 
@@ -173,6 +214,15 @@ export class SidebarComponent implements OnInit {
             registry.prevIndices = [];
         }
         this.facetedSearch();
+    }
+
+
+    /**
+     * 
+     */
+    public registryChanged(): void {
+        this.getFacetedKeywords();
+        this.resetFacetedSearch();
     }
 
 
@@ -342,6 +392,28 @@ export class SidebarComponent implements OnInit {
             console.log("PubDate change - searching...");
             this.resetFacetedSearch();
         }
+    }
+
+
+    /**
+     * 
+     * @param index 
+     */
+    public addOrUpdateKeyword(index: number, keyword: string): void {
+        if(index == -1 || index == this.selectedKeywords.length) {
+            this.selectedKeywords.push(keyword);
+        } else if(index > -1 && index < this.selectedKeywords.length) {
+            this.selectedKeywords[index] = keyword;
+        }
+    }
+
+
+    /**
+     * 
+     * @param index 
+     */
+    public removeKeyword(index: number): void {
+        this.selectedKeywords.splice(index, 1);
     }
 
 

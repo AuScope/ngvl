@@ -36,9 +36,6 @@ export class SidebarComponent implements OnInit {
     selectedCSWRecord = null;
     recordsLoading = false;
 
-    // Registry results
-    availableRegistries: any = [];    // TODO: Registry model
-
     // Collapsable menus
     anyTextIsCollapsed: boolean = true;
     spatialBoundsIsCollapsed: boolean = true;
@@ -52,19 +49,26 @@ export class SidebarComponent implements OnInit {
     anyTextValue: string = "";
     spatialBounds: olExtent;
     spatialBoundsText: string = "";
+    availableKeywords: string[] = [];   // List of available keywords
+    selectedKeywords: string[] = [""];  // Chosen keywords for filtering
+    availableServices: any = [];
     dateTo: any = null;
     dateFrom: any = null;
-    availableKeywords: string[] = [];
-    selectedKeywords: string[] = [""];
+    availableRegistries: any = [];
+    
+    
+    
+    
 
-    @ViewChild('instance') typeahedInstance: NgbTypeahead;
-    focus$ = new Subject<string>();
+    @ViewChild('instance') typeaheadInstance: NgbTypeahead;
+    //focus$ = new Subject<string>();
     click$ = new Subject<string>();
     searchKeywords = (text$: Observable<string>) =>
         text$
-        .debounceTime(200).distinctUntilChanged()
-        .merge(this.focus$)
-        .merge(this.click$.filter(() => !this.typeahedInstance.isPopupOpen()))
+        .debounceTime(200)
+        .distinctUntilChanged()
+        //.merge(this.focus$)
+        .merge(this.click$.filter(() => !this.typeaheadInstance.isPopupOpen()))
         .map(term => (term === '' ? this.availableKeywords : this.availableKeywords.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10));
 
 
@@ -111,13 +115,13 @@ export class SidebarComponent implements OnInit {
         let serviceIds: string[] = [];
         let starts: number[] = [];
         let registrySelected: boolean = false;
-        for (let registry of this.availableRegistries) {
+        this.availableRegistries.forEach(registry => {
             if (registry.checked) {
                 registrySelected = true;
                 serviceIds.push(registry.id);
                 starts.push(registry.startIndex);
             }
-        }
+        });
         // If no registries are selected, there's nothing to search
         if(!registrySelected)
             return;
@@ -147,6 +151,16 @@ export class SidebarComponent implements OnInit {
             types.push('bbox');
             comparisons.push('eq');
         }
+
+        // Keywords
+        this.selectedKeywords.forEach(keyword => {
+            if(keyword != '') {
+                fields.push('keyword');
+                values.push(keyword);
+                types.push('string');
+                comparisons.push('eq');
+            }
+        });
 
         // Publication dates
         if (this.dateFrom != null && this.dateTo != null) {
@@ -404,6 +418,7 @@ export class SidebarComponent implements OnInit {
             this.selectedKeywords[index] = keyword;
             // Push a new empty keyword
             this.selectedKeywords.push("");
+            this.resetFacetedSearch();
         }
     }
 
@@ -418,6 +433,7 @@ export class SidebarComponent implements OnInit {
             // If no keywords, push a new empty keyword
             this.selectedKeywords.push("");
         }
+        this.resetFacetedSearch();
     }
 
 

@@ -55,7 +55,7 @@ export class SidebarComponent implements OnInit {
     dateTo: any = null;
     dateFrom: any = null;
     availableKeywords: string[] = [];
-    selectedKeywords: string[] = [];
+    selectedKeywords: string[] = [""];
 
     @ViewChild('instance') typeahedInstance: NgbTypeahead;
     focus$ = new Subject<string>();
@@ -400,10 +400,10 @@ export class SidebarComponent implements OnInit {
      * @param index 
      */
     public addOrUpdateKeyword(index: number, keyword: string): void {
-        if(index == -1 || index == this.selectedKeywords.length) {
-            this.selectedKeywords.push(keyword);
-        } else if(index > -1 && index < this.selectedKeywords.length) {
+        if(keyword != null && keyword != "" && !(this.selectedKeywords.some(k=>k==keyword))) {
             this.selectedKeywords[index] = keyword;
+            // Push a new empty keyword
+            this.selectedKeywords.push("");
         }
     }
 
@@ -414,6 +414,10 @@ export class SidebarComponent implements OnInit {
      */
     public removeKeyword(index: number): void {
         this.selectedKeywords.splice(index, 1);
+        if(this.selectedKeywords.length==0) {
+            // If no keywords, push a new empty keyword
+            this.selectedKeywords.push("");
+        }
     }
 
 

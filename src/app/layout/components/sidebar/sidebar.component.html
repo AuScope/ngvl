@@ -77,37 +77,21 @@
                             <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="keywordsIsCollapsed">
-
-                            <!-- Previously selected keywords -->
-                            <!-- TODO: Update on change -->
                             <li *ngFor="let keyword of selectedKeywords; index as i">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" [ngbTypeahead]="searchKeywords"
-                                        (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
+                                    <!-- TODO: Catch update change event, update model -->
+                                    <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]=selectedKeywords[i] 
+                                        (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
                                     <div class="input-group-btn input-group-apppend">
-                                        <button class="btn btn-secondary" type="button" (click)="removeKeyword(i)">
+                                            <button *ngIf="i==selectedKeywords.length-1" class="btn btn-secondary" type="button" (click)="addOrUpdateKeyword(i, keyword.value)" style="background-color:green;">
+                                                <i class="fa fa-plus-circle"></i>
+                                            </button>
+                                        <button *ngIf="i!=selectedKeywords.length-1" class="btn btn-secondary" type="button" (click)="removeKeyword(i)" style="background-color:red;">
                                             <i class="fa fa-minus-circle"></i>
                                         </button>
                                     </div>
                                 </div>
                             </li>
-
-                            <!-- New keyword, always present -->
-                            <li>
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" [ngbTypeahead]="searchKeywords"
-                                        (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
-                                    <div class="input-group-btn input-group-apppend">
-                                        <button class="btn btn-secondary" type="button" (click)="addOrUpdateKeyword(-1, value)" style="background-color:green;">
-                                            <i class="fa fa-plus-circle"></i>
-                                        </button>
-                                        <button *ngIf="selectedKeywords.length > 0" class="btn btn-secondary" type="button" (click)="removeKeyword(-1)" style="background-color:red;">
-                                            <i class="fa fa-minus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>                            
-
                         </div>
                     </li>
                     <!-- Available services -->

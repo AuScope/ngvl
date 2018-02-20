@@ -56,9 +56,6 @@ export class SidebarComponent implements OnInit {
     dateFrom: any = null;
     availableRegistries: any = [];
     
-    
-    
-    
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     //focus$ = new Subject<string>();
@@ -95,6 +92,14 @@ export class SidebarComponent implements OnInit {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
         });
+
+        // Define available services
+        this.availableServices = [
+            {'id': 'wcs', 'name': 'WCS', 'checked': false},
+            {'id': 'ncss', 'name': 'NCSS', 'checked': false},
+            {'id': 'opendap', 'name': 'OPeNDAP', 'checked': false},
+            {'id': 'wfs', 'name': 'WFS', 'checked': false},
+            {'id': 'wms', 'name': 'WMS', 'checked': false}];
     }
 
     eventCalled() {
@@ -161,6 +166,16 @@ export class SidebarComponent implements OnInit {
                 comparisons.push('eq');
             }
         });
+
+        // Available services
+        for(let service of this.availableServices) {
+            if(service.checked) {
+                fields.push('servicetype');
+                values.push(service.name);
+                types.push('string');
+                comparisons.push('eq');
+            }
+        }
 
         // Publication dates
         if (this.dateFrom != null && this.dateTo != null) {
@@ -232,7 +247,7 @@ export class SidebarComponent implements OnInit {
 
 
     /**
-     * 
+     * Fires when a registry is changed, resets keywords and re-runs facted search.
      */
     public registryChanged(): void {
         this.getFacetedKeywords();
@@ -434,6 +449,10 @@ export class SidebarComponent implements OnInit {
             this.selectedKeywords.push("");
         }
         this.resetFacetedSearch();
+    }
+
+    public getService(id: string): any {
+        return this.availableServices.find(s=>s.id===id);
     }
 
 

@@ -20,7 +20,6 @@ export class CSWSearchService {
         serviceIDs.forEach(id => {
             httpParams = httpParams.append('serviceId', id);
         });
-        console.log(httpParams.toString());
         return this.httpClient.post(this.env.portalBaseUrl + 'facetedKeywords.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'

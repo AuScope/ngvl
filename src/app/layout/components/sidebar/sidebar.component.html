@@ -106,7 +106,7 @@
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="checkbox" id="check1">
+                                        <input type="checkbox" [(ngModel)]="getService('wcs').checked" (change)="resetFacetedSearch()" id="check1">
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check1" style="color:white;">&nbsp;Web Coverage Service</label>
@@ -114,7 +114,7 @@
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="checkbox" id="check2">
+                                        <input type="checkbox" [(ngModel)]="getService('ncss').checked" (change)="resetFacetedSearch()" id="check2">
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check2" style="color:white;">&nbsp;NetCDF Subset Service</label>
@@ -122,7 +122,7 @@
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="checkbox" id="check3">
+                                        <input type="checkbox" [(ngModel)]="getService('opendap').checked" (change)="resetFacetedSearch()" id="check3">
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check3" style="color:white;">&nbsp;OPenNDAP Service</label>
@@ -131,7 +131,7 @@
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="checkbox" id="check4">
+                                        <input type="checkbox" [(ngModel)]="getService('wfs').checked" (change)="resetFacetedSearch()" id="check4">
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check4" style="color:white;">&nbsp;Web Feature Service</label>
@@ -140,7 +140,7 @@
                             <div class="input-group input-group-sm">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
-                                        <input type="checkbox" id="check5">
+                                        <input type="checkbox" [(ngModel)]="getService('wms').checked" (change)="resetFacetedSearch()" id="check5">
                                     </div>
                                 </div>
                                 <label class="control-label small" for="check5" style="color:white;">&nbsp;Web Map Service</label>

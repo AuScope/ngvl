@@ -102,49 +102,55 @@
                             <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="servicesIsCollapsed">
-                            <label class="control-label medium" style="color:white;">Gridded Data Services</label>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" [(ngModel)]="getService('wcs').checked" (change)="resetFacetedSearch()" id="check1">
+                            <fieldset style="border:1px solid #ddd;margin-right:4px;">
+                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Gridded Data Services</legend>
+                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" [(ngModel)]="getService('wcs').checked" (change)="resetFacetedSearch()" id="check1">
+                                        </div>
                                     </div>
+                                    <label class="control-label small" for="check1" style="color:white;">&nbsp;Web Coverage Service</label>
                                 </div>
-                                <label class="control-label small" for="check1" style="color:white;">&nbsp;Web Coverage Service</label>
-                            </div>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" [(ngModel)]="getService('ncss').checked" (change)="resetFacetedSearch()" id="check2">
+                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" [(ngModel)]="getService('ncss').checked" (change)="resetFacetedSearch()" id="check2">
+                                        </div>
                                     </div>
+                                    <label class="control-label small" for="check2" style="color:white;">&nbsp;NetCDF Subset Service</label>
                                 </div>
-                                <label class="control-label small" for="check2" style="color:white;">&nbsp;NetCDF Subset Service</label>
-                            </div>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" [(ngModel)]="getService('opendap').checked" (change)="resetFacetedSearch()" id="check3">
+                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" [(ngModel)]="getService('opendap').checked" (change)="resetFacetedSearch()" id="check3">
+                                        </div>
                                     </div>
+                                    <label class="control-label small" for="check3" style="color:white;">&nbsp;OPenNDAP Service</label>
                                 </div>
-                                <label class="control-label small" for="check3" style="color:white;">&nbsp;OPenNDAP Service</label>
-                            </div>
-                            <label style="color:white;">Point/Line Data Services</label>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" [(ngModel)]="getService('wfs').checked" (change)="resetFacetedSearch()" id="check4">
+                            </fieldset>
+                            <fieldset style="border:1px solid #ddd;margin-right:4px;">
+                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Point/Line Data Services</legend>
+                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" [(ngModel)]="getService('wfs').checked" (change)="resetFacetedSearch()" id="check4">
+                                        </div>
                                     </div>
+                                    <label class="control-label small" for="check4" style="color:white;">&nbsp;Web Feature Service</label>
                                 </div>
-                                <label class="control-label small" for="check4" style="color:white;">&nbsp;Web Feature Service</label>
-                            </div>
-                            <label style="color:white;">Visualisation Services</label>
-                            <div class="input-group input-group-sm">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" [(ngModel)]="getService('wms').checked" (change)="resetFacetedSearch()" id="check5">
+                            </fieldset>
+                            <fieldset style="border:1px solid #ddd;margin-right:4px;">
+                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Visualisation Services</legend>
+                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" [(ngModel)]="getService('wms').checked" (change)="resetFacetedSearch()" id="check5">
+                                        </div>
                                     </div>
+                                    <label class="control-label small" for="check5" style="color:white;">&nbsp;Web Map Service</label>
                                 </div>
-                                <label class="control-label small" for="check5" style="color:white;">&nbsp;Web Map Service</label>
-                            </div>
+                            </fieldset>
                         </div>
                     </li>
                     <!-- Publication date -->

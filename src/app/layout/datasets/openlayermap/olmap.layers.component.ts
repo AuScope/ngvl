@@ -22,7 +22,7 @@ export class OlMapLayersComponent {
 
 
     /**
-     * 
+     * TODO: This is used elsewhere, should make a map service method
      */
     public getActiveLayerCount(): number {
         return Object.keys(this.olMapService.getLayers()).length;

@@ -3,13 +3,17 @@
 
   <!-- TODO: style in CSS -->
   <div class="btn-group" style="position:absolute;z-index:1;margin-top:4px;margin-left:4px;">
+    <!-- Zoom button -->
     <app-ol-map-zoom></app-ol-map-zoom>
   </div>
   <div class="btn-group" style="position:absolute;z-index:1;margin-top:40px;margin-left:4px;">
+    <!-- Select Data button -->
     <app-ol-map-select-data></app-ol-map-select-data>
   </div>
   <div style="position:absolute;z-index:1;margin-top:4px;width:400px;right:18px;">
+      <!-- Active Layers drop down menu -->
       <app-ol-map-layers></app-ol-map-layers>
   </div>
+  <!-- The map -->
   <app-ol-map class="height-full width-full"></app-ol-map>
 </div>

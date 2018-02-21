@@ -29,7 +29,15 @@ export class OlMapDataSelectComponent {
         me.olMapService.fitView(feature.getGeometry().getExtent());
       });
       */
+        this.buttonText = 'Select Data';
 
     });
+  }
+
+  /**
+   * TODO: This is used elsewhere, should make a map service method
+   */
+  public getActiveLayerCount(): number {
+    return Object.keys(this.olMapService.getLayers()).length;
   }
 }

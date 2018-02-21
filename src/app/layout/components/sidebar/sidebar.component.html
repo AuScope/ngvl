@@ -39,9 +39,9 @@
                         <div [ngbCollapse]="anyTextIsCollapsed">
                             <div class="input-group input-group-sm">
                                 <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
-                                    [(ngModel)]="anyTextValue">
+                                    [(ngModel)]="anyTextValue" (keyup.enter)="facetedSearch()">
                                 <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" (click)="registryChanged()">
+                                    <button class="btn btn-secondary" type="button" (click)="facetedSearch()">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -239,17 +239,17 @@
                                     <span class="input-group-btn">
                                         <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
                                             (click)="addCSWRecord(cswRecord)">
-                                            <i class="fa fa-plus-circle"></i>
+                                            <i class="fa fa-plus-circle" style="color:green;"></i>
                                         </button>
                                         <button *ngIf="olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Remove layer from map"
                                             (click)="removeCSWRecord(cswRecord.id)">
-                                            <i class="fa fa-trash"></i>
+                                            <i class="fa fa-trash" style="color:red;"></i>
                                         </button>
                                     </span>
                                     <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
                                     <span class="input-group-btn">
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecord(cswRecord)">
-                                            <i class="fa fa-info-circle"></i>
+                                            <i class="fa fa-info-circle" style="color:blue;"></i>
                                         </button>
                                     </span>
                                     <span class="input-group-btn">

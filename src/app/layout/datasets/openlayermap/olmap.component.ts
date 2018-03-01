@@ -1,5 +1,5 @@
 import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
-import {AfterViewInit, Component, ElementRef, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 /*
  * Note: The hight style is important or the map won't appear on first load

@@ -6,9 +6,9 @@ import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
 
 import { OlMapComponent } from './openlayermap/olmap.component';
-import { OlMapZoomComponent } from './openlayermap/olmap.zoom.component';
-import { OlMapDataSelectComponent } from './openlayermap/olmap.select.data.component';
-import { OlMapLayersComponent } from './openlayermap/olmap.layers.component';
+import { OlMapZoomComponent } from './openlayermap/controls/olmap.zoom.component';
+import { OlMapDataSelectComponent } from './openlayermap/controls/olmap.select.data.component';
+import { OlMapLayersComponent } from './openlayermap/controls/olmap.layers.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 

@@ -4,7 +4,7 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { Component } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { RecordModalContent } from '../record.modal.component';
+import { RecordModalContent } from '../../record.modal.component';
 
 
 @Component({

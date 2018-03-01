@@ -177,10 +177,10 @@
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                            <form class="form-inline">
+                            <!--</form>-->
+                            <!--<form class="form-inline">-->
                                 <div class="form-group">
-                                    <div class="input-group input-group-sm">
+                                    <div class="input-group input-group-sm" style="position: relative;">
                                         <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
                                         <!-- TODO: Validation -->
                                         <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()"
@@ -227,14 +227,12 @@
                             </span>
                         </a>
                         <div [ngbCollapse]="searchResultsIsCollapsed" style="height:370px;position:relative;border-style:solid;border-color:#666">
-
                             <div *ngIf="recordsLoading" class="records-spinner">
                                     <div class="bounce1"></div>
                                     <div class="bounce2"></div>
                                     <div class="bounce3"></div>
                             </div>
-
-                            <li *ngFor="let cswRecord of cswRecords" style="margin-top:2px;margin-right:2px;margin-left:2px;">
+                            <li *ngFor="let cswRecord of cswSearchResults" style="margin-top:2px;margin-right:2px;margin-left:2px;">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-btn">
                                         <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
@@ -248,7 +246,7 @@
                                     </span>
                                     <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
                                     <span class="input-group-btn">
-                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecord(cswRecord)">
+                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
                                             <i class="fa fa-info-circle" style="color:blue;"></i>
                                         </button>
                                     </span>
@@ -262,11 +260,11 @@
                                 </div>
                             </li>
                             
-                            <div *ngIf="cswRecords.length==0 && !recordsLoading" style="position:relative;top:30%;transform:translate(0,-10px);margin-right:4px;margin-left:10px;">
+                            <div *ngIf="cswSearchResults.length==0 && !recordsLoading" style="position:relative;top:30%;transform:translate(0,-10px);margin-right:4px;margin-left:10px;">
                                 <label style="color:white;">No records match the current filter(s)</label>
                             </div>
 
-                            <div *ngIf="cswRecords.length>0 || recordsLoading" style="position:absolute;bottom:0;right:2px;">
+                            <div *ngIf="cswSearchResults.length>0 || recordsLoading" style="position:absolute;bottom:0;right:2px;">
                                 <button [disabled]="!hasNextResultsPage()" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
                                     (click)="nextResultsPage()">
                                     <i class="fa fa-arrow-circle-right"></i>

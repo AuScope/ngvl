@@ -25,21 +25,17 @@ export class OlMapLayersComponent {
      * TODO: This is used elsewhere, should make a map service method
      */
     public getActiveLayerCount(): number {
-        return Object.keys(this.olMapService.getLayers()).length;
+        return Object.keys(this.olMapService.getLayerModelList()).length;
     }
 
 
     /**
-     * 
+     * Get active layers
      */
     public getActiveLayers(): LayerModel[] {
         let layers: LayerModel[] = [];
-        const activeLayers: { [id: string]: [olLayer] } = this.olMapService.getLayers();
-        for(const layerId in activeLayers) {
-            const layerTiles = activeLayers[layerId];
-            layerTiles.forEach(layer => {
-                layers.push(layer.layer);
-            });
+        for(let key of Object.keys(this.olMapService.getLayerModelList())) {
+            layers.push(this.olMapService.getLayerModelList()[key]);
         }
         return layers;
     }
@@ -56,14 +52,16 @@ export class OlMapLayersComponent {
 
     /**
      * 
+     * @param layer 
      */
-    public displayRecord(layer: LayerModel) {
+    public displayRecordInformation(layer: LayerModel) {
         if(layer.cswRecords.length > 0) {
             const modelRef = this.modalService.open(RecordModalContent);
             // TODO: DO we ever need to worry about other records?
             modelRef.componentInstance.record = layer.cswRecords[0];
         }
     }
+
 
     /**
      * 

@@ -32,7 +32,7 @@ export class SidebarComponent implements OnInit {
     showMenu: string = '';
 
     // Search results
-    cswRecords: CSWRecordModel[] = [];
+    cswSearchResults: CSWRecordModel[] = [];
     selectedCSWRecord = null;
     recordsLoading = false;
 
@@ -111,7 +111,7 @@ export class SidebarComponent implements OnInit {
      * Search results based on the current faceted search panel values
      */
     public facetedSearch(): void {
-        this.cswRecords = [];
+        this.cswSearchResults = [];
 
         // Limit
         const limit = this.CSW_RECORD_PAGE_LENGTH;
@@ -198,7 +198,7 @@ export class SidebarComponent implements OnInit {
                 registry.prevIndices.push(registry.startIndex);
                 registry.startIndex = response.nextIndexes[registry.id];
             }
-            this.cswRecords = response.records;
+            this.cswSearchResults = response.records;
             this.recordsLoading = false;
         }, error => {
             // TODO: proper error reporting
@@ -302,7 +302,12 @@ export class SidebarComponent implements OnInit {
      * @param cswRecord 
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
-        this.olMapService.addCSWRecord(cswRecord);
+        try {
+            this.olMapService.addCSWRecord(cswRecord);
+        } catch(error) {
+            // TODO: Proper error reporting
+            alert(error.message);
+        }
     }
 
 
@@ -319,10 +324,9 @@ export class SidebarComponent implements OnInit {
      * 
      * @param cswRecord 
      */
-    public displayRecord(cswRecord) {
+    public displayRecordInformation(cswRecord) {
         if(cswRecord) {
             const modelRef = this.modalService.open(RecordModalContent);
-            // TODO: DO we ever need to worry about other records?
             modelRef.componentInstance.record = cswRecord;
         }
     }
@@ -378,7 +382,8 @@ export class SidebarComponent implements OnInit {
 
 
     /**
-     * 
+     * TODO: Limit map zoom out. Getting some unusual results if zooming out
+     * too far, probably due to going past the limits of the defined EPSG.
      */
     public drawSpatialBounds(): void {
         this.olMapService.drawBound().subscribe((vector) => {

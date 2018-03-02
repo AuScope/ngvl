@@ -1,3 +1,11 @@
-<button type="button" class="btn btn-sm btn-inverse active" id="map-theme-text" (click)='zoomClick()'>
-    <span class="fa fa-search-plus fa-fw" aria-hidden="true"></span>&nbsp;{{buttonText}}
-</button>
+<div class="input-group input-group-sm">
+    <button type="button" class="btn btn-sm btn-inverse active" (click)="zoomOut()">
+        <span class="fa fa-minus-square fa-fw" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-sm btn-inverse active" id="map-theme-text" (click)='zoomClick()' style="margin-left: 2px;">
+        <span class="fa fa-search-plus fa-fw" aria-hidden="true"></span>&nbsp;{{buttonText}}
+    </button>
+    <button type="button" class="btn btn-sm btn-inverse active" (click)="zoomIn()" style="margin-left: 2px;">
+        <span class="fa fa-plus-square fa-fw" aria-hidden="true"></span>
+    </button>
+</div>

@@ -160,7 +160,7 @@ $topnav-background-color: #222;
 
 // Fix issue with datepicker z-index
 ::ng-deep ngb-datepicker.dropdown-menu.ng-star-inserted {
-    //left: 0px !important;
+    left: 0px !important;
 }
 
 .records-spinner {

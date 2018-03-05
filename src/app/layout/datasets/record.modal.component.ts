@@ -14,33 +14,46 @@ export class RecordModalContent {
 
     @Input() record: any;
 
-    // Service submenu dropdowns
-    ncssExpanded: boolean = true;
-    wcsExpanded: boolean = true;
-    wmsExpanded: boolean = true;
-    wwwExpanded: boolean = true;
+    // Types of online resources
+    onlineResources: any = {
+        'NCSS': {
+            'name': 'NetCDF Subset Services',
+            'expanded': true
+        },
+        'WCS': {
+            'name': 'OGC Web Coverage Service 1.0.0',
+            'expanded': true
+        },
+        'WMS': {
+            'name': 'OGC Web Map Service 1.1.1',
+            'expanded': true
+        },
+        'WWW': {
+            'name': 'Web Link',
+            'expanded': true
+        }
+
+    };
 
 
     constructor(public activeModal: NgbActiveModal) { }
 
 
     /**
-     * 
-     * @param cswRecord 
+     * Get a list of online resource types for iteration
      */
-    public getNetCDFServices(cswRecord: CSWRecordModel): OnlineResourceModel[] {
-        let serviceList: OnlineResourceModel[] = [];
-        for (const onlineResource of cswRecord.onlineResources) {
-            if (onlineResource.type === Constants.resourceType.NCSS) {
-                let res: OnlineResourceModel = onlineResource;
-                res.cswRecord = cswRecord;
-                serviceList.push(res);
-            }
-        }
-        return serviceList;
+    getOnlineResourceTypes(): string[] {
+        return Object.keys(this.onlineResources);
     }
 
 
+    /**
+     * Get all online resources of a particular resource type for a given
+     * CSW record
+     * 
+     * @param cswRecord the CSW Record
+     * @param resourceType  the resource type
+     */
     public getOnlineResources(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
         let serviceList: OnlineResourceModel[] = [];
         for (const onlineResource of cswRecord.onlineResources) {

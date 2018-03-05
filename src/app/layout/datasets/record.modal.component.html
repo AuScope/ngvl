@@ -47,64 +47,23 @@
         </div>
 
         <!-- Services -->
-        <div *ngIf="getOnlineResources(record, 'NCSS').length>0">
-            <div style="border: 1px solid; background-color: lightgray;">
-                <a (click)="ncssExpanded=!ncssExpanded" class="panel-header" style="cursor:pointer; margin: 2px;">
-                    <span>&nbsp;NetCDF Subset Services ({{ getOnlineResources(record, 'NCSS').length }} item<span *ngIf="getOnlineResources(record, 'NCSS').length>1">s</span>)</span>
-                    <i *ngIf="!ncssExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
-                    <i *ngIf="ncssExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
-                </a>
-                <div *ngFor="let resource of getOnlineResources(record, 'NCSS')" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
-                    <div *ngIf="ncssExpanded" style="margin: 2px;">
-                        <strong>{{ resource.name }}</strong>
-                        <a href="{{ resource.url }}" target="_blank">{{ resource.url }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- VGL has Describe Coverage -> Link to XML -->
-        <div *ngIf="getOnlineResources(record, 'WCS').length>0">
-            <div style="border: 1px solid; background-color: lightgray;">
-                <a (click)="wcsExpanded=!wcsExpanded" class="panel-header" style="cursor:pointer; margin: 2px;">
-                    <span>&nbsp;OGC Web Coverage Service 1.0.0 ({{ getOnlineResources(record, 'WCS').length }} item<span *ngIf="getOnlineResources(record, 'WCS').length>1">s</span>)</span>
-                    <i *ngIf="!wcsExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
-                    <i *ngIf="wcsExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
-                </a>
-                <div *ngFor="let resource of getOnlineResources(record, 'WCS')" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
-                    <div *ngIf="wcsExpanded" style="margin: 2px;">
-                        <strong>{{ resource.name }}</strong>
-                        <a href="{{ resource.url }}" target="_blank">{{ resource.url }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- TODO: VGL has layer preview -->
-        <div *ngIf="getOnlineResources(record, 'WMS').length>0">
-            <div style="border: 1px solid; background-color: lightgray;">
-                <a (click)="wmsExpanded=!wmsExpanded" class="panel-header" style="cursor:pointer; margin: 2px;">
-                    <span>&nbsp;OGC Web Map Service 1.1.1 ({{ getOnlineResources(record, 'WMS').length }} item<span *ngIf="getOnlineResources(record, 'WMS').length>1">s</span>)</span>
-                    <i *ngIf="!wmsExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
-                    <i *ngIf="wmsExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
-                </a>
-                <div *ngFor="let resource of getOnlineResources(record, 'WMS')" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
-                    <div *ngIf="wmsExpanded" style="margin: 2px;">
-                        <strong>{{ resource.name }}</strong>
-                        <a href="{{ resource.url }}" target="_blank">{{ resource.url }}</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div *ngIf="getOnlineResources(record, 'WWW').length>0">
-            <div style="border: 1px solid; background-color: lightgray;">
-                <a (click)="wwwExpanded=!wwwExpanded" class="panel-header" style="cursor:pointer; margin: 2px;">
-                    <span>&nbsp;Web Link ({{ getOnlineResources(record, 'WWW').length }} item<span *ngIf="getOnlineResources(record, 'WWW').length>1">s</span>)</span>
-                    <i *ngIf="!wwwExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
-                    <i *ngIf="wwwExpanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
-                </a>
-                <div *ngFor="let resource of getOnlineResources(record, 'WWW')" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
-                    <div *ngIf="wwwExpanded" style="margin: 2px;">
-                        <strong>{{ resource.name }}</strong>
-                        <a href="{{ resource.url }}" target="_blank">{{ resource.url }}</a>
+        <div *ngIf="record.hasOwnProperty('onlineResources') && record.onlineResources.length>0">
+            <div *ngFor="let resourceType of getOnlineResourceTypes()">
+                <div *ngIf="getOnlineResources(record, resourceType).length>0">
+                    <div style="border: 1px solid; background-color: lightgray;">
+                        <a (click)="onlineResources[resourceType].expanded=!onlineResources[resourceType].expanded" class="panel-header" style="cursor:pointer; margin: 2px;">
+                            <span>&nbsp;{{ onlineResources[resourceType].name }}&nbsp;({{ getOnlineResources(record, resourceType).length }}&nbsp;item<span *ngIf="getOnlineResources(record, resourceType).length>1">s</span>)</span>
+                            <i *ngIf="!onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
+                            <i *ngIf="onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
+                        </a>
+                        <div *ngFor="let resource of getOnlineResources(record, resourceType)" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
+                            <div *ngIf="onlineResources[resourceType].expanded" style="margin: 2px;">
+                                <strong>{{ resource.name }}</strong>
+                                <a href="{{ resource.url }}" target="_blank">{{ resource.url }}</a>
+                                <!-- TODO: WCS Describe Coverage, link to XML -->
+                                <!-- TODO: WMS layer preview -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

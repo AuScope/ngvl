@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
+import { UserStateService } from './shared';
 
 
 // AoT requires an exported function for factories
@@ -38,7 +39,7 @@ export function createTranslateLoader(http: HttpClient) {
         AppRoutingModule
     ],
     declarations: [AppComponent],
-    providers: [AuthGuard],
+    providers: [AuthGuard, UserStateService],
     bootstrap: [AppComponent]
 })
 export class AppModule {}

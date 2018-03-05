@@ -6,6 +6,8 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
+import { UserStateService, ViewType } from '../../../shared';
+
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
@@ -17,9 +19,14 @@ export class SidebarComponent implements OnInit {
   showMenu: string = '';
   cswRecords = [];
 
-  constructor(private layerHandlerService: LayerHandlerService, private olMapService: OlMapService,  private httpClient: HttpClient) {
+  private currentView: ViewType;
 
-  }
+  constructor(
+    private layerHandlerService: LayerHandlerService,
+    private olMapService: OlMapService,
+    private userStateService: UserStateService,
+    private httpClient: HttpClient
+  ) {}
 
   ngOnInit(): void {
     let httpParams = new HttpParams();
@@ -33,6 +40,16 @@ export class SidebarComponent implements OnInit {
     }).subscribe(response => {
       this.cswRecords = response['data'].records;
     });
+
+    // Listen for the current user view, and display the appropriate
+    // view-specific components.
+    this.userStateService.currentView
+      .subscribe(viewType => this.showComponentForView(viewType));
+
+  }
+
+  showComponentForView(viewType: ViewType) {
+    this.currentView = viewType;
   }
 
   eventCalled() {

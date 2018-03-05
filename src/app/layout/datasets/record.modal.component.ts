@@ -32,7 +32,6 @@ export class RecordModalContent {
             'name': 'Web Link',
             'expanded': true
         }
-
     };
 
 
@@ -59,7 +58,6 @@ export class RecordModalContent {
         for (const onlineResource of cswRecord.onlineResources) {
             if (onlineResource.type === resourceType) {
                 let res: OnlineResourceModel = onlineResource;
-                //res.cswRecord = cswRecord;
                 serviceList.push(res);
             }
         }

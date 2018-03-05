@@ -155,7 +155,6 @@
                         </div>
                     </li>
                     <!-- Publication date -->
-                    <!-- TODO: Bring calendars to front, currently partially obscured under map -->
                     <li>
                         <a style="color:white;" (click)="pubDateIsCollapsed = !pubDateIsCollapsed">
                             <span>Publication Date</span>
@@ -163,38 +162,24 @@
                             <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                         </a>
                         <div [ngbCollapse]="pubDateIsCollapsed">
-                            <!-- Form required for Datepicker -->
-                            <form class="form-inline">
-                                <div class="form-group">
-                                    <div class="input-group input-group-sm">
-                                        <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
-                                        <!-- TODO: Validation -->
-                                        <input class="form-control" id="date-from" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" (ngModelChange)="publicationDateChanged()"
-                                            ngbDatepicker #df="ngbDatepicker">
-                                        <div class="input-group-btn input-group-append">
-                                            <button class="btn btn-secondary" type="button" (click)="df.toggle()">
-                                                <i class="fa fa-calendar"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                            <div class="input-group input-group-sm">
+                                <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
+                                <!-- TODO: Validation -->
+                                <input class="form-control" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" ngbDatepicker #df="ngbDatepicker" (ngModelChange)="publicationDateChanged()">
+                                <div class="input-group-addon" (click)="df.toggle()" >
+                                    <span class="fa fa-calendar"></span>
                                 </div>
-                            <!--</form>-->
-                            <!--<form class="form-inline">-->
-                                <div class="form-group">
-                                    <div class="input-group input-group-sm" style="position: relative;">
-                                        <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
-                                        <!-- TODO: Validation -->
-                                        <input class="form-control" id="date-to" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" (ngModelChange)="publicationDateChanged()"
-                                            ngbDatepicker #dt="ngbDatepicker">
-                                        <div class="input-group-btn input-group-append">
-                                            <button class="btn btn-secondary" type="button" (click)="dt.toggle()">
-                                                <i class="fa fa-calendar"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="input-group input-group-sm" style="position: relative;">
+                                <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
+                                <!-- TODO: Validation -->
+                                <input class="form-control" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" ngbDatepicker #dt="ngbDatepicker" (ngModelChange)="publicationDateChanged()">
+                                <div class="input-group-addon" (click)="dt.toggle()" >
+                                    <span class="fa fa-calendar"></span>
                                 </div>
-                            </form>
+                            </div>
                         </div>
+                        
                     </li>
                     <!-- Available registries -->
                     <li>

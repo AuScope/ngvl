@@ -423,7 +423,6 @@ export class SidebarComponent implements OnInit {
      */
     public publicationDateChanged(): void {
         if (this.isValidDate(this.dateFrom) && this.isValidDate(this.dateTo)) {
-            console.log("PubDate change - searching...");
             this.resetFacetedSearch();
         }
     }

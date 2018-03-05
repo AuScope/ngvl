@@ -1,4 +1,5 @@
 import { environment } from '../../environments/environment';
+import { DatePickerComponent } from './bs-component/components/date-picker/date-picker.component';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { PortalCorePipesModule } from 'portal-core-ui/uiutilities/portal-core.pipes.module';
@@ -24,7 +25,7 @@ import { RecordModalContent } from './datasets/record.modal.component';
         TranslateModule,
         NgbModule.forRoot()
     ],
-    declarations: [LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent],
+    declarations: [LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent],
     providers: [CSWSearchService],
     entryComponents: [RecordModalContent]
 })

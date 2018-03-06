@@ -422,7 +422,7 @@ export class SidebarComponent implements OnInit {
 
 
     /**
-     * 
+     * Re-run faceted search whenpublication dates change
      */
     public publicationDateChanged(): void {
         if (this.isValidDate(this.dateFrom) && this.isValidDate(this.dateTo)) {
@@ -432,7 +432,8 @@ export class SidebarComponent implements OnInit {
 
 
     /**
-     * Add a new empty 
+     * Add a new empty keyword to the end of the list so that an empty
+     * typeahead is added to the UI
      */
     public addNewKeyword(): void {
         this.selectedKeywords.push("");
@@ -455,6 +456,7 @@ export class SidebarComponent implements OnInit {
 
     /**
      * Remove a selected keyword
+     * 
      * @param index 
      */
     public removeKeyword(index: number): void {
@@ -469,6 +471,7 @@ export class SidebarComponent implements OnInit {
 
     /**
      * Get service information
+     * 
      * @param id the ID of the service
      */
     public getService(id: string): any {

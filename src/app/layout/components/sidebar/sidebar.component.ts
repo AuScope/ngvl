@@ -55,24 +55,26 @@ export class SidebarComponent implements OnInit {
     dateTo: any = null;
     dateFrom: any = null;
     availableRegistries: any = [];
-    
+
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     //focus$ = new Subject<string>();
     click$ = new Subject<string>();
     searchKeywords = (text$: Observable<string>) =>
         text$
-        .debounceTime(200)
-        .distinctUntilChanged()
-        //.merge(this.focus$)
-        .merge(this.click$.filter(() => !this.typeaheadInstance.isPopupOpen()))
-        .map(term => (term === '' ? this.availableKeywords : this.availableKeywords.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10));
+            .debounceTime(200)
+            .distinctUntilChanged()
+            //.merge(this.focus$)
+            .merge(this.click$.filter(() => !this.typeaheadInstance.isPopupOpen()))
+            .map(term => (term === '' ? this.availableKeywords : this.availableKeywords.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10));
 
 
-    constructor(/*private layerHandlerService: LayerHandlerService, */private olMapService: OlMapService,
-        private httpClient: HttpClient, private cswSearchService: CSWSearchService,
-        private modalService: NgbModal) {
+    constructor(private olMapService: OlMapService,
+                private httpClient: HttpClient,
+                private cswSearchService: CSWSearchService,
+                private modalService: NgbModal) {
     }
+
 
     ngOnInit(): void {
         // Load available registries
@@ -95,12 +97,13 @@ export class SidebarComponent implements OnInit {
 
         // Define available services
         this.availableServices = [
-            {'id': 'wcs', 'name': 'WCS', 'checked': false},
-            {'id': 'ncss', 'name': 'NCSS', 'checked': false},
-            {'id': 'opendap', 'name': 'OPeNDAP', 'checked': false},
-            {'id': 'wfs', 'name': 'WFS', 'checked': false},
-            {'id': 'wms', 'name': 'WMS', 'checked': false}];
+            { 'id': 'wcs', 'name': 'WCS', 'checked': false },
+            { 'id': 'ncss', 'name': 'NCSS', 'checked': false },
+            { 'id': 'opendap', 'name': 'OPeNDAP', 'checked': false },
+            { 'id': 'wfs', 'name': 'WFS', 'checked': false },
+            { 'id': 'wms', 'name': 'WMS', 'checked': false }];
     }
+
 
     eventCalled() {
         this.isActive = !this.isActive;
@@ -128,7 +131,7 @@ export class SidebarComponent implements OnInit {
             }
         });
         // If no registries are selected, there's nothing to search
-        if(!registrySelected)
+        if (!registrySelected)
             return;
 
         let fields: string[] = [];
@@ -159,7 +162,7 @@ export class SidebarComponent implements OnInit {
 
         // Keywords
         this.selectedKeywords.forEach(keyword => {
-            if(keyword != '') {
+            if (keyword != '') {
                 fields.push('keyword');
                 values.push(keyword);
                 types.push('string');
@@ -168,8 +171,8 @@ export class SidebarComponent implements OnInit {
         });
 
         // Available services
-        for(let service of this.availableServices) {
-            if(service.checked) {
+        for (let service of this.availableServices) {
+            if (service.checked) {
                 fields.push('servicetype');
                 values.push(service.name);
                 types.push('string');
@@ -193,18 +196,18 @@ export class SidebarComponent implements OnInit {
 
         this.recordsLoading = true;
         this.cswSearchService.getFacetedSearch(starts, limit, serviceIds, fields, values, types, comparisons)
-                .subscribe(response => {
-            for(let registry of this.availableRegistries) {
-                registry.prevIndices.push(registry.startIndex);
-                registry.startIndex = response.nextIndexes[registry.id];
-            }
-            this.cswSearchResults = response.records;
-            this.recordsLoading = false;
-        }, error => {
-            // TODO: proper error reporting
-            console.log("Faceted search error: " + error.message);
-            this.recordsLoading = false;
-        });
+            .subscribe(response => {
+                for (let registry of this.availableRegistries) {
+                    registry.prevIndices.push(registry.startIndex);
+                    registry.startIndex = response.nextIndexes[registry.id];
+                }
+                this.cswSearchResults = response.records;
+                this.recordsLoading = false;
+            }, error => {
+                // TODO: proper error reporting
+                console.log("Faceted search error: " + error.message);
+                this.recordsLoading = false;
+            });
     }
 
 
@@ -221,7 +224,7 @@ export class SidebarComponent implements OnInit {
             }
         }
         // If no registries are selected, there's nothing to search
-        if(!registrySelected)
+        if (!registrySelected)
             return;
         this.cswSearchService.getFacetedKeywords(serviceIds).subscribe(data => {
             this.availableKeywords = data;
@@ -238,7 +241,7 @@ export class SidebarComponent implements OnInit {
     public resetFacetedSearch(): void {
         this.currentCSWRecordPage = 1;
         // Reset registry start and previous indices
-        for(let registry of this.availableRegistries) {
+        for (let registry of this.availableRegistries) {
             registry.startIndex = 1;
             registry.prevIndices = [];
         }
@@ -262,8 +265,8 @@ export class SidebarComponent implements OnInit {
      *          otherwise
      */
     public hasNextResultsPage(): boolean {
-        for(let registry of this.availableRegistries) {
-            if(registry.startIndex != 0) {
+        for (let registry of this.availableRegistries) {
+            if (registry.startIndex != 0) {
                 return true;
             }
         }
@@ -277,8 +280,8 @@ export class SidebarComponent implements OnInit {
     public previousResultsPage(): void {
         if (this.currentCSWRecordPage != 1) {
             this.currentCSWRecordPage -= 1;
-            for(let registry of this.availableRegistries) {
-                if(registry.prevIndices.length >= 2) {
+            for (let registry of this.availableRegistries) {
+                if (registry.prevIndices.length >= 2) {
                     registry.startIndex = registry.prevIndices[registry.prevIndices.length - 2];
                     registry.prevIndices.splice(registry.prevIndices.length - 2, 2);
                 }
@@ -304,7 +307,7 @@ export class SidebarComponent implements OnInit {
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         try {
             this.olMapService.addCSWRecord(cswRecord);
-        } catch(error) {
+        } catch (error) {
             // TODO: Proper error reporting
             alert(error.message);
         }
@@ -325,7 +328,7 @@ export class SidebarComponent implements OnInit {
      * @param cswRecord 
      */
     public displayRecordInformation(cswRecord) {
-        if(cswRecord) {
+        if (cswRecord) {
             const modelRef = this.modalService.open(RecordModalContent);
             modelRef.componentInstance.record = cswRecord;
         }
@@ -404,7 +407,7 @@ export class SidebarComponent implements OnInit {
 
     }
 
-    
+
     /**
      * 
      * @param extent 
@@ -429,34 +432,47 @@ export class SidebarComponent implements OnInit {
 
 
     /**
-     * 
-     * @param index 
+     * Add a new empty 
      */
-    public addOrUpdateKeyword(index: number, keyword: string): void {
-        if(keyword != null && keyword != "" && !(this.selectedKeywords.some(k=>k==keyword))) {
-            this.selectedKeywords[index] = keyword;
-            // Push a new empty keyword
-            this.selectedKeywords.push("");
+    public addNewKeyword(): void {
+        this.selectedKeywords.push("");
+    }
+
+
+    /**
+     * Fires when a new keyword is selected from a keyword typeahead
+     * 
+     * @param index index of the typeahead from which a selection was made
+     * @param $event allows us to get the typeahead selection
+     */
+    public keywordSelected(index: number, $event): void {
+        if ($event.item != null && $event.item != "" && !(this.selectedKeywords.some(k => k == $event.item))) {
+            this.selectedKeywords[index] = $event.item;
             this.resetFacetedSearch();
         }
     }
 
 
     /**
-     * 
+     * Remove a selected keyword
      * @param index 
      */
     public removeKeyword(index: number): void {
         this.selectedKeywords.splice(index, 1);
-        if(this.selectedKeywords.length==0) {
+        if (this.selectedKeywords.length == 0) {
             // If no keywords, push a new empty keyword
             this.selectedKeywords.push("");
         }
         this.resetFacetedSearch();
     }
 
+
+    /**
+     * Get service information
+     * @param id the ID of the service
+     */
     public getService(id: string): any {
-        return this.availableServices.find(s=>s.id===id);
+        return this.availableServices.find(s => s.id === id);
     }
 
 

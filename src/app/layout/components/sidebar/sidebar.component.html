@@ -82,12 +82,12 @@
                                 <div class="input-group input-group-sm">
                                     <!-- TODO: Catch update change event, update model -->
                                     <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]=selectedKeywords[i] 
-                                        (click)="click$.next($event.target.value)" #instance="ngbTypeahead" />
+                                        (click)="click$.next($event.target.value)" #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"/>
                                     <div class="input-group-btn input-group-apppend">
-                                            <button *ngIf="i==selectedKeywords.length-1" class="btn btn-secondary" type="button" (click)="addOrUpdateKeyword(i, keyword.value)" style="background-color:green;">
+                                            <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary" type="button" (click)="addNewKeyword()" style="background-color:green;">
                                                 <i class="fa fa-plus-circle"></i>
                                             </button>
-                                        <button *ngIf="i!=selectedKeywords.length-1" class="btn btn-secondary" type="button" (click)="removeKeyword(i)" style="background-color:red;">
+                                        <button *ngIf="selectedKeywords[i]!=''" class="btn btn-secondary" type="button" (click)="removeKeyword(i)" style="background-color:red;">
                                             <i class="fa fa-minus-circle"></i>
                                         </button>
                                     </div>

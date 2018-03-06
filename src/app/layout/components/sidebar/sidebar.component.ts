@@ -175,7 +175,7 @@ export class SidebarComponent implements OnInit {
             if (service.checked) {
                 fields.push('servicetype');
                 values.push(service.name);
-                types.push('string');
+                types.push('servicetype');
                 comparisons.push('eq');
             }
         }

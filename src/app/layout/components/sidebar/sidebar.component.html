@@ -220,8 +220,12 @@
                             </div>
                             <li *ngFor="let cswRecord of cswSearchResults" style="margin-top:2px;margin-right:2px;margin-left:2px;">
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-btn">
-                                        <button *ngIf="!olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
+                                    <span class="input-group-prepend">
+                                        <!-- Record must have online resources and not already be added to map to have an add button -->
+                                        <button *ngIf="!cswRecord.hasOwnProperty('onlineResources') || cswRecord.onlineResources.length==0" class="btn btn-sm" data-toggle="tooltip" title="Layer has no associated online resources and as such, cannot be added">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                        <button *ngIf="cswRecord.hasOwnProperty('onlineResources') && cswRecord.onlineResources.length>0 && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
                                             (click)="addCSWRecord(cswRecord)">
                                             <i class="fa fa-plus-circle" style="color:green;"></i>
                                         </button>
@@ -230,13 +234,13 @@
                                             <i class="fa fa-trash" style="color:red;"></i>
                                         </button>
                                     </span>
-                                    <input class="text text-truncate small" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
-                                    <span class="input-group-btn">
+                                    <input class="input-group-text text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
+                                    <span class="input-group-append">
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
                                             <i class="fa fa-info-circle" style="color:blue;"></i>
                                         </button>
                                     </span>
-                                    <span class="input-group-btn">
+                                    <span class="input-group-append" *ngIf="cswRecord.hasOwnProperty('geographicElements') && cswRecord.geographicElements.length>0">
                                         <!-- TODO: Delay required to stop dblclick registering as 2 single clicks -->
                                         <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
                                             (dblclick)="zoomToCSWRecordBounds(cswRecord)">

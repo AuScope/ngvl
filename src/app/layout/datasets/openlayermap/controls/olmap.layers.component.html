@@ -1,0 +1,54 @@
+<!-- TODO: Any styles to CSS -->
+<!-- TODO: Translations -->
+<ngb-accordion #acc="ngbAccordion">
+    <ngb-panel>
+        <ng-template ngbPanelTitle>
+            <span>&nbsp;Active Layers</span>
+            <i *ngIf="activeLayersIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+            <i *ngIf="!activeLayersIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+        </ng-template>
+        <ng-template ngbPanelContent>
+            <div *ngIf="getActiveLayerCount()==0" style="padding:1.25rem;">
+                No layers have been added to the map.
+            </div>
+            <div *ngIf="getActiveLayerCount()>0">
+                <div *ngFor="let layer of getActiveLayers()" style="margin-bottom:2px;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-prepend">
+                            <!-- TODO: Request status icon should show status (e.g. loading spinner, tick for complete etc.)
+                            <button *ngIf="!olMapService.layerLoading(layer.id)" class="btn btn-sm" data-toggle="tooltip" title="TODO: Request status">
+                                <i class="fa fa-check"></i>
+                            </button>
+                            <button *ngIf="olMapService.layerLoading(layer.id)" class="btn btn-sm" data-toggle="tooltip" title="TODO: Request status">
+                                <i class="fa fa-spinner"></i>
+                            </button>
+                            -->
+                            <button class="btn btn-sm">
+                                <i class="fa fa-check" style="color:green;"></i>
+                            </button>
+                        </span>
+                        <input class="input-group-text text-truncate" style="width:100%;" data-toggle="tooltip" title="{{ layer.name }}" value="{{ layer.name }}" readonly>
+                        <span class="input-group-append">
+                            <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
+                                <i class="fa fa-info-circle" style="color:blue;"></i>
+                            </button>
+                        </span>
+                        <span class="input-group-append">
+                            <button *ngIf="!layer.hidden" class="btn btn-sm" data-toggle="tooltip" title="Click to hide layer" (click)="toggleLayerVisibility(layer)">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            <button *ngIf="layer.hidden" class="btn btn-sm" data-toggle="tooltip" title="Click to make layer visibility" (click)="toggleLayerVisibility(layer)">
+                                <i class="fa fa-eye-slash"></i>
+                            </button>
+                        </span>
+                        <span class="input-group-append">
+                            <button class="btn btn-sm" data-toggle="tooltip" title="Remove layer from map" (click)="removeRecord(layer.id)">
+                                <i class="fa fa-trash" style="color:red;"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </ngb-panel>
+</ngb-accordion>

@@ -4,11 +4,13 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { RouteReuseStrategy } from '@angular/router';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { CustomReuseStrategy } from './app-custom-reuse-strategy';
 import { AuthGuard } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
@@ -38,7 +40,7 @@ export function createTranslateLoader(http: HttpClient) {
         AppRoutingModule
     ],
     declarations: [AppComponent],
-    providers: [AuthGuard],
+    providers: [AuthGuard, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
     bootstrap: [AppComponent]
 })
 export class AppModule {}

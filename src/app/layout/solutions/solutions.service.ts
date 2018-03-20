@@ -1,22 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { environment } from '../../../environments/environment';
-
-import { Solution, Problem } from './models';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { Solution, Problem } from '../../shared/modules/vgl/models';
 
 @Injectable()
 export class SolutionsService {
 
-  const getSolutionsUrl = environment.portalBaseUrl + ''
+  constructor(private vgl: VglService) {}
 
-  constructor(private http: HttpClient) {}
-
-  getSolutions(): Observable<Solution[]> {
-    return this.http.get<Solution[]>()
+  public getSolutions(): Observable<Problem[]> {
+    return this.vgl.problems;
   }
 
 }

@@ -13,33 +13,34 @@ import { AuthGuard } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { UserStateService } from './shared';
-
+import { VglModule } from './shared';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
-    // for development
-    // return new TranslateHttpLoader(http, '/start-angular/SB-Admin-BS4-Angular-5/master/dist/assets/i18n/', '.json');
-    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  // for development
+  // return new TranslateHttpLoader(http, '/start-angular/SB-Admin-BS4-Angular-5/master/dist/assets/i18n/', '.json');
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 @NgModule({
-    imports: [
-        PortalCoreModule.forRoot(environment),
-        CommonModule,
-        BrowserModule,
-        BrowserAnimationsModule,
-        HttpClientModule,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: createTranslateLoader,
-                deps: [HttpClient]
-            }
-        }),
-        AppRoutingModule
-    ],
-    declarations: [AppComponent],
-    providers: [AuthGuard, UserStateService],
-    bootstrap: [AppComponent]
+  imports: [
+    PortalCoreModule.forRoot(environment),
+    CommonModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
+      }
+    }),
+    AppRoutingModule,
+    VglModule
+  ],
+  declarations: [AppComponent],
+  providers: [AuthGuard, UserStateService],
+  bootstrap: [AppComponent]
 })
 export class AppModule {}

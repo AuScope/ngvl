@@ -2,31 +2,41 @@ import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
+import { Observable } from 'rxjs/Observable';
+
+import { UserStateService } from '../../../shared';
+
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-    pushRightClass: string = 'push-right';
+  pushRightClass: string = 'push-right';
 
-    constructor(private translate: TranslateService, public router: Router) {
+  username$: Observable<string>;
 
-        this.translate.addLangs(['en', 'fr', 'ur', 'es', 'it', 'fa', 'de']);
-        this.translate.setDefaultLang('en');
-        const browserLang = this.translate.getBrowserLang();
-        this.translate.use(browserLang.match(/en|fr|ur|es|it|fa|de/) ? browserLang : 'en');
+  constructor(private translate: TranslateService,
+              private userStateService: UserStateService,
+              public router: Router) {
 
-        this.router.events.subscribe(val => {
-            if (
-                val instanceof NavigationEnd &&
-                window.innerWidth <= 992 &&
-                this.isToggled()
-            ) {
-                this.toggleSidebar();
-            }
-        });
-    }
+    this.translate.addLangs(['en', 'fr', 'ur', 'es', 'it', 'fa', 'de']);
+    this.translate.setDefaultLang('en');
+    const browserLang = this.translate.getBrowserLang();
+    this.translate.use(browserLang.match(/en|fr|ur|es|it|fa|de/) ? browserLang : 'en');
+
+    this.router.events.subscribe(val => {
+      if (
+        val instanceof NavigationEnd &&
+          window.innerWidth <= 992 &&
+          this.isToggled()
+      ) {
+        this.toggleSidebar();
+      }
+    });
+
+    this.username$ = this.userStateService.user.map(user => user.fullName);
+  }
 
     ngOnInit() {}
 
@@ -45,11 +55,12 @@ export class HeaderComponent implements OnInit {
         dom.classList.toggle('rtl');
     }
 
-    onLoggedout() {
-        localStorage.removeItem('isLoggedin');
-    }
+  onLoggedout() {
+    localStorage.removeItem('isLoggedin');
+  }
 
     changeLang(language: string) {
         this.translate.use(language);
     }
+
 }

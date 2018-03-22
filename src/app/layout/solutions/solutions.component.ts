@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 
+import { Observable } from 'rxjs/Observable';
+
+import { UserStateService, SOLUTIONS_VIEW } from '../../shared';
+import { Problem, Solution } from '../../shared/modules/vgl/models';
+
 @Component({
   selector: 'app-solutions',
   templateUrl: './solutions.component.html',
@@ -9,9 +14,28 @@ import { routerTransition } from '../../router.animations';
 })
 export class SolutionsComponent implements OnInit {
 
-  constructor() { }
+  selectedProblem: Problem;
+
+  cart$: Observable<Solution[]>;
+
+  constructor(private userStateService: UserStateService) {}
 
   ngOnInit() {
+    // Notify user state that we're using the solutions view
+    this.userStateService.setView(SOLUTIONS_VIEW);
+
+    // Subscribe to the current solution query to display relevant
+    // results/selections.
+    this.userStateService.solutionQuery.subscribe(query => {
+      const { problems } = query;
+      this.selectedProblem = problems ? problems[0] : null;
+    });
+
+    this.cart$ = this.userStateService.selectedSolutions;
+  }
+
+  selectSolution(solution: Solution) {
+    this.userStateService.selectSolution(solution);
   }
 
 }

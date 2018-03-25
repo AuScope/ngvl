@@ -1,0 +1,17 @@
+[
+  {
+    "context": ["/VGL-Portal/**"],
+    "target": "http://localhost:8080/",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  },
+  {
+    "context": ["/fake-portal/**"],
+    "target": "http://localhost:8080/",
+    "pathRewrite": {"^/fake-portal" : "/VGL-Portal"},
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true
+  }
+]

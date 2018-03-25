@@ -14,6 +14,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { CSWSearchService } from '../shared/services/csw-search.service';
 import { RecordModalContent } from './datasets/record.modal.component';
+import { SolutionsModule } from './solutions/solutions.module';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { RecordModalContent } from './datasets/record.modal.component';
         FormsModule,
         LayoutRoutingModule,
         TranslateModule,
-        NgbModule.forRoot()
+        NgbModule.forRoot(),
+        SolutionsModule
     ],
     declarations: [LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent],
     providers: [CSWSearchService],

@@ -1,6 +1,45 @@
 <div [@routerTransition]>
-  <app-page-header [heading]="'Solutions Explorer'" [icon]="'fa-map-signs'"></app-page-header>
-  <p>
-    Solutions works! Now with aot in dev!
-  </p>
+
+  <div class="row justify-content-between">
+    <div class="col-sm-6">
+      <div class="page-header">
+        <h1>Problem detail</h1>
+        <hr>
+      </div>
+      <div class="problem-info" *ngIf="selectedProblem">
+        <h3>{{ selectedProblem.name }}</h3>
+        <p>{{ selectedProblem.description }}</p>
+        <a [attr.href]="selectedProblem['@id']" target="_blank">More info...</a>
+      </div>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="card">
+        <div class="card-header">Cart</div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" *ngFor="let solution of cart$ | async">
+            {{ solution.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="solution-results" *ngIf="selectedProblem?.solutions">
+    <div class="page-header">
+      <h1>Solutions</h1>
+      <hr>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-4 card" *ngFor="let solution of selectedProblem.solutions">
+        <div class="card-body">
+          <h3 class="card-title">{{ solution.name }}</h3>
+          <p class="card-text">{{ solution.description }}</p>
+          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
+          <a [attr.href]="solution['@id']" target="_blank">More info...</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

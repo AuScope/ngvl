@@ -6,6 +6,7 @@
 export const environment = {
   production: false,
   getCSWRecordUrl: 'getKnownLayers.do',
-  portalBaseUrl: 'http://gis-dev-or.it.csiro.au:8080/VGL-Portal/',
+  portalBaseUrl: '/VGL-Portal/',
+  //portalBaseUrl: 'http://gis-dev-or.it.csiro.au:8080/VGL-Portal/',
 
 };

@@ -18,12 +18,16 @@ import { Subject } from 'rxjs/Subject';
 import { ViewChild } from '@angular/core';
 
 
+import { UserStateService, ViewType } from '../../../shared';
+
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
+
+    private currentView: ViewType;
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
     currentCSWRecordPage: number = 1;
@@ -71,6 +75,7 @@ export class SidebarComponent implements OnInit {
 
     constructor(private olMapService: OlMapService,
                 private httpClient: HttpClient,
+                private userStateService: UserStateService,
                 private cswSearchService: CSWSearchService,
                 private modalService: NgbModal) {
     }
@@ -102,12 +107,23 @@ export class SidebarComponent implements OnInit {
             { 'id': 'opendap', 'name': 'OPeNDAP', 'checked': false },
             { 'id': 'wfs', 'name': 'WFS', 'checked': false },
             { 'id': 'wms', 'name': 'WMS', 'checked': false }];
+
+        // Listen for the current user view, and display the appropriate
+        // view-specific components.
+        this.userStateService.currentView
+            .subscribe(viewType => this.showComponentForView(viewType));
     }
+
+    
+  showComponentForView(viewType: ViewType) {
+    this.currentView = viewType;
+  }
 
 
     eventCalled() {
         this.isActive = !this.isActive;
     }
+    
 
 
     /**

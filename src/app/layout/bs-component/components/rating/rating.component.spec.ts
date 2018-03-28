@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RatingComponent } from './rating.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('RatingComponent', () => {
   let component: RatingComponent;
@@ -8,7 +9,8 @@ describe('RatingComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RatingComponent ]
+      declarations: [ RatingComponent ],
+      imports: [ NgbModule.forRoot() ]
     })
     .compileComponents();
   }));

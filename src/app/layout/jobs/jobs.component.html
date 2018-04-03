@@ -1,6 +1,69 @@
 <div [@routerTransition]>
-  <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
-  <p>
-    jobs works!
-  </p>
+    <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
+    <div class="row" style="display:flex;">
+        <!-- Job tree -->
+        <!-- TODO: Translations -->
+        <!-- TODO: Move styles to CSS -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">Your Jobs</div>
+                <div class="card-body" style="padding: 0px;">
+                    <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)">
+                        <p-column field="name" header="Name"></p-column>
+                        <p-column field="submitDate" header="Submit Date"></p-column>
+                        <p-column field="status" header="Status"></p-column>
+                    </p-treeTable>
+                </div>                        
+            </div>
+        </div>
+        <!-- Selected job -->
+        <div class="col-auto" style="flex: 1;">
+            <div class="card">
+                <!-- Header: Selected job details or prompt user to select a job -->
+                <div *ngIf="!selectedJobNode">
+                    <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
+                </div>
+                <div *ngIf="selectedJobNode">
+                    <div class="card-header">{{ selectedJob.name }}</div>
+                </div>
+                <div class="card-body" *ngIf="selectedJob" style="padding-top:0px;">
+                    <!-- General job details -->
+                    <div class="row" style="display:flex;">
+                        <table>
+                            <tr>
+                                <td><strong>{{selectedJob.status}}</strong></td>
+                                <td><strong>{{selectedJob.id}}</strong></td>
+                                <td *ngIf="selectedJob.computeInstanceId"><strong>{{selectedJob.computeInstanceId}}</strong></td>
+                                <td *ngIf="!selectedJob.computeInstanceId"><strong>N/A</strong></td>
+                                <td *ngIf="selectedJob.computeInstanceType"><strong>{{selectedJob.computeInstanceType}}</strong></td>
+                                <td *ngIf="!selectedJob.computeInstanceType"><strong>N/A</strong></td>
+                                <td><strong>{{selectedJob.submitDate | date}}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><small>Status</small></td>
+                                <td><small>Job ID</small></td>
+                                <td><small>Instance ID</small></td>
+                                <td><small>Instance Type</small></td>
+                                <td><small>Submitted</small></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="row">
+                        <!-- File panel -->
+                        <div class="col">
+                            <div class="card" style="height:400px;">File Panel</div>
+                        </div>
+                    
+                        <!-- Preview panel -->
+                        <div class="col">
+                                <div class="card" style="height:400px;">Preview Panel</div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

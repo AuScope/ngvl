@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User } from './models';
+import { Problem, Problems, User, TreeJobs } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -32,5 +32,27 @@ export class VglService {
       .map(vglData)
       .map(problems => problems.configuredProblems);
   }
+
+  public get treeJobs(): Observable<TreeJobs> {
+    return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
+        .map(vglData)
+        .map(treeJob => treeJob);
+  }
+
+  /*
+  public get treeJobs(): Observable<TreeJobs> {
+    return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
+      .map(vglData)
+  }
+
+  
+  public get treeNodes(): Observable<TreeNode> {
+    return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
+        .map(vglData)
+        //.map(treeNodes => treeJobs.nodes);
+        .map(treeNodes => treeNodes.nodes);
+  }
+  */
+  
 
 }

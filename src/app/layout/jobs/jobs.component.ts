@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { TreeJobs, TreeJobNode, Job, JobFile } from '../../shared/modules/vgl/models';
+import { TreeJobs, TreeJobNode, Job, JobFile, CloudFileInformation } from '../../shared/modules/vgl/models';
 import { JobsService } from './jobs.service';
 import { TreeNode } from 'primeng/api';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -26,30 +26,64 @@ export class JobsComponent implements OnInit {
     jobs: Job[] = [];
     selectedJob: Job = null;
 
-    // File tree
-    treeFileData: TreeNode[] = [];
-    selectedFileNodes: TreeNode[] = [];
+    // Job cloud files
+    cloudFiles: CloudFileInformation[] = [];
 
-    // Files
-    files: JobFile[];
-    selectedFiles: JobFile[] = [];
-
+    // Spinner flags
     jobsLoading: boolean = false;
+    filesLoading: boolean = false;
+    filePreviewLoading: boolean = false;
+
     newFolderName: string = "";
+
+    cloudFilesIsCollapsed: boolean = false;
+    jobDownloadsIsCollapsed: boolean = false;
 
 
     constructor(private jobsService: JobsService, private modalService: NgbModal) { }
 
 
+    /*
+    private addCloudFilesToFileTree(cloudFiles: CloudFileInformation[]) {
+        if(cloudFiles.length > 0) {
+            for(let file of cloudFiles) {
+                //let node: TreeNode = { data: {name: file.name, size: file.size} };
+                //this.treeFileData.push(node);
+            }
+        }
+        
+    }
+    */
+
+
     /**
      * A new job has been selected, update file panel
+     * 
+     * TODO: IMPORTANT! Cancel all in-progress calls when job is selected,
+     * as currently it's possible cloud files will be added to wrong job XXX
      * 
      * @param event the select node event
      */
     public jobSelected(event) {
+        // Reset Job object and file tree objects
         this.selectedJob = null;
+        this.cloudFiles = [];
+
         if(event.node && event.node.data.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
+            if(this.selectedJob) {
+                // Request job cloud files
+                this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
+                    //fileDetails => this.addCloudFilesToFileTree(fileDetails),
+                    fileDetails => this.cloudFiles = fileDetails,
+                    // TODO: Proper error reporting
+                    error => {
+                        console.log(error.message);
+                    }
+                );
+
+                // TODO: Include Job.jobFiles (part of Job object)? No examples...
+            }
         }
     }
 
@@ -58,13 +92,15 @@ export class JobsComponent implements OnInit {
      * 
      * @param event 
      */
+    /*
     public filesSelected(event) {
         this.selectedFiles = [];
         if(event.node) {
             console.log("XXX Selecting files...");
-            //this.selecteFiles = this.files.find(f => f.id in event.nodes.);
+            //this.selectedFiles = this.files.find(f => f.id in event.nodes.);
         }
     }
+    */
 
 
     /**

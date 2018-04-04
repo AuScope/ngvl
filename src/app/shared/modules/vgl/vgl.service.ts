@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User, TreeJobs, Series } from './models';
+import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -40,11 +40,18 @@ export class VglService {
   }
 
   public addFolder(folderName: string): Observable<Series> {
-      folderName = folderName.trim();
-      const options = {params: new HttpParams().set('seriesName', folderName).set('seriesDescription','') };
-      return this.http.get<VglResponse<Series>>(environment.portalBaseUrl + 'secure/createFolder.do', options)
-        .map(vglData)
-        .map(series => series);
+    folderName = folderName.trim();
+    const options = { params: new HttpParams().set('seriesName', folderName).set('seriesDescription','') };
+    return this.http.get<VglResponse<Series>>(environment.portalBaseUrl + 'secure/createFolder.do', options)
+      .map(vglData)
+      .map(series => series);
+  }
+
+  public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
+    const options = { params: new HttpParams().set('jobId', jobId.toString()) };
+    return this.http.get<VglResponse<CloudFileInformation[]>>(environment.portalBaseUrl + 'secure/jobCloudFiles.do', options)
+      .map(vglData)
+      .map(fileDetails => fileDetails);
   }
 
   /*

@@ -99,7 +99,9 @@
                                 <div class="row">
                                     <div class="col">
                                         <div ngbDropdown class="d-inline-block" style="margin-top:4px; margin-left:4px;">
-                                            <button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedFiles.length===0" ngbDropdownToggle>
+                                            <!--<button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedFiles.length===0" ngbDropdownToggle>-->
+                                            <!-- TODO: Re-enable disabled -->
+                                            <button class="btn btn-sm" id="actionDropwdown" ngbDropdownToggle>
                                                 <i class="fa fa-folder">&nbsp;Actions</i>
                                             </button>
                                             <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
@@ -112,7 +114,71 @@
                                 </div>
                                 <!-- Files table -->
                                 <div class="row">
+                                    <div class="col">
+                                            <div *ngIf="selectedJob.jobDownloads.length > 0">
+                                                <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
+                                                    <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                                                    <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                                                    <!-- TODO: Dynamic name showing count -->
+                                                    <span>Data service downloads</span>
+                                                </a>
+                                                <div [ngbCollapse]="jobDownloadsIsCollapsed">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <th>Name</th>
+                                                            <th>Details</th>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let file of selectedJob.jobDownloads">
+                                                                <td>{{ file.name }}</td>
+                                                                <!-- Is CSS the best way to truncate long URL? -->
+                                                                <td class="trim-info" title="Service call to {{ file.url }}">Service call to <a href="{{ file.url }}">{{ file.url }}</a></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                        <div *ngIf="cloudFiles.length > 0">
+                                            <a (click)="cloudFilesIsCollapsed = !cloudFilesIsCollapsed">
+                                                <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                                                <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                                                <!-- TODO: Dynamic name showing count -->
+                                                <span>Files in cloud storage</span>
+                                            </a>
+                                            <div [ngbCollapse]="cloudFilesIsCollapsed">
+                                                <table class="table">
+                                                    <thead>
+                                                        <th>Name</th>
+                                                        <th>Details</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor="let file of cloudFiles">
+                                                            <td>{{ file.name }}</td>
+                                                            <td>{{ file.size }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
+
+
+                                        <!-- TODO: Other conditions, e.g. cloud storage files -->
+                                        <!--
+                                        <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0" style="margin:20px;">
+                                            <label>This job does not have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.</label>
+                                        </div>
+                                        -->
+
+                                        <!-- TODO: Other conditions, e.g. cloud storage files (add to OR) -->
+                                        <!--
+                                        <div *ngIf="selectedJob && (selectedJob.jobdownload.length>0)">
+
+                                        </div>
+                                        -->
+
+                                    </div>
 
 
                                 </div>

@@ -107,7 +107,6 @@ export class JobDownload {
 
 export interface Job {
     id: number;
-
     name: string;
     description: string;
     emailAddress: string;
@@ -136,6 +135,14 @@ export interface Job {
     jobDownloads: JobDownload[];
     jobFiles: JobFile[];
     //jobSolutions: Solution[]; // XXX needed?
+}
+
+export interface CloudFileInformation {
+    name: string;
+    size: number;
+    cloudKey: string;
+    publicUrl: string;
+    fileHash: string;
 }
 
 export interface Series {

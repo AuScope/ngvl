@@ -8,7 +8,7 @@ import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
 import { PageHeaderModule } from '../../shared';
 import { JobsService } from './jobs.service';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
@@ -18,7 +18,8 @@ import { FormsModule } from '@angular/forms';
     JobsRoutingModule,
     PageHeaderModule,
     TreeTableModule,
-    NgbDropdownModule.forRoot()
+    NgbDropdownModule.forRoot(),
+    NgbCollapseModule.forRoot()
   ],
   declarations: [ JobsComponent ],
   providers: [ JobsService ]

@@ -8,15 +8,17 @@ import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
 import { PageHeaderModule } from '../../shared';
 import { JobsService } from './jobs.service';
-import { NgbPanel, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     JobsRoutingModule,
     PageHeaderModule,
     TreeTableModule,
-    NgbModule.forRoot()
+    NgbDropdownModule.forRoot()
   ],
   declarations: [ JobsComponent ],
   providers: [ JobsService ]

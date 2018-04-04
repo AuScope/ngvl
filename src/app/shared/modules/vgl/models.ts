@@ -138,6 +138,13 @@ export interface Job {
     //jobSolutions: Solution[]; // XXX needed?
 }
 
+export interface Series {
+    id: number;
+    user: string;
+    name: string;
+    description: string;
+}
+
 /*
  * Job Tree Models
  */

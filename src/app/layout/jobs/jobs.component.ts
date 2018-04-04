@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { TreeJobs, TreeJobNode, Job } from '../../shared/modules/vgl/models';
+import { TreeJobs, TreeJobNode, Job, JobFile } from '../../shared/modules/vgl/models';
 import { JobsService } from './jobs.service';
 import { TreeNode } from 'primeng/api';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -17,13 +18,27 @@ import { TreeNode } from 'primeng/api';
 
 export class JobsComponent implements OnInit {
 
-    treeJobsData: TreeNode[];
-    selectedJobNode: TreeNode;
-    jobs: Job[];
-    selectedJob: Job;
+    // Job tree
+    treeJobsData: TreeNode[] = [];
+    selectedJobNode: TreeNode = null;
+
+    // Jobs
+    jobs: Job[] = [];
+    selectedJob: Job = null;
+
+    // File tree
+    treeFileData: TreeNode[] = [];
+    selectedFileNodes: TreeNode[] = [];
+
+    // Files
+    files: JobFile[];
+    selectedFiles: JobFile[] = [];
+
+    jobsLoading: boolean = false;
+    newFolderName: string = "";
 
 
-    constructor(private jobsService: JobsService) { }
+    constructor(private jobsService: JobsService, private modalService: NgbModal) { }
 
 
     /**
@@ -32,9 +47,22 @@ export class JobsComponent implements OnInit {
      * @param event the select node event
      */
     public jobSelected(event) {
+        this.selectedJob = null;
         if(event.node && event.node.data.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
-            console.log("Just pulled job from array: " + JSON.stringify(this.selectedJob));
+        }
+    }
+
+
+    /**
+     * 
+     * @param event 
+     */
+    public filesSelected(event) {
+        this.selectedFiles = [];
+        if(event.node) {
+            console.log("XXX Selecting files...");
+            //this.selecteFiles = this.files.find(f => f.id in event.nodes.);
         }
     }
 
@@ -67,6 +95,9 @@ export class JobsComponent implements OnInit {
      * Transform the TreeJobs data that VGL returns into the TreeNode data
      * that p-treetable requires
      * 
+     * TODO: Sort. No column sorting available, but ng-treetable alternative
+     * to p-table may be able to do this
+     * 
      * @param treeJobs the TreeJobs data returned from VGL
      */
     private createTreeJobsData(treeJobs: TreeJobs): TreeNode[] {
@@ -78,21 +109,66 @@ export class JobsComponent implements OnInit {
                 treeData.push(this.createTreeJobNode(treeNodeChild));
             }
         }
-        console.log(JSON.stringify(treeData));
         return treeData;
     }
+    
 
-
-    ngOnInit() {
+    /**
+     * 
+     */
+    public refreshJobs() {
+        this.jobsLoading = true;
+        this.jobs = [];
+        this.selectedJob = null;
+        this.treeJobsData = [];
+        this.selectedJobNode = null;
         this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
                 this.treeJobsData = this.createTreeJobsData(treeJobs);
                 this.jobs = treeJobs.jobs;
+                this.jobsLoading = false;
             },
             // TODO: Proper error reporting
             error => {
+                this.jobsLoading = false;
                 console.log("Error: " + error.message);
             }
         );
+    }
+
+
+    /**
+     * 
+     * @param folderName the name of the folder to be added
+     */
+    public addFolder(folderName: string) {
+        this.jobsService.addFolder(folderName).subscribe(
+            series => {
+                console.log(JSON.stringify(series));
+            },
+            // TODO: Proper error reporting
+            error => {
+                console.log(error.message);
+            }
+        );
+    }
+
+
+    /**
+     * 
+     * @param content the add folder modal content
+     */
+    public showAddFolderModal(content) {
+        this.newFolderName = "";
+        this.modalService.open(content).result.then((result) => {
+            if(result==='OK click' && this.newFolderName !== '') {
+                this.addFolder(this.newFolderName);
+            }
+        });
+    }
+
+
+    ngOnInit() {
+        this.refreshJobs();
     }
 }

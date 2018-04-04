@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User, TreeJobs } from './models';
+import { Problem, Problems, User, TreeJobs, Series } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -37,6 +37,14 @@ export class VglService {
     return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
         .map(vglData)
         .map(treeJob => treeJob);
+  }
+
+  public addFolder(folderName: string): Observable<Series> {
+      folderName = folderName.trim();
+      const options = {params: new HttpParams().set('seriesName', folderName).set('seriesDescription','') };
+      return this.http.get<VglResponse<Series>>(environment.portalBaseUrl + 'secure/createFolder.do', options)
+        .map(vglData)
+        .map(series => series);
   }
 
   /*

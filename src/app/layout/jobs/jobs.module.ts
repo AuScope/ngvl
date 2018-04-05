@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeNode } from 'primeng/api';
 
@@ -17,6 +18,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     JobsRoutingModule,
     PageHeaderModule,
+    TableModule,
     TreeTableModule,
     NgbDropdownModule.forRoot(),
     NgbCollapseModule.forRoot()

@@ -153,7 +153,7 @@ export interface Series {
 }
 
 /*
- * Job Tree Models
+ * Job Tree-Table Models
  */
 export interface TreeJobs {
     nodes: TreeJobNode;

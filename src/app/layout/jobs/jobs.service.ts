@@ -23,4 +23,12 @@ export class JobsService {
       return this.vgl.getJobCloudFiles(jobId);
   }
 
+  public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
+    return this.vgl.downloadFile(jobId, filename, key);
+  }
+
+  public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
+    return this.vgl.downloadFilesAsZip(jobId, filenames);
+  }
+
 }

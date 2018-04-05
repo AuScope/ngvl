@@ -7,6 +7,7 @@ import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation } from 
 
 import { environment } from '../../../../environments/environment';
 
+
 interface VglResponse<T> {
   data: T;
   msg: string;
@@ -53,21 +54,29 @@ export class VglService {
       .map(vglData)
       .map(fileDetails => fileDetails);
   }
-
-  /*
-  public get treeJobs(): Observable<TreeJobs> {
-    return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
-      .map(vglData)
+  
+  public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
+    const httpParams = new HttpParams().set('jobId', jobId.toString()).set('filename', filename).set('key', key);
+    return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
+        params: httpParams,
+        responseType: 'blob'
+    }).map((response) => {
+        return response;
+    }).catch((error: Response) => {
+        return Observable.throw(error);
+    });
   }
 
-  
-  public get treeNodes(): Observable<TreeNode> {
-    return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
-        .map(vglData)
-        //.map(treeNodes => treeJobs.nodes);
-        .map(treeNodes => treeNodes.nodes);
+  public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
+    const httpParams = new HttpParams().set('jobId', jobId.toString()).set('files', filenames.toString());
+    return this.http.get(environment.portalBaseUrl + 'secure/downloadAsZip.do', {
+        params: httpParams,
+        responseType: 'blob'
+    }).map((response) => {
+        return response;
+    }).catch((error: Response) => {
+        return Observable.throw(error);
+    });
   }
-  */
-  
-
+   
 }

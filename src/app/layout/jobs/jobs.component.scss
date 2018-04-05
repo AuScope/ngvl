@@ -1,4 +1,4 @@
-td {
+.center-text {
     text-align: center;
 }
 
@@ -35,13 +35,8 @@ table {
     }
 }
 
-// Truncate long file table values
-.trim-info {
-    max-width: 200px;
-    display: inline-block;
+.text-truncate {
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;  
-    line-height: 15px;
-    position: relative;
- }
+}

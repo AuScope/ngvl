@@ -172,3 +172,10 @@ export interface TreeJobNode {
     submitDate: Date,   // Only present on job leaves
     status: string;     // Only present on job leaves
 }
+
+/*
+ * File Preview Model
+ */
+export interface PreviewComponent {
+    data: any;
+}

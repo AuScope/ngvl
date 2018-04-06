@@ -15,6 +15,7 @@
                         <div class="bounce3"></div>
                     </div>
                     <!-- TODO: Work out how to configure p-columns to use text-truncate -->
+                    <!-- TODO: Implement filtering, and pagination if required -->
                     <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)">
                         <p-column field="name" header="Name"></p-column>
                         <!-- TODO: How to pipe submitDate through date when it's a field? XXX -->
@@ -107,6 +108,7 @@
                                                     <span>Data service downloads</span>
                                                 </a>
                                                 <div [ngbCollapse]="jobDownloadsIsCollapsed">
+                                                    <!-- TODO: Implement filtering, and pagination if required -->
                                                     <p-table [value]="selectedJob.jobDownloads" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedJobDownloads" [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
                                                         <ng-template pTemplate="header">
                                                             <tr>
@@ -133,6 +135,7 @@
                                             </a>
                                             <div [ngbCollapse]="cloudFilesIsCollapsed">
                                                 <!-- TODO: Spinner required -->
+                                                <!-- TODO: Implement filtering, and pagination if required -->
                                                 <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedCloudFiles" [metaKeySelection]="true" (onRowSelect)="jobCloudFileSelected($event)">
                                                     <ng-template pTemplate="header">
                                                         <tr>
@@ -149,7 +152,7 @@
                                                 </p-table>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
 
                                         <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0 && this.cloudFiles.length===0" style="margin:20px;">
@@ -163,7 +166,12 @@
                         <!-- Preview panel -->
                         <div class="col" style="padding-right:0px;">
                             <div class="card container" style="height:400px;">
-
+                                <div *ngIf="filePreviewLoading" class="jobs-spinner">
+                                    <div class="bounce1"></div>
+                                    <div class="bounce2"></div>
+                                    <div class="bounce3"></div>
+                                </div>
+                                <ng-template preview-host></ng-template>
                             </div>
                         </div>
                     </div>

@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { TreeJobs, TreeJobNode, Job, JobFile, CloudFileInformation, JobDownload } from '../../shared/modules/vgl/models';
+import { TreeJobs, TreeJobNode, Job, JobFile, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
 import { JobsService } from './jobs.service';
 import { TreeNode } from 'primeng/api';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver/FileSaver';
+import { PreviewDirective } from './preview/preview.directive';
+import { PlainTextPreview } from './preview/plaintext-preview.component';
+import { ImagePreview } from './preview/image-preview.component';
+import { PreviewItem } from './preview/preview-item';
+import { TtlPreview } from './preview/ttl-preview.component';
 
 
 @Component({
@@ -45,8 +50,18 @@ export class JobsComponent implements OnInit {
 
     newFolderName: string = ""; // Name for new folder
 
+    // Preview components
+    previewItems: PreviewItem[] = [
+        new PreviewItem(PlainTextPreview, {}, ['txt', 'sh']),
+        new PreviewItem(ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
+        new PreviewItem(TtlPreview, {}, ['ttl'])
+    ];
+    @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
-    constructor(private jobsService: JobsService, private modalService: NgbModal) { }
+
+    constructor(private componentFactoryResolver: ComponentFactoryResolver,
+                private jobsService: JobsService,
+                private modalService: NgbModal) { }
 
 
     /**
@@ -85,6 +100,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * TODO: Cache selected jobs so we don't need to re-download?
      * 
      * @param event 
      */
@@ -94,16 +110,36 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * TODO: Cache selected jobs so we don't need to re-download?
      * 
      * @param event 
      */
     public jobCloudFileSelected(event): void {
         // TODO: Deselect anything in job download table if meta key wasn't used
+        // Clear preview panel
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();        
+        this.filePreviewLoading = true;
+        // Download file
+        this.jobsService.downloadFile(this.selectedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
+            response => {
+                // Set preview
+                this.previewFile(this.selectedCloudFiles[0].name, response);
+                this.filePreviewLoading = false;
+            },
+            error => {
+                this.filePreviewLoading = false;
+                //TODO: Proper error reporting
+                console.log(error.message);
+            }
+        )
     }
 
 
     /**
-     * XXX This is specific to cloud files, may need to make general
+     * XXX This is specific to cloud files, may need to make genera
+     * 
+     * TODO: Cache selected jobs so we don't need to re-download?
      */
     public downloadSingleFile(): void {
         this.jobsService.downloadFile(this.selectedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
@@ -163,6 +199,28 @@ export class JobsComponent implements OnInit {
                 this.downloadFilesAsZip()
             }
         }
+    }
+
+
+    /**
+     * 
+     * @param filename 
+     * @param data 
+     */
+    private previewFile(filename: string, data: any) {
+        const extension = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+        if(!previewItem) {
+            // TODO: Proper error reporting
+            console.log("No preview for files of type: " + extension);
+            return;
+        }
+        previewItem.data = data;
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();        
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+        let componentRef = viewContainerRef.createComponent(componentFactory);
+        (<PreviewComponent>componentRef.instance).data = previewItem.data;
     }
 
 

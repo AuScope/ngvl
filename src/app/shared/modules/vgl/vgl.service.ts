@@ -57,9 +57,25 @@ export class VglService {
   
   public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
     const httpParams = new HttpParams().set('jobId', jobId.toString()).set('filename', filename).set('key', key);
+    // TODO: Move this elsewhere, to a service perhaps?
+    /*
+    const extension = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
+    if(extension === "") {
+        // TODO: Better message
+        // TODO: Translate
+        return Observable.throw("Unknown file type");
+    }
+    let options = { params: httpParams, responseType: 'text' };
+    if(extension === 'txt' || extension === 'sh') {
+        options['responseType'] = 'text';
+    } else if(extension === 'jpg' || extension === 'jpeg' || extension === 'gif' || extension === 'png') {
+        options['responseType'] = 'blob';
+    }
+    */
+
     return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
         params: httpParams,
-        responseType: 'blob'
+        responseType: 'text'
     }).map((response) => {
         return response;
     }).catch((error: Response) => {

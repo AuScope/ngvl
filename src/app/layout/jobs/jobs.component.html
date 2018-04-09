@@ -1,13 +1,13 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
-    <div class="row" style="display:flex;">
+    <div class="row" style="height: calc(100vh - 200px);">
         <!-- Job tree -->
         <!-- TODO: Translations -->
         <!-- TODO: Move styles to CSS -->
         <div class="col-lg-4">
-            <div class="card">
+            <div class="card" style="padding: 0px; height: 100%;">
                 <div class="card-header">Your Jobs</div>
-                <div class="card-body" style="padding: 0px;">
+                <div class="card-body">
                     <!-- TODO: Position this better -->
                     <div *ngIf="jobsLoading" class="jobs-spinner">
                         <div class="bounce1"></div>
@@ -16,13 +16,14 @@
                     </div>
                     <!-- TODO: Work out how to configure p-columns to use text-truncate -->
                     <!-- TODO: Implement filtering, and pagination if required -->
-                    <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)">
+                    <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
                         <p-column field="name" header="Name"></p-column>
                         <!-- TODO: How to pipe submitDate through date when it's a field? XXX -->
                         <p-column field="submitDate" header="Submit Date"></p-column>
                         <!-- TODO: Display status==="Error" in red -->
                         <p-column field="status" header="Status"></p-column>
                     </p-treeTable>
+                    <p-contextMenu #jobContextMenu [model]="jobContextMenuItems" appendTo="body"></p-contextMenu>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
@@ -36,7 +37,7 @@
         </div>
         <!-- Selected job -->
         <div class="col-auto" style="flex: 1;">
-            <div class="card">
+            <div class="card" style="height:100%;">
                 <!-- Header: Selected job details or prompt user to select a job -->
                 <div *ngIf="!selectedJob">
                     <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
@@ -81,7 +82,7 @@
                     <div class="row">
                         <!-- File panel -->
                         <div class="col" style="padding-left:0px;">
-                            <div class="card container" style="height:400px;">
+                            <div class="card container" style="height:100%;">
                                 <!-- Actions button -->
                                 <div class="row">
                                     <div class="col">
@@ -165,13 +166,18 @@
 
                         <!-- Preview panel -->
                         <div class="col" style="padding-right:0px;">
-                            <div class="card container" style="height:400px;">
+                            <div class="card container" style="height:100%;">
                                 <div *ngIf="filePreviewLoading" class="jobs-spinner">
                                     <div class="bounce1"></div>
                                     <div class="bounce2"></div>
                                     <div class="bounce3"></div>
                                 </div>
                                 <ng-template preview-host></ng-template>
+                                <!--
+                                <div class="card-footer" *ngIf="selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0">
+                                    <button class="btn btn-sm pull-right" (click)="refreshFilePreview()"><i class="fa fa-refresh"></i>&nbsp; Refresh</button>
+                                </div>
+                                -->
                             </div>
                         </div>
                     </div>
@@ -199,3 +205,6 @@
         <button type="button" class="btn" (click)="c('Close click')">Cancel</button>
     </div>
 </ng-template>
+
+<!-- Confirmation dialog -->
+<p-confirmDialog></p-confirmDialog>

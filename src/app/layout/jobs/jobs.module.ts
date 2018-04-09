@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeNode } from 'primeng/api';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
@@ -23,6 +26,8 @@ import { TtlPreview } from './preview/ttl-preview.component';
     FormsModule,
     JobsRoutingModule,
     PageHeaderModule,
+    ConfirmDialogModule,
+    ContextMenuModule,
     TableModule,
     TreeTableModule,
     NgbDropdownModule.forRoot(),
@@ -30,6 +35,6 @@ import { TtlPreview } from './preview/ttl-preview.component';
   ],
   declarations: [ JobsComponent, PreviewDirective, ImagePreview, PlainTextPreview, TtlPreview ],
   entryComponents: [ ImagePreview, PlainTextPreview, TtlPreview ],
-  providers: [ JobsService ]
+  providers: [ JobsService, ConfirmationService ]
 })
 export class JobsModule { }

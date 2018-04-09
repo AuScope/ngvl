@@ -57,22 +57,6 @@ export class VglService {
   
   public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
     const httpParams = new HttpParams().set('jobId', jobId.toString()).set('filename', filename).set('key', key);
-    // TODO: Move this elsewhere, to a service perhaps?
-    /*
-    const extension = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
-    if(extension === "") {
-        // TODO: Better message
-        // TODO: Translate
-        return Observable.throw("Unknown file type");
-    }
-    let options = { params: httpParams, responseType: 'text' };
-    if(extension === 'txt' || extension === 'sh') {
-        options['responseType'] = 'text';
-    } else if(extension === 'jpg' || extension === 'jpeg' || extension === 'gif' || extension === 'png') {
-        options['responseType'] = 'blob';
-    }
-    */
-
     return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
         params: httpParams,
         responseType: 'text'
@@ -94,5 +78,35 @@ export class VglService {
         return Observable.throw(error);
     });
   }
+
+  public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<string> {
+    const httpParams = new HttpParams().set('jobId', jobId.toString()).set('file', file).set('maxSize', maxSize.toString());
+    return this.http.get<VglResponse<string>>(environment.portalBaseUrl + 'secure/getPlaintextPreview.do', {
+        params: httpParams
+    }).map(vglData)
+      .map(preview => preview);
+  }
+
+  /*
+  public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
+    return this.http.get<ImageData>(environment.portalBaseUrl + 'secure/getImagePreview.do');
+  }
+  */
+
+  public deleteJob(jobId: number): Observable<any> {
+    const options = { params: new HttpParams().set('jobId', jobId.toString()) };
+    return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'secure/deleteJob.do', options)
+        .map(vglData)
+        .map(response => response);
+  }
+
+  /*
+  public duplicateJob(jobId: number): Observable<any> {
+    const options = { params: new HttpParams().set('jobId', jobId.toString()) };
+    return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'secure/duplicateJob.do', options)
+        .map(vglData)
+        .map(response => response);
+  }
+  */
    
 }

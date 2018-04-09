@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular
 import { routerTransition } from '../../router.animations';
 import { TreeJobs, TreeJobNode, Job, JobFile, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
 import { JobsService } from './jobs.service';
-import { TreeNode } from 'primeng/api';
+import { TreeNode, ConfirmationService } from 'primeng/api';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver/FileSaver';
 import { PreviewDirective } from './preview/preview.directive';
@@ -27,6 +27,7 @@ export class JobsComponent implements OnInit {
     // Job tree
     treeJobsData: TreeNode[] = [];
     selectedJobNode: TreeNode = null;
+    jobContextMenuItems = [];
 
     // Jobs and selected job
     jobs: Job[] = [];
@@ -52,16 +53,17 @@ export class JobsComponent implements OnInit {
 
     // Preview components
     previewItems: PreviewItem[] = [
-        new PreviewItem(PlainTextPreview, {}, ['txt', 'sh']),
-        new PreviewItem(ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
-        new PreviewItem(TtlPreview, {}, ['ttl'])
+        new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh']),
+        new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
+        new PreviewItem("ttl", TtlPreview, {}, ['ttl'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
                 private jobsService: JobsService,
-                private modalService: NgbModal) { }
+                private modalService: NgbModal,
+                private confirmationService: ConfirmationService) { }
 
 
     /**
@@ -83,16 +85,18 @@ export class JobsComponent implements OnInit {
         if(event.node && event.node.data.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
             if(this.selectedJob) {
+                // Create context menu
+                this.jobContextMenuItems = this.createJobContextMenu();
+
                 // Request job cloud files
                 this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
-                    //fileDetails => this.addCloudFilesToFileTree(fileDetails),
+                    // TODO: VGL seems to filter some files
                     fileDetails => this.cloudFiles = fileDetails,
                     // TODO: Proper error reporting
                     error => {
                         console.log(error.message);
                     }
                 );
-
                 // TODO: Include Job.jobFiles (part of Job object)? No examples...
             }
         }
@@ -111,28 +115,115 @@ export class JobsComponent implements OnInit {
 
     /**
      * TODO: Cache selected jobs so we don't need to re-download?
+     * TODO: Deselect anything in job download table if meta key wasn't used
      * 
      * @param event 
      */
     public jobCloudFileSelected(event): void {
-        // TODO: Deselect anything in job download table if meta key wasn't used
         // Clear preview panel
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();        
-        this.filePreviewLoading = true;
-        // Download file
-        this.jobsService.downloadFile(this.selectedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
-            response => {
-                // Set preview
-                this.previewFile(this.selectedCloudFiles[0].name, response);
-                this.filePreviewLoading = false;
-            },
-            error => {
-                this.filePreviewLoading = false;
-                //TODO: Proper error reporting
-                console.log(error.message);
+
+        const extension = this.selectedCloudFiles[0].name.substr(this.selectedCloudFiles[0].name.lastIndexOf('.') + 1).toLowerCase();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+        if(previewItem && (previewItem.type === 'plaintext' || previewItem.type==='ttl')) {
+            this.filePreviewLoading = true;
+            // TODO: Max file size to config
+            this.jobsService.getPlaintextPreview(this.selectedJob.id, this.selectedCloudFiles[0].name, 512).subscribe(
+                preview => {
+                    this.previewFile(previewItem, preview);
+                    this.filePreviewLoading = false;
+                },
+                error => {
+                    //TODO: Proper error reporting
+                    this.filePreviewLoading = false;
+                    console.log(error.message);
+                }
+            );
+        } else if(previewItem && previewItem.type === 'image') {
+            this.previewFile(previewItem, this.selectedCloudFiles[0].publicUrl);
+        }
+    }
+
+
+    /**
+     * Build the job context menu based on job status
+     * 
+     * TODO: Delete series
+     */
+    public createJobContextMenu(): any[] {
+        let items: any[] = [];
+        if(this.selectedJob) {
+            console.log("Selected job status: " + this.selectedJob.status);
+            items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
+            if(this.selectedJob.status.toLowerCase() === 'done' || this.selectedJob.status.toLowerCase() === 'error') {
+                items.push({label: 'Duplicate', icon: 'fa-copy', command: (event) => this.duplicateJob()});
+                items.push({label: 'Status', icon: 'fa-info-circle', command: (event) => this.jobStatus()});
+            } else if(this.selectedJob.status.toLowerCase()==='saved') {
+                items.push({label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitJob()});
+                items.push({label: 'Edit', icon: 'fa-edit', command: (event) => this.editJob()});
             }
-        )
+        }
+        return items;
+    }
+
+
+    /**
+     * Delete selected job (job context menu)
+     */
+    public deleteJob(): void {
+        if(this.selectedJob) {
+            const message = 'Are you sure want to delete the job <strong>' + this.selectedJob.name + '</strong>';
+            this.confirmationService.confirm({
+                message: message,
+                header: 'Delete Job',
+                icon: 'fa fa-trash',
+                accept: () => {
+                    this.jobsService.deleteJob(this.selectedJob.id).subscribe(
+                        response => {
+                            this.refreshJobs();
+                            // TODO: Success message
+                        },
+                        error => {
+                            // TODO: Proper error reporting
+                            console.log(error.message);
+                        }
+                    )
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Duplicate selected job (job context menu)
+     */
+    public duplicateJob(): void {
+        
+    }
+
+
+    /**
+     * Get the status of the selected job (job context menu)
+     */
+    public jobStatus(): void {
+        
+    }
+
+
+    /**
+     * Submit selected job (job context menu)
+     */
+    public submitJob(): void {
+
+    }
+
+
+    /**
+     * Edit selected job (job context menu)
+     */
+    public editJob(): void {
+
     }
 
 
@@ -204,9 +295,18 @@ export class JobsComponent implements OnInit {
 
     /**
      * 
-     * @param filename 
+     * @param previewItem 
      * @param data 
      */
+   private previewFile(previewItem: PreviewItem, data: any) {
+        previewItem.data = data;
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();        
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+        let componentRef = viewContainerRef.createComponent(componentFactory);
+        (<PreviewComponent>componentRef.instance).data = previewItem.data;
+    }
+    /*
     private previewFile(filename: string, data: any) {
         const extension = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
         let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
@@ -221,6 +321,12 @@ export class JobsComponent implements OnInit {
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
         let componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>componentRef.instance).data = previewItem.data;
+    }
+    */
+
+
+    public refreshFilePreview() {
+
     }
 
 

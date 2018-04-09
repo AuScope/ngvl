@@ -31,4 +31,18 @@ export class JobsService {
     return this.vgl.downloadFilesAsZip(jobId, filenames);
   }
 
+  public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<String> {
+    return this.vgl.getPlaintextPreview(jobId, file, maxSize);
+  }
+
+  public deleteJob(jobId: number): Observable<any> {
+      return this.vgl.deleteJob(jobId);
+  }
+
+  /*
+  public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
+    return this.vgl.getImagePreview(jobId, filename);
+  }
+  */
+
 }

@@ -39,34 +39,34 @@
         <div class="col-auto" style="flex: 1;">
             <div class="card" style="height: 100%;">
                 <!-- Header: Selected job details or prompt user to select a job -->
-                <div *ngIf="!selectedJob">
+                <div *ngIf="!lastSelectedJob">
                     <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
                 </div>
-                <div *ngIf="selectedJob">
-                    <div class="card-header">{{ selectedJob.name }}</div>
+                <div *ngIf="lastSelectedJob">
+                    <div class="card-header">{{ lastSelectedJob.name }}</div>
                 </div>
-                <div class="card-body" *ngIf="selectedJob" style="padding-top:0px;">
+                <div class="card-body" *ngIf="lastSelectedJob" style="padding-top:0px;">
                     <!-- General job details -->
                     <div class="row">
                         <div class="col">
                             <table class="center-text">
                                 <tr>
                                     <!-- TODO: Display status==="Error" in red -->
-                                    <td><strong>{{selectedJob.status}}</strong></td>
-                                    <td><strong>{{selectedJob.id}}</strong></td>
-                                    <td *ngIf="selectedJob.computeInstanceId">
-                                        <strong>{{selectedJob.computeInstanceId}}</strong>
+                                    <td><strong>{{lastSelectedJob.status}}</strong></td>
+                                    <td><strong>{{lastSelectedJob.id}}</strong></td>
+                                    <td *ngIf="lastSelectedJob.computeInstanceId">
+                                        <strong>{{lastSelectedJob.computeInstanceId}}</strong>
                                     </td>
-                                    <td *ngIf="!selectedJob.computeInstanceId">
+                                    <td *ngIf="!lastSelectedJob.computeInstanceId">
                                         <strong>N/A</strong>
                                     </td>
-                                    <td *ngIf="selectedJob.computeInstanceType">
-                                        <strong>{{selectedJob.computeInstanceType}}</strong>
+                                    <td *ngIf="lastSelectedJob.computeInstanceType">
+                                        <strong>{{lastSelectedJob.computeInstanceType}}</strong>
                                     </td>
-                                    <td *ngIf="!selectedJob.computeInstanceType">
+                                    <td *ngIf="!lastSelectedJob.computeInstanceType">
                                         <strong>N/A</strong>
                                     </td>
-                                    <td><strong>{{selectedJob.submitDate | date}}</strong></td>
+                                    <td><strong>{{lastSelectedJob.submitDate | date}}</strong></td>
                                 </tr>
                                 <tr>
                                     <td><small>Status</small></td>
@@ -103,7 +103,7 @@
                                 <!-- Files table -->
                                 <div class="row">
                                     <div class="col">
-                                            <div *ngIf="selectedJob.jobDownloads.length > 0">
+                                            <div *ngIf="lastSelectedJob.jobDownloads.length > 0">
                                                 <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
                                                     <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
                                                     <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
@@ -112,7 +112,7 @@
                                                 </a>
                                                 <div [ngbCollapse]="jobDownloadsIsCollapsed">
                                                     <!-- TODO: Implement filtering, and pagination if required -->
-                                                    <p-table [value]="selectedJob.jobDownloads" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedJobDownloads" [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
+                                                    <p-table [value]="lastSelectedJob.jobDownloads" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedJobDownloads" [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
                                                         <ng-template pTemplate="header">
                                                             <tr>
                                                                 <th pResizableColumn>Name</th>

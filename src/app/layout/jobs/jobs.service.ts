@@ -39,6 +39,10 @@ export class JobsService {
       return this.vgl.deleteJob(jobId);
   }
 
+  public cancelJob(jobId: number): Observable<any> {
+      return this.vgl.cancelJob(jobId);
+  }
+
   /*
   public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
     return this.vgl.getImagePreview(jobId, filename);

@@ -100,6 +100,13 @@ export class VglService {
         .map(response => response);
   }
 
+  public cancelJob(jobId: number): Observable<any> {
+    const options = { params: new HttpParams().set('jobId', jobId.toString()) };
+    return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'secure/killJob.do', options)
+        .map(vglData)
+        .map(response => response);
+  }
+
   /*
   public duplicateJob(jobId: number): Observable<any> {
     const options = { params: new HttpParams().set('jobId', jobId.toString()) };

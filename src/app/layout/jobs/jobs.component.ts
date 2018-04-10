@@ -60,11 +60,11 @@ export class JobsComponent implements OnInit {
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
     // Job context menu actions
-    cancelJobAction = { label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob() };
-    duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob() };
-    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob() };
-    submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitJob() };
-    editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editJob() };
+    cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
+    duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
+    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() };
+    submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
+    editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
 
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
@@ -162,36 +162,40 @@ export class JobsComponent implements OnInit {
         let items: any[] = [];
         // If more than 1 item is selected, or only a series is selected, delete is only action
         if(this.selectedJobNodes.length > 1 || !this.lastSelectedJob) {
-            items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
+            items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob()});
         }
         // Otherwise available actions are specific to job status
         else if(this.selectedJobNodes.length === 1 && this.lastSelectedJob) {
             console.log("single  selection");
             if(this.lastSelectedJob.status.toLowerCase() === 'active') {
-                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob()});
-                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});
+                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob()});
             } else if(this.lastSelectedJob.status.toLowerCase() === 'saved') {
-                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
-                items.push({label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitJob()});
-                items.push({label: 'Edit', icon: 'fa-edit', command: (event) => this.editJob()});
+                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob()});
+                items.push({label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob()});
+                items.push({label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob()});
             } else if(this.lastSelectedJob.status.toLowerCase() === 'done') {
-                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
-                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});                
+                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob()});                
             } else {
-                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob()});
-                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});
+                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob()});
             }
         }
         return items;
     }
 
+    /*
+     * TODO: If the following job actions will behave similarly in other
+     * classes (e.g. same dialog confirmations), move that code to job service
+     */
 
     /**
      * Delete selected job (job context menu)
      * 
      * TODO: Delete series
      */
-    public deleteJob(): void {
+    public deleteSelectedJob(): void {
         if(this.lastSelectedJob) {
             const message = 'Are you sure want to delete the job <strong>' + this.lastSelectedJob.name + '</strong>';
             this.confirmationService.confirm({
@@ -218,15 +222,34 @@ export class JobsComponent implements OnInit {
     /**
      * Cancel the selected job (job context menu)
      */
-    public cancelJob(): void {
-
+    public cancelSelectedJob(): void {
+        if(this.lastSelectedJob) {
+            const message = 'Are you sure want to cancel the job <strong>' + this.lastSelectedJob.name + '</strong>';
+            this.confirmationService.confirm({
+                message: message,
+                header: 'Cancel Job',
+                icon: 'fa fa-times',
+                accept: () => {
+                    this.jobsService.cancelJob(this.lastSelectedJob.id).subscribe(
+                        response => {
+                            this.refreshJobs();
+                            // TODO: Success message
+                        },
+                        error => {
+                            // TODO: Proper error reporting
+                            console.log(error.message);
+                        }
+                    )
+                }
+            });
+        }
     }
 
 
     /**
      * Duplicate selected job (job context menu)
      */
-    public duplicateJob(): void {
+    public duplicateSelectedJob(): void {
         
     }
 
@@ -234,7 +257,7 @@ export class JobsComponent implements OnInit {
     /**
      * Get the status of the selected job (job context menu)
      */
-    public jobStatus(): void {
+    public showSelectedJobStatus(): void {
         
     }
 
@@ -242,7 +265,7 @@ export class JobsComponent implements OnInit {
     /**
      * Submit selected job (job context menu)
      */
-    public submitJob(): void {
+    public submitSelectedJob(): void {
 
     }
 
@@ -250,7 +273,7 @@ export class JobsComponent implements OnInit {
     /**
      * Edit selected job (job context menu)
      */
-    public editJob(): void {
+    public editSelectedJob(): void {
 
     }
 

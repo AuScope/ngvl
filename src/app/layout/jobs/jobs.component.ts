@@ -26,12 +26,12 @@ export class JobsComponent implements OnInit {
 
     // Job tree
     treeJobsData: TreeNode[] = [];
-    selectedJobNode: TreeNode = null;
+    selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
 
     // Jobs and selected job
     jobs: Job[] = [];
-    selectedJob: Job = null;
+    lastSelectedJob: Job = null;
 
     // Job cloud files (downloads are retrieved with Jobs)
     cloudFiles: CloudFileInformation[] = [];
@@ -59,6 +59,13 @@ export class JobsComponent implements OnInit {
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
+    // Job context menu actions
+    cancelJobAction = { label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob() };
+    duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob() };
+    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob() };
+    submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitJob() };
+    editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editJob() };
+
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
                 private jobsService: JobsService,
@@ -76,20 +83,20 @@ export class JobsComponent implements OnInit {
      */
     public jobSelected(event): void {
         // Reset Job object and file tree objects
-        this.selectedJob = null;
+        this.lastSelectedJob = null;
         this.cloudFiles = [];
 
         this.selectedJobDownloads = [];
         this.selectedCloudFiles = [];
 
         if(event.node && event.node.data.leaf) {
-            this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
-            if(this.selectedJob) {
+            this.lastSelectedJob = this.jobs.find(j => j.id === event.node.data.id);
+            if(this.lastSelectedJob) {
                 // Create context menu
-                this.jobContextMenuItems = this.createJobContextMenu();
+                //this.jobContextMenuItems = this.createJobContextMenu();
 
                 // Request job cloud files
-                this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
+                this.jobsService.getJobCloudFiles(this.lastSelectedJob.id).subscribe(
                     // TODO: VGL seems to filter some files
                     fileDetails => this.cloudFiles = fileDetails,
                     // TODO: Proper error reporting
@@ -100,6 +107,8 @@ export class JobsComponent implements OnInit {
                 // TODO: Include Job.jobFiles (part of Job object)? No examples...
             }
         }
+
+        this.jobContextMenuItems = this.createJobContextMenu();
     }
 
 
@@ -129,7 +138,7 @@ export class JobsComponent implements OnInit {
         if(previewItem && (previewItem.type === 'plaintext' || previewItem.type==='ttl')) {
             this.filePreviewLoading = true;
             // TODO: Max file size to config
-            this.jobsService.getPlaintextPreview(this.selectedJob.id, this.selectedCloudFiles[0].name, 512).subscribe(
+            this.jobsService.getPlaintextPreview(this.lastSelectedJob.id, this.selectedCloudFiles[0].name, 512).subscribe(
                 preview => {
                     this.previewFile(previewItem, preview);
                     this.filePreviewLoading = false;
@@ -148,20 +157,29 @@ export class JobsComponent implements OnInit {
 
     /**
      * Build the job context menu based on job status
-     * 
-     * TODO: Delete series
      */
     public createJobContextMenu(): any[] {
         let items: any[] = [];
-        if(this.selectedJob) {
-            console.log("Selected job status: " + this.selectedJob.status);
+        // If more than 1 item is selected, or only a series is selected, delete is only action
+        if(this.selectedJobNodes.length > 1 || !this.lastSelectedJob) {
             items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
-            if(this.selectedJob.status.toLowerCase() === 'done' || this.selectedJob.status.toLowerCase() === 'error') {
-                items.push({label: 'Duplicate', icon: 'fa-copy', command: (event) => this.duplicateJob()});
-                items.push({label: 'Status', icon: 'fa-info-circle', command: (event) => this.jobStatus()});
-            } else if(this.selectedJob.status.toLowerCase()==='saved') {
+        }
+        // Otherwise available actions are specific to job status
+        else if(this.selectedJobNodes.length === 1 && this.lastSelectedJob) {
+            console.log("single  selection");
+            if(this.lastSelectedJob.status.toLowerCase() === 'active') {
+                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});
+            } else if(this.lastSelectedJob.status.toLowerCase() === 'saved') {
+                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
                 items.push({label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitJob()});
                 items.push({label: 'Edit', icon: 'fa-edit', command: (event) => this.editJob()});
+            } else if(this.lastSelectedJob.status.toLowerCase() === 'done') {
+                items.push({label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});                
+            } else {
+                items.push({label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelJob()});
+                items.push({label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateJob()});
             }
         }
         return items;
@@ -170,16 +188,18 @@ export class JobsComponent implements OnInit {
 
     /**
      * Delete selected job (job context menu)
+     * 
+     * TODO: Delete series
      */
     public deleteJob(): void {
-        if(this.selectedJob) {
-            const message = 'Are you sure want to delete the job <strong>' + this.selectedJob.name + '</strong>';
+        if(this.lastSelectedJob) {
+            const message = 'Are you sure want to delete the job <strong>' + this.lastSelectedJob.name + '</strong>';
             this.confirmationService.confirm({
                 message: message,
                 header: 'Delete Job',
                 icon: 'fa fa-trash',
                 accept: () => {
-                    this.jobsService.deleteJob(this.selectedJob.id).subscribe(
+                    this.jobsService.deleteJob(this.lastSelectedJob.id).subscribe(
                         response => {
                             this.refreshJobs();
                             // TODO: Success message
@@ -192,6 +212,14 @@ export class JobsComponent implements OnInit {
                 }
             });
         }
+    }
+
+
+    /**
+     * Cancel the selected job (job context menu)
+     */
+    public cancelJob(): void {
+
     }
 
 
@@ -233,7 +261,7 @@ export class JobsComponent implements OnInit {
      * TODO: Cache selected jobs so we don't need to re-download?
      */
     public downloadSingleFile(): void {
-        this.jobsService.downloadFile(this.selectedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
+        this.jobsService.downloadFile(this.lastSelectedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
             response => {
                 saveAs(response, this.selectedCloudFiles[0].name);
             },
@@ -253,9 +281,9 @@ export class JobsComponent implements OnInit {
         for(let f of this.selectedCloudFiles) {
             files.push(f.name);
         }
-        this.jobsService.downloadFilesAsZip(this.selectedJob.id, files).subscribe(
+        this.jobsService.downloadFilesAsZip(this.lastSelectedJob.id, files).subscribe(
             response => {
-                saveAs(response, 'Job_' + this.selectedJob.id.toString() + '.zip');
+                saveAs(response, 'Job_' + this.lastSelectedJob.id.toString() + '.zip');
             },
             error => {
                 //TODO: Proper error reporting
@@ -382,9 +410,9 @@ export class JobsComponent implements OnInit {
     public refreshJobs(): void {
         this.jobsLoading = true;
         this.jobs = [];
-        this.selectedJob = null;
+        this.lastSelectedJob = null;
         this.treeJobsData = [];
-        this.selectedJobNode = null;
+        this.selectedJobNodes = [];
         this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
                 this.treeJobsData = this.createTreeJobsData(treeJobs);

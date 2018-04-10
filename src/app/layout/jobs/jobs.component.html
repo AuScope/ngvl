@@ -16,9 +16,9 @@
                     </div>
                     <!-- TODO: Work out how to configure p-columns to use text-truncate -->
                     <!-- TODO: Implement filtering, and pagination if required -->
-                    <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
+                    <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
                         <p-column field="name" header="Name"></p-column>
-                        <!-- TODO: How to pipe submitDate through date when it's a field? XXX -->
+                        <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
                         <p-column field="submitDate" header="Submit Date"></p-column>
                         <!-- TODO: Display status==="Error" in red -->
                         <p-column field="status" header="Status"></p-column>
@@ -37,7 +37,7 @@
         </div>
         <!-- Selected job -->
         <div class="col-auto" style="flex: 1;">
-            <div class="card" style="height:100%;">
+            <div class="card" style="height: 100%;">
                 <!-- Header: Selected job details or prompt user to select a job -->
                 <div *ngIf="!selectedJob">
                     <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
@@ -82,7 +82,9 @@
                     <div class="row">
                         <!-- File panel -->
                         <div class="col" style="padding-left:0px;">
-                            <div class="card container" style="height:100%;">
+                            <!-- TODO; Fix stretching... needs scrollbars -->
+                            <!--<div class="card container" style="height:100%;">-->
+                            <div class="card container" style="height:calc(100vh - 304px);">
                                 <!-- Actions button -->
                                 <div class="row">
                                     <div class="col">

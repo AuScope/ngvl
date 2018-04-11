@@ -58,6 +58,7 @@ export class JobsComponent implements OnInit {
         new PreviewItem("ttl", TtlPreview, {}, ['ttl'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
+    showingFilePreview: boolean = false;
 
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
@@ -82,25 +83,24 @@ export class JobsComponent implements OnInit {
      * @param event the select node event
      */
     public jobSelected(event): void {
-        // Reset Job object and file tree objects
-        this.displayedJob = null;
-        this.cloudFiles = [];
-
-        this.selectedJobDownloads = [];
-        this.selectedCloudFiles = [];
-
         if (event.node && event.node.data.leaf) {
             this.displayedJob = this.jobs.find(j => j.id === event.node.data.id);
             if (this.displayedJob) {
-                // Create context menu
-                //this.jobContextMenuItems = this.createJobContextMenu();
-
+                // Reset file selections
+                this.selectedJobDownloads = [];
+                this.selectedCloudFiles = [];
                 // Request job cloud files
+                this.cloudFiles = [];
                 this.cloudFilesLoading = true;
                 this.jobsService.getJobCloudFiles(this.displayedJob.id).subscribe(
                     // TODO: VGL seems to filter some files
                     fileDetails => {
-                        this.cloudFiles = fileDetails
+                        // XXX Server was not returning error when the associated S3 bucket didn't exist
+                        if(!fileDetails) {
+                            this.cloudFiles = [];
+                        } else {
+                            this.cloudFiles = fileDetails
+                        }
                         this.cloudFilesLoading = false;
                     },
                     // TODO: Proper error reporting
@@ -112,7 +112,6 @@ export class JobsComponent implements OnInit {
                 // TODO: Include Job.jobFiles (part of Job object)? No examples...
             }
         }
-
         this.jobContextMenuItems = this.createJobContextMenu();
     }
 
@@ -142,11 +141,13 @@ export class JobsComponent implements OnInit {
         let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
         if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
             this.filePreviewLoading = true;
+            this.showingFilePreview = false;
             // TODO: Max file size to config
             this.jobsService.getPlaintextPreview(this.displayedJob.id, this.selectedCloudFiles[0].name, 512).subscribe(
                 preview => {
                     this.previewFile(previewItem, preview);
                     this.filePreviewLoading = false;
+                    this.showingFilePreview = true;
                 },
                 error => {
                     //TODO: Proper error reporting
@@ -361,23 +362,6 @@ export class JobsComponent implements OnInit {
         let componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>componentRef.instance).data = previewItem.data;
     }
-    /*
-    private previewFile(filename: string, data: any) {
-        const extension = filename.substr(filename.lastIndexOf('.') + 1).toLowerCase();
-        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
-        if(!previewItem) {
-            // TODO: Proper error reporting
-            console.log("No preview for files of type: " + extension);
-            return;
-        }
-        previewItem.data = data;
-        let viewContainerRef = this.previewHost.viewContainerRef;
-        viewContainerRef.clear();        
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        let componentRef = viewContainerRef.createComponent(componentFactory);
-        (<PreviewComponent>componentRef.instance).data = previewItem.data;
-    }
-    */
 
 
     /**
@@ -442,6 +426,8 @@ export class JobsComponent implements OnInit {
         this.displayedJob = null;
         this.treeJobsData = [];
         this.selectedJobNodes = [];
+
+        this.showingFilePreview = false;
 
         // Load jobs
         this.jobsService.getTreeJobs().subscribe(

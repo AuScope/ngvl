@@ -1,13 +1,14 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
+    <!-- TODO: Translations -->
+    <!-- TODO: Move styles to CSS -->
     <div class="row" style="height: calc(100vh - 200px);">
         <!-- Job tree -->
-        <!-- TODO: Translations -->
-        <!-- TODO: Move styles to CSS -->
+        
         <div class="col-lg-4">
             <div class="card" style="padding: 0px; height: 100%;">
                 <div class="card-header">Your Jobs</div>
-                <div class="card-body">
+                <div class="card-body" style="overflow-y:auto;">
                     <!-- TODO: Position this better -->
                     <div *ngIf="jobsLoading" class="spinner">
                         <div class="bounce1"></div>
@@ -23,7 +24,6 @@
                         <!-- TODO: Display status==="Error" in red -->
                         <p-column field="status" header="Status"></p-column>
                     </p-treeTable>
-                    <p-contextMenu #jobContextMenu [model]="jobContextMenuItems" appendTo="body"></p-contextMenu>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
@@ -82,9 +82,7 @@
                     <div class="row">
                         <!-- File panel -->
                         <div class="col" style="padding-left:0px;">
-                            <!-- TODO; Fix stretching... needs scrollbars -->
-                            <!--<div class="card container" style="height:100%;">-->
-                            <div class="card container" style="height:calc(100vh - 304px);">
+                            <div class="card container" style="height:calc(100vh - 304px);overflow-y:auto;">
                                 <div *ngIf="cloudFilesLoading" class="spinner">
                                     <div class="bounce1"></div>
                                     <div class="bounce2"></div>
@@ -105,6 +103,10 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <!-- Display message if no job has no associated files -->
+                                    <div *ngIf="displayedJob && !cloudFilesLoading && displayedJob.jobDownloads.length===0 && cloudFiles.length===0" style="padding:8px">
+                                        This job doesn't have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.
                                     </div>
                                     <!-- Files table -->
                                     <div class="row">
@@ -176,6 +178,9 @@
                         <!-- Preview panel -->
                         <div class="col" style="padding-right:0px;">
                             <div class="card" style="height:100%;">
+                                <div *ngIf="!showingFilePreview && !filePreviewLoading" style="padding:8px;">
+                                    Select a file to the left to preview it here.
+                                </div>
                                 <div *ngIf="filePreviewLoading" class="spinner">
                                     <div class="bounce1"></div>
                                     <div class="bounce2"></div>
@@ -214,6 +219,9 @@
         <button type="button" class="btn" (click)="c('Close click')">Cancel</button>
     </div>
 </ng-template>
+
+<!-- Job context menu -->
+<p-contextMenu #jobContextMenu [model]="jobContextMenuItems" appendTo="body"></p-contextMenu>
 
 <!-- Confirmation dialog -->
 <p-confirmDialog></p-confirmDialog>

@@ -4,7 +4,6 @@
     <!-- TODO: Move styles to CSS -->
     <div class="row" style="height: calc(100vh - 200px);">
         <!-- Job tree -->
-        
         <div class="col-lg-4">
             <div class="card" style="padding: 0px; height: 100%;">
                 <div class="card-header">Your Jobs</div>
@@ -16,14 +15,19 @@
                         <div class="bounce3"></div>
                     </div>
                     <!-- TODO: Work out how to configure p-columns to use text-truncate -->
-                    <!-- TODO: Implement filtering, and pagination if required -->
-                    <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
-                        <p-column field="name" header="Name"></p-column>
-                        <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
-                        <p-column field="submitDate" header="Submit Date"></p-column>
-                        <!-- TODO: Display status==="Error" in red -->
-                        <p-column field="status" header="Status"></p-column>
-                    </p-treeTable>
+                    <!-- TODO: Implement filtering, and pagination if required, XXX Looks like TreeTable can't do this -->
+                    <div *ngIf="treeJobsData.length > 0 && !jobsLoading">
+                        <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
+                            <p-column field="name" header="Name"></p-column>
+                            <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
+                            <p-column field="submitDate" header="Submit Date"></p-column>
+                            <!-- TODO: Display status==="Error" in red -->
+                            <p-column field="status" header="Status"></p-column>
+                        </p-treeTable>
+                    </div>
+                    <div *ngIf="treeJobsData.length === 0 && ! jobsLoading">
+                        You have no jobs.
+                    </div>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
@@ -189,7 +193,7 @@
                                 <div style="height:100%">
                                     <ng-template preview-host></ng-template>
                                 </div>
-                                <div class="card-footer" *ngIf="!filePreviewLoading && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
+                                <div class="card-footer" *ngIf="!filePreviewLoading && showingFilePreview && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
                                     <button class="btn btn-sm pull-right" (click)="jobCloudFileSelected(null)"><i class="fa fa-refresh"></i>&nbsp; Refresh</button>
                                 </div>
                             </div>

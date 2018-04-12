@@ -182,7 +182,7 @@
                         <!-- Preview panel -->
                         <div class="col" style="padding-right:0px;">
                             <div class="card" style="height:100%;">
-                                <div *ngIf="!showingFilePreview && !filePreviewLoading" style="padding:8px;">
+                                <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;">
                                     Select a file to the left to preview it here.
                                 </div>
                                 <div *ngIf="filePreviewLoading" class="spinner">
@@ -193,8 +193,8 @@
                                 <div style="height:100%">
                                     <ng-template preview-host></ng-template>
                                 </div>
-                                <div class="card-footer" *ngIf="!filePreviewLoading && showingFilePreview && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
-                                    <button class="btn btn-sm pull-right" (click)="jobCloudFileSelected(null)"><i class="fa fa-refresh"></i>&nbsp; Refresh</button>
+                                <div class="card-footer" *ngIf="!filePreviewLoading && currentPreviewObject && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
+                                    <button class="btn btn-sm pull-right" (click)="refreshPreview()"><i class="fa fa-refresh"></i>&nbsp; Refresh</button>
                                 </div>
                             </div>
                         </div>

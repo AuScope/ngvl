@@ -10,6 +10,7 @@ import { PlainTextPreview } from './preview/plaintext-preview.component';
 import { ImagePreview } from './preview/image-preview.component';
 import { PreviewItem } from './preview/preview-item';
 import { TtlPreview } from './preview/ttl-preview.component';
+import { DataServicePreview } from './preview/data-service-preview.component';
 
 
 @Component({
@@ -53,12 +54,14 @@ export class JobsComponent implements OnInit {
 
     // Preview components
     previewItems: PreviewItem[] = [
+        new PreviewItem("data-service", DataServicePreview, {}, []),
         new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh']),
         new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
         new PreviewItem("ttl", TtlPreview, {}, ['ttl'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
-    showingFilePreview: boolean = false;
+    // Will be JobDownload or CloudFileInformation, needed for preview Refresh
+    currentPreviewObject: any = null;
 
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
@@ -72,6 +75,92 @@ export class JobsComponent implements OnInit {
         private jobsService: JobsService,
         private modalService: NgbModal,
         private confirmationService: ConfirmationService) { }
+    
+
+    ngOnInit() {
+        this.refreshJobs();
+    }
+
+
+    /**
+     * Convert a VGL TreeNode to an p-treetable TreeNode
+     * 
+     * @param treeNode the TreeNode to convert to an p-treetable TreeNode
+     */
+    private createTreeJobNode(treeNode: TreeJobNode): TreeNode {
+        let node: TreeNode = {};
+        node.data = {
+            "id": treeNode.id,
+            "name": treeNode.name,
+            "submitDate": treeNode.submitDate,
+            "status": treeNode.status,
+            "leaf": treeNode.leaf
+        }
+        if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
+            node.children = [];
+            for (let treeNodeChild of treeNode.children) {
+                node.children.push(this.createTreeJobNode(treeNodeChild));
+            }
+        }
+        return node;
+    }
+
+
+    /**
+     * Transform the TreeJobs data that VGL returns into the TreeNode data
+     * that p-treetable requires
+     * 
+     * TODO: Sort. No column sorting available, but ng-treetable alternative
+     * to p-table may be able to do this
+     * 
+     * @param treeJobs the TreeJobs data returned from VGL
+     */
+    private createTreeJobsData(treeJobs: TreeJobs): TreeNode[] {
+        let treeData: TreeNode[] = [];
+        // Skip root node (user name)
+        let rootNode: TreeJobNode = treeJobs.nodes;
+        if (rootNode.hasOwnProperty('children') && rootNode.children.length > 0) {
+            for (let treeNodeChild of rootNode.children) {
+                treeData.push(this.createTreeJobNode(treeNodeChild));
+            }
+        }
+        return treeData;
+    }
+
+
+    /**
+     * 
+     */
+    public refreshJobs(): void {
+        // Reset spinners
+        this.jobsLoading = true;
+        this.filePreviewLoading = false;
+        this.cloudFilesLoading = false;
+
+        // Reset job and file objects
+        this.jobs = [];
+        this.selectedCloudFiles = [];
+        this.selectedJobDownloads = [];
+        this.displayedJob = null;
+        this.treeJobsData = [];
+        this.selectedJobNodes = [];
+
+        this.currentPreviewObject = null;
+
+        // Load jobs
+        this.jobsService.getTreeJobs().subscribe(
+            treeJobs => {
+                this.treeJobsData = this.createTreeJobsData(treeJobs);
+                this.jobs = treeJobs.jobs;
+                this.jobsLoading = false;
+            },
+            // TODO: Proper error reporting
+            error => {
+                this.jobsLoading = false;
+                console.log("Error: " + error.message);
+            }
+        );
+    }
 
 
     /**
@@ -89,6 +178,11 @@ export class JobsComponent implements OnInit {
                 // Reset file selections
                 this.selectedJobDownloads = [];
                 this.selectedCloudFiles = [];
+                this.filePreviewLoading = false;
+                if(this.previewHost) {
+                    let viewContainerRef = this.previewHost.viewContainerRef;
+                    viewContainerRef.clear();
+                }
                 // Request job cloud files
                 this.cloudFiles = [];
                 this.cloudFilesLoading = true;
@@ -113,51 +207,6 @@ export class JobsComponent implements OnInit {
             }
         }
         this.jobContextMenuItems = this.createJobContextMenu();
-    }
-
-
-    /**
-     * TODO: Cache selected jobs so we don't need to re-download?
-     * 
-     * @param event 
-     */
-    public jobDownloadSelected(event): void {
-        // TODO: Deselect anything in cloud file table if meta key wasn't used
-    }
-
-
-    /**
-     * TODO: Cache selected jobs so we don't need to re-download?
-     * TODO: Deselect anything in job download table if meta key wasn't used
-     * 
-     * @param event event triggered by node selection, unused
-     */
-    public jobCloudFileSelected(event): void {
-        // Clear preview panel
-        let viewContainerRef = this.previewHost.viewContainerRef;
-        viewContainerRef.clear();
-
-        const extension = this.selectedCloudFiles[0].name.substr(this.selectedCloudFiles[0].name.lastIndexOf('.') + 1).toLowerCase();
-        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
-        if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
-            this.filePreviewLoading = true;
-            this.showingFilePreview = false;
-            // TODO: Max file size to config
-            this.jobsService.getPlaintextPreview(this.displayedJob.id, this.selectedCloudFiles[0].name, 512).subscribe(
-                preview => {
-                    this.previewFile(previewItem, preview);
-                    this.filePreviewLoading = false;
-                    this.showingFilePreview = true;
-                },
-                error => {
-                    //TODO: Proper error reporting
-                    this.filePreviewLoading = false;
-                    console.log(error.message);
-                }
-            );
-        } else if (previewItem && previewItem.type === 'image') {
-            this.previewFile(previewItem, this.selectedCloudFiles[0].publicUrl);
-        }
     }
 
 
@@ -188,6 +237,111 @@ export class JobsComponent implements OnInit {
             }
         }
         return items;
+    }
+
+
+    /**
+     * 
+     * @param previewItem 
+     * @param data 
+     */
+    private previewFile(previewItem: PreviewItem, data: any) {
+        previewItem.data = data;
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+        let componentRef = viewContainerRef.createComponent(componentFactory);
+        (<PreviewComponent>componentRef.instance).data = previewItem.data;
+    }
+
+
+    /**
+     * 
+     * @param jobDownload 
+     */
+    previewJobDownload(jobDownload: JobDownload): void {
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.type === 'data-service');
+        this.filePreviewLoading = true;
+
+
+        this.previewFile(previewItem, "");
+
+
+        this.filePreviewLoading = false;
+        this.currentPreviewObject = jobDownload;
+    }
+
+
+    /**
+     * TODO: Cache selected jobs so we don't need to re-download?
+     * TODO: Deselect anything in cloud file table if meta key wasn't used
+     * 
+     * @param event 
+     */
+    public jobDownloadSelected(event): void {
+        const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length-1];
+        this.previewJobDownload(jobDownload);
+    }
+
+
+    /**
+     * 
+     * @param cloudFile 
+     */
+    public previewCloudFile(cloudFile: CloudFileInformation): void {
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+        if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+            this.filePreviewLoading = true;
+            // TODO: Max file size to config
+            this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 512).subscribe(
+                preview => {
+                    this.previewFile(previewItem, preview);
+                    this.filePreviewLoading = false;
+                    this.currentPreviewObject = cloudFile;
+                },
+                error => {
+                    //TODO: Proper error reporting
+                    this.filePreviewLoading = false;
+                    console.log(error.message);
+                }
+            );
+        } else if (previewItem && previewItem.type === 'image') {
+            this.previewFile(previewItem, cloudFile.publicUrl);
+        }
+    }
+
+
+    /**
+     * TODO: Cache selected jobs so we don't need to re-download?
+     * TODO: Deselect anything in job download table if meta key wasn't used
+     * TODO: Remove (or change) preview on item de-selection?
+     * 
+     * @param event event triggered by node selection, unused
+     */
+    public jobCloudFileSelected(event): void {
+        console.log("Selection: " + JSON.stringify(event));
+        let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length-1];
+        this.previewCloudFile(cloudFile);
+    }
+
+
+    /**
+     * 
+     */
+    refreshPreview(): void {
+        if(this.currentPreviewObject) {
+            // Hacky type check
+            if(this.currentPreviewObject.hasOwnProperty('localPath')) {
+                this.previewJobDownload(this.currentPreviewObject);
+            } else {
+                this.previewCloudFile(this.currentPreviewObject);
+            }
+        }
     }
 
     /*
@@ -351,102 +505,6 @@ export class JobsComponent implements OnInit {
 
     /**
      * 
-     * @param previewItem 
-     * @param data 
-     */
-    private previewFile(previewItem: PreviewItem, data: any) {
-        previewItem.data = data;
-        let viewContainerRef = this.previewHost.viewContainerRef;
-        viewContainerRef.clear();
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        let componentRef = viewContainerRef.createComponent(componentFactory);
-        (<PreviewComponent>componentRef.instance).data = previewItem.data;
-    }
-
-
-    /**
-     * Convert a VGL TreeNode to an p-treetable TreeNode
-     * 
-     * @param treeNode the TreeNode to convert to an p-treetable TreeNode
-     */
-    private createTreeJobNode(treeNode: TreeJobNode): TreeNode {
-        let node: TreeNode = {};
-        node.data = {
-            "id": treeNode.id,
-            "name": treeNode.name,
-            "submitDate": treeNode.submitDate,
-            "status": treeNode.status,
-            "leaf": treeNode.leaf
-        }
-        if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
-            node.children = [];
-            for (let treeNodeChild of treeNode.children) {
-                node.children.push(this.createTreeJobNode(treeNodeChild));
-            }
-        }
-        return node;
-    }
-
-
-    /**
-     * Transform the TreeJobs data that VGL returns into the TreeNode data
-     * that p-treetable requires
-     * 
-     * TODO: Sort. No column sorting available, but ng-treetable alternative
-     * to p-table may be able to do this
-     * 
-     * @param treeJobs the TreeJobs data returned from VGL
-     */
-    private createTreeJobsData(treeJobs: TreeJobs): TreeNode[] {
-        let treeData: TreeNode[] = [];
-        // We don't want to add the root node to the tree, it will just be the user name
-        let rootNode: TreeJobNode = treeJobs.nodes;
-        if (rootNode.hasOwnProperty('children') && rootNode.children.length > 0) {
-            for (let treeNodeChild of rootNode.children) {
-                treeData.push(this.createTreeJobNode(treeNodeChild));
-            }
-        }
-        return treeData;
-    }
-
-
-    /**
-     * 
-     */
-    public refreshJobs(): void {
-        // Reset spinners
-        this.jobsLoading = true;
-        this.filePreviewLoading = false;
-        this.cloudFilesLoading = false;
-
-        // Reset job and file objects
-        this.jobs = [];
-        this.selectedCloudFiles = [];
-        this.selectedJobDownloads = [];
-        this.displayedJob = null;
-        this.treeJobsData = [];
-        this.selectedJobNodes = [];
-
-        this.showingFilePreview = false;
-
-        // Load jobs
-        this.jobsService.getTreeJobs().subscribe(
-            treeJobs => {
-                this.treeJobsData = this.createTreeJobsData(treeJobs);
-                this.jobs = treeJobs.jobs;
-                this.jobsLoading = false;
-            },
-            // TODO: Proper error reporting
-            error => {
-                this.jobsLoading = false;
-                console.log("Error: " + error.message);
-            }
-        );
-    }
-
-
-    /**
-     * 
      * @param folderName the name of the folder to be added
      */
     public addFolder(folderName: string): void {
@@ -474,9 +532,5 @@ export class JobsComponent implements OnInit {
             }
         });
     }
-
-
-    ngOnInit() {
-        this.refreshJobs();
-    }
+    
 }

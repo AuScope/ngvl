@@ -4,12 +4,7 @@ import { CommonModule } from '@angular/common';
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
-
-import { OlMapComponent } from './openlayermap/olmap.component';
-import { OlMapZoomComponent } from './openlayermap/controls/olmap.zoom.component';
-import { OlMapDataSelectComponent } from './openlayermap/controls/olmap.select.data.component';
-import { OlMapLayersComponent } from './openlayermap/controls/olmap.layers.component';
-
+import { OlMapModule } from './openlayermap/olmap.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -18,9 +13,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     CommonModule,
     PageHeaderModule,
     DatasetsRoutingModule,
+    OlMapModule,
     NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent, OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent],
-  bootstrap: [OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent]
+  declarations: [DatasetsComponent],
 })
 export class DatasetsModule { }

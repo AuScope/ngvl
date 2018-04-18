@@ -19,6 +19,7 @@ import { PlainTextPreview } from './preview/plaintext-preview.component';
 import { ImagePreview } from './preview/image-preview.component';
 import { PreviewDirective } from './preview/preview.directive';
 import { TtlPreview } from './preview/ttl-preview.component';
+import { OlMapModule } from '../datasets/openlayermap/olmap.module';
 
 
 @NgModule({
@@ -31,6 +32,7 @@ import { TtlPreview } from './preview/ttl-preview.component';
     ContextMenuModule,
     TableModule,
     TreeTableModule,
+    OlMapModule,
     NgbDropdownModule.forRoot(),
     NgbCollapseModule.forRoot()
   ],

@@ -11,6 +11,11 @@ import { ImagePreview } from './preview/image-preview.component';
 import { PreviewItem } from './preview/preview-item';
 import { TtlPreview } from './preview/ttl-preview.component';
 import { DataServicePreview } from './preview/data-service-preview.component';
+import olProj from 'ol/proj';
+import olFeature from 'ol/feature';
+import { point, featureCollection, polygon } from '@turf/helpers';
+import * as center from '@turf/center';
+import * as envelope from '@turf/envelope';
 
 
 @Component({
@@ -75,7 +80,7 @@ export class JobsComponent implements OnInit {
         private jobsService: JobsService,
         private modalService: NgbModal,
         private confirmationService: ConfirmationService) { }
-    
+
 
     ngOnInit() {
         this.refreshJobs();
@@ -179,7 +184,7 @@ export class JobsComponent implements OnInit {
                 this.selectedJobDownloads = [];
                 this.selectedCloudFiles = [];
                 this.filePreviewLoading = false;
-                if(this.previewHost) {
+                if (this.previewHost) {
                     let viewContainerRef = this.previewHost.viewContainerRef;
                     viewContainerRef.clear();
                 }
@@ -190,7 +195,7 @@ export class JobsComponent implements OnInit {
                     // TODO: VGL seems to filter some files
                     fileDetails => {
                         // XXX Server was not returning error when the associated S3 bucket didn't exist
-                        if(!fileDetails) {
+                        if (!fileDetails) {
                             this.cloudFiles = [];
                         } else {
                             this.cloudFiles = fileDetails
@@ -265,10 +270,39 @@ export class JobsComponent implements OnInit {
         let previewItem: PreviewItem = this.previewItems.find(item => item.type === 'data-service');
         this.filePreviewLoading = true;
 
+        // TODO: Will there ever be more than 1 bbox? Confirm...
+        let featureArr: any = [];
+        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]));
+        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]));
+        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]));
+        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]));
 
-        this.previewFile(previewItem, "");
+        const key = "preview-key";
+        let bboxPolygonArr = {};
+        bboxPolygonArr[key] = featureCollection([polygon([[
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]),
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]),
+            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]),
+            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]),
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude])
+        ]])]);
+        bboxPolygonArr[key].crs = {
+            'type': 'name',
+            'properties': {
+                'name': 'EPSG:3857'
+            }
+        };
+
+        let reCentrePt: any = {};
+        // Calculate the envelope, if not too big then re-centred map can be calculated
+        const featureColl = featureCollection(featureArr);
+        const envelopePoly = envelope(featureColl);
+        const centerPt = center(featureColl);
+
+        const bboxData = [ olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr ];
 
 
+        this.previewFile(previewItem, bboxData);
         this.filePreviewLoading = false;
         this.currentPreviewObject = jobDownload;
     }
@@ -281,7 +315,7 @@ export class JobsComponent implements OnInit {
      * @param event 
      */
     public jobDownloadSelected(event): void {
-        const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length-1];
+        const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
         this.previewJobDownload(jobDownload);
     }
 
@@ -324,8 +358,7 @@ export class JobsComponent implements OnInit {
      * @param event event triggered by node selection, unused
      */
     public jobCloudFileSelected(event): void {
-        console.log("Selection: " + JSON.stringify(event));
-        let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length-1];
+        let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];
         this.previewCloudFile(cloudFile);
     }
 
@@ -334,9 +367,9 @@ export class JobsComponent implements OnInit {
      * 
      */
     refreshPreview(): void {
-        if(this.currentPreviewObject) {
+        if (this.currentPreviewObject) {
             // Hacky type check
-            if(this.currentPreviewObject.hasOwnProperty('localPath')) {
+            if (this.currentPreviewObject.hasOwnProperty('localPath')) {
                 this.previewJobDownload(this.currentPreviewObject);
             } else {
                 this.previewCloudFile(this.currentPreviewObject);
@@ -532,5 +565,5 @@ export class JobsComponent implements OnInit {
             }
         });
     }
-    
+
 }

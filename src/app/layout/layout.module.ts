@@ -27,8 +27,8 @@ import { SolutionsModule } from './solutions/solutions.module';
         NgbModule.forRoot(),
         SolutionsModule
     ],
-    declarations: [LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent],
-    providers: [CSWSearchService],
-    entryComponents: [RecordModalContent]
+    declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent ],
+    providers: [ CSWSearchService ],
+    entryComponents: [ RecordModalContent ]
 })
 export class LayoutModule {}

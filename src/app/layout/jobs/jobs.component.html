@@ -7,7 +7,7 @@
         <div class="col-lg-4">
             <div class="card" style="padding: 0px; height: 100%;">
                 <div class="card-header">Your Jobs</div>
-                <div class="card-body" style="overflow-y:auto;">
+                <div class="card-body" style="overflow-y:auto;padding:0px;">
                     <!-- TODO: Position this better -->
                     <div *ngIf="jobsLoading" class="spinner">
                         <div class="bounce1"></div>
@@ -17,7 +17,8 @@
                     <!-- TODO: Work out how to configure p-columns to use text-truncate -->
                     <!-- TODO: Implement filtering, and pagination if required, XXX Looks like TreeTable can't do this -->
                     <div *ngIf="treeJobsData.length > 0 && !jobsLoading">
-                        <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
+                        <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)"
+                            (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
                             <p-column field="name" header="Name"></p-column>
                             <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
                             <p-column field="submitDate" header="Submit Date"></p-column>
@@ -39,8 +40,9 @@
                 </div>
             </div>
         </div>
+
         <!-- Selected job -->
-        <div class="col-auto" style="flex: 1;">
+        <div class="col">
             <div class="card" style="height: 100%;">
                 <!-- Header: Selected job details or prompt user to select a job -->
                 <div *ngIf="!displayedJob">
@@ -49,152 +51,183 @@
                 <div *ngIf="displayedJob">
                     <div class="card-header">{{ displayedJob.name }}</div>
                 </div>
-                <div class="card-body" *ngIf="displayedJob" style="padding-top:0px;">
-                    <!-- General job details -->
-                    <div class="row">
-                        <div class="col">
-                            <table class="center-text">
-                                <tr>
-                                    <!-- TODO: Display status==="Error" in red -->
-                                    <td><strong>{{displayedJob.status}}</strong></td>
-                                    <td><strong>{{displayedJob.id}}</strong></td>
-                                    <td *ngIf="displayedJob.computeInstanceId">
-                                        <strong>{{displayedJob.computeInstanceId}}</strong>
-                                    </td>
-                                    <td *ngIf="!displayedJob.computeInstanceId">
-                                        <strong>N/A</strong>
-                                    </td>
-                                    <td *ngIf="displayedJob.computeInstanceType">
-                                        <strong>{{displayedJob.computeInstanceType}}</strong>
-                                    </td>
-                                    <td *ngIf="!displayedJob.computeInstanceType">
-                                        <strong>N/A</strong>
-                                    </td>
-                                    <td><strong>{{displayedJob.submitDate | date}}</strong></td>
-                                </tr>
-                                <tr>
-                                    <td><small>Status</small></td>
-                                    <td><small>Job ID</small></td>
-                                    <td><small>Instance ID</small></td>
-                                    <td><small>Instance Type</small></td>
-                                    <td><small>Submitted</small></td>
-                                </tr>
-                            </table>
+                <div class="card-body" *ngIf="displayedJob" style="padding:0px;">
+                    <div class="container">
+                        <!-- General job details -->
+                        <div class="row">
+                            <div class="col">
+                                <table class="center-text">
+                                    <tr>
+                                        <!-- TODO: Display status==="Error" in red -->
+                                        <td>
+                                            <strong>{{displayedJob.status}}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{{displayedJob.id}}</strong>
+                                        </td>
+                                        <td *ngIf="displayedJob.computeInstanceId">
+                                            <strong>{{displayedJob.computeInstanceId}}</strong>
+                                        </td>
+                                        <td *ngIf="!displayedJob.computeInstanceId">
+                                            <strong>N/A</strong>
+                                        </td>
+                                        <td *ngIf="displayedJob.computeInstanceType">
+                                            <strong>{{displayedJob.computeInstanceType}}</strong>
+                                        </td>
+                                        <td *ngIf="!displayedJob.computeInstanceType">
+                                            <strong>N/A</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{{displayedJob.submitDate | date}}</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <small>Status</small>
+                                        </td>
+                                        <td>
+                                            <small>Job ID</small>
+                                        </td>
+                                        <td>
+                                            <small>Instance ID</small>
+                                        </td>
+                                        <td>
+                                            <small>Instance Type</small>
+                                        </td>
+                                        <td>
+                                            <small>Submitted</small>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <!-- File panel -->
-                        <div class="col" style="padding-left:0px;">
-                            <div class="card container" style="height:calc(100vh - 304px);overflow-y:auto;">
-                                <div *ngIf="cloudFilesLoading" class="spinner">
-                                    <div class="bounce1"></div>
-                                    <div class="bounce2"></div>
-                                    <div class="bounce3"></div>
-                                </div>
-                                <div *ngIf="!cloudFilesLoading">
-                                    <!-- Actions button -->
-                                    <div class="row">
-                                        <div class="col">
-                                            <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
-                                                <button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0" ngbDropdownToggle>
-                                                    <i class="fa fa-folder">&nbsp;Actions</i>
-                                                </button>
-                                                <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
-                                                    <button class="dropdown-item" (click)="downloadSelectedFiles()">
-                                                        <i class="fa fa-download">&nbsp;Download file(s) to your machine</i>
-                                                    </button>
-                                                </div>
-                                            </div>
+                        <div class="row">
+                            <!-- File panel -->
+                            <!-- Issue with padding changing after navigating to Datasets -->
+                            <div class="col">
+                                <div class="card" style="height: calc(100vh - 304px);">
+                                    <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
+                                        <div *ngIf="cloudFilesLoading" class="spinner">
+                                            <div class="bounce1"></div>
+                                            <div class="bounce2"></div>
+                                            <div class="bounce3"></div>
                                         </div>
-                                    </div>
-                                    <!-- Display message if no job has no associated files -->
-                                    <div *ngIf="displayedJob && !cloudFilesLoading && displayedJob.jobDownloads.length===0 && cloudFiles.length===0" style="padding:8px">
-                                        This job doesn't have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.
-                                    </div>
-                                    <!-- Files table -->
-                                    <div class="row">
-                                        <div class="col">
-                                            <div *ngIf="displayedJob.jobDownloads.length > 0">
-                                                <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
-                                                    <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
-                                                    <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
-                                                    <!-- TODO: Dynamic name showing count -->
-                                                    <span>Data service downloads</span>
-                                                </a>
-                                                <div [ngbCollapse]="jobDownloadsIsCollapsed">
-                                                    <!-- TODO: Implement filtering, and pagination if required -->
-                                                    <p-table [value]="displayedJob.jobDownloads" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedJobDownloads" [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
-                                                        <ng-template pTemplate="header">
-                                                            <tr>
-                                                                <th pResizableColumn>Name</th>
-                                                                <th pResizableColumn>Details</th>
-                                                            </tr>
-                                                        </ng-template>
-                                                        <ng-template pTemplate="body" let-download>
-                                                            <tr [pSelectableRow]="download">
-                                                                <td class="ui-resizable-column text-truncate" title="{{ download.name }}">{{ download.name }}</td>
-                                                                <td class="ui-resizable-column text-truncate" title="Service call to {{ download.url }}">Service call to <a href="{{ download.url }}" target="_blank">{{ download.url }}</a></td>
-                                                            </tr>
-                                                        </ng-template>
-                                                    </p-table>
+                                        <div *ngIf="!cloudFilesLoading">
+                                            <!-- Actions button -->
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
+                                                        <button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
+                                                            ngbDropdownToggle>
+                                                            <i class="fa fa-folder">&nbsp;Actions</i>
+                                                        </button>
+                                                        <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
+                                                            <button class="dropdown-item" (click)="downloadSelectedFiles()">
+                                                                <i class="fa fa-download">&nbsp;Download file(s) to your machine</i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <!-- Display message if no job has no associated files -->
+                                            <div *ngIf="displayedJob && !cloudFilesLoading && displayedJob.jobDownloads.length===0 && cloudFiles.length===0" style="padding:8px">
+                                                This job doesn't have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input
+                                                files visible here.
+                                            </div>
+                                            <!-- Files table -->
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div *ngIf="displayedJob.jobDownloads.length > 0">
+                                                        <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
+                                                            <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                                                            <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                                                            <!-- TODO: Dynamic name showing count -->
+                                                            <span>Data service downloads</span>
+                                                        </a>
+                                                        <div [ngbCollapse]="jobDownloadsIsCollapsed">
+                                                            <!-- TODO: Implement filtering, and pagination if required -->
+                                                            <p-table [value]="displayedJob.jobDownloads" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedJobDownloads"
+                                                                [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
+                                                                <ng-template pTemplate="header">
+                                                                    <tr>
+                                                                        <th pResizableColumn>Name</th>
+                                                                        <th pResizableColumn>Details</th>
+                                                                    </tr>
+                                                                </ng-template>
+                                                                <ng-template pTemplate="body" let-download>
+                                                                    <tr [pSelectableRow]="download">
+                                                                        <td class="ui-resizable-column text-truncate" title="{{ download.name }}">{{ download.name }}</td>
+                                                                        <td class="ui-resizable-column text-truncate" title="Service call to {{ download.url }}">Service call to
+                                                                            <a href="{{ download.url }}" target="_blank">{{ download.url }}</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-template>
+                                                            </p-table>
+                                                        </div>
+                                                    </div>
 
-                                            <div *ngIf="cloudFiles.length > 0" style="margin-top: 15px;">
-                                                <a (click)="cloudFilesIsCollapsed = !cloudFilesIsCollapsed">
-                                                    <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
-                                                    <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
-                                                    <!-- TODO: Dynamic name showing count -->
-                                                    <span>Files in cloud storage</span>
-                                                </a>
-                                                <div [ngbCollapse]="cloudFilesIsCollapsed">
-                                                    <!-- TODO: Implement filtering, and pagination if required -->
-                                                    <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedCloudFiles" [metaKeySelection]="true" (onRowSelect)="jobCloudFileSelected($event)">
-                                                        <ng-template pTemplate="header">
-                                                            <tr>
-                                                                <th pResizableColumn>Name</th>
-                                                                <th pResizableColumn>Details</th>
-                                                            </tr>
-                                                        </ng-template>
-                                                        <ng-template pTemplate="body" let-cloudfile>
-                                                            <tr [pSelectableRow]="cloudfile">
-                                                                <td class="ui-resizable-column text-truncate" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
-                                                                <td class="ui-resizable-column text-truncate" title="{{ cloudfile.size }}">{{ cloudfile.size }}</td>
-                                                            </tr>
-                                                        </ng-template>
-                                                    </p-table>
+                                                    <div *ngIf="cloudFiles.length > 0" style="margin-top: 15px;">
+                                                        <a (click)="cloudFilesIsCollapsed = !cloudFilesIsCollapsed">
+                                                            <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                                                            <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                                                            <!-- TODO: Dynamic name showing count -->
+                                                            <span>Files in cloud storage</span>
+                                                        </a>
+                                                        <div [ngbCollapse]="cloudFilesIsCollapsed">
+                                                            <!-- TODO: Implement filtering, and pagination if required -->
+                                                            <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="multiple" [(selection)]="selectedCloudFiles" [metaKeySelection]="true"
+                                                                (onRowSelect)="jobCloudFileSelected($event)">
+                                                                <ng-template pTemplate="header">
+                                                                    <tr>
+                                                                        <th pResizableColumn>Name</th>
+                                                                        <th pResizableColumn>Details</th>
+                                                                    </tr>
+                                                                </ng-template>
+                                                                <ng-template pTemplate="body" let-cloudfile>
+                                                                    <tr [pSelectableRow]="cloudfile">
+                                                                        <td class="ui-resizable-column text-truncate" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
+                                                                        <td class="ui-resizable-column text-truncate" title="{{ cloudfile.size }}">{{ cloudfile.size }}</td>
+                                                                    </tr>
+                                                                </ng-template>
+                                                            </p-table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
+
+                                                    <!-- TODO: Only display if preview is active, puhsh to bottom of container -->
+                                                    <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0 && this.cloudFiles.length===0" style="margin:20px;">
+                                                        <label>This job does not have any uploaded input files or service downloads
+                                                            configured. Unsubmitted jobs will not have their input files
+                                                            visible here.
+                                                        </label>
+                                                    </div>
+
                                                 </div>
                                             </div>
-                                            <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
-
-                                            <!-- TODO: Only display if preview is active, puhsh to bottom of container -->
-                                            <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0 && this.cloudFiles.length===0" style="margin:20px;">
-                                                <label>This job does not have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input files visible here.</label>
-                                            </div>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Preview panel -->
-                        <div class="col" style="padding-right:0px;">
-                            <div class="card" style="height:100%;">
-                                <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;">
-                                    Select a file to the left to preview it here.
-                                </div>
-                                <div *ngIf="filePreviewLoading" class="spinner">
-                                    <div class="bounce1"></div>
-                                    <div class="bounce2"></div>
-                                    <div class="bounce3"></div>
-                                </div>
-                                <div style="height:100%">
-                                    <ng-template preview-host></ng-template>
-                                </div>
-                                <div class="card-footer" *ngIf="!filePreviewLoading && currentPreviewObject && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
-                                    <button class="btn btn-sm pull-right" (click)="refreshPreview()"><i class="fa fa-refresh"></i>&nbsp; Refresh</button>
+                            <!-- Preview panel -->
+                            <div class="col">
+                                <div class="card" style="height:100%;">
+                                    <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;">
+                                        Select a file to the left to preview it here.
+                                    </div>
+                                    <div *ngIf="filePreviewLoading" class="spinner">
+                                        <div class="bounce1"></div>
+                                        <div class="bounce2"></div>
+                                        <div class="bounce3"></div>
+                                    </div>
+                                    <div style="height:100%;">
+                                        <ng-template preview-host></ng-template>
+                                    </div>
+                                    <div class="card-footer" *ngIf="!filePreviewLoading && currentPreviewObject && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
+                                        <button class="btn btn-sm pull-right" (click)="refreshPreview()">
+                                            <i class="fa fa-refresh"></i>&nbsp; Refresh</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -215,7 +248,8 @@
     </div>
     <div class="modal-body">
         <div class="input-group">
-            <label for="folderName">Folder Name&nbsp;</label><input type="text" type="form-control" id="folderName" [(ngModel)]="newFolderName" style="display:flex;flex:1;">
+            <label for="folderName">Folder Name&nbsp;</label>
+            <input type="text" type="form-control" id="folderName" [(ngModel)]="newFolderName" style="display:flex;flex:1;">
         </div>
     </div>
     <div class="modal-footer">

@@ -6,12 +6,13 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 @Component({
     selector: 'app-plaintext-preview',
     templateUrl: 'plaintext-preview.component.html',
-    styleUrls: ['plaintext-preview.component.scss']
+    styleUrls: []
 })
 
 
 export class PlainTextPreview implements PreviewComponent {
 
+    // Data will be the plaintext string
     data: any;
 
 

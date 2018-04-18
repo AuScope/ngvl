@@ -5,12 +5,13 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 @Component({
     selector: 'app-image-preview',
     templateUrl: 'ttl-preview.component.html',
-    styleUrls: ['ttl-preview.component.scss']
+    styleUrls: []
 })
 
 
 export class TtlPreview implements PreviewComponent {
 
+    // Data will be the TTL data as a plaintext string
     data: any;
 
 

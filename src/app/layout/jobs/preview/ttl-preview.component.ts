@@ -3,7 +3,7 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
 @Component({
-    selector: 'app-image-preview',
+    selector: 'app-ttl-preview',
     templateUrl: 'ttl-preview.component.html',
     styleUrls: []
 })

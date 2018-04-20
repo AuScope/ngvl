@@ -136,6 +136,7 @@
                                                 files visible here.
                                             </div>
                                             <!-- Files table -->
+                                            <!-- TODO: Deselect file selection when preview loading, or interrupt file loading if selection changed -->
                                             <div class="row">
                                                 <div class="col">
                                                     <div *ngIf="displayedJob.jobDownloads.length > 0">
@@ -195,7 +196,7 @@
                                                     </div>
                                                     <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
 
-                                                    <!-- TODO: Only display if preview is active, puhsh to bottom of container -->
+                                                    <!-- TODO: Only display if preview is active, push to bottom of container -->
                                                     <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0 && this.cloudFiles.length===0" style="margin:20px;">
                                                         <label>This job does not have any uploaded input files or service downloads
                                                             configured. Unsubmitted jobs will not have their input files
@@ -213,18 +214,19 @@
                             <!-- Preview panel -->
                             <div class="col">
                                 <div class="card" style="height:100%;">
-                                    <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;">
-                                        Select a file to the left to preview it here.
-                                    </div>
-                                    <div *ngIf="filePreviewLoading" class="spinner">
-                                        <div class="bounce1"></div>
-                                        <div class="bounce2"></div>
-                                        <div class="bounce3"></div>
-                                    </div>
-                                    <div style="height:100%;">
+                                    <div class="card-body" style="display:grid;overflow:auto;width:100%;height:100%;">
+                                        <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;overflow:hidden;">
+                                            Select a file to the left to preview it here.
+                                        </div>
+                                        <div *ngIf="filePreviewLoading" class="spinner">
+                                            <div class="bounce1"></div>
+                                            <div class="bounce2"></div>
+                                            <div class="bounce3"></div>
+                                        </div>
                                         <ng-template preview-host></ng-template>
                                     </div>
                                     <div class="card-footer" *ngIf="!filePreviewLoading && currentPreviewObject && (selectedCloudFiles.length > 0 || selectedJobDownloads.length > 0)">
+                                        <!-- TODO: Add any PreviewItem extras here, such as ImageItem's ACtual Size checkbox -->
                                         <button class="btn btn-sm pull-right" (click)="refreshPreview()">
                                             <i class="fa fa-refresh"></i>&nbsp; Refresh</button>
                                     </div>

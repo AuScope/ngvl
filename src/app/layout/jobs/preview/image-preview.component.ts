@@ -15,6 +15,21 @@ export class ImagePreview implements PreviewComponent {
     data: any;
 
 
-    constructor() { }
+    constructor() {
+    }
+
+
+    /**
+     * 
+     * @param cbElement TODO: Have this called from the footer of the preview panel, use it to change style
+     */
+    public actualSizeChanged(cbElement: HTMLInputElement): void {
+        if(cbElement.checked) {
+            
+        } else {
+            
+        }
+    }
+
 
 }

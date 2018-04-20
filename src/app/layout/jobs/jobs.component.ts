@@ -261,6 +261,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * TODO: Are there other types of Data Service Downloads?
      * 
      * @param jobDownload 
      */
@@ -298,10 +299,7 @@ export class JobsComponent implements OnInit {
         const featureColl = featureCollection(featureArr);
         const envelopePoly = envelope(featureColl);
         const centerPt = center(featureColl);
-
         const bboxData = [ olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr ];
-
-
         this.previewFile(previewItem, bboxData);
         this.filePreviewLoading = false;
         this.currentPreviewObject = jobDownload;
@@ -341,10 +339,12 @@ export class JobsComponent implements OnInit {
                 error => {
                     //TODO: Proper error reporting
                     this.filePreviewLoading = false;
+                    this.currentPreviewObject = null;
                     console.log(error.message);
                 }
             );
         } else if (previewItem && previewItem.type === 'image') {
+            this.currentPreviewObject = cloudFile;
             this.previewFile(previewItem, cloudFile.publicUrl);
         }
     }
@@ -376,6 +376,7 @@ export class JobsComponent implements OnInit {
             }
         }
     }
+
 
     /*
      * TODO: If the following job actions will behave similarly in other

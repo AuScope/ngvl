@@ -12,7 +12,7 @@ import { OlMapPreviewComponent } from "../../datasets/openlayermap/olmap.preview
 
 export class DataServicePreview implements PreviewComponent, AfterViewInit {
 
-    // Data will be the map center point and the bbox geometries
+    // Data will be array containing map center point [0] and the bbox geometries [1]
     data: any;
 
     // Have a reference to the OlMapPreview Component so we can set the data

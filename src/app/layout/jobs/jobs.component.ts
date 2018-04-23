@@ -16,6 +16,7 @@ import olFeature from 'ol/feature';
 import { point, featureCollection, polygon } from '@turf/helpers';
 import * as center from '@turf/center';
 import * as envelope from '@turf/envelope';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -74,6 +75,9 @@ export class JobsComponent implements OnInit {
     deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() };
     submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
+
+    // Current HttpClient GET request (for cancellation purposes)
+    httpSubscription: Subscription;
 
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
@@ -136,6 +140,16 @@ export class JobsComponent implements OnInit {
     /**
      * 
      */
+    private cancelCurrentSubscription() {
+        if(this.httpSubscription && !this.httpSubscription.closed) {
+            this.httpSubscription.unsubscribe();
+        }
+    }
+
+
+    /**
+     * 
+     */
     public refreshJobs(): void {
         // Reset spinners
         this.jobsLoading = true;
@@ -153,7 +167,8 @@ export class JobsComponent implements OnInit {
         this.currentPreviewObject = null;
 
         // Load jobs
-        this.jobsService.getTreeJobs().subscribe(
+        this.cancelCurrentSubscription();
+        this.httpSubscription = this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
                 this.treeJobsData = this.createTreeJobsData(treeJobs);
                 this.jobs = treeJobs.jobs;
@@ -170,9 +185,6 @@ export class JobsComponent implements OnInit {
 
     /**
      * A new job has been selected, update file panel
-     * 
-     * TODO: IMPORTANT! Cancel all in-progress calls when job is selected,
-     * as currently it's possible cloud files will be added to wrong job XXX
      * 
      * @param event the select node event
      */
@@ -191,7 +203,8 @@ export class JobsComponent implements OnInit {
                 // Request job cloud files
                 this.cloudFiles = [];
                 this.cloudFilesLoading = true;
-                this.jobsService.getJobCloudFiles(this.displayedJob.id).subscribe(
+                this.cancelCurrentSubscription();
+                this.httpSubscription = this.jobsService.getJobCloudFiles(this.displayedJob.id).subscribe(
                     // TODO: VGL seems to filter some files
                     fileDetails => {
                         // XXX Server was not returning error when the associated S3 bucket didn't exist
@@ -329,8 +342,9 @@ export class JobsComponent implements OnInit {
         let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
         if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
             this.filePreviewLoading = true;
+            this.cancelCurrentSubscription();
             // TODO: Max file size to config
-            this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 512).subscribe(
+            this.httpSubscription = this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 512).subscribe(
                 preview => {
                     this.previewFile(previewItem, preview);
                     this.filePreviewLoading = false;

@@ -8,45 +8,45 @@ import { TreeJobs, Series, CloudFileInformation } from '../../shared/modules/vgl
 @Injectable()
 export class JobsService {
 
-  constructor(private vgl: VglService) {}
+    constructor(private vgl: VglService) { }
 
 
-  public getTreeJobs(): Observable<TreeJobs> {
-    return this.vgl.treeJobs;
-  }
+    public getTreeJobs(): Observable<TreeJobs> {
+        return this.vgl.treeJobs;
+    }
 
-  public addFolder(newFolder: string): Observable<Series> {
-      return this.vgl.addFolder(newFolder);
-  }
+    public addFolder(newFolder: string): Observable<Series> {
+        return this.vgl.addFolder(newFolder);
+    }
 
-  public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
-      return this.vgl.getJobCloudFiles(jobId);
-  }
+    public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
+        return this.vgl.getJobCloudFiles(jobId);
+    }
 
-  public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
-    return this.vgl.downloadFile(jobId, filename, key);
-  }
+    public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
+        return this.vgl.downloadFile(jobId, filename, key);
+    }
 
-  public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
-    return this.vgl.downloadFilesAsZip(jobId, filenames);
-  }
+    public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
+        return this.vgl.downloadFilesAsZip(jobId, filenames);
+    }
 
-  public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<String> {
-    return this.vgl.getPlaintextPreview(jobId, file, maxSize);
-  }
+    public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<String> {
+        return this.vgl.getPlaintextPreview(jobId, file, maxSize);
+    }
 
-  public deleteJob(jobId: number): Observable<any> {
-      return this.vgl.deleteJob(jobId);
-  }
+    public deleteJob(jobId: number): Observable<any> {
+        return this.vgl.deleteJob(jobId);
+    }
 
-  public cancelJob(jobId: number): Observable<any> {
-      return this.vgl.cancelJob(jobId);
-  }
+    public cancelJob(jobId: number): Observable<any> {
+        return this.vgl.cancelJob(jobId);
+    }
 
-  /*
-  public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
-    return this.vgl.getImagePreview(jobId, filename);
-  }
-  */
+    /*
+    public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
+      return this.vgl.getImagePreview(jobId, filename);
+    }
+    */
 
 }

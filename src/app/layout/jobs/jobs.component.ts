@@ -138,7 +138,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     * Cancel the current HttpClient request
      */
     private cancelCurrentSubscription() {
         if(this.httpSubscription && !this.httpSubscription.closed) {
@@ -148,7 +148,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     * Refresh the job panel based on any/all facted search elements
      */
     public refreshJobs(): void {
         // Reset spinners
@@ -344,7 +344,7 @@ export class JobsComponent implements OnInit {
             this.filePreviewLoading = true;
             this.cancelCurrentSubscription();
             // TODO: Max file size to config
-            this.httpSubscription = this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 512).subscribe(
+            this.httpSubscription = this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 20*1024).subscribe(
                 preview => {
                     this.previewFile(previewItem, preview);
                     this.filePreviewLoading = false;

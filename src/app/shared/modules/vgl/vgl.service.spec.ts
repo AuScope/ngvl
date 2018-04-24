@@ -1,11 +1,12 @@
 import { TestBed, inject } from '@angular/core/testing';
 
 import { VglService } from './vgl.service';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
 describe('VglService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [VglService]
+      providers: [ VglService, HttpClient, HttpHandler ]
     });
   });
 

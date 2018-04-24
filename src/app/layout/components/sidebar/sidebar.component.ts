@@ -1,4 +1,4 @@
-import { environment } from '../../../../environments/environment';
+//import { environment } from '../../../../environments/environment';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';

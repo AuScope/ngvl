@@ -20,6 +20,8 @@ import { Subscription } from 'rxjs';
 import { JobStatusModalContent } from './job-status.modal.component';
 
 
+import { UserStateService, JOBS_VIEW } from '../../shared';
+
 @Component({
     selector: 'app-jobs',
     templateUrl: './jobs.component.html',
@@ -82,19 +84,21 @@ export class JobsComponent implements OnInit {
 
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
-        private jobsService: JobsService,
-        private modalService: NgbModal,
-        private confirmationService: ConfirmationService) { }
+                private jobsService: JobsService,
+                private modalService: NgbModal,
+                private confirmationService: ConfirmationService,
+                private userStateService: UserStateService) { }
 
 
     ngOnInit() {
+        this.userStateService.setView(JOBS_VIEW);
         this.refreshJobs();
     }
 
 
     /**
      * Convert a VGL TreeNode to an p-treetable TreeNode
-     * 
+     *
      * @param treeNode the TreeNode to convert to an p-treetable TreeNode
      */
     private createTreeJobNode(treeNode: TreeJobNode): TreeNode {
@@ -120,10 +124,10 @@ export class JobsComponent implements OnInit {
     /**
      * Transform the TreeJobs data that VGL returns into the TreeNode data
      * that p-treetable requires
-     * 
+     *
      * TODO: Sort. No column sorting available, but ng-treetable alternative
      * to p-table may be able to do this
-     * 
+     *
      * @param treeJobs the TreeJobs data returned from VGL
      */
     private createTreeJobsData(treeJobs: TreeJobs): TreeNode[] {
@@ -187,7 +191,7 @@ export class JobsComponent implements OnInit {
 
     /**
      * A new job has been selected, update file panel
-     * 
+     *
      * @param event the select node event
      */
     public jobSelected(event): void {
@@ -271,9 +275,9 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
-     * @param previewItem 
-     * @param data 
+     *
+     * @param previewItem
+     * @param data
      */
     private previewFile(previewItem: PreviewItem, data: any) {
         previewItem.data = data;
@@ -287,8 +291,8 @@ export class JobsComponent implements OnInit {
 
     /**
      * TODO: Are there other types of Data Service Downloads?
-     * 
-     * @param jobDownload 
+     *
+     * @param jobDownload
      */
     previewJobDownload(jobDownload: JobDownload): void {
         let viewContainerRef = this.previewHost.viewContainerRef;
@@ -334,8 +338,8 @@ export class JobsComponent implements OnInit {
     /**
      * TODO: Cache selected jobs so we don't need to re-download?
      * TODO: Deselect anything in cloud file table if meta key wasn't used
-     * 
-     * @param event 
+     *
+     * @param event
      */
     public jobDownloadSelected(event): void {
         this.cancelCurrentSubscription();
@@ -345,8 +349,8 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
-     * @param cloudFile 
+     *
+     * @param cloudFile
      */
     public previewCloudFile(cloudFile: CloudFileInformation): void {
         this.cancelCurrentSubscription();
@@ -381,7 +385,7 @@ export class JobsComponent implements OnInit {
      * TODO: Cache selected jobs so we don't need to re-download?
      * TODO: Deselect anything in job download table if meta key wasn't used
      * TODO: Remove (or change) preview on item de-selection?
-     * 
+     *
      * @param event event triggered by node selection, unused
      */
     public jobCloudFileSelected(event): void {
@@ -391,7 +395,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     *
      */
     refreshPreview(): void {
         if (this.currentPreviewObject) {
@@ -503,7 +507,7 @@ export class JobsComponent implements OnInit {
 
     /**
      * Duplicate selected job (job context menu)
-     * 
+     *
      * TODO: Do. This will replicate a lot of submission functionality, so delaying
      */
     public duplicateSelectedJob(): void {
@@ -547,7 +551,7 @@ export class JobsComponent implements OnInit {
 
     /**
      * XXX This is specific to cloud files, may need to make genera
-     * 
+     *
      * TODO: Cache selected jobs so we don't need to re-download?
      */
     public downloadSingleFile(): void {
@@ -587,7 +591,7 @@ export class JobsComponent implements OnInit {
      * Download selected job files (downloads and ckoud files). Individual
      * files are downloaded in their native format, multiple files will be
      * zipped
-     * 
+     *
      * TODO: Figure out how to do data service downloads XXX
      * TODO: Report any errors
      */
@@ -612,7 +616,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     *
      * @param folderName the name of the folder to be added
      */
     public addFolder(folderName: string): void {
@@ -629,7 +633,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     *
      * @param content the add folder modal content
      */
     public showAddFolderModal(content): void {

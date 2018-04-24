@@ -9,11 +9,12 @@ import { VglService } from '../modules/vgl/vgl.service';
 
 import { environment } from '../../../environments/environment';
 
+export const DASHBOARD_VIEW = 'dashboard-view';
 export const DATA_VIEW = 'data-view';
 export const SOLUTIONS_VIEW = 'solutions-view';
 export const JOBS_VIEW = 'jobs-view';
 
-export type ViewType = 'data-view' | 'solutions-view' | 'jobs-view' | null;
+export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs-view' | null;
 
 @Injectable()
 export class UserStateService {

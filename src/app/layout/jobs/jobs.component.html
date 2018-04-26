@@ -14,16 +14,27 @@
                         <div class="bounce2"></div>
                         <div class="bounce3"></div>
                     </div>
-                    <!-- TODO: Work out how to configure p-columns to use text-truncate -->
                     <!-- TODO: Implement filtering, and pagination if required, XXX Looks like TreeTable can't do this -->
                     <div *ngIf="treeJobsData.length > 0 && !jobsLoading">
                         <p-treeTable [value]="treeJobsData" selectionMode="multiple" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)"
                             (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
-                            <p-column field="name" header="Name"></p-column>
+                            <p-column header="Name" [style]="{'width':'40%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.name }}">{{ node.data.name }}</span>
+                                </ng-template>
+                            </p-column>
                             <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
-                            <p-column field="submitDate" header="Submit Date"></p-column>
+                            <p-column header="Submit Date" [style]="{'width':'40%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.submitDate | date:'medium' }}">{{ node.data.submitDate | date:'medium' }}</span>
+                                </ng-template>
+                            </p-column>
                             <!-- TODO: Display status==="Error" in red -->
-                            <p-column field="status" header="Status"></p-column>
+                            <p-column field="status" header="Status" [style]="{'width':'20%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.status }}">{{ node.data.status }}</span>
+                                </ng-template>
+                            </p-column>
                         </p-treeTable>
                     </div>
                     <div *ngIf="treeJobsData.length === 0 && ! jobsLoading" style="padding:8px;">
@@ -158,8 +169,8 @@
                                                                 </ng-template>
                                                                 <ng-template pTemplate="body" let-download>
                                                                     <tr [pSelectableRow]="download">
-                                                                        <td class="ui-resizable-column text-truncate" title="{{ download.name }}">{{ download.name }}</td>
-                                                                        <td class="ui-resizable-column text-truncate" title="Service call to {{ download.url }}">Service call to
+                                                                        <td class="ui-resizable-column" title="{{ download.name }}">{{ download.name }}</td>
+                                                                        <td class="ui-resizable-column" title="Service call to {{ download.url }}">Service call to
                                                                             <a href="{{ download.url }}" target="_blank">{{ download.url }}</a>
                                                                         </td>
                                                                     </tr>
@@ -187,8 +198,8 @@
                                                                 </ng-template>
                                                                 <ng-template pTemplate="body" let-cloudfile>
                                                                     <tr [pSelectableRow]="cloudfile">
-                                                                        <td class="ui-resizable-column text-truncate" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
-                                                                        <td class="ui-resizable-column text-truncate" title="{{ cloudfile.size }}">{{ cloudfile.size }}</td>
+                                                                        <td class="ui-resizable-column" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
+                                                                        <td class="ui-resizable-column" title="{{ cloudfile.size }}">{{ cloudfile.size }}</td>
                                                                     </tr>
                                                                 </ng-template>
                                                             </p-table>

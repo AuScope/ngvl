@@ -72,7 +72,7 @@ export class JobsComponent implements OnInit {
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
     duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
-    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() };
+    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() };
     submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
 
@@ -100,6 +100,7 @@ export class JobsComponent implements OnInit {
         let node: TreeNode = {};
         node.data = {
             "id": treeNode.id,
+            "seriesId": treeNode.seriesId,
             "name": treeNode.name,
             "submitDate": treeNode.submitDate,
             "status": treeNode.status,
@@ -189,6 +190,7 @@ export class JobsComponent implements OnInit {
      * @param event the select node event
      */
     public jobSelected(event): void {
+        // Job selected
         if (event.node && event.node.data.leaf) {
             this.displayedJob = this.jobs.find(j => j.id === event.node.data.id);
             if (this.displayedJob) {
@@ -224,18 +226,22 @@ export class JobsComponent implements OnInit {
                 // TODO: Include Job.jobFiles (part of Job object)? No examples...
             }
         }
-        this.jobContextMenuItems = this.createJobContextMenu();
+        // Folder selected
+        else if(event.node && !event.node.data.leaf) {
+            console.log("Folder selected");
+        }
+        this.jobContextMenuItems = this.createJobContextMenu(event.node);
     }
 
 
     /**
      * Build the job context menu based on job status
      */
-    public createJobContextMenu(): any[] {
+    public createJobContextMenu(node): any[] {
         let items: any[] = [];
         // If more than 1 item is selected, or only a series is selected, delete is only action
-        if (this.selectedJobNodes.length > 1 || !this.displayedJob) {
-            items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() });
+        if (this.selectedJobNodes.length > 1 || !this.displayedJob || !node.data.leaf) {
+            items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
         }
         // Otherwise available actions are specific to job status
         else if (this.selectedJobNodes.length === 1 && this.displayedJob) {
@@ -243,11 +249,11 @@ export class JobsComponent implements OnInit {
                 items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
                 items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
             } else if (this.displayedJob.status.toLowerCase() === 'saved') {
-                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() });
+                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
                 items.push({ label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() });
                 items.push({ label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() });
             } else if (this.displayedJob.status.toLowerCase() === 'done' || this.displayedJob.status.toLowerCase() === 'error') {
-                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJob() });
+                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
                 items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
             } else {
                 items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
@@ -400,30 +406,65 @@ export class JobsComponent implements OnInit {
 
     /**
      * Delete selected job (job context menu)
-     * 
-     * TODO: Delete series
      */
-    public deleteSelectedJob(): void {
-        if (this.displayedJob) {
-            const message = 'Are you sure want to delete the job <strong>' + this.displayedJob.name + '</strong>';
-            this.confirmationService.confirm({
-                message: message,
-                header: 'Delete Job',
-                icon: 'fa fa-trash',
-                accept: () => {
-                    this.jobsService.deleteJob(this.displayedJob.id).subscribe(
-                        response => {
-                            this.refreshJobs();
-                            // TODO: Success message
-                        },
-                        error => {
-                            // TODO: Proper error reporting
-                            console.log(error.message);
-                        }
-                    )
-                }
-            });
+    public deleteSelectedJobsAndFolders(): void {
+        // Deleting job, series, or multiple jobs and/or series?
+        let confirmTitle = '';
+        let confirmMessage: string = '';
+        if(this.selectedJobNodes.length === 1 && !this.selectedJobNodes[0].data.leaf) {
+            confirmTitle = 'Delete Series';
+            confirmMessage = 'Are you sure you want to delete the folder <strong>' + this.selectedJobNodes[0].data.name + '</strong> and its jobs?';
+        } else if(this.selectedJobNodes.length === 1 && this.selectedJobNodes[0].data.leaf) {
+            confirmTitle = 'Delete Job';
+            confirmMessage = 'Are you sure you want to delete the job <strong>' + this.selectedJobNodes[0].data.name + ' </strong>?';
+        } else if(this.selectedJobNodes.length > 1) {
+            confirmTitle = 'Delete Jobs';
+            confirmMessage = 'Are you sure you want to delete all selected jobs and folders?';
+        } else {
+            return;
         }
+        // Confirm and delete
+        this.confirmationService.confirm({
+            header: confirmTitle,
+            message: confirmMessage,
+            icon: 'fa fa-trash',
+            accept: () => {
+                //for(let node of this.selectedJobNodes) {
+                for(let i = 0; i < this.selectedJobNodes.length; i++) {
+                    // Job
+                    const node: TreeNode = this.selectedJobNodes[i];
+                    if(node.data.leaf) {
+                        this.jobsService.deleteJob(node.data.id).subscribe(
+                            response => {
+                                if(i === this.selectedJobNodes.length-1) {
+                                    this.refreshJobs();
+                                    // TODO: Success message
+                                }
+                            },
+                            error => {
+                                // TODO: Proper error reporting
+                                console.log(error.message);
+                            }
+                        )
+                    }
+                    // Series
+                    else if(!node.data.leaf) {
+                        this.jobsService.deleteSeries(node.data.seriesId).subscribe(
+                            response => {
+                                if(i === this.selectedJobNodes.length-1) {
+                                    this.refreshJobs();
+                                    // TODO: Success message
+                                }
+                            },
+                            error => {
+                                // TODO: Proper error reporting
+                                console.log(error.message);
+                            }
+                        )
+                    }
+                }
+            }
+        });
     }
 
 

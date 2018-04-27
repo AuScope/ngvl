@@ -39,6 +39,10 @@ export class JobsService {
         return this.vgl.deleteJob(jobId);
     }
 
+    public deleteSeries(seriesId: number): Observable<any> {
+        return this.vgl.deleteSeries(seriesId);
+    }
+
     public cancelJob(jobId: number): Observable<any> {
         return this.vgl.cancelJob(jobId);
     }

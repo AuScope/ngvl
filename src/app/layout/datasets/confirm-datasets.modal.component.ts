@@ -22,6 +22,8 @@ export class ConfirmDatasetsModalContent {
 
 
     /**
+     * Download the resource
+     * 
      * TODO: Do
      */
     public downloadResource(event): void {
@@ -31,6 +33,8 @@ export class ConfirmDatasetsModalContent {
 
 
     /**
+     * Edit the download options for the resource
+     * 
      * TODO: Do
      */
     public editDownload(event): void {

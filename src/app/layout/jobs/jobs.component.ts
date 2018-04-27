@@ -326,6 +326,7 @@ export class JobsComponent implements OnInit {
      * @param event 
      */
     public jobDownloadSelected(event): void {
+        this.cancelCurrentSubscription();
         const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
         this.previewJobDownload(jobDownload);
     }
@@ -336,13 +337,13 @@ export class JobsComponent implements OnInit {
      * @param cloudFile 
      */
     public previewCloudFile(cloudFile: CloudFileInformation): void {
+        this.cancelCurrentSubscription();
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
         const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
         let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
         if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
             this.filePreviewLoading = true;
-            this.cancelCurrentSubscription();
             // TODO: Max file size to config
             this.httpSubscription = this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 20*1024).subscribe(
                 preview => {

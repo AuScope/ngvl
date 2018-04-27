@@ -31,6 +31,7 @@ export class DataServicePreview implements PreviewComponent, AfterViewInit {
     public updateBbox(): void {
         if(this.data != null && this.data.length==2) {
             this.olMapPreview.setupBBoxes(this.data[0], this.data[1]);
+            this.olMapPreview.fitViewToAllLayers();
         }
     };
 

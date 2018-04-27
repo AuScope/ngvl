@@ -23,7 +23,6 @@
                                     <span title="{{ node.data.name }}">{{ node.data.name }}</span>
                                 </ng-template>
                             </p-column>
-                            <!-- TODO: Can't pipe submit date in field, so date->string when creating tree nodes -->
                             <p-column header="Submit Date" [style]="{'width':'40%'}">
                                 <ng-template let-col let-node="rowData" pTemplate="body">
                                     <span title="{{ node.data.submitDate | date:'medium' }}">{{ node.data.submitDate | date:'medium' }}</span>
@@ -224,7 +223,7 @@
 
                             <!-- Preview panel -->
                             <div class="col">
-                                <div class="card" style="height:100%;">
+                                <div class="card" style="height: calc(100vh - 304px);">
                                     <div class="card-body" style="display:grid;overflow:hidden;padding:0;width:100%;height:100%;">
                                         <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="padding:8px;overflow:hidden;">
                                             Select a file to the left to preview it here.

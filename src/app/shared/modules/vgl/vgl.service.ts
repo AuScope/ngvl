@@ -172,4 +172,11 @@ export class VglService {
             .map(response => response);
     }
 
+    public getAuditLogs(jobId: number): Observable<any> {
+        const options = { params: new HttpParams().set('jobId', jobId.toString()) };
+        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'secure/getAuditLogsForJob.do', options)
+            .map(vglData)
+            .map(response => response);
+    }
+
 }

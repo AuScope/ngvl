@@ -20,6 +20,7 @@ import { ImagePreview } from './preview/image-preview.component';
 import { PreviewDirective } from './preview/preview.directive';
 import { TtlPreview } from './preview/ttl-preview.component';
 import { OlMapModule } from '../datasets/openlayermap/olmap.module';
+import { JobStatusModalContent } from './job-status.modal.component';
 
 
 @NgModule({
@@ -36,8 +37,8 @@ import { OlMapModule } from '../datasets/openlayermap/olmap.module';
     NgbDropdownModule.forRoot(),
     NgbCollapseModule.forRoot()
   ],
-  declarations: [ JobsComponent, PreviewDirective, DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview ],
-  entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview ],
+  declarations: [ JobsComponent, PreviewDirective, DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, JobStatusModalContent ],
+  entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, JobStatusModalContent ],
   providers: [ JobsService, ConfirmationService ]
 })
 export class JobsModule { }

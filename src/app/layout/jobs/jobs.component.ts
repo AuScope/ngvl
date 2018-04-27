@@ -17,6 +17,7 @@ import { point, featureCollection, polygon } from '@turf/helpers';
 import * as center from '@turf/center';
 import * as envelope from '@turf/envelope';
 import { Subscription } from 'rxjs';
+import { JobStatusModalContent } from './job-status.modal.component';
 
 
 @Component({
@@ -99,8 +100,8 @@ export class JobsComponent implements OnInit {
     private createTreeJobNode(treeNode: TreeJobNode): TreeNode {
         let node: TreeNode = {};
         node.data = {
-            "id": treeNode.id,
-            "seriesId": treeNode.seriesId,
+            "id": treeNode.id,              // Jobs only
+            "seriesId": treeNode.seriesId,  // Series only
             "name": treeNode.name,
             "submitDate": treeNode.submitDate,
             "status": treeNode.status,
@@ -240,21 +241,26 @@ export class JobsComponent implements OnInit {
     public createJobContextMenu(node): any[] {
         let items: any[] = [];
         // If more than 1 item is selected, or only a series is selected, delete is only action
-        if (this.selectedJobNodes.length > 1 || !this.displayedJob || !node.data.leaf) {
+        if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
             items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
         }
         // Otherwise available actions are specific to job status
-        else if (this.selectedJobNodes.length === 1 && this.displayedJob) {
-            if (this.displayedJob.status.toLowerCase() === 'active') {
+        else if (this.selectedJobNodes.length === 1 && node.data.leaf) {
+            const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
+            if (selectedJob.status.toLowerCase() === 'active') {
                 items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
                 items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
-            } else if (this.displayedJob.status.toLowerCase() === 'saved') {
+                // TODO: Confirm on active jobs
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+            } else if (selectedJob.status.toLowerCase() === 'saved') {
                 items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
                 items.push({ label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() });
                 items.push({ label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() });
-            } else if (this.displayedJob.status.toLowerCase() === 'done' || this.displayedJob.status.toLowerCase() === 'error') {
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+            } else if (selectedJob.status.toLowerCase() === 'done' || selectedJob.status.toLowerCase() === 'error') {
                 items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
                 items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else {
                 items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
                 items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
@@ -497,6 +503,8 @@ export class JobsComponent implements OnInit {
 
     /**
      * Duplicate selected job (job context menu)
+     * 
+     * TODO: Do. This will replicate a lot of submission functionality, so delaying
      */
     public duplicateSelectedJob(): void {
 
@@ -507,7 +515,17 @@ export class JobsComponent implements OnInit {
      * Get the status of the selected job (job context menu)
      */
     public showSelectedJobStatus(): void {
-
+        this.httpSubscription = this.jobsService.getAuditLogs(this.displayedJob.id).subscribe(
+            auditLogs => {
+                const modelRef = this.modalService.open(JobStatusModalContent);
+                modelRef.componentInstance.job = this.displayedJob;
+                modelRef.componentInstance.logs = auditLogs;
+            },
+            // TODO: Proper error reporting
+            error => {
+                console.log("Error: " + error.message);
+            }
+        );
     }
 
 

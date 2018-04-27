@@ -1,0 +1,14 @@
+<!-- TODO: Styles to CSS -->
+<!-- TODO: Translations -->
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title" id="exampleModalLongTitle">Job Status</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="margin-left:10px;margin-right:10px;">
+    <span>{{ job.name }}</span>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
+</div>

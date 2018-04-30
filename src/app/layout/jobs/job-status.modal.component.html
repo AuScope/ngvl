@@ -1,13 +1,33 @@
 <!-- TODO: Styles to CSS -->
 <!-- TODO: Translations -->
 <div class="modal-header" style="background: #EEE">
-    <h5 class="modal-title" id="exampleModalLongTitle">Job Status</h5>
+    <h5 class="modal-title" id="exampleModalLongTitle">Status information for {{ job.name }}</h5>
     <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-<div class="modal-body" style="margin-left:10px;margin-right:10px;">
-    <span>{{ job.name }}</span>
+<div class="modal-body">
+    <!--<div style="margin-bottom: 4px;">{{ logs[0].toStatus }}-->
+    <!--{{ statusDescriptions[logs[0].toStatus] }}
+    </div>-->
+    <p-table [value]="logs"  sortField="transitionDate" sortOrder="-1">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Status</th>
+                <th pSortableColumn="transitionDate">
+                    Changed At<p-sortIcon></p-sortIcon>
+                </th>
+                <th>Message</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-status>
+            <tr>
+                <td>{{ status.toStatus }}</td>
+                <td title="{{ status.transitionDate | date:'medium' }}">{{ status.transitionDate | date:'medium' }}</td>
+                <td title="{{ status.message }}">{{ status.message }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>

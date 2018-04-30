@@ -7,8 +7,8 @@
     </button>
 </div>
 <div class="modal-body">
-    <div style="margin-bottom: 4px;">{{ job.status }}</div>
-    <!--<div>{{ statusDescriptions[job.status] }}-->
+    <div>{{ job.status }}</div>
+    <div style="margin-bottom: 4px;">{{ getStatusDescription(job.status) }}</div>
     <p-table [value]="logs"  sortField="transitionDate" sortOrder="-1">
         <ng-template pTemplate="header">
             <tr>

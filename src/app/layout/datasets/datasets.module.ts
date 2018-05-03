@@ -22,7 +22,7 @@ import { TreeTableModule } from 'primeng/treetable';
     TreeTableModule,
     NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent, ConfirmDatasetsModalContent],
-  entryComponents: [ConfirmDatasetsModalContent]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent],
+  entryComponents: [ ConfirmDatasetsModalContent ]
 })
 export class DatasetsModule { }

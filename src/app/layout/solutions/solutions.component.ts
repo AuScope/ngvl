@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 
 import { Observable } from 'rxjs/Observable';
@@ -12,7 +12,7 @@ import { Problem, Solution } from '../../shared/modules/vgl/models';
   styleUrls: ['./solutions.component.scss'],
   animations: [routerTransition()]
 })
-export class SolutionsComponent implements OnInit {
+export class SolutionsComponent implements OnInit, AfterViewChecked {
 
   selectedProblem: Problem;
 
@@ -22,7 +22,7 @@ export class SolutionsComponent implements OnInit {
 
   ngOnInit() {
     // Notify user state that we're using the solutions view
-    this.userStateService.setView(SOLUTIONS_VIEW);
+    //this.userStateService.setView(SOLUTIONS_VIEW);
 
     // Subscribe to the current solution query to display relevant
     // results/selections.
@@ -36,6 +36,10 @@ export class SolutionsComponent implements OnInit {
 
   selectSolution(solution: Solution) {
     this.userStateService.selectSolution(solution);
+  }
+
+  ngAfterViewChecked() {
+    this.userStateService.setView(SOLUTIONS_VIEW);
   }
 
 }

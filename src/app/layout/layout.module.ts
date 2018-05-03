@@ -15,6 +15,8 @@ import { HeaderComponent } from './components/header/header.component';
 import { CSWSearchService } from '../shared/services/csw-search.service';
 import { RecordModalContent } from './datasets/record.modal.component';
 import { SolutionsModule } from './solutions/solutions.module';
+import { DatasetsModule } from './datasets/datasets.module';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
 @NgModule({
@@ -25,7 +27,9 @@ import { SolutionsModule } from './solutions/solutions.module';
         LayoutRoutingModule,
         TranslateModule,
         NgbModule.forRoot(),
-        SolutionsModule
+        SolutionsModule,
+        DatasetsModule,
+        OverlayPanelModule
     ],
     declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent ],
     providers: [ CSWSearchService ],

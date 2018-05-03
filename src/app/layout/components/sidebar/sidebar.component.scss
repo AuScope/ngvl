@@ -13,7 +13,7 @@ $topnav-background-color: #222;
     background-color: $topnav-background-color;
     bottom: 0;
     overflow-x: hidden;
-    padding-bottom: 40px;
+    //padding-bottom: 40px; // Was this space important? XXX
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     -ms-transition: all 0.2s ease-in-out;
@@ -153,6 +153,21 @@ $topnav-background-color: #222;
     }
 }
 
+/*
+// Menu overlay styling
+::ng-deep .ui-overlaypanel {
+    z-index: 0 !important; // Otherwise a 1-2 pixel artifact appears in sidebar
+}
+
+// TODO: Fix overlay positioning for small devices
+::ng-deep .ui-overlaypanel-content {
+    position: fixed;
+    left: 270px;
+    top: 64px;
+}
+*/
+
+/*
 // Datasets CSS below
 .btn {
     cursor: pointer;
@@ -167,9 +182,9 @@ $topnav-background-color: #222;
     position: relative;
     top: 50%;
     left: 50%;
-    -ms-transform: translate(-50%,-50%); /* IE 9 */
-    -webkit-transform: translate(-50%,-50%); /* Safari */
-    transform: translate(-50%,-50%); /* Standard syntax */
+    -ms-transform: translate(-50%,-50%); // IE 9
+    -webkit-transform: translate(-50%,-50%); // Safari
+    transform: translate(-50%,-50%); // Standard syntax
     width: 70px;
     height: 70px;
     > div {
@@ -191,3 +206,4 @@ $topnav-background-color: #222;
         animation-delay: -0.16s;
     }
 }
+*/

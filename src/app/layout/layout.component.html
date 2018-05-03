@@ -1,5 +1,5 @@
 <app-header></app-header>
-<app-sidebar></app-sidebar>
-<section class="main-container">
+<app-sidebar [isSidebarExpanded]="isSidebarExpanded" (sidebarExpansionEvent)="setSidebarExpanded($event)"></app-sidebar>
+<section class="main-container" [ngStyle]="setMainContainerStyle()">
     <router-outlet></router-outlet>
 </section>

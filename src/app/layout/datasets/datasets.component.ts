@@ -15,9 +15,6 @@ import olExtent from 'ol/extent';
 import { NgbTypeahead, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
-
-import { UserStateService, DATA_VIEW } from '../../shared';
-
 @Component({
     selector: 'app-datasets',
     templateUrl: './datasets.component.html',

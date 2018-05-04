@@ -31,7 +31,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
         DatasetsModule,
         OverlayPanelModule
     ],
-    declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent, DatePickerComponent ],
+    declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent ],
     providers: [ CSWSearchService ],
     entryComponents: [ RecordModalContent ]
 })

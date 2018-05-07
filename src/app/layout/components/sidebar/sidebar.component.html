@@ -1,45 +1,28 @@
 <nav class="sidebar d-flex flex-column" [ngClass]="{sidebarPushRight: isActive}" [ngStyle]="setSidebarStyle()">
     <div class="list-group common-items">
-        <a routerLink="/dashboard" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-home"></i>&nbsp;{{ 'Home' | translate }}
+        <a routerLink="/dashboard" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-home" [attr.title]="isSidebarExpanded ? null : ('Home' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Home' | translate }}</span>
         </a>
-        <a routerLink="/dashboard" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-home" title="{{ 'Home' | translate }}"></i>
+        <a [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-map" [attr.title]="isSidebarExpanded ? null : ('Data' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Data' | translate }}</span>
         </a>
-
-        <a [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-map"></i>&nbsp;{{ 'Data' | translate }}
+        <a [routerLink]="['/solutions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-map-signs" [attr.title]="isSidebarExpanded ? null : ('Solutions' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Solutions' | translate }}</span>
         </a>
-        <a [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-map" title="{{ 'Data' | translate }}"></i>
+        <a [routerLink]="['/jobs']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-magic" [attr.title]="isSidebarExpanded ? null : ('Jobs' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Jobs' | translate }}</span>
         </a>
-
-        <a [routerLink]="['/solutions']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-map-signs"></i>&nbsp;{{ 'Solutions' | translate }}
+        <a href="mailto:cg-admin@csiro.au??Subject=VGL query" class="list-group-item">
+            <i class="fa fa-fw fa-send" [attr.title]="isSidebarExpanded ? null : ('Contact us' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Contact us' | translate }}</span>
         </a>
-        <a [routerLink]="['/solutions']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-map-signs" title="{{ 'Solutions' | translate }}"></i>
-        </a>
-
-        <a [routerLink]="['/jobs']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-magic"></i>&nbsp;{{ 'Jobs' | translate }}
-        </a>
-        <a [routerLink]="['/jobs']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-magic" title="{{ 'Jobs' | translate }}"></i>
-        </a>
-
-        <a href="mailto:cg-admin@csiro.au??Subject=VGL query" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-send"></i>&nbsp;{{ 'Contact us' | translate }}
-        </a>
-        <a href="mailto:cg-admin@csiro.au??Subject=VGL query" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-send" title="{{ 'Contact us' | translate }}"></i>
-        </a>
-
-        <a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="isSidebarExpanded">
-            <i class="fa fa-fw fa-info"></i>&nbsp;{{ 'About' | translate }}
-        </a>
-        <a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="!isSidebarExpanded">
-            <i class="fa fa-fw fa-info" title="{{ 'About' | translate }}"></i>
+        <a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-info" [attr.title]="isSidebarExpanded ? null : ('About' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'About' | translate }}</span>
         </a>
         <!-- <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">
          <i class="fa fa-fw fa-bar-chart-o"></i>&nbsp;{{ 'Charts' | translate }}

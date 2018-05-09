@@ -1,0 +1,133 @@
+<!-- TODO: Styles to CSS -->
+<!-- TODO: Translations -->
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title">Download Options</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body">
+    <!-- Data Type (WFS, WCS) -->
+    <div *ngIf="onlineResource.type==='WFS' || onlineResource.type==='WCS'">
+        <div class="row">
+            <div class="col-lg-2">
+                <label>Data Type</label>
+            </div>
+            <div class="col-lg-10">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm" [(value)]="downloadOptions.format">
+                </div>
+                <small>The data format to request from the remote service.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Region (WFS/ WCS, NetCDF) -->
+    <div class="row">
+        <div class="col-lg-2">
+            <label>Region</label>
+        </div>
+        <div class="col-lg-10">
+            <div class="input-group input-group-sm">
+                <input type="text" style="width:100px;" class="form-control form-control-sm" [(value)]="downloadOptions.northBoundLatitude">
+                <div class="input-group-addon">North</div>
+                <input type="text" style="width:100px;" class="form-control form-control-sm" [(value)]="downloadOptions.westBoundLongitude">
+                <div class="input-group-addon">West</div>
+                <input type="text" style="width:100px;" class="form-control form-control-sm" [(value)]="downloadOptions.southBoundLatitude">
+                <div class="input-group-addon">South</div>
+                <input type="text" style="width:100px;" class="form-control form-control-sm" [(value)]="downloadOptions.eastBoundLongitude">
+                <div class="input-group-addon">East</div>
+            </div>
+            <small>The spatial region subset to request from the data service. The values represent a WGS:84 bounding box.</small>
+        </div>
+    </div>
+
+    <!-- Selection Size (WFS, WCS) -->
+    <!-- Seems to just be a status label
+    <form class="form-inline" *ngIf="onlineResource.type==='WFS' || onlineResource.type==='WCS'">
+        <label for="selection-size">Selection Size</label>
+        <div class="form-group form-group-sm" id="selection-size">
+            <input type="text" class="form-control form-control-sm">
+        </div>
+        <small>This selection size is only an approximation. It should only be used as a rough gauge of how much data you are requesting.</small>
+    </form>
+    -->
+    <!-- Feature Type (WFS/ WCS, NetCDF) -->
+    <!-- Hidden
+    <form class="form-inline">
+        <label for="feature-type">Feature Type</label>
+        <div class="form-group form-group-sm" id="feature-type">
+        </div>
+    </form>
+    -->
+    <!-- Service URL (WFS/ WCS, NetCDF) -->
+    <!-- Hidden
+    <form class="form-inline">
+        <label for="service-url">Service URL</label>
+        <div class="form-group form-group-sm" id="service-url">
+        </div>
+    </form>
+    -->
+    <!-- Response SRS (WFS) -->
+    <div *ngIf="onlineResource.type==='WFS'">
+        <div class="row">
+            <div class="col-lg-2">
+                <label>Response SRS</label>
+            </div>
+            <div class="col-lg-10">
+                <div class="input-group input-group-sm">
+                    <input type="text" class="form-control form-control-sm" [(value)]="downloadOptions.srsName">
+                </div>
+            </div>
+        </div>
+        <small>The response features can be reprojected to a preferred coordinate reference system. The default response value is
+            EPSG:4326.
+        </small>
+    </div>
+
+    <!-- Location (WFS, WCS, NetCDF) -->
+    <div class="row">
+        <div class="col-lg-2">
+            <label>Location</label>
+        </div>
+        <div class="col-lg-10">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control form-control-sm" [(value)]="downloadOptions.location">
+            </div>
+            <small>A file path where requested data will be downloaded to. It will be accessible from within your job script.</small>
+        </div>
+    </div>
+
+    <!-- Name (WFS, WCS, NetCDF) -->
+    <div class="row">
+        <div class="col-lg-2">
+            <label>Name</label>
+        </div>
+        <div class="col-lg-10">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control form-control-sm" [(value)]="downloadOptions.name">
+            </div>
+            <small>A short name to describe this download request.</small>
+        </div>
+    </div>
+
+    <!-- Description (WFS, WCS, NetCDF) -->
+    <div class="row">
+        <div class="col-lg-2">
+            <label>Description</label>
+        </div>
+        <div class="col-lg-10">
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control form-control-sm" [(value)]="downloadOptions.description">
+            </div>
+            <small>A longer description to outline the purpose of this download request.</small>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-secondary" (click)="saveChanges()">
+        <i class="fa fa-plus-circle"></i>&nbsp;Save Changes
+    </button>
+</div>

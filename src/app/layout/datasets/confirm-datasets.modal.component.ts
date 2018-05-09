@@ -1,10 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { DownloadOptions } from '../../shared/modules/vgl/models';
+import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { TreeTable } from 'primeng/treetable';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+
 
 
 @Component({
@@ -16,9 +18,10 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 export class ConfirmDatasetsModalContent {
 
     @Input() public cswRecordTreeData: TreeNode[] = [];
+    selectedData: TreeNode[];
 
 
-    constructor(public activeModal: NgbActiveModal) { }
+    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal) { }
 
 
     /**
@@ -28,7 +31,8 @@ export class ConfirmDatasetsModalContent {
      */
     public downloadResource(event): void {
         event.stopPropagation();
-        console.log("download");
+        // TODO: Do
+        console.log("download...");
     }
 
 
@@ -37,9 +41,30 @@ export class ConfirmDatasetsModalContent {
      * 
      * TODO: Do
      */
-    public editDownload(event): void {
+    public editDownload(onlineResource: any, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
-        console.log("edit download");
+        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        modelRef.componentInstance.onlineResource = onlineResource;
+        modelRef.componentInstance.downloadOptions = downloadOptions;
+    }
+
+
+    /**
+     * User has selected to save the selected datasets
+     */
+    public captureData(): void {
+        for(let record of this.selectedData) {
+            if(record.data.leaf) {
+                let cswRecord: CSWRecordModel = record.data.cswRecord;
+                if(cswRecord) {
+                    
+                }
+            }
+        }
+
+        // XXX
+
+        //this.activeModal.close();
     }
 
 }

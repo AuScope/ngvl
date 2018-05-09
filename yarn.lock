@@ -5598,9 +5598,8 @@ pkg-dir@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-portal-core-ui@stuartwoodman/portal-core-ui:
+portal-core-ui@../../../portal-core/portal-core-ui-fork:
   version "0.0.0"
-  resolved "https://codeload.github.com/stuartwoodman/portal-core-ui/tar.gz/eedbd234ec05dd775f45e3bf19b93f4a91c54a0e"
 
 portfinder@^1.0.9, portfinder@~1.0.12:
   version "1.0.13"

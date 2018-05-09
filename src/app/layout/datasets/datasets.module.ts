@@ -7,6 +7,7 @@ import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
 import { ConfirmDatasetsModalContent } from './confirm-datasets.modal.component';
+import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TreeTableModule } from 'primeng/treetable';
@@ -22,7 +23,7 @@ import { TreeTableModule } from 'primeng/treetable';
     TreeTableModule,
     NgbModule.forRoot()
   ],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent],
-  entryComponents: [ ConfirmDatasetsModalContent ]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent],
+  entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent ]
 })
 export class DatasetsModule { }

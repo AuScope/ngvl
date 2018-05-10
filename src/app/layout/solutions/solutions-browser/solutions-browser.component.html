@@ -1,20 +1,19 @@
-<div>
-  <div class="card bg-dark text-white mb-3">
-    <div class="card-header">Problems</div>
-    <div class="card-body">
-      <div class="btn-group-vertical btn-group-toggle" role="group" data-toggle="buttons">
-        <label class="btn btn-secondary" [class.active]="selectedProblem === problem['@id']" *ngFor="let problem of problems; let i=index">
-          <input
-            type="radio"
-            name="problems-radio"
-            [attr.value]="problem['@id']"
-            [attr.id]="'problem' + i"
-            [attr.checked]="selectedProblem === problem['@id']"
-            autocomplete="off"
-            (click)="selectProblem(problem['@id'])">
-          {{ problem.name }}
-        </label>
-      </div>
+<div class="card">
+  <div class="card-header">Solutions</div>
+  <div class="card-body">
+    <!-- Search by problem -->
+    <div class="btn-group-vertical btn-group-toggle" role="group" data-toggle="buttons">
+      <label class="btn btn-secondary" [class.active]="selectedProblem === problem['@id']" *ngFor="let problem of problems; let i=index">
+        <input
+          type="radio"
+          name="problems-radio"
+          [attr.value]="problem['@id']"
+          [attr.id]="'problem' + i"
+          [attr.checked]="selectedProblem === problem['@id']"
+          autocomplete="off"
+          (click)="selectProblem(problem['@id'])">
+        {{ problem.name }}
+      </label>
     </div>
   </div>
 </div>

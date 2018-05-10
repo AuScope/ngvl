@@ -53,18 +53,17 @@ export class ConfirmDatasetsModalContent {
      * User has selected to save the selected datasets
      */
     public captureData(): void {
-        for(let record of this.selectedData) {
-            if(record.data.leaf) {
-                let cswRecord: CSWRecordModel = record.data.cswRecord;
-                if(cswRecord) {
-                    
+        if(this.selectedData) {
+            for(let record of this.selectedData) {
+                if(record.data.leaf) {
+                    let cswRecord: CSWRecordModel = record.data.cswRecord;
+                    if(cswRecord) {
+                        
+                    }
                 }
             }
         }
-
-        // XXX
-
-        //this.activeModal.close();
+        this.activeModal.close();
     }
 
 }

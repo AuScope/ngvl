@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
@@ -17,6 +17,7 @@ import { TreeTableModule } from 'primeng/treetable';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     PageHeaderModule,
     DatasetsRoutingModule,
     OlMapModule,

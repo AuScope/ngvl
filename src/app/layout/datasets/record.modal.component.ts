@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Constants } from 'portal-core-ui/utility/constants.service';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 

@@ -1,277 +1,30 @@
-<nav class="sidebar" [ngClass]="{sidebarPushRight: isActive}">
+<nav class="sidebar d-flex flex-column" [ngClass]="{sidebarPushRight: isActive}" [ngStyle]="setSidebarStyle()">
     <div class="list-group common-items">
         <a routerLink="/dashboard" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-home"></i>&nbsp;{{ 'Home' | translate }}
+            <i class="fa fa-fw fa-home" [attr.title]="isSidebarExpanded ? null : ('Home' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Home' | translate }}</span>
         </a>
-        <!-- a [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-map"></i>&nbsp;{{ 'Data' | translate }}
-        </a-->
+        <a [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-map" [attr.title]="isSidebarExpanded ? null : ('Data' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Data' | translate }}</span>
+        </a>
         <a [routerLink]="['/solutions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-map-signs"></i>&nbsp;{{ 'Solutions' | translate }}
+            <i class="fa fa-fw fa-map-signs" [attr.title]="isSidebarExpanded ? null : ('Solutions' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Solutions' | translate }}</span>
         </a>
         <a [routerLink]="['/jobs']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-magic"></i>&nbsp;{{ 'Jobs' | translate }}
+            <i class="fa fa-fw fa-magic" [attr.title]="isSidebarExpanded ? null : ('Jobs' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Jobs' | translate }}</span>
         </a>
         <a href="mailto:cg-admin@csiro.au??Subject=VGL query" class="list-group-item">
-            <i class="fa fa-fw fa-send"></i>&nbsp;{{ 'Contact us' | translate }}
+            <i class="fa fa-fw fa-send" [attr.title]="isSidebarExpanded ? null : ('Contact us' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Contact us' | translate }}</span>
         </a>
         <a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-info"></i>&nbsp;{{ 'About' | translate }}
+            <i class="fa fa-fw fa-info" [attr.title]="isSidebarExpanded ? null : ('About' | translate)"></i>
+            <span *ngIf="isSidebarExpanded">&nbsp;{{ 'About' | translate }}</span>
         </a>
-		<div class="nested-menu">
-            <a class="list-group-item" [routerLink]="['/data']" [routerLinkActive]="['router-link-active']" (click)="addExpandClass('pages')">
-                <span>
-                    <i class="fa fa-fw fa-map"></i>&nbsp; {{ 'Data' | translate }}
-                </span>
-            </a>
-            <!-- TODO: Find all inline style definitions and move to CSS -->
-            <!-- TODO: All translations -->
-            <!-- TODO: Run search on any input contents changing (e.g. after losing focus), also on ENTER -->
-            <!-- TODO: Original portal has X button on all facets to close panel and delete any entries -->
-            <li class="nested" [class.expand]="showMenu === 'pages'">
-                <ul class="submenu" style="margin-right:2px;">
-                    <!-- Any text search -->
-                    <li>
-                        <a class="submenu" (click)="anyTextIsCollapsed = !anyTextIsCollapsed">
-                            <span>Any Text</span>
-                            <i *ngIf="anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="anyTextIsCollapsed">
-                            <div class="input-group input-group-sm">
-                                <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
-                                    [(ngModel)]="anyTextValue" (keyup.enter)="facetedSearch()">
-                                <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" (click)="facetedSearch()">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <!-- Spatial bounds search -->
-                    <li>
-                        <a (click)="spatialBoundsIsCollapsed = !spatialBoundsIsCollapsed">
-                            <span>Spatial Bounds</span>
-                            <i *ngIf="spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="spatialBoundsIsCollapsed">
-                            <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
-                                <div class="input-group-btn input-group-apppend">
-                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
-                                        <i class="fa fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
-                                        <i class="fa fa-edit"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <!-- Keywords search -->
-                    <li>
-                        <a (click)="keywordsIsCollapsed = !keywordsIsCollapsed">
-                            <span>Keywords</span>
-                            <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="keywordsIsCollapsed">
-                            <li *ngFor="let keyword of selectedKeywords; index as i">
-                                <div class="input-group input-group-sm">
-                                    <!-- TODO: Catch update change event, update model -->
-                                    <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]=selectedKeywords[i] 
-                                        (click)="click$.next($event.target.value)" #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"/>
-                                    <div class="input-group-btn input-group-apppend">
-                                            <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary" type="button" (click)="addNewKeyword()" style="background-color:green;">
-                                                <i class="fa fa-plus-circle"></i>
-                                            </button>
-                                        <button *ngIf="selectedKeywords[i]!=''" class="btn btn-secondary" type="button" (click)="removeKeyword(i)" style="background-color:red;">
-                                            <i class="fa fa-minus-circle"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                        </div>
-                    </li>
-                    <!-- Available services -->
-                    <li>
-                        <a (click)="servicesIsCollapsed = !servicesIsCollapsed">
-                            <span>Available Services</span>
-                            <i *ngIf="servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="servicesIsCollapsed">
-                            <fieldset style="border: solid #666;margin-right:4px;">
-                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Gridded Data Services</legend>
-                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="getService('wcs').checked" (change)="resetFacetedSearch()" id="check1">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check1" style="color:white;">&nbsp;Web Coverage Service</label>
-                                </div>
-                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="getService('ncss').checked" (change)="resetFacetedSearch()" id="check2">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check2" style="color:white;">&nbsp;NetCDF Subset Service</label>
-                                </div>
-                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="getService('opendap').checked" (change)="resetFacetedSearch()" id="check3">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check3" style="color:white;">&nbsp;OPenNDAP Service</label>
-                                </div>
-                            </fieldset>
-                            <fieldset style="border:solid #666;margin-right:4px;">
-                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Point/Line Data Services</legend>
-                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="getService('wfs').checked" (change)="resetFacetedSearch()" id="check4">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check4" style="color:white;">&nbsp;Web Feature Service</label>
-                                </div>
-                            </fieldset>
-                            <fieldset style="border:solid #666;margin-right:4px;">
-                                <legend class="control-label small" style="width:auto;margin-left:4px;color:white;">Visualisation Services</legend>
-                                <div class="input-group input-group-sm" style="margin-left:4px;margin-right:4px;">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="getService('wms').checked" (change)="resetFacetedSearch()" id="check5">
-                                        </div>
-                                    </div>
-                                    <label class="control-label small" for="check5" style="color:white;">&nbsp;Web Map Service</label>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </li>
-                    <!-- Publication date -->
-                    <li>
-                        <a style="color:white;" (click)="pubDateIsCollapsed = !pubDateIsCollapsed">
-                            <span>Publication Date</span>
-                            <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="pubDateIsCollapsed">
-                            <div class="input-group input-group-sm">
-                                <label class="control-label col-sm-4 small" for="date-from" style="color:white;">From</label>
-                                <!-- TODO: Validation -->
-                                <input class="form-control" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" ngbDatepicker #df="ngbDatepicker" (ngModelChange)="publicationDateChanged()">
-                                <div class="input-group-addon" (click)="df.toggle()" >
-                                    <span class="fa fa-calendar"></span>
-                                </div>
-                            </div>
-                            <div class="input-group input-group-sm" style="position: relative;">
-                                <label class="control-label col-sm-4 small" for="date-to" style="color:white;">To</label>
-                                <!-- TODO: Validation -->
-                                <input class="form-control" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" ngbDatepicker #dt="ngbDatepicker" (ngModelChange)="publicationDateChanged()">
-                                <div class="input-group-addon" (click)="dt.toggle()" >
-                                    <span class="fa fa-calendar"></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </li>
-                    <!-- Available registries -->
-                    <li>
-                        <a (click)="registriesIsCollapsed = !registriesIsCollapsed">
-                            <span>Available Registries</span>
-                            <i *ngIf="registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                        </a>
-                        <div [ngbCollapse]="registriesIsCollapsed">
-                            <li *ngFor="let registry of availableRegistries">
-                                <div class="input-group input-group-sm">
-                                    <div class="input-group-prepend">
-                                        <div class="input-group-text">
-                                            <input type="checkbox" [(ngModel)]="registry.checked" (change)="resetFacetedSearch()" id="check1">
-                                        </div>
-                                    </div>
-                                    <label for="check1" class="small" style="color:white;">&nbsp;{{ registry.title }}</label>
-                                </div>
-                            </li>
-                        </div>
-                    </li>
-                    <!-- Search results -->
-                    <!-- TODO : Paging of results (use factedSearch start/limit) -->
-                    <li>
-                        <a (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">Search Results
-                            <span>
-                                <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                            </span>
-                            <span>
-                                <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-                            </span>
-                        </a>
-                        <div [ngbCollapse]="searchResultsIsCollapsed" style="height:370px;position:relative;border-style:solid;border-color:#666">
-                            <div *ngIf="recordsLoading" class="records-spinner">
-                                    <div class="bounce1"></div>
-                                    <div class="bounce2"></div>
-                                    <div class="bounce3"></div>
-                            </div>
-                            <li *ngFor="let cswRecord of cswSearchResults" style="margin-top:2px;margin-right:2px;margin-left:2px;">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-prepend">
-                                        <!-- Record must have online resources and not already be added to map to have an add button -->
-                                        <button *ngIf="!cswRecord.hasOwnProperty('onlineResources') || cswRecord.onlineResources.length==0" class="btn btn-sm" data-toggle="tooltip" title="Layer has no associated online resources and as such, cannot be added">
-                                            <i class="fa fa-times"></i>
-                                        </button>
-                                        <button *ngIf="cswRecord.hasOwnProperty('onlineResources') && cswRecord.onlineResources.length>0 && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Add layer to map"
-                                            (click)="addCSWRecord(cswRecord)">
-                                            <i class="fa fa-plus-circle" style="color:green;"></i>
-                                        </button>
-                                        <button *ngIf="olMapService.layerExists(cswRecord.id)" class="btn btn-sm" data-toggle="tooltip" title="Remove layer from map"
-                                            (click)="removeCSWRecord(cswRecord.id)">
-                                            <i class="fa fa-trash" style="color:red;"></i>
-                                        </button>
-                                    </span>
-                                    <input class="input-group-text text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" value="{{ cswRecord.name }}" readonly>
-                                    <span class="input-group-append">
-                                        <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
-                                            <i class="fa fa-info-circle" style="color:blue;"></i>
-                                        </button>
-                                    </span>
-                                    <span class="input-group-append" *ngIf="cswRecord.hasOwnProperty('geographicElements') && cswRecord.geographicElements.length>0">
-                                        <!-- TODO: Delay required to stop dblclick registering as 2 single clicks -->
-                                        <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
-                                            (dblclick)="zoomToCSWRecordBounds(cswRecord)">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                            </li>
-                            
-                            <div *ngIf="cswSearchResults.length==0 && !recordsLoading" style="position:relative;top:30%;transform:translate(0,-10px);margin-right:4px;margin-left:10px;">
-                                <label style="color:white;">No records match the current filter(s)</label>
-                            </div>
-
-                            <div *ngIf="cswSearchResults.length>0 || recordsLoading" style="position:absolute;bottom:0;right:2px;">
-                                <button [disabled]="!hasNextResultsPage()" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
-                                    (click)="nextResultsPage()">
-                                    <i class="fa fa-arrow-circle-right"></i>
-                                </button>
-                                <button [disabled]="currentCSWRecordPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
-                                    title="Previous page" (click)="previousResultsPage()">
-                                    <i class="fa fa-arrow-circle-left"></i>
-                                </button>
-                                <label class="pull-right" style="color:white;">Page {{ currentCSWRecordPage }}&nbsp;</label>
-                            </div>
-
-                        </div>
-                    </li>
-                </ul>
-            </li>
-        </div>
-		<!-- <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <!-- <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">
          <i class="fa fa-fw fa-bar-chart-o"></i>&nbsp;{{ 'Charts' | translate }}
          </a>
          <a [routerLink]="['/tables']" [routerLinkActive]="['router-link-active']" class="list-group-item">
@@ -312,14 +65,22 @@
          </a> -->
     </div>
 
+    <!-- Sidebar expansion/contraction -->
+    <div class="mt-auto" style="bottom:0px;">
+        <button class="btn pull-right" *ngIf="isSidebarExpanded" (click)="setExpanded(false)" title="Collapse sidebar" style="background: #222;"><i class="fa fa-lg fa-chevron-circle-left" style="color: #fff;"></i></button>
+        <button class="btn pull-right" *ngIf="!isSidebarExpanded" (click)="setExpanded(true)" title="Expand sidebar" style="background: #222;"><i class="fa fa-lg fa-chevron-circle-right" style="color: #fff;"></i></button>
+    </div>
+
+    <!--
     <hr class="nav-divider">
 
     <div [ngSwitch]="currentView" class="list-group">
-      <a *ngSwitchCase="'data-view'" class="list-group-item">Data stuff here!</a>
+      <app-datasets-browser *ngSwitchCase="'data-view'"></app-datasets-browser>
       <app-solutions-browser *ngSwitchCase="'solutions-view'"></app-solutions-browser>
       <a *ngSwitchCase="'jobs-view'" class="list-group-item">Jobs stuff here!</a>
       <a *ngSwitchDefault class="list-group-item">Nothing to see here!</a>
     </div>
+    -->
     <!-- <div class="logos">
          <img height="40px" src="/assets/images/CSIRO_Grad_RGB_lr.jpg">
          <img height="40px" src="/assets/images/auscope.jpg">

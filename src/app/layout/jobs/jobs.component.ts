@@ -1,17 +1,644 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { routerTransition } from '../../router.animations';
+import { TreeJobs, TreeJobNode, Job, JobFile, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
+import { JobsService } from './jobs.service';
+import { TreeNode, ConfirmationService } from 'primeng/api';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { saveAs } from 'file-saver/FileSaver';
+import { PreviewDirective } from './preview/preview.directive';
+import { PlainTextPreview } from './preview/plaintext-preview.component';
+import { ImagePreview } from './preview/image-preview.component';
+import { PreviewItem } from './preview/preview-item';
+import { TtlPreview } from './preview/ttl-preview.component';
+import { DataServicePreview } from './preview/data-service-preview.component';
+import olProj from 'ol/proj';
+import olFeature from 'ol/feature';
+import { point, featureCollection, polygon } from '@turf/helpers';
+import * as center from '@turf/center';
+import * as envelope from '@turf/envelope';
+import { Subscription } from 'rxjs';
+import { JobStatusModalContent } from './job-status.modal.component';
+
 
 @Component({
-  selector: 'app-jobs',
-  templateUrl: './jobs.component.html',
-  styleUrls: ['./jobs.component.scss'],
-  animations: [routerTransition()]
+    selector: 'app-jobs',
+    templateUrl: './jobs.component.html',
+    styleUrls: [
+        './jobs.component.scss'
+    ],
+    animations: [routerTransition()]
 })
+
+
 export class JobsComponent implements OnInit {
 
-  constructor() { }
+    // Job tree
+    treeJobsData: TreeNode[] = [];
+    selectedJobNodes: TreeNode[] = [];
+    jobContextMenuItems = [];
 
-  ngOnInit() {
-  }
+    // Jobs and selected job
+    jobs: Job[] = [];
+    displayedJob: Job = null;
+
+    // Job cloud files (downloads are retrieved with Jobs)
+    cloudFiles: CloudFileInformation[] = [];
+
+    // Selected files
+    selectedJobDownloads: JobDownload[] = [];
+    selectedCloudFiles: CloudFileInformation[] = [];
+
+    // Spinner flags
+    jobsLoading: boolean = false;
+    cloudFilesLoading: boolean = false;
+    filePreviewLoading: boolean = false;
+
+    // File panel collapsable flags
+    cloudFilesIsCollapsed: boolean = false;
+    jobDownloadsIsCollapsed: boolean = false;
+
+    newFolderName: string = ""; // Name for new folder
+
+    // Preview components
+    previewItems: PreviewItem[] = [
+        new PreviewItem("data-service", DataServicePreview, {}, []),
+        new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh']),
+        new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
+        new PreviewItem("ttl", TtlPreview, {}, ['ttl'])
+    ];
+    @ViewChild(PreviewDirective) previewHost: PreviewDirective;
+    // Will be JobDownload or CloudFileInformation, needed for preview Refresh
+    currentPreviewObject: any = null;
+
+    // Job context menu actions
+    cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
+    duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
+    deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() };
+    submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
+    editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
+
+    // Current HttpClient GET request (for cancellation purposes)
+    httpSubscription: Subscription;
+
+
+    constructor(private componentFactoryResolver: ComponentFactoryResolver,
+        private jobsService: JobsService,
+        private modalService: NgbModal,
+        private confirmationService: ConfirmationService) { }
+
+
+    ngOnInit() {
+        this.refreshJobs();
+    }
+
+
+    /**
+     * Convert a VGL TreeNode to an p-treetable TreeNode
+     * 
+     * @param treeNode the TreeNode to convert to an p-treetable TreeNode
+     */
+    private createTreeJobNode(treeNode: TreeJobNode): TreeNode {
+        let node: TreeNode = {};
+        node.data = {
+            "id": treeNode.id,              // Jobs only
+            "seriesId": treeNode.seriesId,  // Series only
+            "name": treeNode.name,
+            "submitDate": treeNode.submitDate,
+            "status": treeNode.status,
+            "leaf": treeNode.leaf
+        }
+        if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
+            node.children = [];
+            for (let treeNodeChild of treeNode.children) {
+                node.children.push(this.createTreeJobNode(treeNodeChild));
+            }
+        }
+        return node;
+    }
+
+
+    /**
+     * Transform the TreeJobs data that VGL returns into the TreeNode data
+     * that p-treetable requires
+     * 
+     * TODO: Sort. No column sorting available, but ng-treetable alternative
+     * to p-table may be able to do this
+     * 
+     * @param treeJobs the TreeJobs data returned from VGL
+     */
+    private createTreeJobsData(treeJobs: TreeJobs): TreeNode[] {
+        let treeData: TreeNode[] = [];
+        // Skip root node (user name)
+        let rootNode: TreeJobNode = treeJobs.nodes;
+        if (rootNode.hasOwnProperty('children') && rootNode.children.length > 0) {
+            for (let treeNodeChild of rootNode.children) {
+                treeData.push(this.createTreeJobNode(treeNodeChild));
+            }
+        }
+        return treeData;
+    }
+
+
+    /**
+     * Cancel the current HttpClient request
+     */
+    private cancelCurrentSubscription() {
+        if(this.httpSubscription && !this.httpSubscription.closed) {
+            this.httpSubscription.unsubscribe();
+        }
+    }
+
+
+    /**
+     * Refresh the job panel based on any/all facted search elements
+     */
+    public refreshJobs(): void {
+        // Reset spinners
+        this.jobsLoading = true;
+        this.filePreviewLoading = false;
+        this.cloudFilesLoading = false;
+
+        // Reset job and file objects
+        this.jobs = [];
+        this.selectedCloudFiles = [];
+        this.selectedJobDownloads = [];
+        this.displayedJob = null;
+        this.treeJobsData = [];
+        this.selectedJobNodes = [];
+
+        this.currentPreviewObject = null;
+
+        // Load jobs
+        this.cancelCurrentSubscription();
+        this.httpSubscription = this.jobsService.getTreeJobs().subscribe(
+            treeJobs => {
+                this.treeJobsData = this.createTreeJobsData(treeJobs);
+                this.jobs = treeJobs.jobs;
+                this.jobsLoading = false;
+            },
+            // TODO: Proper error reporting
+            error => {
+                this.jobsLoading = false;
+                console.log("Error: " + error.message);
+            }
+        );
+    }
+
+
+    /**
+     * A new job has been selected, update file panel
+     * 
+     * @param event the select node event
+     */
+    public jobSelected(event): void {
+        // Job selected
+        if (event.node && event.node.data.leaf) {
+            this.displayedJob = this.jobs.find(j => j.id === event.node.data.id);
+            if (this.displayedJob) {
+                // Reset file selections
+                this.selectedJobDownloads = [];
+                this.selectedCloudFiles = [];
+                this.filePreviewLoading = false;
+                if (this.previewHost) {
+                    let viewContainerRef = this.previewHost.viewContainerRef;
+                    viewContainerRef.clear();
+                }
+                // Request job cloud files
+                this.cloudFiles = [];
+                this.cloudFilesLoading = true;
+                this.cancelCurrentSubscription();
+                this.httpSubscription = this.jobsService.getJobCloudFiles(this.displayedJob.id).subscribe(
+                    // TODO: VGL seems to filter some files
+                    fileDetails => {
+                        // XXX Server was not returning error when the associated S3 bucket didn't exist
+                        if (!fileDetails) {
+                            this.cloudFiles = [];
+                        } else {
+                            this.cloudFiles = fileDetails
+                        }
+                        this.cloudFilesLoading = false;
+                    },
+                    // TODO: Proper error reporting
+                    error => {
+                        this.cloudFilesLoading = false;
+                        console.log(error.message);
+                    }
+                );
+                // TODO: Include Job.jobFiles (part of Job object)? No examples...
+            }
+        }
+        // Folder selected
+        else if(event.node && !event.node.data.leaf) {
+            console.log("Folder selected");
+        }
+        this.jobContextMenuItems = this.createJobContextMenu(event.node);
+    }
+
+
+    /**
+     * Build the job context menu based on job status
+     */
+    public createJobContextMenu(node): any[] {
+        let items: any[] = [];
+        // If more than 1 item is selected, or only a series is selected, delete is only action
+        if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
+            items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+        }
+        // Otherwise available actions are specific to job status
+        else if (this.selectedJobNodes.length === 1 && node.data.leaf) {
+            const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
+            if (selectedJob.status.toLowerCase() === 'active') {
+                items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
+                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+                // TODO: Confirm on active jobs
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+            } else if (selectedJob.status.toLowerCase() === 'saved') {
+                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+                items.push({ label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() });
+                items.push({ label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() });
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+            } else if (selectedJob.status.toLowerCase() === 'done' || selectedJob.status.toLowerCase() === 'error') {
+                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+            } else {
+                items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
+                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+            }
+        }
+        return items;
+    }
+
+
+    /**
+     * 
+     * @param previewItem 
+     * @param data 
+     */
+    private previewFile(previewItem: PreviewItem, data: any) {
+        previewItem.data = data;
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+        let componentRef = viewContainerRef.createComponent(componentFactory);
+        (<PreviewComponent>componentRef.instance).data = previewItem.data;
+    }
+
+
+    /**
+     * TODO: Are there other types of Data Service Downloads?
+     * 
+     * @param jobDownload 
+     */
+    previewJobDownload(jobDownload: JobDownload): void {
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.type === 'data-service');
+        this.filePreviewLoading = true;
+
+        // TODO: Will there ever be more than 1 bbox? Confirm...
+        let featureArr: any = [];
+        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]));
+        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]));
+        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]));
+        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]));
+
+        const key = "preview-key";
+        let bboxPolygonArr = {};
+        bboxPolygonArr[key] = featureCollection([polygon([[
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]),
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]),
+            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]),
+            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]),
+            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude])
+        ]])]);
+        bboxPolygonArr[key].crs = {
+            'type': 'name',
+            'properties': {
+                'name': 'EPSG:3857'
+            }
+        };
+
+        let reCentrePt: any = {};
+        // Calculate the envelope, if not too big then re-centred map can be calculated
+        const featureColl = featureCollection(featureArr);
+        const envelopePoly = envelope(featureColl);
+        const centerPt = center(featureColl);
+        const bboxData = [ olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr ];
+        this.previewFile(previewItem, bboxData);
+        this.filePreviewLoading = false;
+        this.currentPreviewObject = jobDownload;
+    }
+
+
+    /**
+     * TODO: Cache selected jobs so we don't need to re-download?
+     * TODO: Deselect anything in cloud file table if meta key wasn't used
+     * 
+     * @param event 
+     */
+    public jobDownloadSelected(event): void {
+        this.cancelCurrentSubscription();
+        const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
+        this.previewJobDownload(jobDownload);
+    }
+
+
+    /**
+     * 
+     * @param cloudFile 
+     */
+    public previewCloudFile(cloudFile: CloudFileInformation): void {
+        this.cancelCurrentSubscription();
+        let viewContainerRef = this.previewHost.viewContainerRef;
+        viewContainerRef.clear();
+        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
+        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+        if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+            this.filePreviewLoading = true;
+            // TODO: Max file size to config
+            this.httpSubscription = this.jobsService.getPlaintextPreview(this.displayedJob.id, cloudFile.name, 20*1024).subscribe(
+                preview => {
+                    this.previewFile(previewItem, preview);
+                    this.filePreviewLoading = false;
+                    this.currentPreviewObject = cloudFile;
+                },
+                error => {
+                    //TODO: Proper error reporting
+                    this.filePreviewLoading = false;
+                    this.currentPreviewObject = null;
+                    console.log(error.message);
+                }
+            );
+        } else if (previewItem && previewItem.type === 'image') {
+            this.currentPreviewObject = cloudFile;
+            this.previewFile(previewItem, cloudFile.publicUrl);
+        }
+    }
+
+
+    /**
+     * TODO: Cache selected jobs so we don't need to re-download?
+     * TODO: Deselect anything in job download table if meta key wasn't used
+     * TODO: Remove (or change) preview on item de-selection?
+     * 
+     * @param event event triggered by node selection, unused
+     */
+    public jobCloudFileSelected(event): void {
+        let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];
+        this.previewCloudFile(cloudFile);
+    }
+
+
+    /**
+     * 
+     */
+    refreshPreview(): void {
+        if (this.currentPreviewObject) {
+            // Hacky type check
+            if (this.currentPreviewObject.hasOwnProperty('localPath')) {
+                this.previewJobDownload(this.currentPreviewObject);
+            } else {
+                this.previewCloudFile(this.currentPreviewObject);
+            }
+        }
+    }
+
+
+    /*
+     * TODO: If the following job actions will behave similarly in other
+     * classes (e.g. same dialog confirmations), move that code to job service
+     */
+
+    /**
+     * Delete selected job (job context menu)
+     */
+    public deleteSelectedJobsAndFolders(): void {
+        // Deleting job, series, or multiple jobs and/or series?
+        let confirmTitle = '';
+        let confirmMessage: string = '';
+        if(this.selectedJobNodes.length === 1 && !this.selectedJobNodes[0].data.leaf) {
+            confirmTitle = 'Delete Series';
+            confirmMessage = 'Are you sure you want to delete the folder <strong>' + this.selectedJobNodes[0].data.name + '</strong> and its jobs?';
+        } else if(this.selectedJobNodes.length === 1 && this.selectedJobNodes[0].data.leaf) {
+            confirmTitle = 'Delete Job';
+            confirmMessage = 'Are you sure you want to delete the job <strong>' + this.selectedJobNodes[0].data.name + ' </strong>?';
+        } else if(this.selectedJobNodes.length > 1) {
+            confirmTitle = 'Delete Jobs';
+            confirmMessage = 'Are you sure you want to delete all selected jobs and folders?';
+        } else {
+            return;
+        }
+        // Confirm and delete
+        this.confirmationService.confirm({
+            header: confirmTitle,
+            message: confirmMessage,
+            icon: 'fa fa-trash',
+            accept: () => {
+                //for(let node of this.selectedJobNodes) {
+                for(let i = 0; i < this.selectedJobNodes.length; i++) {
+                    // Job
+                    const node: TreeNode = this.selectedJobNodes[i];
+                    if(node.data.leaf) {
+                        this.jobsService.deleteJob(node.data.id).subscribe(
+                            response => {
+                                if(i === this.selectedJobNodes.length-1) {
+                                    this.refreshJobs();
+                                    // TODO: Success message
+                                }
+                            },
+                            error => {
+                                // TODO: Proper error reporting
+                                console.log(error.message);
+                            }
+                        )
+                    }
+                    // Series
+                    else if(!node.data.leaf) {
+                        this.jobsService.deleteSeries(node.data.seriesId).subscribe(
+                            response => {
+                                if(i === this.selectedJobNodes.length-1) {
+                                    this.refreshJobs();
+                                    // TODO: Success message
+                                }
+                            },
+                            error => {
+                                // TODO: Proper error reporting
+                                console.log(error.message);
+                            }
+                        )
+                    }
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Cancel the selected job (job context menu)
+     */
+    public cancelSelectedJob(): void {
+        if (this.displayedJob) {
+            const message = 'Are you sure want to cancel the job <strong>' + this.displayedJob.name + '</strong>';
+            this.confirmationService.confirm({
+                message: message,
+                header: 'Cancel Job',
+                icon: 'fa fa-times',
+                accept: () => {
+                    this.jobsService.cancelJob(this.displayedJob.id).subscribe(
+                        response => {
+                            this.refreshJobs();
+                            // TODO: Success message
+                        },
+                        error => {
+                            // TODO: Proper error reporting
+                            console.log(error.message);
+                        }
+                    )
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Duplicate selected job (job context menu)
+     * 
+     * TODO: Do. This will replicate a lot of submission functionality, so delaying
+     */
+    public duplicateSelectedJob(): void {
+
+    }
+
+
+    /**
+     * Get the status of the selected job (job context menu)
+     */
+    public showSelectedJobStatus(): void {
+        this.httpSubscription = this.jobsService.getAuditLogs(this.displayedJob.id).subscribe(
+            auditLogs => {
+                const modelRef = this.modalService.open(JobStatusModalContent);
+                modelRef.componentInstance.job = this.displayedJob;
+                modelRef.componentInstance.logs = auditLogs;
+            },
+            // TODO: Proper error reporting
+            error => {
+                console.log("Error: " + error.message);
+            }
+        );
+    }
+
+
+    /**
+     * Submit selected job (job context menu)
+     */
+    public submitSelectedJob(): void {
+
+    }
+
+
+    /**
+     * Edit selected job (job context menu)
+     */
+    public editSelectedJob(): void {
+
+    }
+
+
+    /**
+     * XXX This is specific to cloud files, may need to make genera
+     * 
+     * TODO: Cache selected jobs so we don't need to re-download?
+     */
+    public downloadSingleFile(): void {
+        this.jobsService.downloadFile(this.displayedJob.id, this.selectedCloudFiles[0].name, this.selectedCloudFiles[0].name).subscribe(
+            response => {
+                saveAs(response, this.selectedCloudFiles[0].name);
+            },
+            error => {
+                //TODO: Proper error reporting
+                console.log(error.message);
+            }
+        )
+    }
+
+
+    /**
+     * XXX This is specific to cloud files, may need to make general
+     */
+    public downloadFilesAsZip(): void {
+        let files: string[] = [];
+        for (let f of this.selectedCloudFiles) {
+            files.push(f.name);
+        }
+        this.jobsService.downloadFilesAsZip(this.displayedJob.id, files).subscribe(
+            response => {
+                saveAs(response, 'Job_' + this.displayedJob.id.toString() + '.zip');
+            },
+            error => {
+                //TODO: Proper error reporting
+                console.log(error.message);
+            }
+        )
+    }
+
+
+    /**
+     * Download selected job files (downloads and ckoud files). Individual
+     * files are downloaded in their native format, multiple files will be
+     * zipped
+     * 
+     * TODO: Figure out how to do data service downloads XXX
+     * TODO: Report any errors
+     */
+    public downloadSelectedFiles(): void {
+        if (this.selectedJobDownloads.length > 0 && this.selectedCloudFiles.length > 0) {
+            // TODO: Output message:
+            // "Sorry, but combining multiple file categories isn't supported. Please only select files from the same category and try again."
+        } else {
+            if (this.selectedJobDownloads.length === 1) {
+                // XXX
+
+            } else if (this.selectedJobDownloads.length > 1) {
+                // XXX
+
+            } else if (this.selectedCloudFiles.length === 1) {
+                this.downloadSingleFile();
+            } else if (this.selectedCloudFiles.length > 1) {
+                this.downloadFilesAsZip()
+            }
+        }
+    }
+
+
+    /**
+     * 
+     * @param folderName the name of the folder to be added
+     */
+    public addFolder(folderName: string): void {
+        this.jobsService.addFolder(folderName).subscribe(
+            series => {
+                console.log(JSON.stringify(series));
+            },
+            // TODO: Proper error reporting
+            error => {
+                console.log(error.message);
+            }
+        );
+    }
+
+
+    /**
+     * 
+     * @param content the add folder modal content
+     */
+    public showAddFolderModal(content): void {
+        this.newFolderName = "";
+        this.modalService.open(content).result.then((result) => {
+            if (result === 'OK click' && this.newFolderName !== '') {
+                this.addFolder(this.newFolderName);
+            }
+        });
+    }
 
 }

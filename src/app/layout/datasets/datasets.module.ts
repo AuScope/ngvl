@@ -1,26 +1,28 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
-
-import { OlMapComponent } from './openlayermap/olmap.component';
-import { OlMapZoomComponent } from './openlayermap/controls/olmap.zoom.component';
-import { OlMapDataSelectComponent } from './openlayermap/controls/olmap.select.data.component';
-import { OlMapLayersComponent } from './openlayermap/controls/olmap.layers.component';
-
+import { OlMapModule } from './openlayermap/olmap.module';
+import { ConfirmDatasetsModalContent } from './confirm-datasets.modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { TreeTableModule } from 'primeng/treetable';
 
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     PageHeaderModule,
     DatasetsRoutingModule,
+    OlMapModule,
+    TreeTableModule,
     NgbModule.forRoot()
   ],
-  declarations: [DatasetsComponent, OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent],
-  bootstrap: [OlMapComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent],
+  entryComponents: [ ConfirmDatasetsModalContent ]
 })
 export class DatasetsModule { }

@@ -14,8 +14,8 @@ import { DownloadOptions } from '../../shared/modules/vgl/models';
 export class DownloadOptionsModalContent implements OnInit {
 
     // TODO: We may want to move these if needed by other classes
-    LATITUDE_PATTERN = '^(\\+|-)?(?:90(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,6})?))$';
-    LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,6})?))$';
+    LATITUDE_PATTERN = '^(\\+|-)?(?:90(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,20})?))$';
+    LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,20})?))$';
 
     @Input() public downloadOptions: DownloadOptions;
     @Input() public onlineResource: any;

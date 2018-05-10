@@ -150,7 +150,7 @@
 
     <div class="modal-footer" style="background: #EEE">
         <button type="button" type="submit" class="btn btn-secondary" (click)="revertChanges()">Revert Changes</button>
-        <button type="button" type="submit" class="btn btn-secondary" (click)="saveChanges()">
+        <button type="button" [disabled]="!downloadOptionsForm.valid" type="submit" class="btn btn-secondary" (click)="saveChanges()">
             <i class="fa fa-plus-circle"></i>&nbsp;Save Changes
         </button>
     </div>

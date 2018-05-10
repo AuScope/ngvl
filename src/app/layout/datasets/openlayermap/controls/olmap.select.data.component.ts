@@ -66,10 +66,14 @@ export class OlMapDataSelectComponent {
             // Check for intersections with active layer CSW record extents
             let extent: olExtent = vector.getSource().getExtent();
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);
+
+            // Get 4326 projection
+            extent = olProj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');    
+
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
                 const modelRef = this.modalService.open(ConfirmDatasetsModalContent);
-                modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords);
+                modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent);
             }
             this.buttonText = 'Select Data';
         });
@@ -195,12 +199,23 @@ export class OlMapDataSelectComponent {
      * TODO: Currently only looks at NCSS data
      * 
      * @param cswRecords list of CSWRecords from which to construct a list of
-     * TreeNodes
+     *                   TreeNodes
+     * @param region the user selected region, may be the entire CSWRecord
+     *               extent or a subset
      * @return list of TreeNodes used to build the TreeTable
      */
-    public buildTreeData(cswRecords: CSWRecordModel[]): TreeNode[] {
+    public buildTreeData(cswRecords: CSWRecordModel[], region: olExtent): TreeNode[] {
         let cswRecordTreeNodes: TreeNode[] = [];
         if (cswRecords != null) {
+            let defaultBbox: any = null;
+            if(region) {
+                defaultBbox = {
+                    northBoundLatitude: region[3],
+                    eastBoundLongitude: region[2],
+                    southBoundLatitude: region[1],
+                    westBoundLongitude: region[0]
+                }
+            }
             let rootNcssNode: TreeNode = {};
             rootNcssNode.data = {
                 "name": this.onlineResources.NCSS.name,
@@ -212,7 +227,7 @@ export class OlMapDataSelectComponent {
                 const onlineResources: OnlineResourceModel[] = this.getOnlineResources(record, 'NCSS');
                 if (onlineResources.length > 0) {
                     for (const resource of onlineResources) {
-                        let downloadOptions: DownloadOptions = this.createDownloadOptionsForResource(resource, record, null);
+                        let downloadOptions: DownloadOptions = this.createDownloadOptionsForResource(resource, record, defaultBbox);
                         let node: TreeNode = {};
                         node.data = {
                             "name": resource.name,

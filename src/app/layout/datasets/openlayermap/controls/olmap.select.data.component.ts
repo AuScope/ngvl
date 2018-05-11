@@ -72,7 +72,7 @@ export class OlMapDataSelectComponent {
 
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
-                const modelRef = this.modalService.open(ConfirmDatasetsModalContent);
+                const modelRef = this.modalService.open(ConfirmDatasetsModalContent, { size: 'lg' });
                 modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent);
             }
             this.buttonText = 'Select Data';
@@ -231,7 +231,7 @@ export class OlMapDataSelectComponent {
                         let node: TreeNode = {};
                         node.data = {
                             "name": resource.name,
-                            "url": resource.description,
+                            "url": resource.url,
                             "cswRecord": record,
                             "onlineResource": resource,
                             "downloadOptions": downloadOptions,

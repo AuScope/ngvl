@@ -238,28 +238,4 @@ export class VglService {
             .map(response => response);
     }
 
-    private dlTest(data: Response) {
-        var blob = new Blob([data], { type: 'text/csv' });
-        var url= window.URL.createObjectURL(blob);
-        window.open(url);
-    }
-
-    public downloadDataset(downloadUrl: string): Observable<any> {
-        //var url= window.URL.createObjectURL(blob);
-        window.open(downloadUrl);
-        /*
-        const httpParams: HttpParams = this.createHttpParamsFromUrl(downloadUrl);
-        downloadUrl = downloadUrl.split('?')[0];
-        return this.http.get(downloadUrl, {
-            params: httpParams,
-            responseType: 'blob'
-        }).map((response) => {
-            //return response;
-            response => this.dlTest(response);
-        }).catch((error: Response) => {
-            return Observable.throw(error);
-        });
-        */
-    }
-
 }

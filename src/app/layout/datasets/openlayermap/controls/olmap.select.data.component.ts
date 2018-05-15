@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { ConfirmDatasetsModalContent } from '../../confirm-datasets.modal.component';
 import { UserStateService } from '../../../../shared';

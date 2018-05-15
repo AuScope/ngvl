@@ -22,7 +22,7 @@
         <!-- TODO: 'Click here to download' download link (WWW) -->
         <p-column header="Download" [style]="{'width':'10%','text-align':'center'}">
             <ng-template let-col let-node="rowData" pTemplate="body">
-                <button pButton *ngIf="node.data.leaf" (click)="downloadResource($event)"><i class="fa fa-download" title="Download this data to your local machine"></i></button>
+                <button pButton *ngIf="node.data.leaf" (click)="downloadDataset(node.data.onlineResource, node.data.downloadOptions)"><i class="fa fa-download" title="Download this data to your local machine"></i></button>
                 <button pButton *ngIf="node.data.leaf" (click)="editDownload(node.data.onlineResource, node.data.downloadOptions)" title="Edit the download options"><i class="fa fa-edit"></i></button>
             </ng-template>
         </p-column>

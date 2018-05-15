@@ -6,6 +6,8 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { TreeTable } from 'primeng/treetable';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { HttpParams } from '@angular/common/http';
 
 
 
@@ -18,14 +20,20 @@ import { TreeTable } from 'primeng/treetable';
 export class ConfirmDatasetsModalContent {
 
     @Input() public cswRecordTreeData: TreeNode[] = [];
-    selectedData: TreeNode[];
+    selectedDatasetNodes: TreeNode[];
 
 
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal) { }
+    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal, private vglService: VglService) { }
 
 
-    private makeDownloadUrl(onlineResource: any, dlOptions: DownloadOptions): string {
-        let url = "";
+    /**
+     * TODO: This lazily opens the download URL in a new window, so this won't
+     * work for mobile devices
+     * 
+     * @param onlineResource 
+     * @param dlOptions 
+     */
+    private downloadDataset(onlineResource: any, dlOptions: DownloadOptions): void {
         switch(onlineResource.type) {
             case 'WCS':
                 //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
@@ -42,56 +50,49 @@ export class ConfirmDatasetsModalContent {
                 if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                     dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
                 }
-                /*
-                Ext.Ajax.request({
-                    url : 'makeErddapUrl.do',
-                    params : Ext.apply({saveSession : saveInSession}, dlOptions),
-                    callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
-                });
-                */
+                this.vglService.makeErddapUrl(dlOptions).subscribe(
+                    response => {
+                        
+                    }, error => {
+                        console.log(error.message);
+                    }
+                );
             break;
             case 'WFS':
-                /*
-                Ext.Ajax.request({
-                    url : 'makeWfsUrl.do',
-                    params : Ext.apply({saveSession : saveInSession}, dlOptions),
-                    callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
-                });
-                */
+            this.vglService.makeWfsUrl(dlOptions).subscribe(
+                response => {
+                    if(response.url) {
+                        window.open(response.url);
+                    }
+                }, error => {
+                    console.log(error.message);
+                }
+            );
             break;
             case 'NCSS':
-                /*
-                Ext.Ajax.request({
-                    url : 'makeNetcdfsubseserviceUrl.do',
-                    params : Ext.apply({saveSession : saveInSession}, dlOptions),
-                    callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
-                });
-                */
+                this.vglService.makeNetcdfsubseserviceUrl(dlOptions).subscribe(
+                    response => {
+                        if(response.url) {
+                            window.open(response.url);
+                        }
+                    }, error => {
+                        console.log(error.message);
+                    }
+                );
             break;
             default:
-                /*
-                Ext.Ajax.request({
-                    url : 'makeDownloadUrl.do',
-                    params : Ext.apply({saveSession : saveInSession}, dlOptions),
-                    callback : Ext.bind(ajaxResponseHandler, this, [callback], true)
-                });
-                */
+                this.vglService.makeDownloadUrl(dlOptions).subscribe(
+                    response => {
+                        if(response.url) {
+                            window.open(response.url);
+                        }
+                    }, error => {
+                        console.log(error.message);
+                    }
+                );
             break;
         }
-        return url;
     }
-
-    /**
-     * Download the resource
-     * 
-     * TODO: Do
-     */
-    public downloadResource(event): void {
-        event.stopPropagation();
-        // TODO: Do
-        console.log("download...");
-    }
-
 
     /**
      * Edit the download options for the resource
@@ -110,8 +111,8 @@ export class ConfirmDatasetsModalContent {
      * User has selected to save the selected datasets
      */
     public captureData(): void {
-        if(this.selectedData) {
-            for(let record of this.selectedData) {
+        if(this.selectedDatasetNodes) {
+            for(let record of this.selectedDatasetNodes) {
                 if(record.data.leaf) {
                     let cswRecord: CSWRecordModel = record.data.cswRecord;
                     if(cswRecord) {

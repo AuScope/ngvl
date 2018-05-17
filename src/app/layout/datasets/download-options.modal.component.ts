@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { DownloadOptions } from '../../shared/modules/vgl/models';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 
 
 @Component({
@@ -25,37 +26,30 @@ export class DownloadOptionsModalContent implements OnInit {
     dataTypes: any[] = [];
 
 
-    constructor(private formBuilder: FormBuilder, public activeModal: NgbActiveModal) { }
+    constructor(private formBuilder: FormBuilder, public activeModal: NgbActiveModal, private vglService: VglService) { }
 
 
     ngOnInit() {
         if(this.onlineResource.type==='WFS' || this.onlineResource.type==='WCS') {
-            this.populateDataTypes(this.onlineResource.type);
+            this.populateDataTypes();
         }
         this.createForm();
     }
 
 
     /**
-     * Reriev the output formats for WFS online resource type.
+     * Retrieve the output formats for WFS online resource type.
      * 
-     * TODO: Implement and enable for WFS, also in template
+     * TODO: Find a working WFS example to test this against
      */
-    getFeatureRequestOutputFormats(): any[] {
-        /*
-        {
-            type : 'ajax',
-            url : 'getFeatureRequestOutputFormats.do',
-            extraParams : {
-                serviceUrl : config.serviceUrl
-            },
-            reader : {
-                type : 'json',
-                rootProperty : 'data'
+    getFeatureRequestOutputFormats(serviceUrl: string): any[] {
+        let outputFormats: any[] = [];
+        this.vglService.getRequestedOutputFormats(serviceUrl).subscribe(
+            response => { 
+                outputFormats = response;
             }
-        }
-        */
-       return [];
+        )
+        return outputFormats;
     }
 
 
@@ -63,10 +57,10 @@ export class DownloadOptionsModalContent implements OnInit {
      * 
      * @param type the type of the online resource, will be 'WCS' or 'WFS'
      */
-    private populateDataTypes(type: string) {
-        if(type==='WFS') {
-            this.dataTypes = this.getFeatureRequestOutputFormats();
-        } else if(type==='WCS') {
+    private populateDataTypes() {
+        if(this.onlineResource.type==='WFS') {
+            this.dataTypes = this.getFeatureRequestOutputFormats(this.onlineResource.serviceUrl);
+        } else if(this.onlineResource.type==='WCS') {
             this.dataTypes = [
                 { label : 'CSV', urn : 'csv' },
                 { label : 'GeoTIFF', urn : 'geotif' },
@@ -85,6 +79,10 @@ export class DownloadOptionsModalContent implements OnInit {
         for(let option in this.downloadOptions) {
             switch(option) {
                 // TODO: Proper validator patterns
+                case "url": {
+                    optionsGroup['url'] = [this.downloadOptions.url, Validators.required];
+                    break;
+                }
                 case "format": {
                     optionsGroup['format'] = [this.downloadOptions.format, Validators.required];
                     break;

@@ -52,7 +52,9 @@ export class ConfirmDatasetsModalContent {
                 }
                 this.vglService.makeErddapUrl(dlOptions).subscribe(
                     response => {
-                        
+                        if(response.url) {
+                            window.open(response.url);
+                        }
                     }, error => {
                         console.log(error.message);
                     }

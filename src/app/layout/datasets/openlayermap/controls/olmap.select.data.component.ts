@@ -25,11 +25,15 @@ export class OlMapDataSelectComponent {
     // TODO: repeated, move to constants
     onlineResources: any = {
         'NCSS': {
-            'name': 'NetCDF Subset Services',
+            'name': 'NetCDF Subset Service',
             'expanded': true
         },
         'WCS': {
             'name': 'OGC Web Coverage Service 1.0.0',
+            'expanded': true
+        },
+        'WFS': {
+            'nme': 'OGC Web Feature Service 1.1.0',
             'expanded': true
         },
         'WMS': {
@@ -67,7 +71,7 @@ export class OlMapDataSelectComponent {
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);
 
             // Get 4326 projection
-            extent = olProj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');    
+            extent = olProj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
 
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
@@ -182,6 +186,8 @@ export class OlMapDataSelectComponent {
                 downloadOptions.coverageName = downloadOptions.layerName;
                 break;
             case 'WWW':
+                delete downloadOptions.format;
+                delete downloadOptions.srsName;
                 break;
             //We don't support EVERY type
             default:
@@ -189,6 +195,23 @@ export class OlMapDataSelectComponent {
         }
 
         return downloadOptions;
+    };
+
+
+    /**
+     * 
+     * @param onlineResource 
+     */
+    private isResourceSupported(onlineResource): boolean {
+        switch (onlineResource.type) {
+            case 'WCS':
+            case 'WFS':
+            case 'WWW':
+            case 'NCSS':
+                return true;
+            default:
+                return false;
+        }
     };
 
 
@@ -207,7 +230,7 @@ export class OlMapDataSelectComponent {
         let cswRecordTreeNodes: TreeNode[] = [];
         if (cswRecords != null) {
             let defaultBbox: any = null;
-            if(region) {
+            if (region) {
                 defaultBbox = {
                     northBoundLatitude: region[3],
                     eastBoundLongitude: region[2],
@@ -215,37 +238,59 @@ export class OlMapDataSelectComponent {
                     westBoundLongitude: region[0]
                 }
             }
-            let rootNcssNode: TreeNode = {};
-            rootNcssNode.data = {
-                "name": this.onlineResources.NCSS.name,
-                "leaf": false
+
+            let resourceTypeNodes: TreeNode[] = [];
+            for (let resourceType in this.onlineResources) {
+                let rootResourceNode: TreeNode = {};
+                rootResourceNode.data = {
+                    "id": resourceType,
+                    "name": this.onlineResources[resourceType].name,
+                    "leaf": false
+                }
+                rootResourceNode.children = [];
+                resourceTypeNodes.push(rootResourceNode);
             }
-            rootNcssNode.children = [];
+
             for (let record of cswRecords) {
-                // TODO: Work out actual logic about what gets included. Will start with NetCDF only XXX
-                const onlineResources: OnlineResourceModel[] = this.getOnlineResources(record, 'NCSS');
-                if (onlineResources.length > 0) {
-                    for (const resource of onlineResources) {
-                        let downloadOptions: DownloadOptions = this.createDownloadOptionsForResource(resource, record, defaultBbox);
-                        let node: TreeNode = {};
-                        node.data = {
-                            "name": resource.name,
-                            "url": resource.url,
-                            "cswRecord": record,
-                            "onlineResource": resource,
-                            "downloadOptions": downloadOptions,
-                            "leaf": true
+                let foundResourceTypeForRecord: boolean = false;
+                for (let resourceType in this.onlineResources) {
+                    let rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === resourceType);
+                    const onlineResources: OnlineResourceModel[] = this.getOnlineResources(record, resourceType);
+                    if (onlineResources.length > 0) {
+                        for (const resource of onlineResources) {
+                            if (this.isResourceSupported(resource)) {
+                                let downloadOptions: DownloadOptions = this.createDownloadOptionsForResource(resource, record, defaultBbox);
+                                let node: TreeNode = {};
+                                node.data = {
+                                    "name": resource.name,
+                                    "url": resource.url,
+                                    "cswRecord": record,
+                                    "onlineResource": resource,
+                                    "downloadOptions": downloadOptions,
+                                    "leaf": true
+                                }
+                                rootResourceNode.children.push(node);
+                                foundResourceTypeForRecord = true;
+                                break;
+                            }
                         }
-                        rootNcssNode.children.push(node);
+                        // Stop iterating online resource types if we've found a supported type
+                        if (foundResourceTypeForRecord) {
+                            break;
+                        }
+                    } else {
+                        // TODO: REMOVE, but may want to report if novalid resource at all
+                        console.log("No " + resourceType + " resources found for record ");
                     }
-                } else {
-                    // TODO: Report no NCSS online resource to user
-                    console.log("No NCSS online resources");
                 }
             }
-            if (rootNcssNode.children.length > 0) {
-                rootNcssNode.expanded = true;
-                cswRecordTreeNodes.push(rootNcssNode);
+
+            // Add resource type nodes to tree if any were found
+            for (let resourceNode of resourceTypeNodes) {
+                if (resourceNode.children.length > 0) {
+                    resourceNode.expanded = true;
+                    cswRecordTreeNodes.push(resourceNode);
+                }
             }
         }
         return cswRecordTreeNodes;

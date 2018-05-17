@@ -238,4 +238,11 @@ export class VglService {
             .map(response => response);
     }
 
+    public getRequestedOutputFormats(serviceUrl: string): Observable<any> {
+        const httpParams = new HttpParams().set('serviceUrl', serviceUrl);
+        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'getFeatureRequestOutputFormats.do', { params: httpParams })
+            .map(vglData)
+            .map(response => response);
+    }
+
 }

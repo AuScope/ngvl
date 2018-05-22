@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { Observable } from 'rxjs/Observable';
 
-import { UserStateService } from '../../../shared';
+import { AuthService, UserStateService } from '../../../shared';
 
 @Component({
     selector: 'app-header',
@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit {
 
   constructor(private translate: TranslateService,
               private userStateService: UserStateService,
+              private authService: AuthService,
               public router: Router) {
 
     this.translate.addLangs(['en', 'fr', 'ur', 'es', 'it', 'fa', 'de']);
@@ -55,8 +56,18 @@ export class HeaderComponent implements OnInit {
         dom.classList.toggle('rtl');
     }
 
-  onLoggedout() {
-    localStorage.removeItem('isLoggedin');
+  onLoggedIn() {
+      // Store the current url then login.
+      this.authService.redirectUrl = this.router.url;
+      this.authService.login();
+    }
+
+  onLoggedOut() {
+      this.authService.logout();
+    }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
   }
 
     changeLang(language: string) {

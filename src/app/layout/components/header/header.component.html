@@ -111,7 +111,7 @@
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
                     <i class="fa fa-user"></i> {{ username$ | async }} <b class="caret"></b>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right">
+                <div *ngIf="isLoggedIn" class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="javascript:void(0)">
                         <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
                     </a>
@@ -121,9 +121,14 @@
                     <a class="dropdown-item" href="javascript:void(0)">
                         <i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}
                     </a>
-                    <a class="dropdown-item" href="/VGL-Portal/j_spring_security_logout" (click)="onLoggedout()">
+                    <button class="dropdown-item" (click)="onLoggedOut()">
                         <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
-                    </a>
+                    </button>
+                </div>
+                <div *ngIf="!isLoggedIn" class="dropdown-menu dropdown-menu-right">
+                  <button class="dropdown-item" (click)="onLoggedIn()">
+                    <i class="fa fa-fw fa-power-on"></i> {{ 'Log In' | translate }}
+                  </button>
                 </div>
             </li>
         </ul>

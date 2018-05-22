@@ -42,6 +42,10 @@ export class UserStateService {
     this.vgl.user.subscribe(user => this._user.next(user));
   }
 
+  public updateAnonymousUser() {
+    this._user.next(ANONYMOUS_USER);
+  }
+
   public setSolutionQuery(query: SolutionQuery) {
     this._solutionQuery.next(query);
   }

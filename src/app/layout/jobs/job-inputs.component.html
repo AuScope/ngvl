@@ -20,12 +20,6 @@
             </div>
         </div>
     </div>
-    <!-- Display message if no job has no associated files -->
-    <div *ngIf="selectedJob && !cloudFilesLoading && selectedJob.jobDownloads.length===0 && cloudFiles.length===0"
-        style="padding:8px">
-        This job doesn't have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input
-        files visible here.
-    </div>
     <!-- Files table -->
     <!-- TODO: Deselect file selection when preview loading, or interrupt file loading if selection changed -->
     <div class="row">

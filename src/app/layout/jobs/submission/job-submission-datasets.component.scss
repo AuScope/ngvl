@@ -1,0 +1,9 @@
+/* Standard file input must be hidden so we can customise display to match existing buttons */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}

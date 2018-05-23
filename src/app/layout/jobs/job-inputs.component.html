@@ -1,0 +1,105 @@
+<div *ngIf="cloudFilesLoading" class="spinner">
+    <div class="bounce1"></div>
+    <div class="bounce2"></div>
+    <div class="bounce3"></div>
+</div>
+<div *ngIf="!cloudFilesLoading">
+    <!-- Actions button -->
+    <div class="row">
+        <div class="col">
+            <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
+                <button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
+                    ngbDropdownToggle>
+                    <i class="fa fa-folder">&nbsp;Actions</i>
+                </button>
+                <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="downloadSelectedFiles()">
+                        <i class="fa fa-download">&nbsp;Download file(s) to your machine</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Display message if no job has no associated files -->
+    <div *ngIf="selectedJob && !cloudFilesLoading && selectedJob.jobDownloads.length===0 && cloudFiles.length===0"
+        style="padding:8px">
+        This job doesn't have any uploaded input files or service downloads configured. Unsubmitted jobs will not have their input
+        files visible here.
+    </div>
+    <!-- Files table -->
+    <!-- TODO: Deselect file selection when preview loading, or interrupt file loading if selection changed -->
+    <div class="row">
+        <div class="col">
+            <div *ngIf="selectedJob && selectedJob.jobDownloads.length > 0">
+                <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
+                    <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                    <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                    <!-- TODO: Dynamic name showing count -->
+                    <span>Data service downloads</span>
+                </a>
+                <div [ngbCollapse]="jobDownloadsIsCollapsed">
+                    <!-- TODO: Implement filtering, and pagination if required -->
+                    <p-table [value]="selectedJob.jobDownloads" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedJobDownloads"
+                        [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th *ngIf="showCheckboxes" style="width: 2.25em"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                                <th pResizableColumn>Name</th>
+                                <th pResizableColumn>Details</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-download>
+                            <tr [pSelectableRow]="download">
+                                <td *ngIf="showCheckboxes">
+                                    <p-tableCheckbox [value]="download"></p-tableCheckbox>
+                                </td>
+                                <td class="ui-resizable-column" title="{{ download.name }}">{{ download.name }}</td>
+                                <td class="ui-resizable-column" title="Service call to {{ download.url }}">Service call to
+                                    <a href="{{ download.url }}" target="_blank">{{ download.url }}</a>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+
+            <div *ngIf="cloudFiles.length > 0" style="margin-top: 15px;">
+                <a (click)="cloudFilesIsCollapsed = !cloudFilesIsCollapsed">
+                    <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
+                    <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                    <!-- TODO: Dynamic name showing count -->
+                    <span>Files in cloud storage</span>
+                </a>
+                <div [ngbCollapse]="cloudFilesIsCollapsed">
+                    <!-- TODO: Implement filtering, and pagination if required -->
+                    <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedCloudFiles" [metaKeySelection]="true"
+                        (onRowSelect)="jobCloudFileSelected($event)">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th *ngIf="showCheckboxes" style="width: 2.25em"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                                <th pResizableColumn>Name</th>
+                                <th pResizableColumn>Details</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-cloudfile>
+                            <tr [pSelectableRow]="cloudfile">
+                                <td *ngIf="showCheckboxes"><p-tableCheckbox [value]="cloudfile"></p-tableCheckbox></td>
+                                <td class="ui-resizable-column" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
+                                <td class="ui-resizable-column" title="{{ cloudfile.size }}">{{ cloudfile.size/1000 }} KB</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <!-- TODO: look at Job's jobFiles array, my examples don't have any -->
+
+            <!-- TODO: Only display if preview is active, push to bottom of container -->
+            <div *ngIf="selectedJob && selectedJob.jobDownloads.length===0 && this.cloudFiles.length===0" style="margin:20px;">
+                <label>This job does not have any uploaded input files or service downloads configured. Unsubmitted jobs will not
+                    have their input files visible here.
+                </label>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title">Copy From An Existing Job</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body" style="margin-left:10px;margin-right:10px;padding:0px;margin:0px;overflow:auto;">
+    <div class="row">
+        <!-- Job panel -->
+        <div class="col">
+
+            <div class="card" style="padding: 0px; height: 100%;">
+                <div class="card-body" style="overflow-y:auto;padding:0px;">
+                    <!-- TODO: Implement filtering, and pagination if required, XXX Looks like TreeTable can't do this -->
+                    <div *ngIf="treeJobsData.length > 0">
+
+                        <p-treeTable [value]="treeJobsData" selectionMode="single" [(selection)]="selectedJobNode" (onNodeSelect)="jobSelected($event)"
+                            (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
+                            <p-column header="Name" [style]="{'width':'40%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.name }}">{{ node.data.name }}</span>
+                                </ng-template>
+                            </p-column>
+                            <p-column header="Submit Date" [style]="{'width':'40%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.submitDate | date:'medium' }}">{{ node.data.submitDate | date:'medium' }}</span>
+                                </ng-template>
+                            </p-column>
+                            <!-- TODO: Display status==="Error" in red, etc. -->
+                            <p-column field="status" header="Status" [style]="{'width':'20%'}">
+                                <ng-template let-col let-node="rowData" pTemplate="body">
+                                    <span title="{{ node.data.status }}">{{ node.data.status }}</span>
+                                </ng-template>
+                            </p-column>
+                        </p-treeTable>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input panel -->
+        <div class="col">
+            <label></label>
+        </div>
+    </div>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-secondary" (click)="copySelectionsToJob()">Copy Selections to Job</button>
+</div>

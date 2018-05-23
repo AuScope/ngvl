@@ -1,0 +1,25 @@
+<div class="card">
+    <div class="card-header">Manage Job Input Files</div>
+    <div class="card-body">
+        <div style="margin:10px;" *ngIf="jobInputNodes.length === 0">
+            This doesn't have any input files or service downloads configured. 
+            You can add some by using the add button below or by selecting a dataset from the 
+            <a href="/data">datasets page</a>.
+        </div>
+        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes">
+            <p-column field="name" header="Name"></p-column>
+            <p-column field="location" header="Location"></p-column>
+            <p-column field="details" header="Details"></p-column>
+        </p-treeTable>
+    </div>
+    <div class="card-footer">
+        <input class="inputfile" id="fileinput" type="file" multiple="multiple" (change)="uploadFile($event)">
+        <label style="margin-left:10px;" for="fileinput" class="btn btn-sm btn-primary pull-right">
+            <i class="fa fa-upload"></i>&nbsp;Upload File(s)
+        </label>
+        <button style="margin-left:10px;" class="btn btn-sm btn-primary pull-right" (click)="remoteDownload()">
+            <i class="fa fa-download"></i>&nbsp;Remote Download</button>
+        <button type="button" class="btn btn-sm btn-primary pull-right" (click)="copyFromJob()">
+            <i class="fa fa-copy"></i>&nbsp;Copy From Job</button>
+    </div>
+</div>

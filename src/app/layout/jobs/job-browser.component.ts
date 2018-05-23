@@ -58,8 +58,6 @@ export class JobBrowserComponent implements OnInit {
     /**
      * Convert a VGL TreeNode to an p-treetable TreeNode
      * 
-     * TODO: This method to JobsService (duplicated in JobSubmissionDatasetsComponent)
-     * 
      * @param treeNode the TreeNode to convert to an p-treetable TreeNode
      */
     private createJobTreeNode(treeNode: TreeJobNode): TreeNode {
@@ -88,8 +86,6 @@ export class JobBrowserComponent implements OnInit {
      * 
      * TODO: Sort. No column sorting available, but ng-treetable alternative
      * to p-table may be able to do this
-     * 
-     * TODO: This method to JobsService (duplicated in JobSubmissionDatasetsComponent)
      * 
      * @param treeJobs the TreeJobs data returned from VGL
      */

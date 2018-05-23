@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs/Observable';
+import { Observable, Subscription } from 'rxjs';
 
 import { SolutionsService } from '../solutions.service';
 
@@ -15,10 +15,15 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './solutions-browser.component.html',
   styleUrls: ['./solutions-browser.component.scss']
 })
-export class SolutionsBrowserComponent implements OnInit {
+export class SolutionsBrowserComponent implements OnDestroy, OnInit {
 
   problems: Problem[] = [];
-  selectedProblem: string;
+  private _selectedProblem: Problem;
+
+  problemIsCollapsed: boolean = false;
+
+  private _solutionSub: Subscription;
+  private _querySub: Subscription;
 
   constructor(
     private solutionsService: SolutionsService,
@@ -26,15 +31,28 @@ export class SolutionsBrowserComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.solutionsService.getSolutions().subscribe(problems => this.problems = problems);
+    this._solutionSub = this.solutionsService
+      .getSolutions()
+      .subscribe(problems => this.problems = problems);
 
-    this.userStateService.solutionQuery
+    this._querySub = this.userStateService.solutionQuery
       .subscribe((query: SolutionQuery) => {
-        this.selectedProblem = (query && query.problems) ? query.problems[0]['@id'] : null;
+        this._selectedProblem = (query && query.problems) ? query.problems[0] : null;
       });
   }
 
-  selectProblem(id: string) {
+  ngOnDestroy() {
+    this._solutionSub.unsubscribe();
+    this._querySub.unsubscribe();
+  }
+
+  get selectedProblemId(): string {
+    const sp = this._selectedProblem;
+    return sp ? sp['@id'] : null;
+  }
+
+  set selectedProblemId(id: string) {
     this.userStateService.setSolutionQuery({ problems: [this.problems.find(it => it['@id'] === id)] });
   }
+
 }

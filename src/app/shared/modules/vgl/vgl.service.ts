@@ -37,7 +37,7 @@ export class VglService {
     public get treeJobs(): Observable<TreeJobs> {
         return this.http.get<VglResponse<TreeJobs>>(environment.portalBaseUrl + 'secure/treeJobs.do')
             .map(vglData)
-            .map(treeJob => treeJob);
+            .map(treeJobs => treeJobs);
     }
 
     public addFolder(folderName: string): Observable<Series> {

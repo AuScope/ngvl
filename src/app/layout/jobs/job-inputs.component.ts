@@ -114,6 +114,11 @@ export class JobInputsComponent implements OnChanges {
      */
     public jobDownloadSelected(event): void {
         this.cancelCurrentSubscription();
+        // Clear any selections from the cloud file table if meta key was not
+        // used
+        if(!event.originalEvent.ctrlKey) {
+            this.selectedCloudFiles = [];
+        }
         const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
         this.inputSelectionChanged.emit(jobDownload);
     }
@@ -128,6 +133,11 @@ export class JobInputsComponent implements OnChanges {
      */
     public jobCloudFileSelected(event): void {
         this.cancelCurrentSubscription();
+        // Clear any selections from the download table if meta key was not
+        // used
+        if(!event.originalEvent.ctrlKey) {
+            this.selectedJobDownloads = [];
+        }
         let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];
         this.inputSelectionChanged.emit(cloudFile);
     }

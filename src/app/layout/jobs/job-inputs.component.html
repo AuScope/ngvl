@@ -37,7 +37,9 @@
                         [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th *ngIf="showCheckboxes" style="width: 2.25em"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                                <th *ngIf="showCheckboxes" style="width: 2.25em">
+                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                </th>
                                 <th pResizableColumn>Name</th>
                                 <th pResizableColumn>Details</th>
                             </tr>
@@ -66,18 +68,22 @@
                 </a>
                 <div [ngbCollapse]="cloudFilesIsCollapsed">
                     <!-- TODO: Implement filtering, and pagination if required -->
-                    <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedCloudFiles" [metaKeySelection]="true"
-                        (onRowSelect)="jobCloudFileSelected($event)">
+                    <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedCloudFiles"
+                        [metaKeySelection]="true" (onRowSelect)="jobCloudFileSelected($event)">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th *ngIf="showCheckboxes" style="width: 2.25em"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+                                <th *ngIf="showCheckboxes" style="width: 2.25em">
+                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                </th>
                                 <th pResizableColumn>Name</th>
                                 <th pResizableColumn>Details</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-cloudfile>
                             <tr [pSelectableRow]="cloudfile">
-                                <td *ngIf="showCheckboxes"><p-tableCheckbox [value]="cloudfile"></p-tableCheckbox></td>
+                                <td *ngIf="showCheckboxes">
+                                    <p-tableCheckbox [value]="cloudfile"></p-tableCheckbox>
+                                </td>
                                 <td class="ui-resizable-column" title="{{ cloudfile.name }}">{{ cloudfile.name }}</td>
                                 <td class="ui-resizable-column" title="{{ cloudfile.size }}">{{ cloudfile.size/1000 }} KB</td>
                             </tr>

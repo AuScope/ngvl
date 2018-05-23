@@ -83,26 +83,29 @@ export class JobInputsComponent implements OnChanges {
 
         // Request job cloud files
         this.cloudFiles = [];
-        this.cloudFilesLoading = true;
 
         this.cancelCurrentSubscription();
-        this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
-            // TODO: VGL seems to filter some files
-            fileDetails => {
-                // XXX Server was not returning error when the associated S3 bucket didn't exist
-                if (!fileDetails) {
-                    this.cloudFiles = [];
-                } else {
-                    this.cloudFiles = fileDetails
+        
+        if(this.selectedJob) {
+            this.cloudFilesLoading = true;
+            this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
+                // TODO: VGL seems to filter some files
+                fileDetails => {
+                    // XXX Server was not returning error when the associated S3 bucket didn't exist
+                    if (!fileDetails) {
+                        this.cloudFiles = [];
+                    } else {
+                        this.cloudFiles = fileDetails
+                    }
+                    this.cloudFilesLoading = false;
+                },
+                // TODO: Proper error reporting
+                error => {
+                    this.cloudFilesLoading = false;
+                    console.log(error.message);
                 }
-                this.cloudFilesLoading = false;
-            },
-            // TODO: Proper error reporting
-            error => {
-                this.cloudFilesLoading = false;
-                console.log(error.message);
-            }
-        );
+            );
+        }
     }
 
 
@@ -116,7 +119,7 @@ export class JobInputsComponent implements OnChanges {
         this.cancelCurrentSubscription();
         // Clear any selections from the cloud file table if meta key was not
         // used
-        if(!event.originalEvent.ctrlKey) {
+        if(!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedCloudFiles = [];
         }
         const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
@@ -135,7 +138,7 @@ export class JobInputsComponent implements OnChanges {
         this.cancelCurrentSubscription();
         // Clear any selections from the download table if meta key was not
         // used
-        if(!event.originalEvent.ctrlKey) {
+        if(!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedJobDownloads = [];
         }
         let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];

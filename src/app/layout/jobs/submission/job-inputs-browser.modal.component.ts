@@ -1,12 +1,11 @@
-import { Component, Input } from '@angular/core';
-
+import { Component, Input, ViewChild } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { VglService } from '../../../shared/modules/vgl/vgl.service';
-
+import { UserStateService } from '../../../shared';
+import { Job } from '../../../shared/modules/vgl/models';
+import { JobBrowserComponent } from '../job-browser.component';
+import { JobInputsComponent } from '../job-inputs.component';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeNode } from 'primeng/api';
-import { Job } from '../../../shared/modules/vgl/models';
-
 
 
 @Component({
@@ -18,28 +17,26 @@ import { Job } from '../../../shared/modules/vgl/models';
 
 export class JobInputsBrowserModalContent {
 
-    @Input() public treeJobsData: TreeNode[] = [];
+    @ViewChild('jobBrowser')
+    public jobBrowser: JobBrowserComponent;
+
+    @ViewChild('jobInputs')
+    public jobInputs: JobInputsComponent;
+
     selectedJobNode: TreeNode = null;
     selectedJob: Job = null;
 
 
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal, private vglService: VglService) { }
+    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal, private userStateService: UserStateService) { }
 
 
     /**
-     * 
-     * @param event 
-     */
-    public jobSelected(event): void {
-
-    }
-
-
-    /**
-     * 
+     * Copy selected inputs to the user state for use in the job being
+     * defined
      */
     public copySelectionsToJob(): void {
-
+        // TODO: Persist inputs in user state, e.g:
+        // this.userStateService.persistDatasets(this.jobInputs.selectedJobDownloads, this.jobInputs.selectedCloudFiles);
     }
 
 }

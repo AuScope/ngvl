@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { UserStateService } from '../../../shared';
 import { TreeJobs, TreeJobNode } from '../../../shared/modules/vgl/models';
 import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.component';
 import { TreeNode } from 'primeng/api';
@@ -24,7 +23,7 @@ export class JobSubmissionDatasetsComponent {
     jobFileUploads: any[] = [];
 
 
-    constructor(private userstateService: UserStateService, private jobsService: JobsService, private modalService: NgbModal) {
+    constructor(private jobsService: JobsService, private modalService: NgbModal) {
         this.jobInputNodes = this.getJobInputs();
     }
 
@@ -34,7 +33,6 @@ export class JobSubmissionDatasetsComponent {
      */
     private getJobInputs(): TreeNode[] {
         let jobNodes: TreeNode[] = [];
-
         const rootRemoteWebServiceDownloads: TreeNode = {
             data: {
                 name: "Remote Web Service Downloads",
@@ -48,59 +46,7 @@ export class JobSubmissionDatasetsComponent {
             rootRemoteWebServiceDownloads.expanded = true;
             jobNodes.push(rootRemoteWebServiceDownloads);
         }
-
         return jobNodes;
-    }
-
-
-    /**
-     * Convert a VGL TreeNode to an p-treetable TreeNode
-     * 
-     * TODO: This method to JobsService (duplicated in JobsComponent)
-     * 
-     * @param treeNode the TreeNode to convert to an p-treetable TreeNode
-     */
-    private createJobTreeNode(treeNode: TreeJobNode): TreeNode {
-        let node: TreeNode = {};
-        node.data = {
-            "id": treeNode.id,              // Jobs only
-            "seriesId": treeNode.seriesId,  // Series only
-            "name": treeNode.name,
-            "submitDate": treeNode.submitDate,
-            "status": treeNode.status,
-            "leaf": treeNode.leaf
-        }
-        if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
-            node.children = [];
-            for (let treeNodeChild of treeNode.children) {
-                node.children.push(this.createJobTreeNode(treeNodeChild));
-            }
-        }
-        return node;
-    }
-
-
-    /**
-     * Transform the TreeJobs data that VGL returns into the TreeNode data
-     * that p-treetable requires
-     * 
-     * TODO: Sort. No column sorting available, but ng-treetable alternative
-     * to p-table may be able to do this
-     * 
-     * TODO: This method to JobsService (duplicated in JobsComponent)
-     * 
-     * @param treeJobs the TreeJobs data returned from VGL
-     */
-    private createJobsTreeNodes(treeJobs: TreeJobs): TreeNode[] {
-        let treeData: TreeNode[] = [];
-        // Skip root node (user name)
-        let rootNode: TreeJobNode = treeJobs.nodes;
-        if (rootNode.hasOwnProperty('children') && rootNode.children.length > 0) {
-            for (let treeNodeChild of rootNode.children) {
-                treeData.push(this.createJobTreeNode(treeNodeChild));
-            }
-        }
-        return treeData;
     }
 
 
@@ -110,9 +56,7 @@ export class JobSubmissionDatasetsComponent {
     public copyFromJob(): void {
         this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
-                const treeJobNodes: TreeNode[] = this.createJobsTreeNodes(treeJobs);
                 const modelRef = this.modalService.open(JobInputsBrowserModalContent, { size: 'lg' });
-                modelRef.componentInstance.treeJobsData = treeJobNodes;
             },
             error => {
                 // TODO: Proper error reporting

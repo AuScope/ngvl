@@ -8,7 +8,9 @@ import { SolutionsRoutingModule } from './solutions-routing.module';
 import { SolutionsComponent } from './solutions.component';
 import { SolutionsService } from './solutions.service';
 import { PageHeaderModule } from '../../shared';
+
 import { SolutionsBrowserComponent } from './solutions-browser/solutions-browser.component';
+import { SolutionsCartComponent } from './solutions-cart.component';
 
 @NgModule({
   imports: [
@@ -18,7 +20,7 @@ import { SolutionsBrowserComponent } from './solutions-browser/solutions-browser
     SolutionsRoutingModule,
     NgbModule.forRoot()
   ],
-  declarations: [SolutionsComponent, SolutionsBrowserComponent],
+  declarations: [SolutionsComponent, SolutionsBrowserComponent, SolutionsCartComponent],
   providers: [SolutionsService],
   exports: [SolutionsBrowserComponent]
 })

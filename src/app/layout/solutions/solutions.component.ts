@@ -14,8 +14,6 @@ export class SolutionsComponent implements OnInit, AfterViewChecked {
 
   selectedProblem: Problem;
 
-  cart$: Observable<Solution[]>;
-
   constructor(private userStateService: UserStateService) {}
 
   ngOnInit() {
@@ -29,11 +27,10 @@ export class SolutionsComponent implements OnInit, AfterViewChecked {
       this.selectedProblem = problems ? problems[0] : null;
     });
 
-    this.cart$ = this.userStateService.selectedSolutions;
   }
 
   selectSolution(solution: Solution) {
-    this.userStateService.selectSolution(solution);
+    this.userStateService.addSolutionToCart(solution);
   }
 
   ngAfterViewChecked() {

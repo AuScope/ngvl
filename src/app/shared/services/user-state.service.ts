@@ -50,7 +50,36 @@ export class UserStateService {
     this._solutionQuery.next(query);
   }
 
-  public selectSolution(solution: Solution) {
-    this._selectedSolutions.next(solution ? [solution] : []);
+  public addSolutionToCart(solution: Solution) {
+    // Add solution to the cart, unless it's already in.
+    if (solution) {
+      this.updateSolutionsCart((cart: Solution[]) => {
+        if (!cart.includes(solution)) {
+          return [...cart, solution];
+        }
+
+        return cart;
+      });
+    }
+  }
+
+  public removeSolutionFromCart(solution: Solution) {
+    if (solution) {
+      this.updateSolutionsCart((cart: Solution[]) => cart.filter(s => s['@id'] !== solution['@id']));
+    }
+  }
+
+  public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
+    // Call the passed function to update the current selection.
+    const solutions = f(this._selectedSolutions.getValue());
+
+    // If we got a sensible value back (i.e. defined, empty is valid) then
+    // update the current cart with the new value.
+    if (solutions) {
+      this._selectedSolutions.next(solutions);
+    }
+
+    // Return the new value so the caller can check that it worked.
+    return solutions;
   }
 }

@@ -24,10 +24,10 @@
 
           </div>
 
-          <div class="problem-info" *ngIf="_selectedProblem">
-            <h3>{{ _selectedProblem.name }}</h3>
-            <p>{{ _selectedProblem.description }}</p>
-            <a [href]="_selectedProblem['@id']" target="_blank">More info...</a>
+          <div class="problem-info" *ngIf="selectedProblem">
+            <h3>{{ selectedProblem.name }}</h3>
+            <p>{{ selectedProblem.description }}</p>
+            <a [href]="selectedProblemId" target="_blank">More info...</a>
           </div>
         </div>
       </div>

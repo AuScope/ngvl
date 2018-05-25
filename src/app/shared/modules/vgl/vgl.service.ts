@@ -25,7 +25,8 @@ export class VglService {
 
   private vglRequest<T>(endpoint: string, options?): Observable<T> {
     const url = environment.portalBaseUrl + endpoint;
-    return this.http.get<VglResponse<T>>(url).map(vglData);
+    const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+    return this.http.get<VglResponse<T>>(url, opts).map(vglData);
   }
 
   public get user(): Observable<User> {
@@ -138,13 +139,13 @@ export class VglService {
     }
 
     public updateOrCreateJob(name: string, description: string, seriesId: number,
-        computeServiceId, string, computeVmId: string,
-        computeVmRunCommand: string, computeTypeId: string, ncpus: number,
-        jobfs: number, mem: number, registeredUrl: string,
-        emailNotification: boolean, walltime: number): Observable<any> {
+            computeServiceId, string, computeVmId: string,
+            computeVmRunCommand: string, computeTypeId: string, ncpus: number,
+            jobfs: number, mem: number, registeredUrl: string,
+            emailNotification: boolean, walltime: number): Observable<any> {
         let httpParams: HttpParams = new HttpParams();
 
-        for (let arg in arguments) {
+        for(let arg in arguments) {
             //params.set(arg.toString(), )
         }
         /*
@@ -195,28 +196,30 @@ export class VglService {
     }
 
     /**
-     * Create a list of HTTP parameters by parsing URL string, e.g:
-     * http://someaddress.com?first_parameter=value1&second_parameters=value2
-     *
-     * @param url
+     * Create a list of parameters by parsing URL string, e.g:
+     * "http://someaddress.com?first_parameter=value1&second_parameters=value2"
+     * returns: { first_parameter: 'value1', second_parameter: 'value2'}
+     * 
+     * @param url 
      */
-    private createHttpParamsFromUrl(url: string): HttpParams {
-        let httpParams: HttpParams = new HttpParams();
+    private createParamsFromUrl(url: string): any {
+        let params: { };
         const urlParameters: string[] = url.split('?');
         if (urlParameters.length == 2) {
             for (let keyValuePair in urlParameters[1].split('&')) {
-                httpParams.set(keyValuePair.split('=')[0], keyValuePair.split('=')[1]);
+                params[keyValuePair.split('=')[0]] = keyValuePair.split('=')[1];
             }
         }
-        return httpParams;
+        return params;
     }
 
     /**
-     * Create a list of HTTP parameters from the key/value pairs of a JSON
+     * Create a list of parameters from the key/value pairs of a JSON
      * object
-     *
-     * @param jsonObject
+     * 
+     * @param jsonObject 
      */
+    /*
     private createHttpParamsFromJsonObject(jsonObject: any): HttpParams {
         let httpParams = new HttpParams();
         for (let param in jsonObject) {
@@ -224,40 +227,41 @@ export class VglService {
         }
         return httpParams;
     }
+    */
 
     public makeErddapUrl(dlOptions: DownloadOptions): Observable<any> {
-        const httpParams = this.createHttpParamsFromJsonObject(dlOptions);
-        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'makeErddapUrl.do', { params: httpParams })
-            .map(vglData)
-            .map(response => response);
+        const options = {
+            params: dlOptions
+        }
+        return this.vglRequest('makeErddapUrl.do', options);
     }
 
     public makeWfsUrl(dlOptions: DownloadOptions): Observable<any> {
-        const httpParams = this.createHttpParamsFromJsonObject(dlOptions);
-        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'makeWfsUrl.do', { params: httpParams })
-            .map(vglData)
-            .map(response => response);
+        const options = {
+            params: dlOptions
+        }
+        return this.vglRequest('makeWfsUrl.do', options);
     }
 
     public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<any> {
-        const httpParams = this.createHttpParamsFromJsonObject(dlOptions);
-        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'makeNetcdfsubseserviceUrl.do', { params: httpParams })
-            .map(vglData)
-            .map(response => response);
+        const options = {
+            params: dlOptions
+        }
+        return this.vglRequest('makeNetcdfsubseserviceUrl.do', options);
     }
 
     public makeDownloadUrl(dlOptions: DownloadOptions): Observable<any> {
-        const httpParams = this.createHttpParamsFromJsonObject(dlOptions);
-        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'makeDownloadUrl.do', { params: httpParams })
-            .map(vglData)
-            .map(response => response);
+        const options = {
+            params: dlOptions
+        }
+        return this.vglRequest('makeDownloadUrl.do', options);
     }
 
     public getRequestedOutputFormats(serviceUrl: string): Observable<any> {
-        const httpParams = new HttpParams().set('serviceUrl', serviceUrl);
-        return this.http.get<VglResponse<any>>(environment.portalBaseUrl + 'getFeatureRequestOutputFormats.do', { params: httpParams })
-            .map(vglData)
-            .map(response => response);
+        const options = {
+            params: { serviceUrl: serviceUrl }
+        }
+        return this.vglRequest('getFeatureRequestOutputFormats.do', options);
     }
 
 }

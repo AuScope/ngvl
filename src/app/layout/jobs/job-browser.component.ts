@@ -176,7 +176,7 @@ export class JobBrowserComponent implements OnInit {
         this.cancelCurrentSubscription();
         if (event.node && event.node.data.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
-            this.jobSelectionChanged.emit(this.selectedJob);
+            this.jobSelectionChanged.emit(event);
         }
         // Folder selected
         else if (event.node && !event.node.data.leaf) {

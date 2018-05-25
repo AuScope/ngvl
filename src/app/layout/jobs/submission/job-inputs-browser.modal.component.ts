@@ -4,7 +4,6 @@ import { UserStateService } from '../../../shared';
 import { Job } from '../../../shared/modules/vgl/models';
 import { JobBrowserComponent } from '../job-browser.component';
 import { JobInputsComponent } from '../job-inputs.component';
-import { TreeTableModule } from 'primeng/treetable';
 import { TreeNode } from 'primeng/api';
 
 
@@ -37,6 +36,8 @@ export class JobInputsBrowserModalContent {
     public copySelectionsToJob(): void {
         // TODO: Persist inputs in user state, e.g:
         // this.userStateService.persistDatasets(this.jobInputs.selectedJobDownloads, this.jobInputs.selectedCloudFiles);
+
+        this.activeModal.close();
     }
 
 }

@@ -12,7 +12,6 @@ import olLayer from 'ol/layer/layer';
 import olProj from 'ol/proj';
 
 
-
 @Component({
     selector: 'app-ol-map-select-data',
     templateUrl: './olmap.select.data.component.html',
@@ -76,6 +75,13 @@ export class OlMapDataSelectComponent {
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
                 const modelRef = this.modalService.open(ConfirmDatasetsModalContent, { size: 'lg' });
+                /*
+                this.userStateService.datasetDownloads.subscribe(
+                    datasetDownloads => {
+                        modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent, datasetDownloads);
+                    }
+                );
+                */
                 modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent);
             }
             this.buttonText = 'Select Data';
@@ -229,6 +235,7 @@ export class OlMapDataSelectComponent {
     public buildTreeData(cswRecords: CSWRecordModel[], region: olExtent): TreeNode[] {
         let cswRecordTreeNodes: TreeNode[] = [];
         if (cswRecords != null) {
+            // Construct bouns
             let defaultBbox: any = null;
             if (region) {
                 defaultBbox = {
@@ -239,6 +246,7 @@ export class OlMapDataSelectComponent {
                 }
             }
 
+            // Construct root resource nodes for each type of resource
             let resourceTypeNodes: TreeNode[] = [];
             for (let resourceType in this.onlineResources) {
                 let rootResourceNode: TreeNode = {};
@@ -252,6 +260,28 @@ export class OlMapDataSelectComponent {
             }
 
             for (let record of cswRecords) {
+
+                // See if this record has already been selected
+                /*
+                const datasetDownload = datasetDownloads.find(dataDl => dataDl.cswRecord === record);
+                if(datasetDownload) {
+                    console.log("Adding existing DL to tree");
+                    let node: TreeNode = {};
+                    node.data = {
+                        "name": datasetDownload.onlineResource.name,
+                        "url": datasetDownload.onlineResource.url,
+                        "cswRecord": datasetDownload.cswRecord,
+                        "onlineResource": datasetDownload.onlineResource,
+                        "downloadOptions": datasetDownload.downloadOptions,
+                        "leaf": true
+                    }
+                    
+                    //node.selected = true;
+                    const rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === datasetDownload.onlineResource.type);
+                    if(rootResourceNode) {
+                        rootResourceNode.children.push(node);
+                    }
+                }*/
                 let foundResourceTypeForRecord: boolean = false;
                 for (let resourceType in this.onlineResources) {
                     let rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === resourceType);
@@ -279,7 +309,7 @@ export class OlMapDataSelectComponent {
                             break;
                         }
                     } else {
-                        // TODO: REMOVE, but may want to report if novalid resource at all
+                        // TODO: REMOVE, but may want to report if no valid resource at all
                         console.log("No " + resourceType + " resources found for record ");
                     }
                 }

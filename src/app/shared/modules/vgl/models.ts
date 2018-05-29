@@ -1,3 +1,6 @@
+import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
+import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
+
 /*
  * User Models
  */
@@ -204,4 +207,14 @@ export interface DownloadOptions {
     serviceUrl: string,
     srsName: string,
     featureType: string
+}
+
+
+
+
+
+export interface DatasetDownloadModel {
+    cswRecord: CSWRecordModel,
+    onlineResource: OnlineResourceModel,
+    downloadOptions: DownloadOptions
 }

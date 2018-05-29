@@ -7,7 +7,7 @@
     </button>
 </div>
 <div class="modal-body" style="margin-left:10px;margin-right:10px;padding:0px;margin:0px;overflow:auto;">
-    <p-treeTable [value]="cswRecordTreeData" selectionMode="checkbox" [(selection)]="selectedData">
+    <p-treeTable [value]="cswRecordTreeData" selectionMode="checkbox" [(selection)]="selectedDatasetNodes">
         <p-column header="Name" class="text-truncate" [style]="{'width':'40%'}">
             <ng-template let-col let-node="rowData" pTemplate="body">
                 <span title="{{ node.data.name }}">{{ node.data.name }}</span>
@@ -29,5 +29,21 @@
     </p-treeTable>
 </div>
 <div class="modal-footer" style="background: #EEE">
-    <button type="button" class="btn btn-secondary" (click)="captureData()">Capture Data</button>
+    <button type="button" class="btn btn-secondary" (click)="captureData()" [disabled]="selectedDatasetNodes.length==0">Capture Data</button>
 </div>
+
+<!-- Capture data success modal -->
+<ng-template #selectedDatasetsOkModal let-c="close">
+    <div class="modal-header">
+        <h4 class="modal-title">Request Saved</h4>
+        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+            Your {{selectedLeafNodeCount}} dataset(s) have been saved. You can either continue selecting more data or create a job to process your existing selections.
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" (click)="c('OK click')">OK</button>
+    </div>
+</ng-template>

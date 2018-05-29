@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { DownloadOptions } from '../../shared/modules/vgl/models';
+import { Component, Input, ViewChild } from '@angular/core';
+import { DownloadOptions, DatasetDownloadModel } from '../../shared/modules/vgl/models';
 import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
@@ -7,8 +7,8 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { TreeTable } from 'primeng/treetable';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { UserStateService } from '../../shared';
 import { HttpParams } from '@angular/common/http';
-
 
 
 @Component({
@@ -20,10 +20,13 @@ import { HttpParams } from '@angular/common/http';
 export class ConfirmDatasetsModalContent {
 
     @Input() public cswRecordTreeData: TreeNode[] = [];
-    selectedDatasetNodes: TreeNode[];
+    selectedDatasetNodes: TreeNode[] = [];
+    selectedLeafNodeCount: number = 0;
+    @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
 
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal, private vglService: VglService) { }
+    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal,
+                private vglService: VglService, private userStateService: UserStateService) { }
 
 
     /**
@@ -108,20 +111,31 @@ export class ConfirmDatasetsModalContent {
         modelRef.componentInstance.downloadOptions = downloadOptions;
     }
 
-
     /**
      * User has selected to save the selected datasets
      */
     public captureData(): void {
         if(this.selectedDatasetNodes) {
+            this.selectedLeafNodeCount = 0;
+            let datasetDownloads: DatasetDownloadModel[] = [];
             for(let record of this.selectedDatasetNodes) {
                 if(record.data.leaf) {
-                    let cswRecord: CSWRecordModel = record.data.cswRecord;
-                    if(cswRecord) {
-                        
+                    if(record.data.cswRecord && record.data.onlineResource && record.data.downloadOptions) {
+                        console.log("Persisting record, resource and options");
+                        const datasetDownload: DatasetDownloadModel = {
+                            cswRecord: record.data.cswRecord,
+                            onlineResource: record.data.onlineResource,
+                            downloadOptions: record.data.downloadOptions
+                        }
+                        datasetDownloads.push(datasetDownload);
+                        this.selectedLeafNodeCount++;
+                        //this.userStateService.addDatasetDownload(datasetDownload);
                     }
                 }
             }
+            this.userStateService.setDatasetDownloads(datasetDownloads);
+            // Display selecition OK modal
+            this.modalService.open(this.selectedDatasetsOkModal);
         }
         this.activeModal.close();
     }

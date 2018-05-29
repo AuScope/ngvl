@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { ANONYMOUS_USER, Solution, SolutionQuery, User } from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, DatasetDownloadModel } from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
 
 import { environment } from '../../../environments/environment';
@@ -33,6 +33,9 @@ export class UserStateService {
   private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
   public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
 
+  private _datasetDownloads: BehaviorSubject<DatasetDownloadModel[]> = new BehaviorSubject([]);
+  public readonly datasetDownloads: Observable<DatasetDownloadModel[]> = this._datasetDownloads.asObservable();
+
   public setView(viewType: ViewType): Observable<ViewType> {
     this._currentView.next(viewType);
     return this.currentView;
@@ -53,4 +56,21 @@ export class UserStateService {
   public selectSolution(solution: Solution) {
     this._selectedSolutions.next(solution ? [solution] : []);
   }
+
+  /*
+  public addDatasetDownload(datasetDownload: DatasetDownloadModel) {
+      let currentDatasetDownloads = this._datasetDownloads.getValue();
+      currentDatasetDownloads.push(datasetDownload);
+      this._datasetDownloads.next(currentDatasetDownloads);
+  }
+  */
+
+  public setDatasetDownloads(datasetDownloads: DatasetDownloadModel[]) {
+      this._datasetDownloads.next(datasetDownloads);
+  }
+
+  public getDatasetDownloads(): DatasetDownloadModel[] {
+      return this._datasetDownloads.getValue();
+  }
+
 }

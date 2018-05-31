@@ -56,6 +56,14 @@ export class JobBrowserComponent implements OnInit {
 
 
     /**
+     * 
+     */
+    public getSelectedJob(): Job {
+        return this.selectedJob;
+    }
+
+
+    /**
      * Convert a VGL TreeNode to an p-treetable TreeNode
      * 
      * @param treeNode the TreeNode to convert to an p-treetable TreeNode

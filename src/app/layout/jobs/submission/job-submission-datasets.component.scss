@@ -7,3 +7,10 @@
 	position: absolute;
 	z-index: -1;
 }
+
+// Truncate all table data text
+::ng-deep td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

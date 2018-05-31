@@ -208,13 +208,3 @@ export interface DownloadOptions {
     srsName: string,
     featureType: string
 }
-
-
-
-
-
-export interface DatasetDownloadModel {
-    cswRecord: CSWRecordModel,
-    onlineResource: OnlineResourceModel,
-    downloadOptions: DownloadOptions
-}

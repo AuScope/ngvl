@@ -1,7 +1,7 @@
-import { Component, Input, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild, Output } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UserStateService } from '../../../shared';
-import { Job } from '../../../shared/modules/vgl/models';
+//import { DataSelectionService } from '../../../shared';
+import { Job, JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
 import { JobBrowserComponent } from '../job-browser.component';
 import { JobInputsComponent } from '../job-inputs.component';
 import { TreeNode } from 'primeng/api';
@@ -26,18 +26,17 @@ export class JobInputsBrowserModalContent {
     selectedJob: Job = null;
 
 
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal, private userStateService: UserStateService) { }
+    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal) { }
 
 
     /**
-     * Copy selected inputs to the user state for use in the job being
-     * defined
+     * Make selected job ID and selected inputs available to caller when modal closed
      */
     public copySelectionsToJob(): void {
-        // TODO: Persist inputs in user state, e.g:
-        // this.userStateService.persistDatasets(this.jobInputs.selectedJobDownloads, this.jobInputs.selectedCloudFiles);
-
-        this.activeModal.close();
+        const jobId: number = this.jobBrowser.getSelectedJob().id;
+        const selectedJobDownloads: JobDownload[] = this.jobInputs.getSelectedJobDownloads();
+        const selectedJobCloudFiles: CloudFileInformation[] = this.jobInputs.getSelectedCloudFiles();
+        this.activeModal.close({jobId: jobId, jobDownloads: selectedJobDownloads, jobCloudFiles: selectedJobCloudFiles});
     }
 
 }

@@ -64,6 +64,22 @@ export class JobInputsComponent implements OnChanges {
 
 
     /**
+     * Return the selected job downloads
+     */
+    public getSelectedJobDownloads(): JobDownload[] {
+        return this.selectedJobDownloads;
+    }
+
+
+    /**
+     * Return the selected job cloud files
+     */
+    public getSelectedCloudFiles(): CloudFileInformation[] {
+        return this.selectedCloudFiles;
+    }
+
+
+    /**
      * Cancel the current HttpClient request, if any
      */
     public cancelCurrentSubscription() {

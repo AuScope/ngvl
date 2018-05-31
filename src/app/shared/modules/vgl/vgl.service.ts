@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation, DownloadOptions } from './models';
+import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -229,28 +229,28 @@ export class VglService {
     }
     */
 
-    public makeErddapUrl(dlOptions: DownloadOptions): Observable<any> {
+    public makeErddapUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
         }
         return this.vglRequest('makeErddapUrl.do', options);
     }
 
-    public makeWfsUrl(dlOptions: DownloadOptions): Observable<any> {
+    public makeWfsUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
         }
         return this.vglRequest('makeWfsUrl.do', options);
     }
 
-    public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<any> {
+    public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
         }
         return this.vglRequest('makeNetcdfsubseserviceUrl.do', options);
     }
 
-    public makeDownloadUrl(dlOptions: DownloadOptions): Observable<any> {
+    public makeDownloadUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
         }

@@ -7,10 +7,23 @@
             You can add some by using the add button below or by selecting a dataset from the 
             <a href="/data">datasets page</a>.
         </div>
+
+        <!-- TODO: Delete/Download input context menu (and maybe action column) -->
+
         <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes">
-            <p-column field="name" header="Name"></p-column>
-            <p-column field="location" header="Location"></p-column>
-            <p-column field="details" header="Details"></p-column>
+            <p-column field="name" header="Name" [style]="{'width':'20%'}"></p-column>
+            <p-column field="location" header="Location" [style]="{'width':'20%'}"></p-column>
+            <p-column header="Description" [style]="{'width':'30%'}">
+                <ng-template let-node="rowData" pTemplate="body">
+                    <span title="{{ node.data.description }}">{{ node.data.description }}</span>
+                </ng-template>
+            </p-column>
+            <p-column header="Details" [style]="{'width':'30%'}">
+                <ng-template let-node="rowData" pTemplate="body">
+                    <span *ngIf="node.data.leaf && node.parent.data.id==='remote'" title="{{ node.data.details }}">Service call to <a href="{{ node.data.details }}">{{ node.data.details }}</a></span>
+                    <span *ngIf="node.data.leaf && node.parent.data.id==='upload'" title="{{ node.data.details }}">{{ node.data.details }}</span>
+                </ng-template>
+            </p-column>
         </p-treeTable>
     </div>
     <div class="card-footer">

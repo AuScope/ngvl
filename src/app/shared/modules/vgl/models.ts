@@ -93,7 +93,7 @@ export class JobParameter {
 }
 
 export class JobDownload {
-    id: number;
+    //id: number;
     name: string;
     description: string;
     url: string;

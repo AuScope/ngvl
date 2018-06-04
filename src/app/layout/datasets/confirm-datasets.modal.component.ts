@@ -176,8 +176,6 @@ export class ConfirmDatasetsModalContent {
                     // TODO: Better error reporting
                     console.log(error.message);
                 });
-            } else {
-                this.dataSelectionService.setJobDownloads([]);
             }
         }
 

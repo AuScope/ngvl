@@ -14,3 +14,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+// Add remote download modal
+label.required:after { 
+    color: #d00;
+    content: "*";
+    position: absolute;
+    margin-left: 5px;
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}

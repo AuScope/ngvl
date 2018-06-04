@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation, DownloadOptions } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -25,7 +25,8 @@ export class VglService {
 
   private vglRequest<T>(endpoint: string, options?): Observable<T> {
     const url = environment.portalBaseUrl + endpoint;
-    return this.http.get<VglResponse<T>>(url).map(vglData);
+    const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+    return this.http.get<VglResponse<T>>(url, opts).map(vglData);
   }
 
   public get user(): Observable<User> {
@@ -260,4 +261,11 @@ export class VglService {
             .map(response => response);
     }
 
+  public getEntry<T>(url: string): Observable<T> {
+    return url ? this.http.get<T>(url) : Observable.empty();
+  }
+
+  public getSolution(url: string): Observable<Solution> {
+    return this.getEntry<Solution>(url);
+  }
 }

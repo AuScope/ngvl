@@ -39,7 +39,8 @@ export interface Variable {
 export interface Entry {
   id: string;
   entryType: EntryType;
-  createdAt: Date;
+  created_at: Date;
+  author: string;
   name: string;
   description: string;
   url: string;

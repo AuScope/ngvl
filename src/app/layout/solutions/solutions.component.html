@@ -12,8 +12,12 @@
         <div class="card-body">
           <h3 class="card-title">{{ solution.name }}</h3>
           <p class="card-text">{{ solution.description }}</p>
-          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
-          <a [attr.href]="solution['@id']" target="_blank">More info...</a>
+          <button class="btn btn-secondary" (click)="selectSolution(solution)">Select</button>
+          <a
+            [routerLink]="['/solutions/detail', solution['@id']]"
+            class="btn btn-secondary">
+            Details...
+          </a>
         </div>
 
       </div>

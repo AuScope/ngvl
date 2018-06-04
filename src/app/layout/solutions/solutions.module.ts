@@ -11,6 +11,7 @@ import { PageHeaderModule } from '../../shared';
 
 import { SolutionsBrowserComponent } from './solutions-browser/solutions-browser.component';
 import { SolutionsCartComponent } from './solutions-cart.component';
+import { SolutionsDetailComponent } from './solutions-detail.component';
 
 @NgModule({
   imports: [
@@ -20,7 +21,12 @@ import { SolutionsCartComponent } from './solutions-cart.component';
     SolutionsRoutingModule,
     NgbModule.forRoot()
   ],
-  declarations: [SolutionsComponent, SolutionsBrowserComponent, SolutionsCartComponent],
+  declarations: [
+    SolutionsComponent,
+    SolutionsBrowserComponent,
+    SolutionsCartComponent,
+    SolutionsDetailComponent
+  ],
   providers: [SolutionsService],
   exports: [SolutionsBrowserComponent]
 })

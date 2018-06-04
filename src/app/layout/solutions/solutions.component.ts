@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { Observable } from 'rxjs/Observable';
+
 import { UserStateService, SOLUTIONS_VIEW } from '../../shared';
 import { Problem, Solution } from '../../shared/modules/vgl/models';
 

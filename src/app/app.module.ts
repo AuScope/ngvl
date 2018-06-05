@@ -17,6 +17,7 @@ import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { DataSelectionService } from './shared';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
+import { UserModule } from './layout/user/user.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -40,7 +41,8 @@ export function createTranslateLoader(http: HttpClient) {
       }
     }),
     AppRoutingModule,
-    VglModule
+    VglModule,
+    UserModule
   ],
   declarations: [AppComponent],
   providers: [AuthGuard, AuthService, DataSelectionService, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],

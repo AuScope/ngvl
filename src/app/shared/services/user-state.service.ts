@@ -4,10 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { ANONYMOUS_USER, Solution, SolutionQuery, User } from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails } from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
 
 import { environment } from '../../../environments/environment';
+
+import { saveAs } from 'file-saver/FileSaver';
 
 export const DASHBOARD_VIEW = 'dashboard-view';
 export const DATA_VIEW = 'data-view';
@@ -19,39 +21,62 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 @Injectable()
 export class UserStateService {
 
-  constructor(private vgl: VglService) {}
+    constructor(private vgl: VglService) { }
 
-  private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
-  public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
+    private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
+    public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
 
-  private _user: BehaviorSubject<User> = new BehaviorSubject(ANONYMOUS_USER);
-  public readonly user: Observable<User> = this._user.asObservable();
+    private _user: BehaviorSubject<User> = new BehaviorSubject(ANONYMOUS_USER);
+    public readonly user: Observable<User> = this._user.asObservable();
 
-  private _solutionQuery: BehaviorSubject<SolutionQuery> = new BehaviorSubject({});
-  public readonly solutionQuery: Observable<SolutionQuery> = this._solutionQuery.asObservable();
+    private _solutionQuery: BehaviorSubject<SolutionQuery> = new BehaviorSubject({});
+    public readonly solutionQuery: Observable<SolutionQuery> = this._solutionQuery.asObservable();
 
-  private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
-  public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
+    private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
+    public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
+    
+    private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
+    public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
 
-  private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
-  public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
+    public setView(viewType: ViewType): Observable<ViewType> {
+        this._currentView.next(viewType);
+        return this.currentView;
+    }
 
-  public setView(viewType: ViewType): Observable<ViewType> {
-    this._currentView.next(viewType);
-    return this.currentView;
-  }
+    public updateUser() {
+        this.vgl.user.subscribe(user => this._user.next(user));
+    }
 
-  public updateUser() {
-    this.vgl.user.subscribe(user => this._user.next(user));
-  }
+    public updateAnonymousUser() {
+        this._user.next(ANONYMOUS_USER);
+    }
 
-  public updateAnonymousUser() {
-    this._user.next(ANONYMOUS_USER);
-  }
+    public setUserAwsDetails(arnExecution: string, arnStorage: string, acceptedTermsConditions: number, awsKeyName: string): Observable<any> {
+        return this.vgl.setUserDetails(arnExecution, arnStorage, acceptedTermsConditions, awsKeyName);
+    }
 
-  public setSolutionQuery(query: SolutionQuery) {
-    this._solutionQuery.next(query);
-  }
+    public getUserNciDetails(): Observable<NCIDetails> {
+        return this.vgl.nciDetails;
+    }
+
+    public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
+        return this.vgl.setUserNciDetails(nciUsername, nciProjectCode, nciKeyfile);
+    }
+
+    public downloadCloudFormationScript() {
+        this.vgl.downloadCloudFormationScript().subscribe(
+            response => {
+                saveAs(response, 'vgl-cloudformation.json');
+            }, error => {
+                // TODO: Proper error reporting
+                console.log(error.message);
+            }
+        );
+    }
+
+    public setSolutionQuery(query: SolutionQuery) {
+        this._solutionQuery.next(query);
+    }
 
   public addSolutionToCart(solution: Solution) {
     // Add solution to the cart, unless it's already in.

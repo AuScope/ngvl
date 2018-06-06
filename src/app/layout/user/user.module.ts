@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { PageHeaderModule } from '../../shared';
 import { UserManagementComponent } from './user-management.component';
 import { UserRoutingModule } from './user-routing.module';
+import { NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
+import { GrowlModule } from 'primeng/growl';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 
 @NgModule({
@@ -13,10 +15,11 @@ import { UserRoutingModule } from './user-routing.module';
     FormsModule,
     PageHeaderModule,
     UserRoutingModule,
-    NgbTabsetModule.forRoot()
+    NgbTabsetModule.forRoot(),
+    GrowlModule
   ],
   declarations: [ UserManagementComponent ],
-  providers: [ ],
+  providers: [ MessageService ],
   exports: [ UserManagementComponent ]
 })
 export class UserModule { }

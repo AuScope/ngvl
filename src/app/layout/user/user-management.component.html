@@ -33,13 +33,13 @@
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="accessArn" class="required">VGL Instance ARN</label>
-                                            <input type="text" class="form-control" id="accessArn" name="accessArn" [(ngModel)]="vglAccessArn" required>
+                                            <input type="text" class="form-control" id="accessArn" name="accessArn" [(ngModel)]="user.arnExecution" required>
                                             <p><small class="text-muted">Amazon resource name for the role which is used to access the client AWS account.</small></p>
                                             <label for="instanceArn" class="required">Job Instance ARN</label>
-                                            <input type="text" class="form-control" id="instanceArn" name="instanceArn" [(ngModel)]="jobInstanceArn" required>
+                                            <input type="text" class="form-control" id="instanceArn" name="instanceArn" [(ngModel)]="user.arnStorage" required>
                                             <p><small class="text-muted">The Amazon resource name for the instance profile which is used when processing user jobs.</small></p>
                                             <label for="keyName">AWS Key Name</label>
-                                            <input type="text" class="form-control" id="keyName" name="keyName" [(ngModel)]="awsKeyName">
+                                            <input type="text" class="form-control" id="keyName" name="keyName" [(ngModel)]="user.awsKeyName">
                                             <p><small class="text-muted">The (optional) name of the key to be applied to every VM started by VGL</small></p>
                                         </div>
                                     </div>
@@ -91,3 +91,5 @@
         </ngb-tabset>
     </div>
 </div>
+
+<p-growl [(value)]="msgs" [baseZIndex]="9999999"></p-growl>

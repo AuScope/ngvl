@@ -163,7 +163,7 @@ export class JobInputsComponent implements OnChanges {
 
 
     /**
-     * XXX This is specific to cloud files, may need to make genera
+     * XXX This is specific to cloud files, may need to make general
      * 
      * TODO: Cache selected jobs so we don't need to re-download?
      */

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -62,6 +62,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             .merge(this.click$.filter(() => !this.typeaheadInstance.isPopupOpen()))
             .map(term => (term === '' ? this.availableKeywords : this.availableKeywords.filter(v => v.toLowerCase().indexOf(term.toLowerCase()) > -1)).slice(0, 10));
 
+    @ViewChild('searchResults') searchResultsElement: ElementRef;
+
 
     constructor(private olMapService: OlMapService,
         private userStateService: UserStateService,
@@ -97,6 +99,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             { 'id': 'opendap', 'name': 'OPeNDAP', 'checked': false },
             { 'id': 'wfs', 'name': 'WFS', 'checked': false },
             { 'id': 'wms', 'name': 'WMS', 'checked': false }];
+
+        this.anyTextIsCollapsed = false;
+        this.searchResultsIsCollapsed = false;
     }
 
 
@@ -198,6 +203,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                 }
                 this.cswSearchResults = response.records;
                 this.recordsLoading = false;
+                this.searchResultsIsCollapsed = false;
+                this.searchResultsElement.nativeElement.scrollIntoView(false);
             }, error => {
                 // TODO: proper error reporting
                 console.log("Faceted search error: " + error.message);

@@ -15,6 +15,7 @@ import { User } from "../../shared/modules/vgl/models";
 })
 export class UserManagementComponent implements OnInit {
 
+    // User object contains AWS information
     private user: User = undefined;
 
     // User NCI fields
@@ -31,18 +32,22 @@ export class UserManagementComponent implements OnInit {
         this.userStateService.user.subscribe(
             user => {
                 this.user = user;
-            }
-        );
-        this.userStateService.getUserNciDetails().subscribe(
-            response => {
-                if (response) {
-                    this.nciUsername = response.nciUsername;
-                    this.nciProjectCode = response.nciProject;
-                    this.nciKeyfile = null;
-                    this.nciKey = "-- Saved --";
-                }
-            }, error => {
-                this.messageService.add({ severity: 'error', summary: 'Error Retreiving NCI Details', detail: error.message });
+                this.userStateService.getUserNciDetails().subscribe(
+                    response => {
+                        if (response) {
+                            this.nciUsername = response.nciUsername;
+                            this.nciProjectCode = response.nciProject;
+                            this.nciKeyfile = null;
+                            if(response.nciKey) {
+                                this.nciKey = "-- Saved --";
+                            } else {
+                                this.nciKey = "";
+                            }
+                        }
+                    }, error => {
+                        this.messageService.add({ severity: 'error', summary: 'Error Retreiving NCI Details', detail: error.message });
+                    }
+                );
             }
         );
     }

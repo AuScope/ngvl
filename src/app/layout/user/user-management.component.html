@@ -8,7 +8,7 @@
                 <ng-template ngbTabContent>
                     <div class="row" style="width:100%;margin-top:10px;">
                         <!-- Initialising AWS -->
-                        <div class="col-lg-5" style="overflow-y:auto;overflow-x:hidden;height:calc(100vh - 250px);">
+                        <div class="col-lg-5" style="overflow-y:auto;height:calc(100vh - 250px);">
                             <div class="card" style="min-height:100%">
                                 <div class="card-header">Step 1: Initialising Your AWS</div>
                                 <div class="card-body">
@@ -26,9 +26,9 @@
                             </div>
                         </div>
                         <!-- Configuring AWS -->
-                        <div class="col-lg-7" style="overflow-y:auto;overflow-x:hidden;">
-                            <form #awsForm="ngForm" style="min-height:100%">
-                                <div class="card" style="height:calc(100vh - 250px);">
+                        <div class="col-lg-7" style="overflow-y:auto;height:calc(100vh - 250px);">
+                            <form #awsForm="ngForm" style="height:100%;">
+                                <div class="card" style="min-height:100%;">
                                     <div class="card-header">Step 2: Configuring NGVL</div>
                                     <div class="card-body">
                                         <div class="form-group">
@@ -56,9 +56,9 @@
             <ngb-tab title="NCI">
                 <ng-template ngbTabContent>
                     <div class="row" style="width:100%;margin-top:10px;">
-                        <div class="col" style="overflow-y:auto;overflow-x:hidden;">
-                            <form #nciForm="ngForm">
-                                <div class="card" style="height:calc(100vh - 250px);">
+                        <div class="col" style="overflow-y:auto;height:calc(100vh - 250px);">
+                            <form #nciForm="ngForm" style="height:100%;">
+                                <div class="card" style="min-height:100%;">
                                     <div class="card-header">Enter Your NCI Credentials</div>
                                     <div class="card-body">
                                         <label class="required" for="username" class="required">NCI Username</label>

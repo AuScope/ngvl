@@ -31,7 +31,7 @@
                     <!-- TODO: Dynamic name showing count -->
                     <span>Data service downloads</span>
                 </a>
-                <div [ngbCollapse]="jobDownloadsIsCollapsed">
+                <div [ngbCollapse]="jobDownloadsIsCollapsed" class="jobFileTable">
                     <!-- TODO: Implement filtering, and pagination if required -->
                     <p-table [value]="selectedJob.jobDownloads" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedJobDownloads"
                         [metaKeySelection]="true" (onRowSelect)="jobDownloadSelected($event)">
@@ -66,7 +66,7 @@
                     <!-- TODO: Dynamic name showing count -->
                     <span>Files in cloud storage</span>
                 </a>
-                <div [ngbCollapse]="cloudFilesIsCollapsed">
+                <div [ngbCollapse]="cloudFilesIsCollapsed" class="jobFileTable">
                     <!-- TODO: Implement filtering, and pagination if required -->
                     <p-table [value]="cloudFiles" [resizableColumns]="true" selectionMode="{{selectionMode}}" [(selection)]="selectedCloudFiles"
                         [metaKeySelection]="true" (onRowSelect)="jobCloudFileSelected($event)">

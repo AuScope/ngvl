@@ -1,15 +1,9 @@
-.center-text {
-    text-align: center;
-}
-
-/* Proper spacing on the selected file information card header */
 table {
+    text-align: center;
     width:100%;
-}
-
-// Truncate all table data text
-::ng-deep td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }

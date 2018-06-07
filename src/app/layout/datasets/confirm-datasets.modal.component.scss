@@ -1,5 +1,9 @@
-::ng-deep td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.confirm-datasets-tree {
+    ::ng-deep {
+        td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 }

@@ -45,7 +45,7 @@
                 <label id="csw-name" class="form-control">
                         <div *ngFor="let constraint of record.constraints">                            
                             <div *ngIf="!(constraint.startsWith('http'))" >{{ constraint }}</div>                                                           
-                            <div class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" title="{{ constraint }}" >{{ constraint }}</a></div>  
+                            <div class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" target="_blank" title="{{ constraint }}" >{{ constraint }}</a></div>  
                         </div>
                 </label>              
             </div>
@@ -55,7 +55,7 @@
                 <div class="col-9">
                     <label id="csw-name" class="form-control">
                             <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
-                                    <div class="text-truncate" > <a href="{{ useLimitConstraints }}" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
+                                    <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
                             </div>                         
                     </label>              
                 </div>
@@ -65,7 +65,7 @@
                 <div class="col-9">
                     <label id="csw-name" class="form-control">
                             <div *ngFor="let accessConstraints of record.accessConstraints">                                                                 
-                                    <div class="text-truncate"> <a href="{{ accessConstraints }}" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>  
+                                    <div class="text-truncate"> <a href="{{ accessConstraints }}" target="_blank" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>  
                             </div>                         
                     </label>              
                 </div>

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 
+import { UserStateService, DASHBOARD_VIEW } from '../../shared';
+
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
@@ -11,7 +13,7 @@ export class DashboardComponent implements OnInit {
     public alerts: Array<any> = [];
     public sliders: Array<any> = [];
 
-    constructor() {
+    constructor(private userStateService: UserStateService) {
         this.sliders.push(
             {
                 imagePath: 'assets/images/slider1.jpg',
@@ -52,7 +54,9 @@ export class DashboardComponent implements OnInit {
         );
     }
 
-    ngOnInit() {}
+  ngOnInit() {
+    this.userStateService.setView(DASHBOARD_VIEW);
+  }
 
     public closeAlert(alert: any) {
         const index: number = this.alerts.indexOf(alert);

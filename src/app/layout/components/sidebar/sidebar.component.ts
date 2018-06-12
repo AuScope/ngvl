@@ -53,7 +53,6 @@ export class SidebarComponent implements OnInit {
     }
 
 
-
     ngOnInit(): void {
         // Listen for the current user view, and display the appropriate
         // view-specific components.

@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
 import { ConfirmDatasetsModalContent } from './confirm-datasets.modal.component';
+import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TreeTableModule } from 'primeng/treetable';
@@ -16,13 +17,14 @@ import { TreeTableModule } from 'primeng/treetable';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     PageHeaderModule,
     DatasetsRoutingModule,
     OlMapModule,
     TreeTableModule,
     NgbModule.forRoot()
   ],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent],
-  entryComponents: [ ConfirmDatasetsModalContent ]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent],
+  entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent ]
 })
 export class DatasetsModule { }

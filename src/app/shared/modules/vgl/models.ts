@@ -1,3 +1,6 @@
+import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
+import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
+
 /*
  * User Models
  */
@@ -90,7 +93,7 @@ export class JobParameter {
 }
 
 export class JobDownload {
-    id: number;
+    //id: number;
     name: string;
     description: string;
     url: string;
@@ -178,4 +181,30 @@ export interface TreeJobNode {
  */
 export interface PreviewComponent {
     data: any;
+}
+
+/*
+ * Dataset options
+ */
+export interface DownloadOptions {
+    name: string,
+    description: string,
+    url: string,
+    method: string,
+    localPath: string,
+    crs: string,
+    eastBoundLongitude: number,
+    northBoundLatitude: number,
+    southBoundLatitude: number,
+    westBoundLongitude: number,
+    dsEastBoundLongitude: number,
+    dsNorthBoundLatitude: number,
+    dsSouthBoundLatitude: number,
+    dsWestBoundLongitude: number,
+    format: string,
+    layerName: string,
+    coverageName: string,
+    serviceUrl: string,
+    srsName: string,
+    featureType: string
 }

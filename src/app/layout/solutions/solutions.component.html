@@ -1,19 +1,25 @@
 <div [@routerTransition]>
 
+  <h1>Solutions</h1>
+
   <div class="row justify-content-between">
-    <div class="col-sm-6">
-      <div class="page-header">
-        <h1>Problem detail</h1>
-        <hr>
-      </div>
-      <div class="problem-info" *ngIf="selectedProblem">
-        <h3>{{ selectedProblem.name }}</h3>
-        <p>{{ selectedProblem.description }}</p>
-        <a [attr.href]="selectedProblem['@id']" target="_blank">More info...</a>
+    <div class="col-lg-3" style="overflow-y:auto;overflow-x:hidden;padding:0px;height:calc(100vh - 200px);">
+      <app-solutions-browser></app-solutions-browser>
+    </div>
+
+    <div class="solution-results col-lg-6" *ngIf="selectedProblem?.solutions">
+      <div class="card" *ngFor="let solution of selectedProblem.solutions">
+        <div class="card-body">
+          <h3 class="card-title">{{ solution.name }}</h3>
+          <p class="card-text">{{ solution.description }}</p>
+          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
+          <a [attr.href]="solution['@id']" target="_blank">More info...</a>
+        </div>
+
       </div>
     </div>
 
-    <div class="col-sm-6">
+    <div class="col-lg-3">
       <div class="card">
         <div class="card-header">Cart</div>
         <ul class="list-group list-group-flush">
@@ -25,21 +31,4 @@
     </div>
   </div>
 
-  <div class="solution-results" *ngIf="selectedProblem?.solutions">
-    <div class="page-header">
-      <h1>Solutions</h1>
-      <hr>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-4 card" *ngFor="let solution of selectedProblem.solutions">
-        <div class="card-body">
-          <h3 class="card-title">{{ solution.name }}</h3>
-          <p class="card-text">{{ solution.description }}</p>
-          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
-          <a [attr.href]="solution['@id']" target="_blank">More info...</a>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>

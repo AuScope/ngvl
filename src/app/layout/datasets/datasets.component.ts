@@ -15,8 +15,6 @@ import olExtent from 'ol/extent';
 import { NgbTypeahead, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 
-
-
 @Component({
     selector: 'app-datasets',
     templateUrl: './datasets.component.html',
@@ -72,7 +70,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     ngOnInit() {
-        //this.userStateService.setView(DATA_VIEW);
+        this.userStateService.setView(DATA_VIEW);
 
         // Load available registries
         this.cswSearchService.getAvailableRegistries().subscribe(data => {
@@ -209,7 +207,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public getFacetedKeywords(): void {
         let registrySelected: boolean = false;
@@ -233,7 +231,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public resetFacetedSearch(): void {
         this.currentCSWRecordPage = 1;
@@ -257,7 +255,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     /**
      * Are there more results to display?
-     * 
+     *
      * @returns true if at least one registry has (nextIndex > 0), false
      *          otherwise
      */
@@ -272,7 +270,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public previousResultsPage(): void {
         if (this.currentCSWRecordPage != 1) {
@@ -289,7 +287,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public nextResultsPage(): void {
         this.currentCSWRecordPage += 1;
@@ -298,8 +296,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         try {
@@ -312,8 +310,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param recordId 
+     *
+     * @param recordId
      */
     public removeCSWRecord(recordId: string): void {
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
@@ -321,8 +319,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public displayRecordInformation(cswRecord) {
         if (cswRecord) {
@@ -333,8 +331,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public showCSWRecordBounds(cswRecord: CSWRecordModel): void {
         if (cswRecord.geographicElements.length > 0) {
@@ -348,8 +346,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public zoomToCSWRecordBounds(cswRecord: CSWRecordModel): void {
         if (cswRecord.geographicElements.length > 0) {
@@ -363,7 +361,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public drawBound(): void {
         this.olMapService.drawBound().subscribe((vector) => {
@@ -395,7 +393,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
+     *
      */
     public spatialBoundsFromMap(): void {
         this.spatialBounds = olProj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
@@ -406,8 +404,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * 
-     * @param extent 
+     *
+     * @param extent
      */
     public updateSpatialBoundsText(extent: olExtent): void {
         let w = extent[3].toFixed(4);
@@ -439,7 +437,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     /**
      * Fires when a new keyword is selected from a keyword typeahead
-     * 
+     *
      * @param index index of the typeahead from which a selection was made
      * @param $event allows us to get the typeahead selection
      */
@@ -453,8 +451,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     /**
      * Remove a selected keyword
-     * 
-     * @param index 
+     *
+     * @param index
      */
     public removeKeyword(index: number): void {
         this.selectedKeywords.splice(index, 1);
@@ -468,18 +466,17 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     /**
      * Get service information
-     * 
+     *
      * @param id the ID of the service
      */
     public getService(id: string): any {
         return this.availableServices.find(s => s.id === id);
     }
 
-
     /**
      * TODO: Maybe switch event to lose focus, this will check after every key press.
      *       Tried to use (change) but ngbDatepicker hijacks the event.
-     * @param date 
+     * @param date
      */
     private isValidDate(date): boolean {
         if (date && date.year && date.month)

@@ -11,9 +11,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CustomReuseStrategy } from './app-custom-reuse-strategy';
-import { AuthGuard } from './shared';
+import { AuthGuard, AuthService } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
+import { DataSelectionService } from './shared';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
 
@@ -42,7 +43,7 @@ export function createTranslateLoader(http: HttpClient) {
     VglModule
   ],
   declarations: [AppComponent],
-  providers: [AuthGuard, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
+  providers: [AuthGuard, AuthService, DataSelectionService, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -16,11 +16,15 @@ export class RecordModalContent {
     // Types of online resources
     onlineResources: any = {
         'NCSS': {
-            'name': 'NetCDF Subset Services',
+            'name': 'NetCDF Subset Service',
             'expanded': true
         },
         'WCS': {
             'name': 'OGC Web Coverage Service 1.0.0',
+            'expanded': true
+        },
+        'WFS': {
+            'nme': 'OGC Web Feature Service 1.1.0',
             'expanded': true
         },
         'WMS': {

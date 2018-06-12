@@ -324,7 +324,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      */
     public displayRecordInformation(cswRecord) {
         if (cswRecord) {
-            const modelRef = this.modalService.open(RecordModalContent);
+            const modelRef = this.modalService.open(RecordModalContent, {size: 'lg'});
             modelRef.componentInstance.record = cswRecord;
         }
     }

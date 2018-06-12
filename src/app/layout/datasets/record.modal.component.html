@@ -39,13 +39,37 @@
                 <label id="csw-name" class="form-control">{{ record.contactOrg }}</label>
             </div>
         </div>
-        <div class="form-group row" *ngIf="record.constraints && record.constraints!=''">
-            <label for="csw-name" class="col-3 col-form-label">Constraints</label>
+        <div class="form-group row" *ngIf="(record.constraints && record.constraints!='') && (record.useLimitConstraints && record.useLimitConstraints=='')" >
+            <label for="csw-name" class="col-3 col-form-label">Constraints</label>            
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.constraints.join(", ") }}</label>
+                <label id="csw-name" class="form-control">
+                        <div *ngFor="let constraint of record.constraints">                            
+                            <div *ngIf="!(constraint.startsWith('http'))" >{{ constraint }}</div>                                                           
+                            <div class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" target="_blank" title="{{ constraint }}" >{{ constraint }}</a></div>  
+                        </div>
+                </label>              
             </div>
         </div>
-
+        <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''" >
+                <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>                
+                <div class="col-9">
+                    <label id="csw-name" class="form-control">
+                            <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
+                                    <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
+                            </div>                         
+                    </label>              
+                </div>
+        </div>
+        <div class="form-group row" *ngIf="record.accessConstraints && record.accessConstraints!=''" >
+                <label for="csw-name" class="col-3 col-form-label" >Access Constraints </label>                
+                <div class="col-9">
+                    <label id="csw-name" class="form-control">
+                            <div *ngFor="let accessConstraints of record.accessConstraints">                                                                 
+                                    <div class="text-truncate"> <a href="{{ accessConstraints }}" target="_blank" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>  
+                            </div>                         
+                    </label>              
+                </div>
+        </div>
         <!-- Services -->
         <div *ngIf="record.hasOwnProperty('onlineResources') && record.onlineResources.length>0">
             <div *ngFor="let resourceType of getOnlineResourceTypes()">

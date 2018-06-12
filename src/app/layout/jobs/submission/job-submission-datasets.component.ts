@@ -176,9 +176,11 @@ export class JobSubmissionDatasetsComponent {
         // Job files copied from jobs
         const copiedJobFiles = this.dataSelectionService.getJobCloudFiles();
         const jobId: number = copiedJobFiles.copiedJobId;
-        const cloudFiles: CloudFileInformation[] = copiedJobFiles.copiedJobFiles;
-        for (const jobFile of cloudFiles) {
-            this.addJobCloudFileToTree(jobFile, jobId);
+        if(copiedJobFiles.hasOwnProperty('copiedJobFiles')) {
+            const cloudFiles: CloudFileInformation[] = copiedJobFiles.copiedJobFiles;
+            for (const jobFile of cloudFiles) {
+                this.addJobCloudFileToTree(jobFile, jobId);
+            }
         }
 
         // Add root download node if any were added

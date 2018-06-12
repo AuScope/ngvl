@@ -21,80 +21,82 @@ function vglData<T>(response: VglResponse<T>): T {
 @Injectable()
 export class VglService {
 
-  constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
-  private vglRequest<T>(endpoint: string, options?): Observable<T> {
-    const url = environment.portalBaseUrl + endpoint;
-    const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
-    return this.http.get<VglResponse<T>>(url, opts).map(vglData);
-  }
-
-  public get user(): Observable<User> {
-    return this.vglRequest('secure/getUser.do');
-  }
-
-  public get problems(): Observable<Problem[]> {
-    return this.vglRequest('secure/getProblems.do')
-      .map((problems: Problems) => problems.configuredProblems);
-  }
-
-  public get treeJobs(): Observable<TreeJobs> {
-    return this.vglRequest('secure/treeJobs.do');
-  }
-
-  public addFolder(folderName: string): Observable<Series> {
-    const options = {
-      params: {
-        seriesName: folderName.trim(),
-        seriesDescription: ''
-      }
-    };
-
-    return this.vglRequest('secure/createFolder.do', options);
-  }
-
-  public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
-    const options = { params: { jobId: jobId.toString() } };
-    return this.vglRequest('secure/jobCloudFiles.do', options);
-  }
-
-  public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
-    const options = {
-      params: {
-        jobId: jobId.toString(),
-        filename: filename,
-        key: key
-      },
-      responseType: 'text'
-    };
-
-    return this.vglRequest('secure/downloadFile.do', options)
-      .catch((error: Response) => Observable.throw(error));
+    private vglRequest<T>(endpoint: string, options?): Observable<T> {
+        const url = environment.portalBaseUrl + endpoint;
+        const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+        return this.http.get<VglResponse<T>>(url, opts).map(vglData);
     }
 
-  public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
-    const options = {
-      params: {
-        jobId: jobId.toString(),
-        files: filenames.toString()
-      },
-      responseType: 'blob'
-    };
+    public get user(): Observable<User> {
+        return this.vglRequest('secure/getUser.do');
+    }
 
-    return this.vglRequest('secure/downloadAsZip.do', options)
-      .catch((error: Response) => Observable.throw(error));
-  }
+    public get problems(): Observable<Problem[]> {
+        return this.vglRequest('secure/getProblems.do')
+            .map((problems: Problems) => problems.configuredProblems);
+    }
+
+    public get treeJobs(): Observable<TreeJobs> {
+        return this.vglRequest('secure/treeJobs.do');
+    }
+
+    public addFolder(folderName: string): Observable<Series> {
+        const options = {
+            params: {
+                seriesName: folderName.trim(),
+                seriesDescription: ''
+            }
+        };
+
+        return this.vglRequest('secure/createFolder.do', options);
+    }
+
+    public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
+        const options = { params: { jobId: jobId.toString() } };
+        return this.vglRequest('secure/jobCloudFiles.do', options);
+    }
+
+    public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
+            params: {
+                jobId: jobId.toString(),
+                filename: filename,
+                key: key
+            },
+            responseType: 'blob'
+        }).map((response) => {
+            return response;
+        }).catch((error: Response) => {
+            return Observable.throw(error);
+        });
+    }
+
+    public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + 'secure/downloadAsZip.do', {
+            params: {
+                jobId: jobId.toString(),
+                files: filenames.toString()
+            },
+            responseType: 'blob'
+        }).map((response) => {
+            return response;
+        }).catch((error: Response) => {
+            return Observable.throw(error);
+        });
+    }
 
     public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<string> {
-      const options = {
-        params: {
-          jobId: jobId.toString(),
-          file: file,
-          maxSize: maxSize.toString()
-        }
-      };
+        const options = {
+            params: {
+                jobId: jobId.toString(),
+                file: file,
+                maxSize: maxSize.toString()
+            }
+        };
 
-      return this.vglRequest('secure/getPlaintextPreview.do', options);
+        return this.vglRequest('secure/getPlaintextPreview.do', options);
     }
 
     /*
@@ -104,48 +106,48 @@ export class VglService {
     */
 
     public deleteJob(jobId: number): Observable<any> {
-      const options = {
-        params: { jobId: jobId.toString() }
-      };
+        const options = {
+            params: { jobId: jobId.toString() }
+        };
 
-      return this.vglRequest('secure/deleteJob.do', options);
+        return this.vglRequest('secure/deleteJob.do', options);
     }
 
     public deleteSeries(seriesId: number): Observable<any> {
-      const options = {
-        params: { seriesId: seriesId.toString() }
-      };
+        const options = {
+            params: { seriesId: seriesId.toString() }
+        };
 
-      return this.vglRequest('secure/deleteSeriesJobs.do', options);
+        return this.vglRequest('secure/deleteSeriesJobs.do', options);
     }
 
     public cancelJob(jobId: number): Observable<any> {
-      const options = {
-        params: { jobId: jobId.toString() }
-      };
+        const options = {
+            params: { jobId: jobId.toString() }
+        };
 
-      return this.vglRequest('secure/killJob.do', options);
+        return this.vglRequest('secure/killJob.do', options);
     }
 
     public duplicateJob(jobId: number, files: string[]): Observable<any> {
-      const options = {
-        params: {
-          jobId: jobId.toString(),
-          files: files.join(',')
-        }
-      };
+        const options = {
+            params: {
+                jobId: jobId.toString(),
+                files: files.join(',')
+            }
+        };
 
-      return this.vglRequest('secure/duplicateJob.do', options);
+        return this.vglRequest('secure/duplicateJob.do', options);
     }
 
     public updateOrCreateJob(name: string, description: string, seriesId: number,
-            computeServiceId, string, computeVmId: string,
-            computeVmRunCommand: string, computeTypeId: string, ncpus: number,
-            jobfs: number, mem: number, registeredUrl: string,
-            emailNotification: boolean, walltime: number): Observable<any> {
+        computeServiceId, string, computeVmId: string,
+        computeVmRunCommand: string, computeTypeId: string, ncpus: number,
+        jobfs: number, mem: number, registeredUrl: string,
+        emailNotification: boolean, walltime: number): Observable<any> {
         let httpParams: HttpParams = new HttpParams();
 
-        for(let arg in arguments) {
+        for (let arg in arguments) {
             //params.set(arg.toString(), )
         }
         /*
@@ -176,23 +178,23 @@ export class VglService {
         if(walltime)
             params.set('', );
         */
-      return this.vglRequest('secure/updateOrCreateJob.do', {params: httpParams});
-  }
+        return this.vglRequest('secure/updateOrCreateJob.do', { params: httpParams });
+    }
 
     public submitJob(jobId: number): Observable<any> {
-      const options = {
-        params: { jobId: jobId.toString() }
-      };
+        const options = {
+            params: { jobId: jobId.toString() }
+        };
 
-      return this.vglRequest('secure/submitJob.do', options);
+        return this.vglRequest('secure/submitJob.do', options);
     }
 
     public getAuditLogs(jobId: number): Observable<any> {
-      const options = {
-        params: { jobId: jobId.toString() }
-      };
+        const options = {
+            params: { jobId: jobId.toString() }
+        };
 
-      return this.vglRequest('secure/getAuditLogsForJob.do', options);
+        return this.vglRequest('secure/getAuditLogsForJob.do', options);
     }
 
     /**
@@ -203,7 +205,7 @@ export class VglService {
      * @param url 
      */
     private createParamsFromUrl(url: string): any {
-        let params: { };
+        let params: {};
         const urlParameters: string[] = url.split('?');
         if (urlParameters.length == 2) {
             for (let keyValuePair in urlParameters[1].split('&')) {

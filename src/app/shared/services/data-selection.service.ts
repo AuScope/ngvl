@@ -3,10 +3,18 @@ import { JobDownload, JobFile, CloudFileInformation } from '../modules/vgl/model
 
 
 /**
+ * User dataset selection service, stores User selection in local storage.
+ * Selections will be persisted to the server when a Job is created.
+ * 
+ * Stored user inputs include:
+ * 
+ * 1. JobDownloads: dataset selections made on map screen (jobDownloads), as
+ *    well as datasets copied from existing jobs (copiedJobDownloads).
+ * 
+ * 2. Copied CloudFileInformation from existing jobs (cloudJobFiles)
+ * 
  * TODO: Copied job info should probably be moved to User State Service,
  *       irrelevant to anonymous users and security issues..?
- * TODO: Can reduce number of methods, store copied/non-copied similarly
- *       and pass copied ID if needed or -1 if not
  */
 @Injectable()
 export class DataSelectionService {
@@ -14,7 +22,7 @@ export class DataSelectionService {
     constructor() { }
 
     /**
-     * JobDownloads (from dataset selection and copied from exiting jobs)
+     * JobDownloads (from dataset selection and copied from existing jobs)
      */
     public getJobDownloads(): JobDownload[] {
         const localStorageDownloads = JSON.parse(localStorage.getItem('jobDownloads'));
@@ -65,48 +73,25 @@ export class DataSelectionService {
         }
     }
 
-    /**
-     * JobFiles (from dataset confirmation screen and copied from exiting jobs)
-     */
-    public getJobFiles(): JobFile[] {
-        const localStorageFiles = JSON.parse(localStorage.getItem('jobFiles'));
-        return localStorageFiles && localStorageFiles.hasOwnProperty('jobFiles') ? localStorageFiles.jobFiles : [];
-    }
-
-    public setJobFiles(jobFiles: JobFile[]): void {
-        localStorage.setItem('jobFiles', JSON.stringify({ jobFiles: jobFiles }));
-    }
-
-    public removeJobFile(jobFile: JobFile): void {
-        let jobFiles: JobFile[] = this.getJobFiles();
-        for(let i = 0; i < this.getJobFiles().length; i++) {
-            if(JSON.stringify(this.getJobFiles()[i]) === JSON.stringify(jobFile)) {
-                jobFiles.splice(i, 1);
-                this.setJobFiles(jobFiles);
-                break;
-            }
-        }
-    }
-
-    // Note the difference between uploaded (JobFile) and copied (CloudFileInformation) files
-    public getCopiedJobFiles(): CloudFileInformation[] {
+    // Copied Job files (CloudFileInformation)
+    public getJobCloudFiles(): CloudFileInformation[] {
         const localStorageCopiedFiles = JSON.parse(localStorage.getItem('copiedJobFiles'));
         return localStorageCopiedFiles && localStorageCopiedFiles.hasOwnProperty('copiedJobFiles') ? localStorageCopiedFiles.copiedJobFiles : [];
     }
 
-    public setCopiedJobFiles(copiedJobFiles: CloudFileInformation[], copiedJobId: number): void {
+    public setJobCloudFiles(copiedJobFiles: CloudFileInformation[], copiedJobId: number): void {
         localStorage.setItem('copiedJobFiles', JSON.stringify({ copiedJobId: copiedJobId, copiedJobFiles: copiedJobFiles }));
     }
 
-    public removeCopiedJobFile(copiedJobFile: CloudFileInformation): void {
+    public removeJobCloudFile(copiedJobFile: CloudFileInformation): void {
         const localStorageCopiedFiles = JSON.parse(localStorage.getItem('copiedJobFiles'));
         const jobId = localStorageCopiedFiles && localStorageCopiedFiles.hasOwnProperty('copiedJobFiles') ? localStorageCopiedFiles.copiedJobId : -1;
         if(jobId != -1) {
-            let copiedJobFiles: CloudFileInformation[] = localStorageCopiedFiles.copiedJobFiles;
-            for(let i = 0; i < this.getCopiedJobFiles().length; i++) {
-                if(JSON.stringify(this.getCopiedJobFiles()[i]) === JSON.stringify(copiedJobFile)) {
-                    copiedJobFiles.splice(i, 1);
-                    this.setCopiedJobFiles(copiedJobFiles, jobId);
+            let cloudJobFiles: CloudFileInformation[] = localStorageCopiedFiles.copiedJobFiles;
+            for(let i = 0; i < this.getJobCloudFiles().length; i++) {
+                if(JSON.stringify(this.getJobCloudFiles()[i]) === JSON.stringify(copiedJobFile)) {
+                    cloudJobFiles.splice(i, 1);
+                    this.setJobCloudFiles(cloudJobFiles, jobId);
                     break;
                 }
             }

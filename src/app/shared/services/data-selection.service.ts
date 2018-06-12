@@ -74,9 +74,9 @@ export class DataSelectionService {
     }
 
     // Copied Job files (CloudFileInformation)
-    public getJobCloudFiles(): CloudFileInformation[] {
-        const localStorageCopiedFiles = JSON.parse(localStorage.getItem('copiedJobFiles'));
-        return localStorageCopiedFiles && localStorageCopiedFiles.hasOwnProperty('copiedJobFiles') ? localStorageCopiedFiles.copiedJobFiles : [];
+    public getJobCloudFiles(): any {
+      const localStorageCopiedFiles = JSON.parse(localStorage.getItem('copiedJobFiles'));
+      return localStorageCopiedFiles && localStorageCopiedFiles.hasOwnProperty('copiedJobFiles') ? localStorageCopiedFiles : [];
     }
 
     public setJobCloudFiles(copiedJobFiles: CloudFileInformation[], copiedJobId: number): void {

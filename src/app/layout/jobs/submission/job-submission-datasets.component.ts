@@ -5,6 +5,7 @@ import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.compone
 import { TreeNode } from 'primeng/api';
 import { JobsService } from '../jobs.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { saveAs } from 'file-saver';
 
 
 @Component({
@@ -98,8 +99,9 @@ export class JobSubmissionDatasetsComponent {
      * Add a CloudFileInformation object (copied job file) to the Tree
      * 
      * @param cloudFile CloudFileInformation file to add to tree
+     * @param jobId: the associated Job ID
      */
-    private addJobCloudFileToTree(jobFile: CloudFileInformation) {
+    private addJobCloudFileToTree(jobFile: CloudFileInformation, jobId: number) {
         const jobFileNode: TreeNode = {
             data: {
                 name: jobFile.name,
@@ -107,6 +109,7 @@ export class JobSubmissionDatasetsComponent {
                 description: 'This file will be made available to the job upon startup. It will be put in the same working directory as the job script.',
                 details: (jobFile.size / 1000) + ' KB',
                 input: jobFile,
+                jobId: jobId,
                 isCopied: true,
                 leaf: true
             }
@@ -166,16 +169,17 @@ export class JobSubmissionDatasetsComponent {
                 this.uploadedFiles = uploadedFiles;
             }
         );
-        for(const jobFile of this.uploadedFiles) {
+        for (const jobFile of this.uploadedFiles) {
             this.addJobFileUploadToTree(jobFile);
         }
 
         // Job files copied from jobs
         const copiedJobFiles = this.dataSelectionService.getJobCloudFiles();
-        for (const jobFile of copiedJobFiles) {
-            this.addJobCloudFileToTree(jobFile);
+        const jobId: number = copiedJobFiles.copiedJobId;
+        const cloudFiles: CloudFileInformation[] = copiedJobFiles.copiedJobFiles;
+        for (const jobFile of cloudFiles) {
+            this.addJobCloudFileToTree(jobFile, jobId);
         }
-
 
         // Add root download node if any were added
         if (this.rootRemoteWebServiceDownloads.children.length > 0) {
@@ -196,9 +200,20 @@ export class JobSubmissionDatasetsComponent {
      */
     private downloadSelectedInput(): void {
         if (this.selectedJobInputNode.parent.data.id === 'upload') {
-            console.log('Download File');
+            // TODO: Don't show download menu if the input has been uploaded
+            if (this.selectedJobInputNode.data.isCopied) {
+                this.jobsService.downloadFile(this.selectedJobInputNode.data.jobId, this.selectedJobInputNode.data.name, this.selectedJobInputNode.data.name).subscribe(
+                    response => {
+                        saveAs(response, this.selectedJobInputNode.data.name);
+                    },
+                    error => {
+                        //TODO: Proper error reporting
+                        console.log(error.message);
+                    }
+                )
+            }
         } else if (this.selectedJobInputNode.parent.data.id === 'remote') {
-            console.log('Download Upload');
+            window.open(this.selectedJobInputNode.data.input.url);
         }
     }
 

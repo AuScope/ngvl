@@ -19,9 +19,9 @@
                             <div [ngbCollapse]="anyTextIsCollapsed">
                                 <div class="input-group input-group-sm">
                                     <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
-                                        [(ngModel)]="anyTextValue" (keyup.enter)="facetedSearch()">
+                                        [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">
                                     <div class="input-group-btn input-group-apppend">
-                                        <button class="btn btn-secondary" type="button" (click)="facetedSearch()">
+                                        <button class="btn btn-secondary" type="button" (click)="resetFacetedSearch()">
                                             <i class="fa fa-search"></i>
                                         </button>
                                     </div>

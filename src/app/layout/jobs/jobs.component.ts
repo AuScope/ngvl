@@ -1,7 +1,8 @@
-import { Component, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { routerTransition } from '../../router.animations';
 import { Job, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
+import { UserStateService, JOBS_VIEW } from '../../shared';
 import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
 import { JobsService } from './jobs.service';
@@ -26,7 +27,7 @@ import * as envelope from '@turf/envelope';
 })
 
 
-export class JobsComponent {
+export class JobsComponent implements OnInit {
 
     @ViewChild('jobBrowser')
     public jobBrowser: JobBrowserComponent;
@@ -57,7 +58,13 @@ export class JobsComponent {
 
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
         private jobsService: JobsService,
-        private modalService: NgbModal) { }
+        private modalService: NgbModal,
+        private userStateService: UserStateService) { }
+
+
+    ngOnInit() {
+        this.userStateService.setView(JOBS_VIEW);
+    }
 
 
     /**

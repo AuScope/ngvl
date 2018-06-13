@@ -1,9 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+
 import { AuthGuard } from '../../shared';
 import { SolutionsComponent } from './solutions.component';
+import { SolutionsDetailComponent } from './solutions-detail.component';
 
-const routes: Routes = [{ path: '', component: SolutionsComponent, canActivate: [AuthGuard]  }];
+const routes: Routes = [
+  { path: '', component: SolutionsComponent, canActivate: [AuthGuard]  },
+  { path: 'detail/:id', component: SolutionsDetailComponent }
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

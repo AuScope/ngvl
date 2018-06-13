@@ -52,7 +52,17 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
   }
 
   set selectedProblemId(id: string) {
-    this.userStateService.setSolutionQuery({ problems: [this.problems.find(it => it['@id'] === id)] });
+    const problem = this.problems.find(it => it['@id'] === id);
+    this.selectedProblem = problem;
+  }
+
+  get selectedProblem(): Problem {
+    return this._selectedProblem;
+  }
+
+  set selectedProblem(problem: Problem) {
+    const problems = problem ? [problem] : [];
+    this.userStateService.setSolutionQuery({ problems: problems });
   }
 
 }

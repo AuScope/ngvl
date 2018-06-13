@@ -64,6 +64,22 @@ export class JobInputsComponent implements OnChanges {
 
 
     /**
+     * Return the selected job downloads
+     */
+    public getSelectedJobDownloads(): JobDownload[] {
+        return this.selectedJobDownloads;
+    }
+
+
+    /**
+     * Return the selected job cloud files
+     */
+    public getSelectedCloudFiles(): CloudFileInformation[] {
+        return this.selectedCloudFiles;
+    }
+
+
+    /**
      * Cancel the current HttpClient request, if any
      */
     public cancelCurrentSubscription() {
@@ -185,7 +201,7 @@ export class JobInputsComponent implements OnChanges {
 
 
     /**
-     * Download selected job files (downloads and ckoud files). Individual
+     * Download selected job files (downloads and cloud files). Individual
      * files are downloaded in their native format, multiple files will be
      * zipped
      * 
@@ -198,11 +214,11 @@ export class JobInputsComponent implements OnChanges {
             // "Sorry, but combining multiple file categories isn't supported. Please only select files from the same category and try again."
         } else {
             if (this.selectedJobDownloads.length === 1) {
-                // XXX
-
+                // TODO: Simply opens a new window with the download URL, check this works in all cases
+                window.open(this.selectedJobDownloads[0].url);
             } else if (this.selectedJobDownloads.length > 1) {
-                // XXX
-
+                // TODO: Deal with multiple downloads, this will only open first selection
+                window.open(this.selectedJobDownloads[0].url);
             } else if (this.selectedCloudFiles.length === 1) {
                 this.downloadSingleFile();
             } else if (this.selectedCloudFiles.length > 1) {

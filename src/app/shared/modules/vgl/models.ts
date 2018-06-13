@@ -1,3 +1,6 @@
+import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
+import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
+
 /*
  * User Models
  */
@@ -39,7 +42,8 @@ export interface Variable {
 export interface Entry {
   id: string;
   entryType: EntryType;
-  createdAt: Date;
+  created_at: Date;
+  author: string;
   name: string;
   description: string;
   url: string;
@@ -90,7 +94,7 @@ export class JobParameter {
 }
 
 export class JobDownload {
-    id: number;
+    //id: number;
     name: string;
     description: string;
     url: string;

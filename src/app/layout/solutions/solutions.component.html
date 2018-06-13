@@ -12,22 +12,19 @@
         <div class="card-body">
           <h3 class="card-title">{{ solution.name }}</h3>
           <p class="card-text">{{ solution.description }}</p>
-          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
-          <a [attr.href]="solution['@id']" target="_blank">More info...</a>
+          <button class="btn btn-secondary" (click)="selectSolution(solution)">Select</button>
+          <a
+            [routerLink]="['/solutions/detail', solution['@id']]"
+            class="btn btn-secondary">
+            Details...
+          </a>
         </div>
 
       </div>
     </div>
 
     <div class="col-lg-3">
-      <div class="card">
-        <div class="card-header">Cart</div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item" *ngFor="let solution of cart$ | async">
-            {{ solution.name }}
-          </li>
-        </ul>
-      </div>
+      <app-solutions-cart></app-solutions-cart>
     </div>
   </div>
 

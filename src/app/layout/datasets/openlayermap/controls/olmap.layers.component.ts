@@ -56,7 +56,7 @@ export class OlMapLayersComponent {
      */
     public displayRecordInformation(layer: LayerModel) {
         if(layer.cswRecords.length > 0) {
-            const modelRef = this.modalService.open(RecordModalContent);
+            const modelRef = this.modalService.open(RecordModalContent, {size: 'lg'});
             // TODO: DO we ever need to worry about other records?
             modelRef.componentInstance.record = layer.cswRecords[0];
         }

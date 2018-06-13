@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { routerTransition } from '../../router.animations';
 import { Observable } from 'rxjs/Observable';
+
 import { UserStateService, SOLUTIONS_VIEW } from '../../shared';
 import { Problem, Solution } from '../../shared/modules/vgl/models';
 
@@ -13,8 +14,6 @@ import { Problem, Solution } from '../../shared/modules/vgl/models';
 export class SolutionsComponent implements OnInit, AfterViewChecked {
 
   selectedProblem: Problem;
-
-  cart$: Observable<Solution[]>;
 
   constructor(private userStateService: UserStateService) {}
 
@@ -29,11 +28,10 @@ export class SolutionsComponent implements OnInit, AfterViewChecked {
       this.selectedProblem = problems ? problems[0] : null;
     });
 
-    this.cart$ = this.userStateService.selectedSolutions;
   }
 
   selectSolution(solution: Solution) {
-    this.userStateService.selectSolution(solution);
+    this.userStateService.addSolutionToCart(solution);
   }
 
   ngAfterViewChecked() {

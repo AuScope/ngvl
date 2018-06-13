@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -56,6 +56,44 @@ export class VglService {
     public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
         const options = { params: { jobId: jobId.toString() } };
         return this.vglRequest('secure/jobCloudFiles.do', options);
+    }
+    
+    public get nciDetails(): Observable<NCIDetails> {
+        return this.vglRequest('secure/getNCIDetails.do');
+    }
+
+    public setUserDetails(arnExecution: string, arnStorage: string, acceptedTermsConditions: number, awsKeyName: string): Observable<any> {
+        const options = {
+            params: {
+                arnExecution: arnExecution,
+                arnStorage: arnStorage,
+                acceptedTermsConditions: acceptedTermsConditions.toString(),
+                awsKeyName: awsKeyName
+            }
+        }
+        return this.vglRequest('secure/setUser.do', options);
+    }
+
+    public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
+        let formData: FormData = new FormData();
+        if(nciKeyfile) {
+            formData.append('nciKey', nciKeyfile);
+        }
+        const options = {
+            params: {
+                nciUsername: nciUsername,
+                nciProject: nciProjectCode
+            }
+        }
+        return this.http.post(environment.portalBaseUrl + 'secure/setNCIDetails.do', formData, options);
+    }
+
+    public downloadCloudFormationScript(): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + 'secure/getCloudFormationScript.do', {
+            responseType: 'blob'
+        }).map(response => {
+            return response;
+        });
     }
 
     public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
@@ -214,22 +252,6 @@ export class VglService {
         }
         return params;
     }
-
-    /**
-     * Create a list of parameters from the key/value pairs of a JSON
-     * object
-     *
-     * @param jsonObject
-     */
-    /*
-    private createHttpParamsFromJsonObject(jsonObject: any): HttpParams {
-        let httpParams = new HttpParams();
-        for (let param in jsonObject) {
-            httpParams = httpParams.set(param, jsonObject[param]);
-        }
-        return httpParams;
-    }
-    */
 
     public makeErddapUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {

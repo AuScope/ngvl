@@ -16,6 +16,7 @@ import { CSWSearchService } from '../shared/services/csw-search.service';
 import { RecordModalContent } from './datasets/record.modal.component';
 import { SolutionsModule } from './solutions/solutions.module';
 import { DatasetsModule } from './datasets/datasets.module';
+import { UserModule } from './user/user.module';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 
@@ -29,6 +30,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
         NgbModule.forRoot(),
         SolutionsModule,
         DatasetsModule,
+        UserModule,
         OverlayPanelModule
     ],
     declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent ],

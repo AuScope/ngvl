@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -21,26 +21,26 @@ function vglData<T>(response: VglResponse<T>): T {
 @Injectable()
 export class VglService {
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    private vglRequest<T>(endpoint: string, options?): Observable<T> {
-        const url = environment.portalBaseUrl + endpoint;
-        const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
-        return this.http.get<VglResponse<T>>(url, opts).map(vglData);
-    }
+  private vglRequest<T>(endpoint: string, options?): Observable<T> {
+    const url = environment.portalBaseUrl + endpoint;
+    const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+    return this.http.get<VglResponse<T>>(url, opts).map(vglData);
+  }
 
-    public get user(): Observable<User> {
-        return this.vglRequest('secure/getUser.do');
-    }
+  public get user(): Observable<User> {
+    return this.vglRequest('secure/getUser.do');
+  }
 
-    public get problems(): Observable<Problem[]> {
-        return this.vglRequest('secure/getProblems.do')
-            .map((problems: Problems) => problems.configuredProblems);
-    }
+  public get problems(): Observable<Problem[]> {
+    return this.vglRequest('secure/getProblems.do')
+      .map((problems: Problems) => problems.configuredProblems);
+  }
 
-    public get treeJobs(): Observable<TreeJobs> {
-        return this.vglRequest('secure/treeJobs.do');
-    }
+  public get treeJobs(): Observable<TreeJobs> {
+    return this.vglRequest('secure/treeJobs.do');
+  }
 
     public addFolder(folderName: string): Observable<Series> {
         const options = {
@@ -201,8 +201,8 @@ export class VglService {
      * Create a list of parameters by parsing URL string, e.g:
      * "http://someaddress.com?first_parameter=value1&second_parameters=value2"
      * returns: { first_parameter: 'value1', second_parameter: 'value2'}
-     * 
-     * @param url 
+     *
+     * @param url
      */
     private createParamsFromUrl(url: string): any {
         let params: {};
@@ -218,8 +218,8 @@ export class VglService {
     /**
      * Create a list of parameters from the key/value pairs of a JSON
      * object
-     * 
-     * @param jsonObject 
+     *
+     * @param jsonObject
      */
     /*
     private createHttpParamsFromJsonObject(jsonObject: any): HttpParams {
@@ -266,4 +266,11 @@ export class VglService {
         return this.vglRequest('getFeatureRequestOutputFormats.do', options);
     }
 
+  public getEntry<T>(url: string): Observable<T> {
+    return url ? this.http.get<T>(url) : Observable.empty();
+  }
+
+  public getSolution(url: string): Observable<Solution> {
+    return this.getEntry<Solution>(url);
+  }
 }

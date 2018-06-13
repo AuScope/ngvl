@@ -1,0 +1,57 @@
+<div [@routerTransition]>
+
+  <a role="button" (click)="location.back()">
+    <i class="fa fa-arrow-left"></i>
+  </a>
+
+  <div *ngIf="(solution$ | async) as solution; else loading">
+
+    <h1>{{ solution.name }}</h1>
+
+    <p *ngIf="solution.icon"><img src="{{ solution.icon }}"></p>
+
+    <p>{{ solution.description }}</p>
+
+    <dl>
+      <dt>Created by</dt><dd>{{ solution.author.name }}</dd>
+      <dt>Created at</dt><dd>{{ solution.created_at }}</dd>
+    </dl>
+
+    <div>
+      <h4>Input variables</h4>
+      <table class="table">
+        <thead class="thead-light">
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of solution.variables">
+            <td>{{ v.label }}</td>
+            <td>{{ v.type }}</td>
+            <td title="{{v.description}}">
+              <span class="d-inline-block text-truncate" style="max-width:300px">{{ v.description }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h4>Template</h4>
+      <pre class="pre-scrollable">{{ solution.template$ | async }}</pre>
+    </div>
+
+    <p>
+      <button class="btn btn-secondary" (click)="location.back()">Done</button>
+      <button class="btn btn-secondary" (click)="selectSolution(solution)">Select</button>
+    </p>
+
+  </div>
+
+  <ng-template #loading>
+    Loading...
+  </ng-template>
+</div>

@@ -1,0 +1,25 @@
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title">Copy From An Existing Job</h5>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <!-- Job panel -->
+        <div class="col">
+            <job-browser #jobBrowser [selectionMode]="'single'" [showContextMenu]="false"></job-browser>
+        </div>
+        <!-- Input panel -->
+        <div class="col">
+            <job-inputs #jobInputs [selectionMode]="'checkbox'" [selectedJob]="jobBrowser.selectedJob" [showCheckboxes]="true">
+            </job-inputs>
+        </div>
+    </div>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-primary" (click)="copySelectionsToJob()" 
+        [disabled]="jobInputs.selectedJobDownloads.length===0 && jobInputs.selectedCloudFiles.length===0">
+        <i class="fa fa-plus-circle"></i>&nbsp;Copy Selections to Job
+    </button>
+</div>

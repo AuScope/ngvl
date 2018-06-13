@@ -1,0 +1,77 @@
+<div class="card">
+    <div class="card-header">Manage Job Input Files</div>
+    <!-- TODO: Unsure where this will sit, if it's a full pager style body to fill vertically using calc -->
+    <div class="card-body">
+        <div style="margin:10px;" *ngIf="jobInputNodes.length === 0">
+            This doesn't have any input files or service downloads configured. You can add some by using the add button below or by selecting
+            a dataset from the
+            <a href="/data">datasets page</a>.
+        </div>
+
+        <!-- TODO: Delete/Download input context menu (and maybe action column) -->
+
+        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
+            <p-column field="name" header="Name" [style]="{'width':'20%'}"></p-column>
+            <p-column field="location" header="Location" [style]="{'width':'20%'}"></p-column>
+            <p-column header="Description" [style]="{'width':'30%'}">
+                <ng-template let-node="rowData" pTemplate="body">
+                    <span title="{{ node.data.description }}">{{ node.data.description }}</span>
+                </ng-template>
+            </p-column>
+            <p-column header="Details" [style]="{'width':'30%'}">
+                <ng-template let-node="rowData" pTemplate="body">
+                    <span *ngIf="node.data.leaf && node.parent.data.id==='remote'" title="{{ node.data.details }}">Service call to
+                        <a href="{{ node.data.details }}">{{ node.data.details }}</a>
+                    </span>
+                    <span *ngIf="node.data.leaf && node.parent.data.id==='upload'" title="{{ node.data.details }}">{{ node.data.details }}</span>
+                </ng-template>
+            </p-column>
+        </p-treeTable>
+    </div>
+    <div class="card-footer">
+        <input class="inputfile" id="fileinput" type="file" multiple="multiple" (change)="uploadFile($event)">
+        <label style="margin-left:10px;" for="fileinput" class="btn btn-sm btn-primary pull-right">
+            <i class="fa fa-upload"></i>&nbsp;Upload File(s)
+        </label>
+        <button style="margin-left:10px;" class="btn btn-sm btn-primary pull-right" (click)="showAddRemoteDownloadDialog(addRemoteDownloadModal)">
+            <i class="fa fa-download"></i>&nbsp;Remote Download</button>
+        <button type="button" class="btn btn-sm btn-primary pull-right" (click)="copyFromJob()">
+            <i class="fa fa-copy"></i>&nbsp;Copy From Job</button>
+    </div>
+</div>
+
+
+<!-- Job download context menu -->
+<p-contextMenu #jobInputContextMenu [model]="jobInputContextMenuItems" appendTo="body"></p-contextMenu>
+
+
+<!-- Add remote download modal -->
+<ng-template #addRemoteDownloadModal let-c="close">
+    <div class="modal-header">
+        <h4 class="modal-title">Download from remote service</h4>
+        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form #downloadForm="ngForm">
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="required" for="url">URL</label>
+                <!-- TODO: URL validation -->
+                <input type="text" class="form-control" id="url" [(ngModel)]="remoteUrl" name="remoteUrl" placeholder="URL for the job to download"
+                    required>
+                <label class="required" for="location" style="margin-top:5px;">Location</label>
+                <!-- TODO: Path validation -->
+                <input type="text" class="form-control" id="location" [(ngModel)]="remoteLocation" name="remoteLocation" placeholder="File path where the downloaded data will be stored"
+                    required>
+                <label class="required" for="name" style="margin-top:5px;">Name</label>
+                <input type="text" class="form-control" id="name" [(ngModel)]="remoteName" name="remoteName" required>
+                <label class="required" for="description" style="margin-top:5px;">Description</label>
+                <input type="text" class="form-control" id="description" [(ngModel)]="remoteDescription" name="remoteDescription" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" [disabled]="!downloadForm.valid" (click)="c('OK click')">Create Input</button>
+        </div>
+    </form>
+</ng-template>

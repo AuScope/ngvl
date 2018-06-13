@@ -33,6 +33,9 @@ export class UserStateService {
   private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
   public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
 
+  private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
+
   public setView(viewType: ViewType): Observable<ViewType> {
     this._currentView.next(viewType);
     return this.currentView;
@@ -82,4 +85,9 @@ export class UserStateService {
     // Return the new value so the caller can check that it worked.
     return solutions;
   }
+
+  public setUploadedFiles(files: any[]): void {
+      this._uploadedFiles.next(files);
+  }
+
 }

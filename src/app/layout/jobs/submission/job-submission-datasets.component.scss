@@ -1,0 +1,28 @@
+/* Standard file input must be hidden so we can customise display to match existing buttons */
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+// Truncate all table data text
+::ng-deep td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// Add remote download modal
+label.required:after { 
+    color: #d00;
+    content: "*";
+    position: absolute;
+    margin-left: 5px;
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}

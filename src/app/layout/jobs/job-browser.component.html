@@ -3,7 +3,7 @@
     <div class="bounce2"></div>
     <div class="bounce3"></div>
 </div>
-<div *ngIf="treeJobsData.length > 0 && !jobsLoading">
+<div *ngIf="treeJobsData.length > 0 && !jobsLoading" class="job-browser-table">
     <p-treeTable [value]="treeJobsData" selectionMode="{{selectionMode}}" [(selection)]="selectedJobNodes" (onNodeSelect)="jobSelected($event)"
         (onContextMenuSelect)="jobSelected($event)" [contextMenu]="jobContextMenu">
         <p-column header="Name" [style]="{'width':'40%'}">

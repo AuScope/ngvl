@@ -21,14 +21,17 @@
     }
 }
 
-// Datasets CSS below
 .btn {
     cursor: pointer;
 }
 
-// Fix issue with datepicker z-index
-::ng-deep ngb-datepicker.dropdown-menu.ng-star-inserted {
-    left: 0px !important;
+// Work around issue with datepicker z-index (pickers always behind map)
+.publication-date-panel {
+    ::ng-deep {
+        ngb-datepicker.dropdown-menu.ng-star-inserted {
+            left: 0px !important;
+        }
+    }
 }
 
 .spinner {

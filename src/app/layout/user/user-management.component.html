@@ -1,0 +1,95 @@
+<div [@routerTransition]>
+    <app-page-header [heading]="'User Profile'" [icon]="'fa-user'"></app-page-header>
+    <div class="row" style="margin-left:0px;width:100%;">
+        <!-- User Management -->
+        <ngb-tabset style="width: 100%;">
+            <!-- AWS Configuration -->
+            <ngb-tab title="AWS">
+                <ng-template ngbTabContent>
+                    <div class="row" style="width:100%;margin-top:10px;">
+                        <!-- Initialising AWS -->
+                        <div class="col-lg-5" style="overflow-y:auto;height:calc(100vh - 250px);">
+                            <div class="card" style="min-height:100%">
+                                <div class="card-header">Step 1: Initialising Your AWS</div>
+                                <div class="card-body">
+                                    <h5>Tutorial Video</h5>
+                                    <!-- TODO: Put in actual video -->
+                                    <img src="http://placekitten.com/450/250" style="max-width:100%;">
+                                    <!-- TODO: Sort out actual link, can't get this to work from dev machine -->
+                                    <p>You can also follow instructions at our
+                                        <a href="https://confluence.csiro.au/display/DEVL/Setting+up+a+Dev+environment" target="_blank">wiki</a>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-primary pull-right" style="max-width:100%;" (click)="downloadCloudFormationPolicy()">Download Cloud Formation Policy</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Configuring AWS -->
+                        <div class="col-lg-7" style="overflow-y:auto;height:calc(100vh - 250px);">
+                            <form #awsForm="ngForm" style="height:100%;">
+                                <div class="card" style="min-height:100%;">
+                                    <div class="card-header">Step 2: Configuring NGVL</div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="accessArn" class="required">VGL Instance ARN</label>
+                                            <input type="text" class="form-control" id="accessArn" name="accessArn" [(ngModel)]="user.arnExecution" required>
+                                            <p><small class="text-muted">Amazon resource name for the role which is used to access the client AWS account.</small></p>
+                                            <label for="instanceArn" class="required">Job Instance ARN</label>
+                                            <input type="text" class="form-control" id="instanceArn" name="instanceArn" [(ngModel)]="user.arnStorage" required>
+                                            <p><small class="text-muted">The Amazon resource name for the instance profile which is used when processing user jobs.</small></p>
+                                            <label for="keyName">AWS Key Name</label>
+                                            <input type="text" class="form-control" id="keyName" name="keyName" [(ngModel)]="user.awsKeyName">
+                                            <p><small class="text-muted">The (optional) name of the key to be applied to every VM started by VGL</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button class="btn btn-primary pull-right" [disabled]="!awsForm.valid" (click)="saveAwsChanges()">Save Changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+            <!-- NCI Configuration -->
+            <ngb-tab title="NCI">
+                <ng-template ngbTabContent>
+                    <div class="row" style="width:100%;margin-top:10px;">
+                        <div class="col" style="overflow-y:auto;height:calc(100vh - 250px);">
+                            <form #nciForm="ngForm" style="height:100%;">
+                                <div class="card" style="min-height:100%;">
+                                    <div class="card-header">Enter Your NCI Credentials</div>
+                                    <div class="card-body">
+                                        <label class="required" for="username" class="required">NCI Username</label>
+                                        <input type="text" class="form-control" id="username" name="username" [(ngModel)]="nciUsername" required>
+                                        <p><small class="text-muted">The username for the NCI account.</small></p>
+                                        <label class="required" for="projectCode" class="required">NCI Project Code</label>
+                                        <input type="text" class="form-control" id="projectCode" name="projectCode" [(ngModel)]="nciProjectCode" required>
+                                        <p><small class="text-muted">The default NCI project code.</small></p>
+                                        <label class="required" for="key">NCI Key</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="key" name="key" [(ngModel)]="nciKey" placeholder="Select SSH file" readonly required>
+                                            <input class="inputfile" id="fileinput" type="file" multiple="single" (change)="nciKeyFileChanged($event)">
+                                            <div class="input-group-append">
+                                                <label for="fileinput" class="btn btn-primary btn-sm" style="height:100%;text-align:center;">
+                                                    <i class="fa fa-upload"></i>&nbsp;Browse
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <p><small class="text-muted">The NCI key (SSH) for the NCI account.</small></p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <button class="btn btn-primary pull-right" [disabled]="!nciForm.valid" (click)="saveNciChanges()">Save Changes</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-tab>
+        </ngb-tabset>
+    </div>
+</div>
+
+<p-growl [(value)]="msgs" [baseZIndex]="9999999"></p-growl>

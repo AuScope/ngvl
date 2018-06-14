@@ -6,11 +6,26 @@ import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.mo
  */
 export interface User {
   fullName: string;
+  acceptedTermsConditions: number;
+  // AWS details
+  arnExecution: string;
+  arnStorage: string;
+  awsKeyName: string;
 }
 
 export const ANONYMOUS_USER: User = {
-  fullName: 'Anonymous User'
+  fullName: 'Anonymous User',
+  acceptedTermsConditions: 0,
+  arnExecution: undefined,
+  arnStorage: undefined,
+  awsKeyName: undefined
 };
+
+export interface NCIDetails {
+    nciUsername: string;
+    nciProject: string;
+    nciKey: string;
+}
 
 /*
  * SSSC Models

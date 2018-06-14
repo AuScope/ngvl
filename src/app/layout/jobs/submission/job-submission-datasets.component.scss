@@ -9,10 +9,14 @@
 }
 
 // Truncate all table data text
-::ng-deep td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.datasetsTablePanel {
+    ::ng-deep {
+        td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 }
 
 // Add remote download modal

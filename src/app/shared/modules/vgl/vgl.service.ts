@@ -21,26 +21,26 @@ function vglData<T>(response: VglResponse<T>): T {
 @Injectable()
 export class VglService {
 
-  constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
-  private vglRequest<T>(endpoint: string, options?): Observable<T> {
-    const url = environment.portalBaseUrl + endpoint;
-    const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
-    return this.http.get<VglResponse<T>>(url, opts).map(vglData);
-  }
+    private vglRequest<T>(endpoint: string, options?): Observable<T> {
+        const url = environment.portalBaseUrl + endpoint;
+        const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+        return this.http.get<VglResponse<T>>(url, opts).map(vglData);
+    }
 
-  public get user(): Observable<User> {
-    return this.vglRequest('secure/getUser.do');
-  }
+    public get user(): Observable<User> {
+        return this.vglRequest('secure/getUser.do');
+    }
 
-  public get problems(): Observable<Problem[]> {
-    return this.vglRequest('secure/getProblems.do')
-      .map((problems: Problems) => problems.configuredProblems);
-  }
+    public get problems(): Observable<Problem[]> {
+        return this.vglRequest('secure/getProblems.do')
+            .map((problems: Problems) => problems.configuredProblems);
+    }
 
-  public get treeJobs(): Observable<TreeJobs> {
-    return this.vglRequest('secure/treeJobs.do');
-  }
+    public get treeJobs(): Observable<TreeJobs> {
+        return this.vglRequest('secure/treeJobs.do');
+    }
 
     public addFolder(folderName: string): Observable<Series> {
         const options = {
@@ -96,33 +96,69 @@ export class VglService {
         });
     }
 
+    public get nciDetails(): Observable<NCIDetails> {
+        return this.vglRequest('secure/getNCIDetails.do');
+    }
+
+    public setUserDetails(arnExecution: string, arnStorage: string, acceptedTermsConditions: number, awsKeyName: string): Observable<any> {
+        const options = {
+            params: {
+                arnExecution: arnExecution,
+                arnStorage: arnStorage,
+                acceptedTermsConditions: acceptedTermsConditions.toString(),
+                awsKeyName: awsKeyName
+            }
+        }
+        return this.vglRequest('secure/setUser.do', options);
+    }
+
+    public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
+        let formData: FormData = new FormData();
+        if(nciKeyfile) {
+            formData.append('nciKey', nciKeyfile);
+        }
+        const options = {
+            params: {
+                nciUsername: nciUsername,
+                nciProject: nciProjectCode
+            }
+        }
+        return this.http.post(environment.portalBaseUrl + 'secure/setNCIDetails.do', formData, options);
+    }
+
+    public downloadCloudFormationScript(): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + 'secure/getCloudFormationScript.do', {
+            responseType: 'blob'
+        }).map(response => {
+            return response;
+        });
+    }
+
     public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
-        return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
+        const options = {
             params: {
                 jobId: jobId.toString(),
                 filename: filename,
                 key: key
             },
-            responseType: 'blob'
-        }).map((response) => {
-            return response;
-        }).catch((error: Response) => {
-            return Observable.throw(error);
-        });
+            responseType: 'text'
+        };
+
+        return this.vglRequest('secure/downloadFile.do', options)
+            .catch((error: Response) => Observable.throw(error));
     }
 
     public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
-        return this.http.get(environment.portalBaseUrl + 'secure/downloadAsZip.do', {
+        const options = {
             params: {
                 jobId: jobId.toString(),
                 files: filenames.toString()
             },
             responseType: 'blob'
-        }).map((response) => {
-            return response;
-        }).catch((error: Response) => {
-            return Observable.throw(error);
-        });
+        };
+
+        return this.vglRequest('secure/downloadAsZip.do', options)
+            .catch((error: Response) => Observable.throw(error));
     }
 
     public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<string> {

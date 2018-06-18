@@ -27,10 +27,16 @@ export class JobBrowserComponent implements OnInit {
     // HttpCLient request (for cancelling)
     httpSubscription: Subscription;
 
-    // Job tree
+    // Job tree, columns, selection and context items
     treeJobsData: TreeNode[] = [];
+    treeCols: any[] = [
+        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
+        { field: 'submitDate', header: 'Submit Date', colStyle: {'width': '40%'} },
+        { field: 'status', header: 'Status', colStyle: {'width': '20%'} }
+    ];
     selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
+    selectedContextNode: TreeNode;
 
     // Jobs
     jobs: Job[] = [];
@@ -148,32 +154,48 @@ export class JobBrowserComponent implements OnInit {
         let items: any[] = [];
         // If more than 1 item is selected, or only a series is selected, delete is only action
         if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
-            items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+            items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
         }
         // Otherwise available actions are specific to job status
         else if (this.selectedJobNodes.length === 1 && node.data.leaf) {
             const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
             if (selectedJob.status.toLowerCase() === 'active') {
-                items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
-                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Cancel', icon: 'fa fa-cross', command: (event) => this.cancelSelectedJob() });
+                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
                 // TODO: Confirm on active jobs
-                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'saved') {
-                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
-                items.push({ label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() });
-                items.push({ label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() });
-                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+                items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+                items.push({ label: 'Submit', icon: 'fa fa-share-square', command: (event) => this.submitSelectedJob() });
+                items.push({ label: 'Edit', icon: 'fa fa-edit', command: (event) => this.editSelectedJob() });
+                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'done' || selectedJob.status.toLowerCase() === 'error') {
-                items.push({ label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
-                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
-                items.push({ label: 'Status', icon: 'fa-info-circle', command: (event) => this.showSelectedJobStatus() });
+                items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
+                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else {
-                items.push({ label: 'Cancel', icon: 'fa-cross', command: (event) => this.cancelSelectedJob() });
-                items.push({ label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Cancel', icon: 'fa fa-cross', command: (event) => this.cancelSelectedJob() });
+                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
             }
         }
         return items;
     }
+
+
+    /**
+     * Handle the context menu selection. Will add selection to the job
+     * selection list and call the job selection method so the correct
+     * context menu can be constructed
+     * 
+     * @param event job tree node context menu was called from
+     */
+    public contextMenuSelected(event) {
+        if (this.selectedJobNodes.indexOf(event.node) === -1) {
+            this.selectedJobNodes.push(event.node);
+        }
+        this.jobSelected(event);
+    }
+
 
 
     /**

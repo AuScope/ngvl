@@ -5,7 +5,6 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
-import { TreeTable } from 'primeng/treetable';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { DataSelectionService, UserStateService } from '../../shared';
 import { HttpParams } from '@angular/common/http';
@@ -22,9 +21,19 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 
 export class ConfirmDatasetsModalContent {
 
+    // TreeData, columns and selection
     @Input() public cswRecordTreeData: TreeNode[] = [];
+    treeCols: any[] = [
+        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
+        { field: 'url', header: 'URL', colStyle: {'width': '40%'} },
+        { header: 'Download', colStyle: {'width': '20%'} }
+    ];
     selectedDatasetNodes: TreeNode[] = [];
+
+    // Keep track of no. of downloads across types
     capturedJobDownloadCount: number = 0;
+
+    // Selections saved dialog
     @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
 
@@ -178,7 +187,6 @@ export class ConfirmDatasetsModalContent {
                 });
             }
         }
-
     }
 
 }

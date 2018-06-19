@@ -6,7 +6,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
-import { TreeNode } from 'primeng/api';
 
 import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';

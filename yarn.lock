@@ -5597,7 +5597,7 @@ pkg-dir@^2.0.0:
 
 portal-core-ui@stuartwoodman/portal-core-ui:
   version "0.0.0"
-  resolved "https://codeload.github.com/stuartwoodman/portal-core-ui/tar.gz/e38c5bd5d8ae1f4ed05705887170ea87ecbff467"
+  resolved "https://codeload.github.com/stuartwoodman/portal-core-ui/tar.gz/c04c2d8fbdbab6fa5e0deab571b388428beac49d"
 
 portfinder@^1.0.9, portfinder@~1.0.12:
   version "1.0.13"
@@ -5689,9 +5689,13 @@ pretty-error@^2.0.2:
     renderkid "^2.0.1"
     utila "~0.4"
 
-primeng@^5.2.4:
-  version "5.2.7"
-  resolved "https://registry.yarnpkg.com/primeng/-/primeng-5.2.7.tgz#9dcf461b6a82ea46de85751dc235ea82303e64b1"
+primeicons@^1.0.0-beta.7:
+  version "1.0.0-beta.7"
+  resolved "https://registry.yarnpkg.com/primeicons/-/primeicons-1.0.0-beta.7.tgz#4e4d4b8ae014d7b87c5e51bbf35100536a49fc96"
+
+primeng@^6.0.0-rc.1:
+  version "6.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/primeng/-/primeng-6.0.0-rc.1.tgz#038e5657a5395e08a5c1fd9312b12cac1a44b527"
 
 process-nextick-args@~1.0.6:
   version "1.0.7"

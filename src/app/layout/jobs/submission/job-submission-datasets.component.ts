@@ -19,6 +19,12 @@ export class JobSubmissionDatasetsComponent {
 
     // Job input file tree (input type root nodes added to this)
     jobInputNodes: TreeNode[];
+    treeCols = [
+        { header: 'Name', field: 'name', colStyle: {'width': '20%'} },
+        { header: 'Location', field: 'location', colStyle: {'width': '20%'} },
+        { header: 'Description', field: 'description', colStyle: {'width': '30%'} },
+        { header: 'Details', field: 'details', colStyle: {'width': '30%'} }
+    ];
 
     // Selected input (single selection)
     selectedJobInputNode: any;
@@ -51,11 +57,11 @@ export class JobSubmissionDatasetsComponent {
     // Job download context menu
     jobInputContextMenuItems = [{
         label: 'Download to your machine',
-        icon: 'fa-download',
+        icon: 'fa fa-download',
         command: (event) => this.downloadSelectedInput()
     }, {
         label: 'Delete this input',
-        icon: 'fa-times',
+        icon: 'fa fa-times',
         command: (event) => this.deleteSelectedInput()
     }];
 
@@ -322,6 +328,7 @@ export class JobSubmissionDatasetsComponent {
         if (!this.jobInputNodes.find(node => node === this.rootFileDownloads)) {
             this.jobInputNodes.push(this.rootFileDownloads);
         }
+        this.loadJobInputs();
     }
 
 }

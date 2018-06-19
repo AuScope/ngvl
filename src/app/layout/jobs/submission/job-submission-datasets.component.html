@@ -10,15 +10,10 @@
 
         <!-- TODO: Delete/Download input context menu (and maybe action column) -->
 
-        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
-            <ng-template pTemplate="colgroup" let-columns>
-                <colgroup>
-                    <col *ngFor="let col of columns" [(ngStyle)]="col.colStyle">
-                </colgroup>
-            </ng-template>
+        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
             <ng-template pTemplate="header" let-columns>
                 <tr>
-                    <th *ngFor="let col of columns" ttResizableColumn>{{ col.header }}</th>
+                    <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn>{{ col.header }}</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-rowNode let-rowData="rowData">

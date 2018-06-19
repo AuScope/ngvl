@@ -8,11 +8,6 @@
 </div>
 <div class="modal-body confirm-datasets-tree" style="margin-left:10px;margin-right:10px;padding:0px;margin:0px;overflow:auto;">
     <p-treeTable [value]="cswRecordTreeData" [columns]="treeCols" [resizableColumns]="true" selectionMode="checkbox" [(selection)]="selectedDatasetNodes">
-        <ng-template pTemplate="colgroup" let-columns>
-            <colgroup>
-                <col *ngFor="let col of columns" [(ngStyle)]="col.colStyle">
-            </colgroup>
-        </ng-template>
         <ng-template pTemplate="caption">
             <div style="text-align:left">
                 <p-treeTableHeaderCheckbox></p-treeTableHeaderCheckbox>
@@ -21,7 +16,7 @@
         </ng-template>
         <ng-template pTemplate="header" let-columns>
             <tr>
-                <th *ngFor="let col of columns" ttResizableColumn>
+                <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn>
                     {{col.header}}
                 </th>
             </tr>

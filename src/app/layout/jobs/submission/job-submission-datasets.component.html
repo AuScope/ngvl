@@ -10,22 +10,30 @@
 
         <!-- TODO: Delete/Download input context menu (and maybe action column) -->
 
-        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
-            <p-column field="name" header="Name" [style]="{'width':'20%'}"></p-column>
-            <p-column field="location" header="Location" [style]="{'width':'20%'}"></p-column>
-            <p-column header="Description" [style]="{'width':'30%'}">
-                <ng-template let-node="rowData" pTemplate="body">
-                    <span title="{{ node.data.description }}">{{ node.data.description }}</span>
-                </ng-template>
-            </p-column>
-            <p-column header="Details" [style]="{'width':'30%'}">
-                <ng-template let-node="rowData" pTemplate="body">
-                    <span *ngIf="node.data.leaf && node.parent.data.id==='remote'" title="{{ node.data.details }}">Service call to
-                        <a href="{{ node.data.details }}">{{ node.data.details }}</a>
-                    </span>
-                    <span *ngIf="node.data.leaf && node.parent.data.id==='upload'" title="{{ node.data.details }}">{{ node.data.details }}</span>
-                </ng-template>
-            </p-column>
+        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
+            <ng-template pTemplate="colgroup" let-columns>
+                <colgroup>
+                    <col *ngFor="let col of columns" [(ngStyle)]="col.colStyle">
+                </colgroup>
+            </ng-template>
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let col of columns" ttResizableColumn>{{ col.header }}</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                <tr [ttSelectableRow]="rowNode" [ttContextMenuRow]="rowNode">
+                    <td><p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
+                    <td>{{ rowData.location }}</td>
+                    <td title="{{ rowData.description }}">{{ rowData.description }}</td>
+                    <td title="{{ rowData.details }}">
+                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'" title="{{ rowData.details }}">Service call to
+                            <a href="{{ rowData.details }}">{{ rowData.details }}</a>
+                        </span>
+                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='upload'" title="{{ rowData.details }}">{{ rowData.details }}</span>
+                    </td>
+                </tr>
+            </ng-template>
         </p-treeTable>
     </div>
     <div class="card-footer">

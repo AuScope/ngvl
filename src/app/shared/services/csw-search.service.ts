@@ -4,11 +4,14 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { BookMark } from '../../shared/modules/vgl/models';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 
 @Injectable()
 export class CSWSearchService {
 
-    constructor(private httpClient: HttpClient, @Inject('env') private env) { }
+    constructor(private httpClient: HttpClient, @Inject('env') private env,private vgl: VglService) { }
 
 
     /**
@@ -93,6 +96,19 @@ export class CSWSearchService {
         }).map(response => {
             return response['data'];
         });
+    }    
+
+    public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {        
+        return this.vgl.getFilteredCSWRecord(fields,values,startPosition);
     }
+
+    public getBookMarks(): Observable <BookMark[]> {       
+        return this.vgl.getBookMarks();
+    }
+
+    public addBookMark(fileIdentifier : string, serviceId : string ) {           
+        return this.vgl.addBookMark(fileIdentifier,serviceId);
+    }
+
 
 }

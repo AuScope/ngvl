@@ -226,3 +226,9 @@ export interface DownloadOptions {
     srsName: string,
     featureType: string
 }
+
+export interface BookMark {    
+    fileIdentifier: string;
+    serviceId: string;
+    userId: string;        
+}

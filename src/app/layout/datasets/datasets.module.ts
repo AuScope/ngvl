@@ -7,9 +7,10 @@ import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
 import { ConfirmDatasetsModalContent } from './confirm-datasets.modal.component';
 import { DownloadOptionsModalContent } from './download-options.modal.component';
-import { NgbCollapseModule, NgbDatepickerModule, NgbModalModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbDatepickerModule, NgbModalModule, NgbTypeaheadModule,NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
+import { DatasetsDisplayComponent } from './datasets-display.component';
 
 
 @NgModule({
@@ -25,9 +26,10 @@ import { TreeTableModule } from 'primeng/treetable';
     NgbCollapseModule.forRoot(),
     NgbDatepickerModule.forRoot(),
     NgbModalModule.forRoot(),
-    NgbTypeaheadModule.forRoot()
+    NgbTypeaheadModule.forRoot(),
+    NgbTabsetModule.forRoot()
   ],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent],
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent, DatasetsDisplayComponent],
   entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent ]
 })
 export class DatasetsModule { }

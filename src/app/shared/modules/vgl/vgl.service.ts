@@ -3,7 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark} from './models';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
 
@@ -291,4 +292,32 @@ export class VglService {
   public getSolution(url: string): Observable<Solution> {
     return this.getEntry<Solution>(url);
   }
+
+  // Add to database dataset information that is bookmarked    
+  public addBookMark(fileIdentifier : string, serviceId : string ) {   
+    const options = {
+            params: { 
+                fileIdentifier: fileIdentifier,
+                serviceId: serviceId 
+            }
+    };   
+    return this.vglRequest('addBookMark.do', options);        
+  }
+
+  //get list of bookmarks for a user
+  public getBookMarks(): Observable <BookMark[]> {       
+    return this.vglRequest('getBookMarks.do');        
+  }
+
+  public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {
+    const options = {
+            params: {
+                key: fields,
+                value: values,            
+                start: startPosition.toString()            
+            }    
+    };
+    return this.vglRequest('getFilteredCSWRecords.do', options);           
+}
+
 }

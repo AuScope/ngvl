@@ -304,6 +304,16 @@ export class VglService {
     return this.vglRequest('addBookMark.do', options);        
   }
 
+  public removeBookMark(fileIdentifier : string, serviceId : string ) {   
+    const options = {
+            params: { 
+                fileIdentifier: fileIdentifier,
+                serviceId: serviceId 
+            }
+    };   
+    return this.vglRequest('deleteBookMark.do', options);        
+  }
+
   //get list of bookmarks for a user
   public getBookMarks(): Observable <BookMark[]> {       
     return this.vglRequest('getBookMarks.do');        

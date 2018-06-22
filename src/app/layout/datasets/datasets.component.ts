@@ -2,7 +2,6 @@ import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@ang
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
-import { DatasetsDisplayComponent } from './datasets-display.component';
 import { routerTransition } from '../../router.animations';
 import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
@@ -26,9 +25,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
     currentCSWRecordPage: number = 1;
-
-    @ViewChild('datasetsDisplay')
-    public datasetsDsiplay: DatasetsDisplayComponent;
 
     // Search results   
     cswSearchResults: CSWRecordModel[] = [];
@@ -95,7 +91,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // selecting a registry will populate results)
             this.facetedSearch();
             this.getFacetedKeywords();
-            this.getBookMarks();
+            this.getBookMarkCSWRecords();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -437,32 +433,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         return false;
     }
 
-    
+   
 
-    /**
-     * Bookmark a dataset as favourite
-     * @param cswRecord 
-     */
-    public addBookMark(cswRecord: CSWRecordModel) {
-        let serviceId: string = "";
-        let fileIdentifier: string = cswRecord.id;
-        //Get the service id information of the cswrecord by matching the record info(recordInfoUrl) with available registries.
-        for (let registry of this.availableRegistries) {
-            var matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
-            if (cswRecord.recordInfoUrl.indexOf(matchingUrl) != -1) {
-                serviceId = registry.id;
-                break;
-            }
-        }
-        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(data => {
-            console.log("Added  book mark " + data);
-        }, error => {
-            // TODO: Proper error reporting
-            console.log("Error adding bookmark " + error.message);
-        });
-    }
-
-    public getBookMarks() {
+    public getBookMarkCSWRecords() {
         let startPosition: number = 0;
         this.cswSearchService.getBookMarks().subscribe(data => {
             this.bookMarks = data;
@@ -485,4 +458,24 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         });
     }
 
+    onBookMarkChoice(selection) {
+        if(selection.choice === "add"){            
+            this.bookMarks.push(selection.mark);            
+            this.bookMarkCSWRecords.push(selection.cswRecord);
+        }
+        else if(selection.choice === "remove"){            
+            let index = this.bookMarks.findIndex(item => {
+                return ((item.fileIdentifier.indexOf(selection.mark.fileIdentifier) >= 0) && (item.serviceId.indexOf(selection.mark.serviceId) >= 0));                
+            });
+            if (index > -1) 
+                this.bookMarks.splice(index, 1);
+            let pos = this.bookMarkCSWRecords.findIndex(rec => {
+                return (rec.id === selection.cswRecord.id);
+            });
+            if (pos > -1) 
+                this.bookMarkCSWRecords.splice(index, 1);
+
+        }
+    }    
+    
 }

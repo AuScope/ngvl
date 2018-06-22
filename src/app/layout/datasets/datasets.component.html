@@ -219,7 +219,7 @@
                                                 </div>
                                                 <!-- Records -->
                                                 <div *ngIf="cswSearchResults.length>0">
-                                                    <app-datasets-display #datasetsDisplay [cswRecordList]="cswSearchResults" [registries]="availableRegistries"></app-datasets-display>
+                                                    <app-datasets-display [cswRecordList]="cswSearchResults" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
                                                     <!-- Record pagination -->
                                                     <div class="row" *ngIf="!recordsLoading" style="bottom:0;right:0px;">
                                                         <div class="col">
@@ -254,7 +254,7 @@
                                 <div class="row">
                                     <div class="col">
                                         <div *ngIf="bookMarkCSWRecords.length>0">
-                                            <app-datasets-display #datasetsDisplay [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries"></app-datasets-display>
+                                            <app-datasets-display [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
                                         </div>
                                     </div>
                                 </div>

@@ -110,5 +110,8 @@ export class CSWSearchService {
         return this.vgl.addBookMark(fileIdentifier,serviceId);
     }
 
+    public removeBookMark(fileIdentifier : string, serviceId : string ) {           
+        return this.vgl.removeBookMark(fileIdentifier,serviceId);
+    }
 
 }

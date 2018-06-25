@@ -230,5 +230,5 @@ export interface DownloadOptions {
 export interface BookMark {    
     fileIdentifier: string;
     serviceId: string;
-    userId: string;        
+    userId: string;
 }

@@ -17,11 +17,11 @@
                             <i class="fa fa-trash" style="color:red;"></i>
                         </button>
                         <div >
-                            <button *ngIf="isValidUser() && !isBookMark(cswRecord)" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
-                                <i class="fa fa-heart-o" style="font-size:10px;color:red;"></i>
+                            <button *ngIf="validUser && !isBookMark(cswRecord)" class="btn btn-sm" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
+                                <i class="fa fa-heart-o" style="color:red;"></i>
                             </button>
-                            <button *ngIf="isValidUser() && isBookMark(cswRecord)" data-toggle="tooltip" title="Remove as favourite" (click)="removeBookMark(cswRecord)">                                    
-                                    <i class="fa fa-heart" style="font-size:10px;color:red;"></i>
+                            <button *ngIf="validUser && isBookMark(cswRecord)" class="btn btn-sm" data-toggle="tooltip" title="Remove as favourite" (click)="removeBookMark(cswRecord)">                                    
+                                    <i class="fa fa-heart" style="color:red;"></i>
                             </button>
                         </div>
                     </span>

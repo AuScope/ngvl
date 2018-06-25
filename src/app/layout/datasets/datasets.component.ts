@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
+import { DatasetsDisplayComponent } from './datasets-display.component';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -7,7 +8,7 @@ import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { BookMark } from '../../shared/modules/vgl/models';
+import { ANONYMOUS_USER,BookMark } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
@@ -21,7 +22,7 @@ import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
     styleUrls: ['./datasets.component.scss'],
     animations: [routerTransition()]
 })
-export class DatasetsComponent implements OnInit, AfterViewChecked {
+export class DatasetsComponent implements OnInit, AfterViewChecked {    
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
     currentCSWRecordPage: number = 1;
@@ -54,6 +55,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     dateTo: any = null;
     dateFrom: any = null;
     availableRegistries: any = [];
+
+  
 
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
@@ -433,8 +436,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         return false;
     }
 
-   
-
+    isValidUser(): boolean {
+        let userName: string;
+        this.userStateService.user.subscribe(user => {
+            userName = user.fullName;
+        });
+        return (this.authService.isLoggedIn && (userName.search(ANONYMOUS_USER.fullName) == -1));
+    } 
+    
     public getBookMarkCSWRecords() {
         let startPosition: number = 0;
         this.cswSearchService.getBookMarks().subscribe(data => {
@@ -452,9 +461,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     }
                 });
             });
-        }, error => {
-            // TODO: Proper error reporting
-            console.log("Error getting bookmarks " + error.message);
+        }, error => {            
+            console.log(error.message);
         });
     }
 
@@ -464,18 +472,18 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             this.bookMarkCSWRecords.push(selection.cswRecord);
         }
         else if(selection.choice === "remove"){            
-            let index = this.bookMarks.findIndex(item => {
+            let index = this.bookMarks.findIndex(item => {                             
                 return ((item.fileIdentifier.indexOf(selection.mark.fileIdentifier) >= 0) && (item.serviceId.indexOf(selection.mark.serviceId) >= 0));                
             });
-            if (index > -1) 
-                this.bookMarks.splice(index, 1);
+            if (index > -1)            
+               this.bookMarks.splice(index, 1);            
             let pos = this.bookMarkCSWRecords.findIndex(rec => {
                 return (rec.id === selection.cswRecord.id);
             });
             if (pos > -1) 
-                this.bookMarkCSWRecords.splice(index, 1);
-
+                this.bookMarkCSWRecords.splice(pos, 1);
         }
+        
     }    
     
 }

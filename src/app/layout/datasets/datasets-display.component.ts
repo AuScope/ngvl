@@ -1,11 +1,10 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { ANONYMOUS_USER,BookMark } from '../../shared/modules/vgl/models';
+import { BookMark } from '../../shared/modules/vgl/models';
 import { RecordModalContent } from './record.modal.component';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AuthService, UserStateService } from '../../shared';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
 
@@ -20,13 +19,12 @@ export class DatasetsDisplayComponent implements OnInit {
     @Input() registries: any = [];
     @Input() cswRecordList: CSWRecordModel[] = [];    
     @Input() bookMarkList: BookMark[] = []; 
+    @Input() validUser = false;
     
     @Output() bookMarkChoice = new EventEmitter();    
 
     constructor(private olMapService: OlMapService,
-        private cswSearchService: CSWSearchService,
-        private userStateService: UserStateService,
-        private authService: AuthService,
+        private cswSearchService: CSWSearchService,                
         private modalService: NgbModal) { }
 
     ngOnInit() {
@@ -96,13 +94,7 @@ export class DatasetsDisplayComponent implements OnInit {
         }
     }
 
-    private isValidUser(): boolean {
-        let userName: string;
-        this.userStateService.user.subscribe(user => {
-            userName = user.fullName;
-        });
-        return (this.authService.isLoggedIn && (userName.search(ANONYMOUS_USER.fullName) == -1));
-    }
+    
 
     public getServiceId(cswRecord: CSWRecordModel) {
         let serviceId: string = "";
@@ -126,12 +118,10 @@ export class DatasetsDisplayComponent implements OnInit {
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
         let BookMark
-        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(data => {
-            this.bookMarkChoice.emit({ choice: "add", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });           
-            console.log("Added  book mark " + data);
-        }, error => {
-            // TODO: Proper error reporting
-            console.log("Error adding bookmark " + error.message);
+        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(data => {            
+            this.bookMarkChoice.emit({ choice: "add", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
+        }, error => {         
+            console.log(error.message);
         });
     }
 
@@ -150,12 +140,10 @@ export class DatasetsDisplayComponent implements OnInit {
     public removeBookMark(cswRecord: CSWRecordModel) {
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
-        this.cswSearchService.removeBookMark(fileIdentifier, serviceId).subscribe(data => {
-            this.bookMarkChoice.emit({ choice: "remove", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });           
-            console.log("deleted  book mark " + data);
-        }, error => {
-            // TODO: Proper error reporting
-            console.log("Error adding bookmark " + error.message);
+        this.cswSearchService.removeBookMark(fileIdentifier, serviceId).subscribe(data => {            
+            this.bookMarkChoice.emit({ choice: "remove", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
+        }, error => {            
+            console.log(error.message);
         });
     }
 }

@@ -219,7 +219,7 @@
                                                 </div>
                                                 <!-- Records -->
                                                 <div *ngIf="cswSearchResults.length>0">
-                                                    <app-datasets-display [cswRecordList]="cswSearchResults" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
+                                                    <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="cswSearchResults" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
                                                     <!-- Record pagination -->
                                                     <div class="row" *ngIf="!recordsLoading" style="bottom:0;right:0px;">
                                                         <div class="col">
@@ -247,15 +247,15 @@
                             </div>
                         </ng-template>
                     </ngb-tab>
-                    <ngb-tab class="card-header" title="Bookmarks">
-                        <ng-template ngbTabContent>
+                    <ngb-tab *ngIf="isValidUser() && bookMarkCSWRecords.length>0" class="card-header" title="Bookmarks">
+                        <ng-template ngbTabContent >
                             <div class="card-body">
                                 <!-- Any text search -->
                                 <div class="row">
                                     <div class="col">
                                         <div *ngIf="bookMarkCSWRecords.length>0">
-                                            <app-datasets-display [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
-                                        </div>
+                                            <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
+                                        </div>                                        
                                     </div>
                                 </div>
                             </div>

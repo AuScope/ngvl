@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+
+import { AuthGuard } from '../shared';
 import { LayoutComponent } from './layout.component';
 
 const routes: Routes = [
@@ -10,8 +12,9 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard' },
       { path: 'dashboard', loadChildren: './dashboard/dashboard.module#DashboardModule' },
       { path: 'data', loadChildren: './datasets/datasets.module#DatasetsModule' },
-      { path: 'solutions', loadChildren: './solutions/solutions.module#SolutionsModule' },
-      { path: 'jobs', loadChildren: './jobs/jobs.module#JobsModule' },
+      { path: 'solutions', loadChildren: './solutions/solutions.module#SolutionsModule', canActivate: [AuthGuard] },
+      { path: 'jobs', loadChildren: './jobs/jobs.module#JobsModule', canActivate: [AuthGuard] },
+      { path: 'wizard', loadChildren: './job-wizard/job-wizard.module#JobWizardModule', canActivate: [AuthGuard]},
       { path: 'charts', loadChildren: './charts/charts.module#ChartsModule' },
       { path: 'tables', loadChildren: './tables/tables.module#TablesModule' },
       { path: 'forms', loadChildren: './form/form.module#FormModule' },

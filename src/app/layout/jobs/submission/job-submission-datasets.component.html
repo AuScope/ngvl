@@ -7,9 +7,7 @@
             a dataset from the
             <a href="/data">datasets page</a>.
         </div>
-
-        <!-- TODO: Delete/Download input context menu (and maybe action column) -->
-
+        <!-- TODO: Actions currently via context menu, do we need an action column to match some other tables? -->
         <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single"
             [(selection)]="selectedJobInputNode" (onNodeSelect)="jobInputSelected($event)" [contextMenu]="jobInputContextMenu"
             [(contextMenuSelection)]="selectedContextNode" (onContextMenuSelect)="contextMenuSelected($event)">

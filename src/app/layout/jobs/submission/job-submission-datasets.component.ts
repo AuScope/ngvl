@@ -177,7 +177,7 @@ export class JobSubmissionDatasetsComponent {
         this.userStateService.jobDownloads.subscribe(
             jobDownloads => {
                 for (const download of jobDownloads) {
-                    this.addJobDownloadToTree(download/*, download.parent !== undefined ? download.parent.id : undefined*/);
+                    this.addJobDownloadToTree(download);
                 }
             }, error => {
                 // TODO: Better error reporting
@@ -188,9 +188,6 @@ export class JobSubmissionDatasetsComponent {
         // Uploaded job files
         this.userStateService.uploadedFiles.subscribe(
             uploadedFiles => {
-
-                //this.uploadedFiles = uploadedFiles;
-
                 for (const jobFile of uploadedFiles) {
                     this.addJobFileUploadToTree(jobFile);
                 }
@@ -201,7 +198,7 @@ export class JobSubmissionDatasetsComponent {
         const copiedJobFiles = this.userStateService.jobCloudFiles.subscribe(
             jobCloudFiles => {
                 for (const jobFile of jobCloudFiles) {
-                    this.addJobCloudFileToTree(jobFile/*, jobId*/);
+                    this.addJobCloudFileToTree(jobFile);
                 }
             }
         );
@@ -289,11 +286,6 @@ export class JobSubmissionDatasetsComponent {
                 const modalRef = this.modalService.open(JobInputsBrowserModalContent, { size: 'lg' });
                 modalRef.result.then((result) => {
                     for (let download of result.jobDownloads) {
-
-
-                        // XXX TEST THAT JOB IS PART OF JobDownload, OR REMOVE parent AND ADD jobId
-
-
                         this.userStateService.addJobDownload(download);
                     }
                     for (let cloudFile of result.jobCloudFiles) {

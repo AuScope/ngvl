@@ -97,30 +97,32 @@ export class VglService {
     }
 
     public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
-        const options = {
+        return this.http.get(environment.portalBaseUrl + 'secure/downloadFile.do', {
             params: {
                 jobId: jobId.toString(),
                 filename: filename,
                 key: key
             },
-            responseType: 'text'
-        };
-
-        return this.vglRequest('secure/downloadFile.do', options)
-            .catch((error: Response) => Observable.throw(error));
+            responseType: 'blob'
+        }).map((response) => {
+            return response;
+        }).catch((error: Response) => {
+            return Observable.throw(error);
+        });
     }
 
     public downloadFilesAsZip(jobId: number, filenames: string[]): Observable<any> {
-        const options = {
+        return this.http.get(environment.portalBaseUrl + 'secure/downloadAsZip.do', {
             params: {
                 jobId: jobId.toString(),
                 files: filenames.toString()
             },
             responseType: 'blob'
-        };
-
-        return this.vglRequest('secure/downloadAsZip.do', options)
-            .catch((error: Response) => Observable.throw(error));
+        }).map((response) => {
+            return response;
+        }).catch((error: Response) => {
+            return Observable.throw(error);
+        });
     }
 
     public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<string> {

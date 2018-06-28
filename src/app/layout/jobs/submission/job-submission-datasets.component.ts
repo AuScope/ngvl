@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { TreeJobs, TreeJobNode, JobDownload, JobFile, CloudFileInformation } from '../../../shared/modules/vgl/models';
-import { DataSelectionService, UserStateService } from '../../../shared';
+import { UserStateService } from '../../../shared';
 import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.component';
 import { TreeNode } from 'primeng/api';
 import { JobsService } from '../jobs.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
+import { VglService } from '../../../shared/modules/vgl/vgl.service';
 
 
 @Component({
@@ -20,14 +21,18 @@ export class JobSubmissionDatasetsComponent {
     // Job input file tree (input type root nodes added to this)
     jobInputNodes: TreeNode[];
     treeCols = [
-        { header: 'Name', field: 'name', colStyle: {'width': '20%'} },
-        { header: 'Location', field: 'location', colStyle: {'width': '20%'} },
-        { header: 'Description', field: 'description', colStyle: {'width': '30%'} },
-        { header: 'Details', field: 'details', colStyle: {'width': '30%'} }
+        { header: 'Name', field: 'name', colStyle: { 'width': '20%' } },
+        { header: 'Location', field: 'location', colStyle: { 'width': '20%' } },
+        { header: 'Description', field: 'description', colStyle: { 'width': '30%' } },
+        { header: 'Details', field: 'details', colStyle: { 'width': '30%' } }
     ];
 
     // Selected input (single selection)
-    selectedJobInputNode: any;
+    selectedJobInputNode: TreeNode;
+
+    // Context menu selection (only stored so we can clear it when user makes
+    // a non-context selection)
+    selectedContextNode: TreeNode;
 
     // Root remote web service node (user selected datasets and copied remote downloads)
     rootRemoteWebServiceDownloads: TreeNode = {
@@ -51,19 +56,20 @@ export class JobSubmissionDatasetsComponent {
         children: []
     }
 
-    // Files user has selected for upload, copied from UserStateService
-    uploadedFiles: any[] = [];
+    // Job download context menu and actions
+    jobInputContextMenuItems = [];
 
-    // Job download context menu
-    jobInputContextMenuItems = [{
+    downloadContextMenuAction = {
         label: 'Download to your machine',
         icon: 'fa fa-download',
         command: (event) => this.downloadSelectedInput()
-    }, {
+    }
+
+    deleteContextMenuAction = {
         label: 'Delete this input',
         icon: 'fa fa-times',
         command: (event) => this.deleteSelectedInput()
-    }];
+    }
 
     // Add remote download modal fields
     remoteUrl: string = "";
@@ -73,7 +79,7 @@ export class JobSubmissionDatasetsComponent {
 
 
     constructor(private jobsService: JobsService, private userStateService: UserStateService,
-        private dataSelectionService: DataSelectionService, private modalService: NgbModal) {
+        private vglService: VglService, private modalService: NgbModal) {
         this.loadJobInputs();
     }
 
@@ -81,10 +87,9 @@ export class JobSubmissionDatasetsComponent {
     /**
      * Add a JobDownload (dataset) or copied Job input to the Tree
      * 
-     * @param jobDownload the JobDOwnload object
-     * @param copiedJobId true if input was copied from an existing job, false otherwise
+     * @param jobDownload the JobDownload object
      */
-    private addJobDownloadToTree(jobDownload: JobDownload, isCopied: boolean) {
+    private addJobDownloadToTree(jobDownload: JobDownload) {
         const jobDownloadTreeNode: TreeNode = {
             data: {
                 name: jobDownload.name,
@@ -92,41 +97,49 @@ export class JobSubmissionDatasetsComponent {
                 description: jobDownload.description,
                 details: jobDownload.url,
                 input: jobDownload,
-                isCopied: isCopied,
                 leaf: true
             }
         }
         this.rootRemoteWebServiceDownloads.children.push(jobDownloadTreeNode);
         this.rootRemoteWebServiceDownloads.expanded = true;
+
+        // Add remote download root node to tree if it isn't already
+        if (this.jobInputNodes.find(j => j.data.id === 'remote') === undefined) {
+            this.rootRemoteWebServiceDownloads.expanded = true;
+            this.jobInputNodes.push(this.rootRemoteWebServiceDownloads);
+        }
     }
 
 
     /**
-     * Add a CloudFileInformation object (copied job file) to the Tree
+     * Add a CloudFileInformation object (copied from existing job) to the Tree
      * 
      * @param cloudFile CloudFileInformation file to add to tree
-     * @param jobId: the associated Job ID
      */
-    private addJobCloudFileToTree(jobFile: CloudFileInformation, jobId: number) {
+    private addJobCloudFileToTree(cloudFile: CloudFileInformation) {
         const jobFileNode: TreeNode = {
             data: {
-                name: jobFile.name,
+                name: cloudFile.name,
                 location: 'Local directory',
                 description: 'This file will be made available to the job upon startup. It will be put in the same working directory as the job script.',
-                details: (jobFile.size / 1000) + ' KB',
-                input: jobFile,
-                jobId: jobId,
-                isCopied: true,
+                details: (cloudFile.size / 1000) + ' KB',
+                input: cloudFile,
                 leaf: true
             }
         }
         this.rootFileDownloads.children.push(jobFileNode);
         this.rootFileDownloads.expanded = true;
+
+        // Add job file root node to tree if it isn't already
+        if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+            this.rootFileDownloads.expanded = true;
+            this.jobInputNodes.push(this.rootFileDownloads);
+        }
     }
 
 
     /**
-     * Add a Job file upload to the Tree. Will be stored locally and in USerStateService
+     * Add a Job file upload to the Tree
      * 
      * @param file the file object to be added to the Tree
      */
@@ -137,15 +150,18 @@ export class JobSubmissionDatasetsComponent {
                 location: 'Local directory',
                 description: 'This file will be made available to the job upon startup. It will be put in the same working directory as the job script.',
                 details: (file.size / 1000) + ' KB',
-
-                // TODO: Still use this
                 input: file,
-
                 leaf: true
             }
         }
         this.rootFileDownloads.children.push(jobFileNode);
         this.rootFileDownloads.expanded = true;
+
+        // Add job file root node to tree if it isn't already
+        if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+            this.rootFileDownloads.expanded = true;
+            this.jobInputNodes.push(this.rootFileDownloads);
+        }
     }
 
 
@@ -157,49 +173,71 @@ export class JobSubmissionDatasetsComponent {
         this.rootFileDownloads.children = [];
         this.rootRemoteWebServiceDownloads.children = [];
 
-        // Job downloads from data selection service (local storage)
-        let jobDownloads: JobDownload[] = this.dataSelectionService.getJobDownloads();
-        for (const download of jobDownloads) {
-            this.addJobDownloadToTree(download, false);
-        }
-
-        // Job downloads copied from existing jobs
-        const copiedJobDownloads = this.dataSelectionService.getCopiedJobDownloads();
-        for (const download of copiedJobDownloads) {
-            this.addJobDownloadToTree(download, true);
-        }
-
-        // Uploaded job files (temporarily stored in UserStateService)
-        this.userStateService.uploadedFiles.subscribe(
-            uploadedFiles => {
-                this.uploadedFiles = uploadedFiles;
+        // Retrieve job downloads
+        this.userStateService.jobDownloads.subscribe(
+            jobDownloads => {
+                for (const download of jobDownloads) {
+                    this.addJobDownloadToTree(download/*, download.parent !== undefined ? download.parent.id : undefined*/);
+                }
+            }, error => {
+                // TODO: Better error reporting
+                console.log(error.message);
             }
         );
-        for (const jobFile of this.uploadedFiles) {
-            this.addJobFileUploadToTree(jobFile);
-        }
+
+        // Uploaded job files
+        this.userStateService.uploadedFiles.subscribe(
+            uploadedFiles => {
+
+                //this.uploadedFiles = uploadedFiles;
+
+                for (const jobFile of uploadedFiles) {
+                    this.addJobFileUploadToTree(jobFile);
+                }
+            }
+        );
 
         // Job files copied from jobs
-        const copiedJobFiles = this.dataSelectionService.getJobCloudFiles();
-        const jobId: number = copiedJobFiles.copiedJobId;
-        if(copiedJobFiles.hasOwnProperty('copiedJobFiles')) {
-            const cloudFiles: CloudFileInformation[] = copiedJobFiles.copiedJobFiles;
-            for (const jobFile of cloudFiles) {
-                this.addJobCloudFileToTree(jobFile, jobId);
+        const copiedJobFiles = this.userStateService.jobCloudFiles.subscribe(
+            jobCloudFiles => {
+                for (const jobFile of jobCloudFiles) {
+                    this.addJobCloudFileToTree(jobFile/*, jobId*/);
+                }
             }
-        }
+        );
+    }
 
-        // Add root download node if any were added
-        if (this.rootRemoteWebServiceDownloads.children.length > 0) {
-            this.rootRemoteWebServiceDownloads.expanded = true;
-            this.jobInputNodes.push(this.rootRemoteWebServiceDownloads);
-        }
 
-        // Add root file node if any were added
-        if (this.rootFileDownloads.children.length > 0) {
-            this.rootFileDownloads.expanded = true;
-            this.jobInputNodes.push(this.rootFileDownloads);
+    /**
+     * Input node selected in Tree, builds context menu based on selection
+     * 
+     * @param event the selection event, intended to clear the existing
+     *              context selection but not working
+     */
+    public jobInputSelected(event) {
+        this.selectedContextNode = event.node;
+    }
+
+
+    /**
+     * Context menu event fired. Select the node the event was fired from and
+     * build context menu based on input
+     * 
+     * @param event the context menu event used to get the appropriate node
+     */
+    public contextMenuSelected(event) {
+        // Make sure this acts as a node selection event as well
+        this.selectedJobInputNode = event.node;
+
+        // Build context menu
+        this.jobInputContextMenuItems = [];
+        // All items except files user has uploaded can be downloaded
+        if (this.selectedJobInputNode.parent.data.id === 'remote' ||
+            (this.selectedJobInputNode.data.leaf && this.selectedJobInputNode.data.input.hasOwnProperty('jobId'))) {
+            this.jobInputContextMenuItems.push(this.downloadContextMenuAction);
         }
+        // All items can deleted regardless of type
+        this.jobInputContextMenuItems.push(this.deleteContextMenuAction);
     }
 
 
@@ -208,18 +246,15 @@ export class JobSubmissionDatasetsComponent {
      */
     private downloadSelectedInput(): void {
         if (this.selectedJobInputNode.parent.data.id === 'upload') {
-            // TODO: Don't show download menu if the input has been uploaded
-            if (this.selectedJobInputNode.data.isCopied) {
-                this.jobsService.downloadFile(this.selectedJobInputNode.data.jobId, this.selectedJobInputNode.data.name, this.selectedJobInputNode.data.name).subscribe(
-                    response => {
-                        saveAs(response, this.selectedJobInputNode.data.name);
-                    },
-                    error => {
-                        //TODO: Proper error reporting
-                        console.log(error.message);
-                    }
-                )
-            }
+            // TODO: Single file downloads assumed to be text by VglService response type... OK?
+            this.vglService.downloadFile(this.selectedJobInputNode.data.input.jobId, this.selectedJobInputNode.data.input.name, this.selectedJobInputNode.data.input.name).subscribe(
+                response => {
+                    saveAs(response, this.selectedJobInputNode.data.input.name);
+                }, error => {
+                    //TODO: Proper error reporting
+                    console.log(error.message);
+                }
+            );
         } else if (this.selectedJobInputNode.parent.data.id === 'remote') {
             window.open(this.selectedJobInputNode.data.input.url);
         }
@@ -227,34 +262,25 @@ export class JobSubmissionDatasetsComponent {
 
 
     /**
-     * Delete the selected input from the Tree and either the UserStateService
-     * (uploads) or DataSelectionService (datasets and copied cloud files)
+     * Delete the selected input from the Tree and the UserStateService
+     * (uploads, datasets and copied cloud files)
      */
     private deleteSelectedInput(): void {
         if (this.selectedJobInputNode.parent.data.id === 'upload') {
-            if (this.selectedJobInputNode.data.isCopied) {
-                this.dataSelectionService.removeJobCloudFile(this.selectedJobInputNode.data.input);
+            if (this.selectedJobInputNode.data.input.hasOwnProperty('cloudKey')) {
+                this.userStateService.removeCloudFile(this.selectedJobInputNode.data.input);
             } else {
-                //this.dataSelectionService.removeJobFile(this.selectedJobInputNode.data.input);
-                const index: number = this.uploadedFiles.indexOf(this.selectedJobInputNode.data.input);
-                if (index !== -1) {
-                    this.uploadedFiles.splice(index, 1);
-                    this.userStateService.setUploadedFiles(this.uploadedFiles);
-                }
+                this.userStateService.removeUploadedFile(this.selectedJobInputNode.data.input);
             }
         } else if (this.selectedJobInputNode.parent.data.id === 'remote') {
-            if (this.selectedJobInputNode.data.isCopied) {
-                this.dataSelectionService.removeCopiedJobDownload(this.selectedJobInputNode.data.input);
-            } else {
-                this.dataSelectionService.removeJobDownload(this.selectedJobInputNode.data.input);
-            }
+            this.userStateService.removeJobDownload(this.selectedJobInputNode.data.input);
         }
         this.loadJobInputs();
     }
 
 
     /**
-     * Copy inouts from an existing Job. Inputs will be JobDownloads (datasets)
+     * Copy inputs from an existing Job. Inputs will be JobDownloads (datasets)
      * or CloudFileInformation (copied job files)
      */
     public copyFromJob(): void {
@@ -262,8 +288,18 @@ export class JobSubmissionDatasetsComponent {
             treeJobs => {
                 const modalRef = this.modalService.open(JobInputsBrowserModalContent, { size: 'lg' });
                 modalRef.result.then((result) => {
-                    this.dataSelectionService.setCopiedJobDownloads(result.jobDownloads, result.jobId);
-                    this.dataSelectionService.setJobCloudFiles(result.jobCloudFiles, result.jobId);
+                    for (let download of result.jobDownloads) {
+
+
+                        // XXX TEST THAT JOB IS PART OF JobDownload, OR REMOVE parent AND ADD jobId
+
+
+                        this.userStateService.addJobDownload(download);
+                    }
+                    for (let cloudFile of result.jobCloudFiles) {
+                        cloudFile.jobId = result.jobId;
+                        this.userStateService.addCloudFile(cloudFile);
+                    }
                     // TODO: Can probably just add new ones instead of full reload,
                     // but will help keep in sync until better logic is added
                     this.loadJobInputs();
@@ -291,22 +327,17 @@ export class JobSubmissionDatasetsComponent {
                     description: this.remoteDescription,
                     url: this.remoteUrl,
                     localPath: this.remoteLocation,
-
-                    // TODO: XXX Effectively server session vars, do we need proper defaults or will these do?
-                    //id: -1,
                     northBoundLatitude: -1,
                     southBoundLatitude: -1,
                     eastBoundLongitude: -1,
                     westBoundLongitude: -1,
                     owner: '',
                     parentUrl: '',
-                    parentName: ''
+                    parentName: '',
+                    parent: undefined   // No Job associated with this download at this stage
                 }
-                this.addJobDownloadToTree(jobDownload, false);
-                // Persist to local storage
-                let downloads: JobDownload[] = this.dataSelectionService.getJobDownloads();
-                downloads.push(jobDownload);
-                this.dataSelectionService.setJobDownloads(downloads);
+                this.addJobDownloadToTree(jobDownload);
+                this.userStateService.addJobDownload(jobDownload);
                 this.loadJobInputs();
             }
         });
@@ -316,14 +347,15 @@ export class JobSubmissionDatasetsComponent {
     /**
      * Upload a file. Will be stored locally and persisted in UserStateService
      * for actual upload to server when Job is created
+     * 
+     * @param event the upload event, will contain the file
      */
     public uploadFile(event): void {
         for (let file of event.target.files) {
             // Add to tree
             this.addJobFileUploadToTree(file);
-            // Add to local list of uploads and persist in UserStateService
-            this.uploadedFiles.push(file);
-            this.userStateService.setUploadedFiles(this.uploadedFiles);
+            // Store
+            this.userStateService.addUploadedFile(file);
         }
         if (!this.jobInputNodes.find(node => node === this.rootFileDownloads)) {
             this.jobInputNodes.push(this.rootFileDownloads);

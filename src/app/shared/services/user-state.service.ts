@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails } from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation } from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
 
 import { environment } from '../../../environments/environment';
@@ -37,6 +37,12 @@ export class UserStateService {
     
     private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
     public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
+
+    private _jobDownloads: BehaviorSubject<JobDownload[]> = new BehaviorSubject([]);
+    public readonly jobDownloads: Observable<JobDownload[]> = this._jobDownloads.asObservable();
+
+    private _jobCloudFiles: BehaviorSubject<CloudFileInformation[]> = new BehaviorSubject([]);
+    public readonly jobCloudFiles: Observable<CloudFileInformation[]> = this._jobCloudFiles.asObservable();
 
     public setView(viewType: ViewType): Observable<ViewType> {
         this._currentView.next(viewType);
@@ -111,8 +117,69 @@ export class UserStateService {
     return solutions;
   }
 
+  // Files User has uploaded for a Job
   public setUploadedFiles(files: any[]): void {
       this._uploadedFiles.next(files);
+  }
+
+  public addUploadedFile(file: any) {
+      let uploadedFiles: any[] = this._uploadedFiles.getValue();
+      uploadedFiles.push(file);
+      this._uploadedFiles.next(uploadedFiles);
+  }
+
+  public removeUploadedFile(file: any): void {
+      let uploadedFiles: any[] = this._uploadedFiles.getValue();
+      uploadedFiles.forEach((item, index) => {
+        if(item === file) {
+            uploadedFiles.splice(index, 1);
+        }
+      });
+      this._uploadedFiles.next(uploadedFiles);
+  }
+
+  // Remote web services User requests as Job inputs. Whether parent (Job)
+  // field is set determines if it's newly selected or copied from an existing
+  // Job
+  public setJobDownloads(jobDownloads: JobDownload[]) {
+      this._jobDownloads.next(jobDownloads);
+  }
+
+  public addJobDownload(jobDownload: JobDownload) {
+      let jobDownloads: JobDownload[] = this._jobDownloads.getValue();
+      jobDownloads.push(jobDownload);
+      this._jobDownloads.next(jobDownloads);
+  }
+
+  public removeJobDownload(jobDownload: JobDownload): void {
+    let jobDownloads: any[] = this._jobDownloads.getValue();
+    jobDownloads.forEach((item, index) => {
+      if(item === jobDownload) {
+          jobDownloads.splice(index, 1);
+      }
+    });
+    this._jobDownloads.next(jobDownloads);
+  }
+
+  // Copied cloud files User requests for a Job (input)
+  public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
+    this._jobCloudFiles.next(jobCloudFiles);
+  }
+
+  public addCloudFile(cloudFile: CloudFileInformation) {
+      let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
+      cloudFiles.push(cloudFile);
+      this._jobCloudFiles.next(cloudFiles);
+  }
+
+  public removeCloudFile(cloudFile: CloudFileInformation): void {
+    let cloudFiles: any[] = this._jobCloudFiles.getValue();
+    cloudFiles.forEach((item, index) => {
+      if(item === cloudFile) {
+          cloudFiles.splice(index, 1);
+      }
+    });
+    this._jobCloudFiles.next(cloudFiles);
   }
 
 }

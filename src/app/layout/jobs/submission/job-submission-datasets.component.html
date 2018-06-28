@@ -10,7 +10,9 @@
 
         <!-- TODO: Delete/Download input context menu (and maybe action column) -->
 
-        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single" [(selection)]="selectedJobInputNode" [contextMenu]="jobInputContextMenu">
+        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single"
+            [(selection)]="selectedJobInputNode" (onNodeSelect)="jobInputSelected($event)" [contextMenu]="jobInputContextMenu"
+            [(contextMenuSelection)]="selectedContextNode" (onContextMenuSelect)="contextMenuSelected($event)">
             <ng-template pTemplate="header" let-columns>
                 <tr>
                     <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn>{{ col.header }}</th>
@@ -18,7 +20,8 @@
             </ng-template>
             <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
                 <tr [ttSelectableRow]="rowNode" [ttContextMenuRow]="rowNode">
-                    <td><p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
+                    <td>
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
                     <td>{{ rowData.location }}</td>
                     <td title="{{ rowData.description }}">{{ rowData.description }}</td>
                     <td title="{{ rowData.details }}">

@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
-
 import { UserStateService } from '../../shared';
-import { Solution } from '../../shared/modules/vgl/models';
+import { routerTransition } from '../../router.animations';
+
 
 @Component({
   selector: 'app-job-wizard',
   templateUrl: './job-wizard.component.html',
-  styleUrls: ['./job-wizard.component.scss']
+  styleUrls: ['./job-wizard.component.scss'],
+  animations: [routerTransition()]
 })
 export class JobWizardComponent implements OnInit {
 

@@ -16,8 +16,10 @@ import { CSWSearchService } from '../shared/services/csw-search.service';
 import { RecordModalContent } from './datasets/record.modal.component';
 import { SolutionsModule } from './solutions/solutions.module';
 import { DatasetsModule } from './datasets/datasets.module';
+import { JobsModule } from './jobs/jobs.module';
 import { UserModule } from './user/user.module';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { JobWizardModule } from './job-wizard/job-wizard.module';
 
 
 @NgModule({
@@ -30,8 +32,10 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
         NgbModule.forRoot(),
         SolutionsModule,
         DatasetsModule,
+        JobsModule,
         UserModule,
-        OverlayPanelModule
+        OverlayPanelModule,
+        JobWizardModule
     ],
     declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent ],
     providers: [ CSWSearchService ],

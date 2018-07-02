@@ -1,6 +1,5 @@
 import { Component, Input, ViewChild, Output } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-//import { DataSelectionService } from '../../../shared';
 import { Job, JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
 import { JobBrowserComponent } from '../job-browser.component';
 import { JobInputsComponent } from '../job-inputs.component';

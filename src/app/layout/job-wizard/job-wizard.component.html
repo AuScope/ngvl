@@ -1,0 +1,34 @@
+<div [@routerTransition]>
+
+  <div class="page-header">
+    <h1>Input data</h1>
+    <hr>
+  </div>
+  <p>
+    <job-submission-datasets></job-submission-datasets>
+  </p>
+
+  <div class="page-header">
+    <h1>Solutions</h1>
+    <hr>
+  </div>
+  <p>
+    <app-job-solutions-summary></app-job-solutions-summary>
+  </p>
+
+  <div class="page-header">
+    <h1>Job object</h1>
+    <hr>
+  </div>
+  <p>Job object widget</p>
+
+  <div class="page-header">
+    <h1>Review</h1>
+    <hr>
+  </div>
+  <p>
+    <button class="btn btn-secondary" [disabled]="jobIncomplete">Submit</button>
+    <button class="btn btn-secondary">Cancel</button>
+  </p>
+
+</div>

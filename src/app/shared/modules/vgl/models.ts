@@ -118,7 +118,7 @@ export class JobDownload {
     southBoundLatitude: number;
     eastBoundLongitude: number;
     westBoundLongitude: number;
-    //parent: Job;    // needed?
+    parent: Job;
     owner: string;
     parentUrl: string;
     parentName: string;
@@ -162,6 +162,8 @@ export interface CloudFileInformation {
     cloudKey: string;
     publicUrl: string;
     fileHash: string;
+
+    jobId: number;
 }
 
 export interface Series {

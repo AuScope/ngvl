@@ -14,7 +14,6 @@ import { CustomReuseStrategy } from './app-custom-reuse-strategy';
 import { AuthGuard, AuthService } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
 import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
-import { DataSelectionService } from './shared';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
 import { UserModule } from './layout/user/user.module';
@@ -45,7 +44,7 @@ export function createTranslateLoader(http: HttpClient) {
     UserModule
   ],
   declarations: [AppComponent],
-  providers: [AuthGuard, AuthService, DataSelectionService, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
+  providers: [AuthGuard, AuthService, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

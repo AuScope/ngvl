@@ -6,7 +6,7 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-import { DataSelectionService, UserStateService } from '../../shared';
+import { UserStateService } from '../../shared';
 import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
@@ -38,13 +38,12 @@ export class ConfirmDatasetsModalContent {
 
 
     constructor(public activeModal: NgbActiveModal, private modalService: NgbModal,
-        private vglService: VglService, private userStateService: UserStateService,
-        private dataSelectionService: DataSelectionService) { }
+        private vglService: VglService, private userStateService: UserStateService) { }
 
 
     /**
      * TODO: This lazily opens the download URL in a new window, so this won't
-     * work for mobile devices
+     * work on mobile devices
      * 
      * @param onlineResource 
      * @param dlOptions 
@@ -159,7 +158,7 @@ export class ConfirmDatasetsModalContent {
     /**
      * User has selected to save the selected datasets
      * 
-     * TODO: Maybe don't reset selections every time, just add new selections
+     * TODO: Don't reset selections every time, just add new selections
      */
     public captureData(): void {
         // Turn leaf selections into JobDownloads
@@ -176,8 +175,8 @@ export class ConfirmDatasetsModalContent {
             if(makeUrls.length > 0) {
                 forkJoin(makeUrls).subscribe(results => {
                     this.capturedJobDownloadCount = results.length;
-                    // Persist data selections to local storage
-                    this.dataSelectionService.setJobDownloads(<JobDownload[]>results);
+                    // Persist data selections to user state service
+                    this.userStateService.setJobDownloads(<JobDownload[]>results);
                     // Display selection OK modal
                     this.modalService.open(this.selectedDatasetsOkModal);
                     this.activeModal.close();

@@ -47,6 +47,7 @@ import { JobInputsBrowserModalContent } from './submission/job-inputs-browser.mo
         PlainTextPreview, TtlPreview, JobStatusModalContent
     ],
     entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, JobStatusModalContent, JobInputsBrowserModalContent ],
-    providers: [ JobsService, ConfirmationService ]
+    providers: [ JobsService, ConfirmationService ],
+    exports: [ JobSubmissionDatasetsComponent ]
 })
 export class JobsModule { }

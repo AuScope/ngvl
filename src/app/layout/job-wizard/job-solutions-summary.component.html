@@ -1,10 +1,26 @@
-<ul class="list-group list-group-flush">
-  <li class="list-group-item d-flex justify-content-between" *ngFor="let solution of userStateService.selectedSolutions | async">
-    <span class="text-truncate">{{ solution.name }}</span>
-    <span class="cart-icons">
-      <a role="button" (click)="removeSolution(solution)">
-        <i class="fa fa-times"></i>
-      </a>
-    </span>
-  </li>
-</ul>
+<div class="row">
+  <div class="col-md">
+    <div class="list-group">
+      <button *ngFor="let solution of userStateService.selectedSolutions | async"
+        type="button"
+        class="list-group-item list-group-item-action flex-column align-items-start"
+        [class.active]="solution.isActive"
+        (click)="toggleSolution(solution)">
+        <div class="d-flex w-100 justify-content-between" style="width:100%">
+          <h5 class="mb-1">{{ solution.name }}</h5>
+          <small>
+            <a role="button" (click)="removeSolution(solution)">
+              <i class="fa fa-times"></i>
+            </a>
+          </small>
+        </div>
+        <p class="mb-1" [ngbCollapse]="!solution.isActive">
+          {{ solution.description }}
+        </p>
+      </button>
+    </div>
+  </div>
+  <div class="col-md">
+    <p>Solution inputs</p>
+  </div>
+</div>

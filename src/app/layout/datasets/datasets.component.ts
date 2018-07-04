@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
-import { DatasetsDisplayComponent } from './datasets-display.component';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 
@@ -8,7 +7,7 @@ import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { ANONYMOUS_USER,BookMark } from '../../shared/modules/vgl/models';
+import { ANONYMOUS_USER,BookMark,Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
@@ -31,7 +30,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     cswSearchResults: CSWRecordModel[] = [];
     //selectedCSWRecord = null;
     recordsLoading = false;
-
+   
     //BookMarks    
     bookMarks: BookMark[] = [];
     bookMarkCSWRecords: CSWRecordModel[] = [];
@@ -54,10 +53,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     availableServices: any = [];
     dateTo: any = null;
     dateFrom: any = null;
-    availableRegistries: any = [];
-
-  
-
+    availableRegistries: Registry[] = [];
+        
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     click$ = new Subject<string>();
@@ -82,7 +79,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.userStateService.setView(DATA_VIEW);
 
         // Load available registries
-        this.cswSearchService.getAvailableRegistries().subscribe(data => {
+        this.cswSearchService.updateRegistries();
+        this.cswSearchService.registries.subscribe(data => {
             this.availableRegistries = data;
             for (let registry of this.availableRegistries) {
                 registry.checked = true;
@@ -94,7 +92,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // selecting a registry will populate results)
             this.facetedSearch();
             this.getFacetedKeywords();
-            this.getBookMarkCSWRecords();
+            //get bookmark data only if the user is logged in
+            if(this.isValidUser())
+                this.getBookMarkCSWRecords();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -436,17 +436,26 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         return false;
     }
 
-    isValidUser(): boolean {
+    /**
+     * Check if the user is logged in and not anonymous
+     */
+    isValidUser(): boolean {        
         let userName: string;
         this.userStateService.user.subscribe(user => {
             userName = user.fullName;
         });
-        return (this.authService.isLoggedIn && (userName.search(ANONYMOUS_USER.fullName) == -1));
+        return (this.authService.isLoggedIn && (userName.search(ANONYMOUS_USER.fullName) == -1));            
+        //return this.authService.isLoggedIn;
     } 
     
+    /**
+     * get user's information for book marks and book marked csw records
+     */
     public getBookMarkCSWRecords() {
+        this.bookMarkCSWRecords = []; // check this code after login gets fixed
         let startPosition: number = 0;
-        this.cswSearchService.getBookMarks().subscribe(data => {
+      //  this.cswSearchService.getBookMarks().subscribe(data => {
+          this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
             this.bookMarks.forEach(bookMark => {
                 let fields: string[] = [];
@@ -456,7 +465,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                 fields.push('cswServiceId');
                 values.push(bookMark.serviceId);
                 this.cswSearchService.getFilteredCSWRecord(fields, values, startPosition).subscribe(response => {
-                    if (response.length == 1) {
+                    if (response && response.length == 1) {
                         this.bookMarkCSWRecords.push(response.pop());
                     }
                 });
@@ -466,6 +475,13 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         });
     }
 
+    /**
+     * processes the event emitted from the datasets-display component 
+     * by adding/removing from bookmarks and related csw records. 
+     * helps update the datasets-display component.
+     * 
+     * @param selection 
+     */
     onBookMarkChoice(selection) {
         if(selection.choice === "add"){            
             this.bookMarks.push(selection.mark);            
@@ -483,7 +499,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             if (pos > -1) 
                 this.bookMarkCSWRecords.splice(pos, 1);
         }
-        
+        //this.userStateService.updateBookMarks();        
     }    
     
 }

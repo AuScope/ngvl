@@ -59,6 +59,7 @@ export class AuthService {
     // navigate to the saved url. Reset the saved url so it isn't retained for
     // later logins.
     this.userStateService.updateUser();
+    this.userStateService.updateBookMarks();
     const savedUrl = this.resetRedirectUrl();
     const redirect = savedUrl ? savedUrl : '/dashboard';
     this.router.navigate([redirect]);

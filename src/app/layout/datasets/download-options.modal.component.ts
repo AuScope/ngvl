@@ -1,11 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit,ChangeDetectionStrategy } from '@angular/core';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DownloadOptions } from '../../shared/modules/vgl/models';
+import { UserStateService } from '../../shared';
+import { DownloadOptions,BookMark } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-
+import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 @Component({
+ //   changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'download-options-modal-content',
     templateUrl: './download-options.modal.component.html',
     styleUrls: ['./download-options.modal.component.scss']
@@ -20,22 +23,38 @@ export class DownloadOptionsModalContent implements OnInit {
 
     @Input() public downloadOptions: DownloadOptions;
     @Input() public onlineResource: any;
+    @Input() isBMarked: boolean; 
+    @Input() hasSavedOptions: boolean; 
+    @Input() cswRecord:CSWRecordModel;          
+    private hasFormChanged: boolean = false;
+    private saveOptionsChecked: boolean;
 
     downloadOptionsForm: FormGroup;
 
     dataTypes: any[] = [];
 
 
-    constructor(private formBuilder: FormBuilder, public activeModal: NgbActiveModal, private vglService: VglService) { }
+    constructor(private formBuilder: FormBuilder, 
+                public activeModal: NgbActiveModal,                                 
+                private vglService: VglService,    
+                private userStateService: UserStateService,            
+                private cswSearchService: CSWSearchService) { }
 
 
     ngOnInit() {
         if(this.onlineResource.type==='WFS' || this.onlineResource.type==='WCS') {
             this.populateDataTypes();
         }
-        this.createForm();
+        this.createForm();        
     }
 
+    subscribeToFormChanges() {
+        this.downloadOptionsForm.valueChanges.subscribe(val => {            
+            this.hasFormChanged = true;            
+          });          
+    }
+
+   
 
     /**
      * Retrieve the output formats for WFS online resource type.
@@ -69,8 +88,6 @@ export class DownloadOptionsModalContent implements OnInit {
         }
 
     }
-
-
     /**
      * Construct the DL options FormGroup based on the supplied DownloadOptions input
      */
@@ -142,13 +159,14 @@ export class DownloadOptionsModalContent implements OnInit {
             }
         }
         this.downloadOptionsForm = this.formBuilder.group(optionsGroup);
+        this.subscribeToFormChanges();
     }
 
 
     /**
      * Revert any form input changes back to their original state
      */
-    public revertChanges() {
+    public revertChanges() {        
         this.createForm();
     }
 
@@ -157,15 +175,71 @@ export class DownloadOptionsModalContent implements OnInit {
      * Save the changes to the DL options and close the dialog
      */
     public saveChanges() {
-        if(this.downloadOptionsForm.valid) {
-            for(let option in this.downloadOptions) {
+        if (this.downloadOptionsForm.valid) {
+            for (let option in this.downloadOptions) {
                 // Not all DL options are editable and hence won't be on form (e.g. URL)
-                if(this.downloadOptionsForm.controls.hasOwnProperty(option)) {
+                if (this.downloadOptionsForm.controls.hasOwnProperty(option)) {
                     this.downloadOptions[option] = this.downloadOptionsForm.controls[option].value;
                 }
             }
+            if (this.isBMarked && this.saveOptionsChecked) {
+                var bookMark : BookMark;
+                if (this.downloadOptions.eastBoundLongitude == undefined &&
+                    this.downloadOptions.northBoundLatitude == undefined &&
+                    this.downloadOptions.southBoundLatitude == undefined &&
+                    this.downloadOptions.westBoundLongitude == undefined)
+                    bookMark = {
+                        fileIdentifier: this.cswRecord.id,
+                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),                        
+                        url: this.downloadOptions.url,
+                        localPath: this.downloadOptions.localPath,
+                        name: this.downloadOptions.name,
+                        description: this.downloadOptions.description
+                    };
+                else
+                    bookMark = {
+                        fileIdentifier: this.cswRecord.id,
+                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),                        
+                        url: this.downloadOptions.url,
+                        localPath: this.downloadOptions.localPath,
+                        name: this.downloadOptions.name,
+                        description: this.downloadOptions.description,
+                        eastBoundLongitude: this.downloadOptions.eastBoundLongitude,
+                        northBoundLatitude: this.downloadOptions.northBoundLatitude,
+                        southBoundLatitude: this.downloadOptions.southBoundLatitude,
+                        westBoundLongitude: this.downloadOptions.westBoundLongitude
+                    };
+                this.vglService.updateDownloadOptions(bookMark).subscribe(data => {
+                    this.userStateService.updateBookMarks();
+                }, error => {
+                    console.log(error.message);
+                });
+            }
             this.activeModal.close();
-        }
+        }       
     }
-    
+
+    /**
+     * disables and enables the checkbox depending on user input changes 
+    */
+    public disableBMOption(): boolean {
+        return (this.isBMarked && this.hasSavedOptions && !this.hasFormChanged);        
+    } 
+
+    /**
+     * selects the check box if it has saved download options in  DB and
+     * deselects when the user makes changes to the form
+     */
+    public selectSaveOptions(): boolean {
+        return (this.hasSavedOptions && !this.hasFormChanged);
+    }
+
+    /**
+     * gets the value of the checkbox to decide if the values need to be saved in DB
+     * @param event 
+     */
+    public isChecked(event) : void
+    {     
+        this.saveOptionsChecked = event.target.checked;         
+    }
 }

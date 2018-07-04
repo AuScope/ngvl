@@ -253,7 +253,7 @@
                                 <!-- Any text search -->
                                 <div class="row">
                                     <div class="col">
-                                        <div *ngIf="bookMarkCSWRecords.length>0">
+                                        <div *ngIf="bookMarkCSWRecords.length>0">                                       
                                             <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries" [bookMarkList]= "bookMarks" (bookMarkChoice)=onBookMarkChoice($event)></app-datasets-display>
                                         </div>                                        
                                     </div>

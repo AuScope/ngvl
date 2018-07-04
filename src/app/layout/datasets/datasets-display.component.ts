@@ -24,7 +24,7 @@ export class DatasetsDisplayComponent implements OnInit {
     @Output() bookMarkChoice = new EventEmitter();    
 
     constructor(private olMapService: OlMapService,
-        private cswSearchService: CSWSearchService,                
+        private cswSearchService: CSWSearchService,
         private modalService: NgbModal) { }
 
     ngOnInit() {
@@ -93,31 +93,14 @@ export class DatasetsDisplayComponent implements OnInit {
             this.olMapService.fitView(extent);
         }
     }
-
-    
-
-    public getServiceId(cswRecord: CSWRecordModel) {
-        let serviceId: string = "";
-        let fileIdentifier: string = cswRecord.id;
-        //Get the service id information of the cswrecord by matching the record info(recordInfoUrl) with available registries.
-        for (let registry of this.registries) {
-            var matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
-            if (cswRecord.recordInfoUrl.indexOf(matchingUrl) != -1) {
-                serviceId = registry.id;
-                break;
-            }
-        }
-        return serviceId;
-    }
-
+   
     /**
-     * Bookmark a dataset as favourite
+     * Bookmark a dataset as favourite and emit the event "add" to be processed by datasets.component
      * @param cswRecord 
      */
     public addBookMark(cswRecord: CSWRecordModel) {
-        let serviceId: string = this.getServiceId(cswRecord);
-        let fileIdentifier: string = cswRecord.id;
-        let BookMark
+        let serviceId: string = this.cswSearchService.getServiceId(cswRecord);
+        let fileIdentifier: string = cswRecord.id;       
         this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(data => {            
             this.bookMarkChoice.emit({ choice: "add", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
         }, error => {         
@@ -125,20 +108,20 @@ export class DatasetsDisplayComponent implements OnInit {
         });
     }
 
-    public isBookMark(cswRecord: CSWRecordModel) {
-        let match: boolean = false;
-        let position: number = 0;
-        let serviceId: string = this.getServiceId(cswRecord);
-        let fileIdentifier: string = cswRecord.id;
-        this.bookMarkList.some(bookMark => {
-            match = ((fileIdentifier.indexOf(bookMark.fileIdentifier) >= 0) && (serviceId.indexOf(bookMark.serviceId) >= 0));                
-            return match;
-        }); 
-        return match;
-    }
+    /**
+     * checks if a csw record has been bookmarked by the user
+     * @param cswRecord 
+     */
+    public isBookMark(cswRecord: CSWRecordModel) {        
+        return this.cswSearchService.isBookMark(cswRecord);
+    } 
 
+    /**
+     * remove dataset as favourite and emit the event "remove" to be processed by datasets.component
+     * @param cswRecord 
+     */
     public removeBookMark(cswRecord: CSWRecordModel) {
-        let serviceId: string = this.getServiceId(cswRecord);
+        let serviceId: string = this.cswSearchService.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
         this.cswSearchService.removeBookMark(fileIdentifier, serviceId).subscribe(data => {            
             this.bookMarkChoice.emit({ choice: "remove", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       

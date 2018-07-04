@@ -26,7 +26,7 @@ export class VglService {
 
     private vglRequest<T>(endpoint: string, options?): Observable<T> {
         const url = environment.portalBaseUrl + endpoint;
-        const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
+        const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };        
         return this.http.get<VglResponse<T>>(url, opts).map(vglData);
     }
 
@@ -304,6 +304,7 @@ export class VglService {
     return this.vglRequest('addBookMark.do', options);        
   }
 
+  //remove book mark information from database
   public removeBookMark(fileIdentifier : string, serviceId : string ) {   
     const options = {
             params: { 
@@ -319,6 +320,15 @@ export class VglService {
     return this.vglRequest('getBookMarks.do');        
   }
 
+  /**
+   * update / save download optiions for a bookmarked dataset
+   */
+  public updateDownloadOptions(bookMark : BookMark) {    
+    const options = { params:bookMark };   
+    return this.vglRequest('updateDownloadOptions.do', options);        
+  }
+
+  //gets csw record information based on fileter parameters such as file identifier and service id
   public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {
     const options = {
             params: {
@@ -329,5 +339,10 @@ export class VglService {
     };
     return this.vglRequest('getFilteredCSWRecords.do', options);           
 }
+
+//gets registry information to be used in faceted search and bookmarking of a dataset
+public getAvailableRegistries(): Observable<any> {  
+    return this.vglRequest('getFacetedCSWServices.do');   
+}    
 
 }

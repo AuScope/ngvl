@@ -3,8 +3,10 @@ import { DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
-import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from '../../shared';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 
@@ -33,9 +35,11 @@ export class ConfirmDatasetsModalContent {
     // Selections saved dialog
     @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
-
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal,
-        private vglService: VglService, private userStateService: UserStateService) { }
+    constructor(public activeModal: NgbActiveModal, 
+        private modalService: NgbModal,
+        private vglService: VglService,
+        private userStateService: UserStateService,
+        private cswSearchService: CSWSearchService) { }
 
 
     /**
@@ -107,18 +111,51 @@ export class ConfirmDatasetsModalContent {
                 break;
         }
     }
+   
 
     /**
-     * Edit the download options for the resource
+     * Edit the download options for the resource.
+     * If the record is book marked and has saved options, loads the downloadoptions from DB 
      * 
      * TODO: Do
      */
-    public editDownload(onlineResource: any, downloadOptions: DownloadOptions): void {
+    public editDownload(onlineResource: any, cswRecord: CSWRecordModel, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
-        modelRef.componentInstance.downloadOptions = downloadOptions;
+        let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
+        modelRef.componentInstance.isBMarked = isBookMarkRecord;
+        if (isBookMarkRecord) {
+            let savedDwnldOptions: DownloadOptions = this.cswSearchService.getDownloadOptions(cswRecord);            
+            if (this.areOptionsStored(savedDwnldOptions)) {         
+                modelRef.componentInstance.downloadOptions = savedDwnldOptions;
+                modelRef.componentInstance.hasSavedOptions = true;
+            }
+            else {
+                modelRef.componentInstance.hasSavedOptions = false;
+                modelRef.componentInstance.downloadOptions = downloadOptions;
+            }
+        }
+        else
+            modelRef.componentInstance.downloadOptions = downloadOptions;
     }
+
+    /**
+     * Checks if the Book mark stored in DB has saved download options data 
+     * @param savedDwnldOptions 
+     */
+    private areOptionsStored(savedDwnldOptions: DownloadOptions) {
+        return ((savedDwnldOptions.url && savedDwnldOptions.url.length != 0) ||
+            (savedDwnldOptions.localPath && savedDwnldOptions.localPath.length != 0) ||
+            (savedDwnldOptions.name && savedDwnldOptions.name.length != 0) ||
+            (savedDwnldOptions.description && savedDwnldOptions.description.length != 0) ||
+            (savedDwnldOptions.northBoundLatitude && savedDwnldOptions.northBoundLatitude != 0) ||
+            (savedDwnldOptions.southBoundLatitude && savedDwnldOptions.southBoundLatitude != 0) ||
+            (savedDwnldOptions.eastBoundLongitude && savedDwnldOptions.eastBoundLongitude != 0) ||
+            (savedDwnldOptions.westBoundLongitude && savedDwnldOptions.westBoundLongitude != 0));
+    }
+
 
     /**
      * 

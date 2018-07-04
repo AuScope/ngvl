@@ -2,18 +2,23 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { BookMark } from '../../shared/modules/vgl/models';
+import { BookMark,Registry,DownloadOptions } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { UserStateService } from './user-state.service';
+import { empty } from 'rxjs/Observer';
 
 @Injectable()
 export class CSWSearchService {
 
-    constructor(private httpClient: HttpClient, @Inject('env') private env,private vgl: VglService) { }
+    constructor(private httpClient: HttpClient, @Inject('env') private env,
+                private vgl: VglService, private userStateService: UserStateService) { }
 
-
+    private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
+    public readonly registries: Observable<Registry[]> = this._registries.asObservable();
     /**
      * Returns an array of keywords for specified service IDs
      * @param serviceIds an array of service IDs
@@ -87,16 +92,32 @@ export class CSWSearchService {
             //return response['data'].records;
             return response['data'];
         });
+    } 
+       
+    public updateRegistries() {
+        this.vgl.getAvailableRegistries().subscribe(registryList => this._registries.next(registryList));
     }
 
-    public getAvailableRegistries(): Observable<any> {
-        return this.httpClient.post(this.env.portalBaseUrl + 'getFacetedCSWServices.do', {
-            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-            responseType: 'json'
-        }).map(response => {
-            return response['data'];
+    /**
+     * Get the service id information of the cswrecord by matching the record info(cswrecord.recordInfoUrl) with available registries.
+     */
+
+    public getServiceId(cswRecord: CSWRecordModel): string {
+        let availableRegistries: Registry[] = [];
+        let serviceId: string = "";
+        let fileIdentifier: string = cswRecord.id;               
+        this.registries.subscribe(data => {
+            availableRegistries = data;
+            for (let registry of availableRegistries) {
+                var matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
+                if (cswRecord.recordInfoUrl.indexOf(matchingUrl) != -1) {
+                    serviceId = registry.id;
+                    break;
+                }
+            }
         });
-    }    
+        return serviceId; 
+    }
 
     public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {        
         return this.vgl.getFilteredCSWRecord(fields,values,startPosition);
@@ -112,6 +133,59 @@ export class CSWSearchService {
 
     public removeBookMark(fileIdentifier : string, serviceId : string ) {           
         return this.vgl.removeBookMark(fileIdentifier,serviceId);
+    }
+
+    /**
+     * checks if a csw record has been bookmarked by the user
+     * @param cswRecord 
+     */
+    public isBookMark(cswRecord: CSWRecordModel) : boolean {
+        let bookMarkList: BookMark[] = [];
+        let match: boolean = false;        
+        let serviceId: string = this.getServiceId(cswRecord);
+        let fileIdentifier: string = cswRecord.id;
+        this.userStateService.bookmarks.subscribe(data => {
+            bookMarkList = data;
+            bookMarkList.some(bookMark => {
+                match = ((fileIdentifier.indexOf(bookMark.fileIdentifier) >= 0) && (serviceId.indexOf(bookMark.serviceId) >= 0));                
+                return match;
+            }); 
+        });        
+        return match;
+    } 
+
+    /**
+     * Gets download options from book marked csw record.
+     * @param cswRecord 
+     */
+    public getDownloadOptions(cswRecord: CSWRecordModel): DownloadOptions {
+        let bookMarkList: BookMark[] = [];
+        let bookMark: BookMark;
+        let match: boolean = false;
+        let savedOptions: DownloadOptions = { url: "", localPath: "", name: "", description: "" };
+        let serviceId: string = this.getServiceId(cswRecord);
+        let fileIdentifier: string = cswRecord.id;
+        this.userStateService.bookmarks.subscribe(data => {
+            bookMarkList = data;
+            bookMarkList.some(rec => {
+                match = ((fileIdentifier.indexOf(rec.fileIdentifier) >= 0) && (serviceId.indexOf(rec.serviceId) >= 0));
+                bookMark = rec;
+                return match;
+            });
+        });
+        savedOptions.url = bookMark.url;
+        savedOptions.localPath = bookMark.localPath;
+        savedOptions.name = bookMark.name;
+        savedOptions.description = bookMark.description;
+        if (bookMark.eastBoundLongitude)
+            savedOptions.eastBoundLongitude = bookMark.eastBoundLongitude;
+        if (bookMark.northBoundLatitude)
+            savedOptions.northBoundLatitude = bookMark.northBoundLatitude;
+        if (bookMark.southBoundLatitude)
+            savedOptions.southBoundLatitude = bookMark.southBoundLatitude;
+        if (bookMark.westBoundLongitude)
+            savedOptions.westBoundLongitude = bookMark.westBoundLongitude;
+        return savedOptions;
     }
 
 }

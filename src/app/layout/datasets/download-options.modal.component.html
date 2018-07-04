@@ -1,6 +1,6 @@
 <!-- TODO: Styles to CSS -->
 <!-- TODO: Translations -->
-<form [formGroup]="downloadOptionsForm">
+<form [formGroup]="downloadOptionsForm" (ngSubmit)="saveChanges()" >
 
     <div class="modal-header" style="background: #EEE">
         <h5 class="modal-title">Download Options</h5>
@@ -146,11 +146,24 @@
                 <small>A longer description to outline the purpose of this download request.</small>
             </div>
         </div>
+
+        <div *ngIf="isBMarked" class="row">
+            <div class="col-lg-2">
+                <label>Save Options</label>
+            </div>
+            <div class="col-lg-10">
+                <div class="input-group-sm">
+                    <input type="checkbox" [checked]="selectSaveOptions()" [disabled]="disableBMOption()" (change)="isChecked($event)" id="Favourite">
+                    <label for="checkFavourite" class="small">&nbsp;Save as Defaults</label>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="modal-footer" style="background: #EEE">
-        <button type="button" type="submit" class="btn btn-secondary" (click)="revertChanges()">Revert Changes</button>
-        <button type="button" [disabled]="!downloadOptionsForm.valid" type="submit" class="btn btn-secondary" (click)="saveChanges()">
+    <div class="modal-footer" style="background: #EEE"> 
+        <button type="button" class="btn btn-secondary" (click)="revertChanges()">Restore defaults</button>
+        <button type="button" type="submit" [disabled]="!downloadOptionsForm.valid"  class="btn btn-secondary">
             <i class="fa fa-plus-circle"></i>&nbsp;Save Changes
         </button>
     </div>

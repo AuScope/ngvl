@@ -126,6 +126,7 @@ export class ConfirmDatasetsModalContent {
         modelRef.componentInstance.onlineResource = onlineResource;
         let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
+        modelRef.componentInstance.defaultDownloadOptions = downloadOptions;
         if (isBookMarkRecord) {
             let savedDwnldOptions: DownloadOptions = this.cswSearchService.getDownloadOptions(cswRecord);            
             if (this.areOptionsStored(savedDwnldOptions)) {         

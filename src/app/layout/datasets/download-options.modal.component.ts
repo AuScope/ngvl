@@ -6,9 +6,10 @@ import { UserStateService } from '../../shared';
 import { DownloadOptions,BookMark } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { startWith } from 'rxjs/operators';
 
 @Component({
- //   changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'download-options-modal-content',
     templateUrl: './download-options.modal.component.html',
     styleUrls: ['./download-options.modal.component.scss']
@@ -22,14 +23,17 @@ export class DownloadOptionsModalContent implements OnInit {
     LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,20})?))$';
 
     @Input() public downloadOptions: DownloadOptions;
+    @Input() public defaultDownloadOptions: DownloadOptions;
     @Input() public onlineResource: any;
     @Input() isBMarked: boolean; 
     @Input() hasSavedOptions: boolean; 
     @Input() cswRecord:CSWRecordModel;          
     private hasFormChanged: boolean = false;
-    private saveOptionsChecked: boolean;
+    private saveOptionsChecked: boolean;    
 
     downloadOptionsForm: FormGroup;
+
+    saveOptionsForm: FormGroup;
 
     dataTypes: any[] = [];
 
@@ -50,7 +54,7 @@ export class DownloadOptionsModalContent implements OnInit {
 
     subscribeToFormChanges() {
         this.downloadOptionsForm.valueChanges.subscribe(val => {            
-            this.hasFormChanged = true;            
+            this.hasFormChanged = true;               
           });          
     }
 
@@ -157,8 +161,8 @@ export class DownloadOptionsModalContent implements OnInit {
                     break;
                 }
             }
-        }
-        this.downloadOptionsForm = this.formBuilder.group(optionsGroup);
+        }          
+        this.downloadOptionsForm = this.formBuilder.group(optionsGroup);        
         this.subscribeToFormChanges();
     }
 
@@ -166,8 +170,10 @@ export class DownloadOptionsModalContent implements OnInit {
     /**
      * Revert any form input changes back to their original state
      */
-    public revertChanges() {        
-        this.createForm();
+    public revertChanges(): void {        
+        this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
+        const checkBox = <HTMLInputElement>document.getElementById('saveBookMark');
+        checkBox.checked = false;
     }
 
 
@@ -222,7 +228,7 @@ export class DownloadOptionsModalContent implements OnInit {
     /**
      * disables and enables the checkbox depending on user input changes 
     */
-    public disableBMOption(): boolean {
+    public disableBMOption(): boolean {        
         return (this.isBMarked && this.hasSavedOptions && !this.hasFormChanged);        
     } 
 
@@ -230,7 +236,7 @@ export class DownloadOptionsModalContent implements OnInit {
      * selects the check box if it has saved download options in  DB and
      * deselects when the user makes changes to the form
      */
-    public selectSaveOptions(): boolean {
+    public selectSaveOptions(): boolean {           
         return (this.hasSavedOptions && !this.hasFormChanged);
     }
 
@@ -239,7 +245,7 @@ export class DownloadOptionsModalContent implements OnInit {
      * @param event 
      */
     public isChecked(event) : void
-    {     
-        this.saveOptionsChecked = event.target.checked;         
+    {   
+        this.saveOptionsChecked = event.target.checked;                
     }
 }

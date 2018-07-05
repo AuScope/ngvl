@@ -452,7 +452,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * get user's information for book marks and book marked csw records
      */
     public getBookMarkCSWRecords() {
-        this.bookMarkCSWRecords = []; // check this code after login gets fixed
+     //   this.bookMarkCSWRecords = []; // check this code after login gets fixed
         let startPosition: number = 0;
       //  this.cswSearchService.getBookMarks().subscribe(data => {
           this.userStateService.bookmarks.subscribe(data => {

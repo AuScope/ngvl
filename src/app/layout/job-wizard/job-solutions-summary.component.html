@@ -1,11 +1,11 @@
-<div class="row">
+<div class="row" *ngIf="(solutions$ | async) as solutions; else noSolutions">
   <div class="col-md">
-    <div class="list-group">
-      <button *ngFor="let solution of userStateService.selectedSolutions | async"
+    <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
+      <button *ngFor="let solution of solutions"
         type="button"
         class="list-group-item list-group-item-action flex-column align-items-start"
         [class.active]="solution.isActive"
-        (click)="toggleSolution(solution)">
+        (click)="activateSolution(solution)">
         <div class="d-flex w-100 justify-content-between" style="width:100%">
           <h5 class="mb-1">{{ solution.name }}</h5>
           <small>
@@ -21,6 +21,14 @@
     </div>
   </div>
   <div class="col-md">
-    <p>Solution inputs</p>
+    <app-job-solution-vars
+      *ngFor="let solution of solutions"
+      [solution]="solution"
+      (solutionChange)="updateTemplate()"></app-job-solution-vars>
   </div>
 </div>
+
+<ng-template #noSolutions>
+  <p class="missing-info">No solution has been selected for this job. Please choose a solution to provide the template, then return here to create a new job.</p>
+  <a [routerLink]="['/solutions']" role="button" class="btn btn-secondary">Choose a solution</a>
+</ng-template>

@@ -20,7 +20,7 @@ export class JobTemplateComponent implements OnInit, OnDestroy {
     theme: 'vs-light',
     language: 'python'
   };
-  template: string = 'foo';
+  template: string = '';
 
   private subscription;
 

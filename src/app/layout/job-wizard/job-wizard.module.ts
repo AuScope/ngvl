@@ -11,6 +11,7 @@ import { JobsModule } from '../jobs/jobs.module';
 import { SolutionsModule } from '../solutions/solutions.module';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 import { JobTemplateComponent } from './job-template.component';
+import { JobSolutionVarsComponent } from './job-solution-vars.component';
 
 @NgModule({
   imports: [
@@ -22,7 +23,7 @@ import { JobTemplateComponent } from './job-template.component';
     JobsModule,
     SolutionsModule
   ],
-  declarations: [JobWizardComponent, JobSolutionsSummaryComponent, JobTemplateComponent],
+  declarations: [JobWizardComponent, JobSolutionsSummaryComponent, JobTemplateComponent, JobSolutionVarsComponent],
   exports: [JobWizardComponent]
 })
 export class JobWizardModule { }

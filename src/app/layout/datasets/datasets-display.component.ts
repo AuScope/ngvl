@@ -27,7 +27,7 @@ export class DatasetsDisplayComponent implements OnInit {
         private cswSearchService: CSWSearchService,
         private modalService: NgbModal) { }
 
-    ngOnInit() {
+    ngOnInit() {       
     }
 
     /**

@@ -1,9 +1,9 @@
-import { Component, Input, OnInit,ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserStateService } from '../../shared';
-import { DownloadOptions,BookMark } from '../../shared/modules/vgl/models';
+import { DownloadOptions, BookMark } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { startWith } from 'rxjs/operators';
@@ -25,40 +25,38 @@ export class DownloadOptionsModalContent implements OnInit {
     @Input() public downloadOptions: DownloadOptions;
     @Input() public defaultDownloadOptions: DownloadOptions;
     @Input() public onlineResource: any;
-    @Input() isBMarked: boolean; 
-    @Input() hasSavedOptions: boolean; 
-    @Input() cswRecord:CSWRecordModel;          
+    @Input() isBMarked: boolean;
+    @Input() hasSavedOptions: boolean;
+    @Input() cswRecord: CSWRecordModel;
     private hasFormChanged: boolean = false;
-    private saveOptionsChecked: boolean;    
+    private saveOptionsChecked: boolean;
 
     downloadOptionsForm: FormGroup;
-
-    saveOptionsForm: FormGroup;
 
     dataTypes: any[] = [];
 
 
-    constructor(private formBuilder: FormBuilder, 
-                public activeModal: NgbActiveModal,                                 
-                private vglService: VglService,    
-                private userStateService: UserStateService,            
-                private cswSearchService: CSWSearchService) { }
+    constructor(private formBuilder: FormBuilder,
+        public activeModal: NgbActiveModal,
+        private vglService: VglService,
+        private userStateService: UserStateService,
+        private cswSearchService: CSWSearchService) { }
 
 
     ngOnInit() {
-        if(this.onlineResource.type==='WFS' || this.onlineResource.type==='WCS') {
+        if (this.onlineResource.type === 'WFS' || this.onlineResource.type === 'WCS') {
             this.populateDataTypes();
         }
-        this.createForm();        
+        this.createForm();
     }
 
     subscribeToFormChanges() {
-        this.downloadOptionsForm.valueChanges.subscribe(val => {            
-            this.hasFormChanged = true;               
-          });          
+        this.downloadOptionsForm.valueChanges.subscribe(val => {
+            this.hasFormChanged = true;
+        });
     }
 
-   
+
 
     /**
      * Retrieve the output formats for WFS online resource type.
@@ -68,7 +66,7 @@ export class DownloadOptionsModalContent implements OnInit {
     getFeatureRequestOutputFormats(serviceUrl: string): any[] {
         let outputFormats: any[] = [];
         this.vglService.getRequestedOutputFormats(serviceUrl).subscribe(
-            response => { 
+            response => {
                 outputFormats = response;
             }
         )
@@ -81,13 +79,13 @@ export class DownloadOptionsModalContent implements OnInit {
      * @param type the type of the online resource, will be 'WCS' or 'WFS'
      */
     private populateDataTypes() {
-        if(this.onlineResource.type==='WFS') {
+        if (this.onlineResource.type === 'WFS') {
             this.dataTypes = this.getFeatureRequestOutputFormats(this.onlineResource.serviceUrl);
-        } else if(this.onlineResource.type==='WCS') {
+        } else if (this.onlineResource.type === 'WCS') {
             this.dataTypes = [
-                { label : 'CSV', urn : 'csv' },
-                { label : 'GeoTIFF', urn : 'geotif' },
-                { label : 'NetCDF', urn : 'nc' }
+                { label: 'CSV', urn: 'csv' },
+                { label: 'GeoTIFF', urn: 'geotif' },
+                { label: 'NetCDF', urn: 'nc' }
             ];
         }
 
@@ -97,8 +95,8 @@ export class DownloadOptionsModalContent implements OnInit {
      */
     private createForm(): void {
         let optionsGroup = {};
-        for(let option in this.downloadOptions) {
-            switch(option) {
+        for (let option in this.downloadOptions) {
+            switch (option) {
                 // TODO: Proper validator patterns
                 case "url": {
                     optionsGroup['url'] = [this.downloadOptions.url, Validators.required];
@@ -161,8 +159,8 @@ export class DownloadOptionsModalContent implements OnInit {
                     break;
                 }
             }
-        }          
-        this.downloadOptionsForm = this.formBuilder.group(optionsGroup);        
+        }
+        this.downloadOptionsForm = this.formBuilder.group(optionsGroup);
         this.subscribeToFormChanges();
     }
 
@@ -170,7 +168,7 @@ export class DownloadOptionsModalContent implements OnInit {
     /**
      * Revert any form input changes back to their original state
      */
-    public revertChanges(): void {        
+    public revertChanges(): void {
         this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
         const checkBox = <HTMLInputElement>document.getElementById('saveBookMark');
         checkBox.checked = false;
@@ -189,14 +187,14 @@ export class DownloadOptionsModalContent implements OnInit {
                 }
             }
             if (this.isBMarked && this.saveOptionsChecked) {
-                var bookMark : BookMark;
+                var bookMark: BookMark;
                 if (this.downloadOptions.eastBoundLongitude == undefined &&
                     this.downloadOptions.northBoundLatitude == undefined &&
                     this.downloadOptions.southBoundLatitude == undefined &&
                     this.downloadOptions.westBoundLongitude == undefined)
                     bookMark = {
                         fileIdentifier: this.cswRecord.id,
-                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),                        
+                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),
                         url: this.downloadOptions.url,
                         localPath: this.downloadOptions.localPath,
                         name: this.downloadOptions.name,
@@ -205,7 +203,7 @@ export class DownloadOptionsModalContent implements OnInit {
                 else
                     bookMark = {
                         fileIdentifier: this.cswRecord.id,
-                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),                        
+                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),
                         url: this.downloadOptions.url,
                         localPath: this.downloadOptions.localPath,
                         name: this.downloadOptions.name,
@@ -222,21 +220,21 @@ export class DownloadOptionsModalContent implements OnInit {
                 });
             }
             this.activeModal.close();
-        }       
+        }
     }
 
     /**
      * disables and enables the checkbox depending on user input changes 
     */
-    public disableBMOption(): boolean {        
-        return (this.isBMarked && this.hasSavedOptions && !this.hasFormChanged);        
-    } 
+    public disableBMOption(): boolean {
+        return (this.isBMarked && this.hasSavedOptions && !this.hasFormChanged);
+    }
 
     /**
      * selects the check box if it has saved download options in  DB and
      * deselects when the user makes changes to the form
      */
-    public selectSaveOptions(): boolean {           
+    public selectSaveOptions(): boolean {
         return (this.hasSavedOptions && !this.hasFormChanged);
     }
 
@@ -244,8 +242,7 @@ export class DownloadOptionsModalContent implements OnInit {
      * gets the value of the checkbox to decide if the values need to be saved in DB
      * @param event 
      */
-    public isChecked(event) : void
-    {   
-        this.saveOptionsChecked = event.target.checked;                
+    public isChecked(event): void {
+        this.saveOptionsChecked = event.target.checked;
     }
 }

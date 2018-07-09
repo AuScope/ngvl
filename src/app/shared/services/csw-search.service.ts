@@ -9,7 +9,6 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark,Registry,DownloadOptions } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
-import { empty } from 'rxjs/Observer';
 
 @Injectable()
 export class CSWSearchService {
@@ -19,6 +18,7 @@ export class CSWSearchService {
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();
+
     /**
      * Returns an array of keywords for specified service IDs
      * @param serviceIds an array of service IDs
@@ -94,8 +94,13 @@ export class CSWSearchService {
         });
     } 
        
-    public updateRegistries() {
-        this.vgl.getAvailableRegistries().subscribe(registryList => this._registries.next(registryList));
+    /**
+     * executes getFacetedCSWServices.do in vgl service 
+     */
+    public updateRegistries() : Observable<Registry[]> {  
+       let obs = this.vgl.getAvailableRegistries();
+       obs.subscribe(registryList => this._registries.next(registryList));
+       return obs;
     }
 
     /**
@@ -104,8 +109,7 @@ export class CSWSearchService {
 
     public getServiceId(cswRecord: CSWRecordModel): string {
         let availableRegistries: Registry[] = [];
-        let serviceId: string = "";
-        let fileIdentifier: string = cswRecord.id;               
+        let serviceId: string = "";             
         this.registries.subscribe(data => {
             availableRegistries = data;
             for (let registry of availableRegistries) {
@@ -119,7 +123,7 @@ export class CSWSearchService {
         return serviceId; 
     }
 
-    public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {        
+    public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {         
         return this.vgl.getFilteredCSWRecord(fields,values,startPosition);
     }
 

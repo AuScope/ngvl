@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable} from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
 import { routerTransition } from '../../router.animations';
@@ -7,7 +7,7 @@ import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { ANONYMOUS_USER,BookMark,Registry } from '../../shared/modules/vgl/models';
+import { ANONYMOUS_USER, BookMark, Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
@@ -21,7 +21,7 @@ import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
     styleUrls: ['./datasets.component.scss'],
     animations: [routerTransition()]
 })
-export class DatasetsComponent implements OnInit, AfterViewChecked {    
+export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
     currentCSWRecordPage: number = 1;
@@ -30,7 +30,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     cswSearchResults: CSWRecordModel[] = [];
     //selectedCSWRecord = null;
     recordsLoading = false;
-   
+
     //BookMarks    
     bookMarks: BookMark[] = [];
     bookMarkCSWRecords: CSWRecordModel[] = [];
@@ -54,7 +54,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     dateTo: any = null;
     dateFrom: any = null;
     availableRegistries: Registry[] = [];
-        
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     click$ = new Subject<string>();
@@ -75,12 +74,10 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         private authService: AuthService) { }
 
 
-    ngOnInit() {
-        this.userStateService.setView(DATA_VIEW);
-
+    ngOnInit() {        
+        this.userStateService.setView(DATA_VIEW);        
         // Load available registries
-        this.cswSearchService.updateRegistries();
-        this.cswSearchService.registries.subscribe(data => {
+        this.cswSearchService.updateRegistries().subscribe(data => {              
             this.availableRegistries = data;
             for (let registry of this.availableRegistries) {
                 registry.checked = true;
@@ -91,15 +88,18 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
             this.facetedSearch();
-            this.getFacetedKeywords();
-            //get bookmark data only if the user is logged in
-            if(this.isValidUser())
-                this.getBookMarkCSWRecords();
+            this.getFacetedKeywords();    
+             //get bookmark data only if the user is logged in
+             if (this.isValidUser())            
+                this.getBookMarkCSWRecords();       
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
-        });
-
+        });   
+                 
+                 
+           
+       
         // Define available services
         this.availableServices = [
             { 'id': 'wcs', 'name': 'WCS', 'checked': false },
@@ -110,8 +110,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
         this.anyTextIsCollapsed = false;
         this.searchResultsIsCollapsed = false;
-    }
-
+    }   
 
     ngAfterViewChecked() {
         this.userStateService.setView(DATA_VIEW);
@@ -439,24 +438,22 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     /**
      * Check if the user is logged in and not anonymous
      */
-    isValidUser(): boolean {        
-        let userName: string;
-        this.userStateService.user.subscribe(user => {
-            userName = user.fullName;
-        });
-        return (this.authService.isLoggedIn && (userName.search(ANONYMOUS_USER.fullName) == -1));            
-        //return this.authService.isLoggedIn;
-    } 
-    
+    isValidUser(): boolean {             
+        return this.authService.isLoggedIn;
+    }
+
     /**
      * get user's information for book marks and book marked csw records
      */
-    public getBookMarkCSWRecords() {
-     //   this.bookMarkCSWRecords = []; // check this code after login gets fixed
-        let startPosition: number = 0;
-      //  this.cswSearchService.getBookMarks().subscribe(data => {
-          this.userStateService.bookmarks.subscribe(data => {
+    public getBookMarkCSWRecords() {                
+        let startPosition: number = 0;      
+        this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
+            }, error => {
+                console.log(error.message);
+            });              
+            // empty the book marked csw record list before gettting updated list
+            this.bookMarkCSWRecords = [];                
             this.bookMarks.forEach(bookMark => {
                 let fields: string[] = [];
                 let values: string[] = [];
@@ -469,10 +466,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                         this.bookMarkCSWRecords.push(response.pop());
                     }
                 });
-            });
-        }, error => {            
-            console.log(error.message);
-        });
+            });                                      
     }
 
     /**
@@ -483,23 +477,22 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * @param selection 
      */
     onBookMarkChoice(selection) {
-        if(selection.choice === "add"){            
-            this.bookMarks.push(selection.mark);            
+        if (selection.choice === "add") {
+            this.bookMarks.push(selection.mark);
             this.bookMarkCSWRecords.push(selection.cswRecord);
         }
-        else if(selection.choice === "remove"){            
-            let index = this.bookMarks.findIndex(item => {                             
-                return ((item.fileIdentifier.indexOf(selection.mark.fileIdentifier) >= 0) && (item.serviceId.indexOf(selection.mark.serviceId) >= 0));                
+        else if (selection.choice === "remove") {
+            let index = this.bookMarks.findIndex(item => {
+                return ((item.fileIdentifier.indexOf(selection.mark.fileIdentifier) >= 0) && (item.serviceId.indexOf(selection.mark.serviceId) >= 0));
             });
-            if (index > -1)            
-               this.bookMarks.splice(index, 1);            
+            if (index > -1)
+                this.bookMarks.splice(index, 1);
             let pos = this.bookMarkCSWRecords.findIndex(rec => {
                 return (rec.id === selection.cswRecord.id);
             });
-            if (pos > -1) 
+            if (pos > -1)
                 this.bookMarkCSWRecords.splice(pos, 1);
-        }
-        //this.userStateService.updateBookMarks();        
-    }    
-    
+        }        
+    }
+
 }

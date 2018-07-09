@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark} from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry} from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -323,7 +323,7 @@ export class VglService {
   /**
    * update / save download optiions for a bookmarked dataset
    */
-  public updateDownloadOptions(bookMark : BookMark) {    
+  public updateDownloadOptions(bookMark : BookMark) :  Observable <any> {    
     const options = { params:bookMark };   
     return this.vglRequest('updateDownloadOptions.do', options);        
   }

@@ -11,12 +11,12 @@ import { PlainTextPreview } from './preview/plaintext-preview.component';
 import { ImagePreview } from './preview/image-preview.component';
 import { PreviewItem } from './preview/preview-item';
 import { TtlPreview } from './preview/ttl-preview.component';
+import { LogPreview } from './preview/log-preview.component';
 import { DataServicePreview } from './preview/data-service-preview.component';
+import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import olProj from 'ol/proj';
 import { point, featureCollection, polygon } from '@turf/helpers';
-import * as center from '@turf/center';
-import * as envelope from '@turf/envelope';
 
 
 @Component({
@@ -42,11 +42,14 @@ export class JobsComponent implements OnInit {
     newFolderName: string = "";
 
     // Preview components
+    // TODO: A code preview would be nice
+    // TODO: TIFF/BMP support untested, may vary on browser
     previewItems: PreviewItem[] = [
         new PreviewItem("data-service", DataServicePreview, {}, []),
-        new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh']),
-        new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png']),
-        new PreviewItem("ttl", TtlPreview, {}, ['ttl'])
+        new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh', 'log']),
+        new PreviewItem("log", LogPreview, {}, ['log']),
+        new PreviewItem("ttl", TtlPreview, {}, ['ttl']),
+        new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
     // Will be JobDownload or CloudFileInformation, needed for preview Refresh
@@ -84,7 +87,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * Refresh the job panel based on any/all facted search elements
+     * Refresh the job panel based on any/all faceted search elements
      */
     public refreshJobs(): void {
         this.currentPreviewObject = null;
@@ -182,8 +185,6 @@ export class JobsComponent implements OnInit {
         let reCentrePt: any = {};
         // Calculate the envelope, if not too big then re-centred map can be calculated
         const featureColl = featureCollection(featureArr);
-        const envelopePoly = envelope(featureColl);
-        const centerPt = center(featureColl);
         const bboxData = [olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr];
         this.previewFile(previewItem, bboxData);
         this.filePreviewLoading = false;
@@ -201,14 +202,27 @@ export class JobsComponent implements OnInit {
         viewContainerRef.clear();
         const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
         let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
-        if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+        // If the type can't be found, we'll try plain text
+        if(previewItem === undefined) {
+            previewItem = this.previewItems.find(item => item.type === 'plaintext');
+        }
+        // Preview image
+        if (previewItem && previewItem.type === 'image') {
+            this.currentPreviewObject = cloudFile;
+            const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
+            this.previewFile(previewItem, imageUrl);
+        }
+        // Log files currently displayed as plain text, but this class will
+        // allow us to make imporvements to display later (e.g. display
+        // sectioned logs in tabs per section)
+        else if (previewItem && (previewItem.type === 'log')) {
             this.filePreviewLoading = true;
             // TODO: Max file size to config
             this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
                 preview => {
                     this.previewFile(previewItem, preview);
-                    this.filePreviewLoading = false;
                     this.currentPreviewObject = cloudFile;
+                    this.filePreviewLoading = false;
                 },
                 error => {
                     //TODO: Proper error reporting
@@ -217,9 +231,24 @@ export class JobsComponent implements OnInit {
                     console.log(error.message);
                 }
             );
-        } else if (previewItem && previewItem.type === 'image') {
-            this.currentPreviewObject = cloudFile;
-            this.previewFile(previewItem, cloudFile.publicUrl);
+        }
+        // Preview text (default option if type can't be determined by extension)
+        else if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+            this.filePreviewLoading = true;
+            // TODO: Max file size to config
+            this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
+                preview => {
+                    this.previewFile(previewItem, preview);
+                    this.currentPreviewObject = cloudFile;
+                    this.filePreviewLoading = false;
+                },
+                error => {
+                    //TODO: Proper error reporting
+                    this.filePreviewLoading = false;
+                    this.currentPreviewObject = null;
+                    console.log(error.message);
+                }
+            );
         }
     }
 

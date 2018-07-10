@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { routerTransition } from "../../router.animations";
 import { UserStateService } from "../../shared";
-import { Message } from 'primeng/components/common/api';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { User } from "../../shared/modules/vgl/models";
 

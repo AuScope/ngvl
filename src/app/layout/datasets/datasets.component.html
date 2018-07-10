@@ -250,14 +250,14 @@
                     <ngb-tab *ngIf="isValidUser() && bookMarkCSWRecords.length>0" class="card-header" title="Bookmarks">
                         <ng-template ngbTabContent >
                             <div class="card-body">
-                                <!-- Any text search -->
+                                <!-- bookmarks -->
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col"> 
                                         <div *ngIf="bookMarkCSWRecords.length>0">                                       
                                             <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries" [bookMarkList]="bookMarks" (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
                                         </div>                                        
                                     </div>
-                                </div>
+                                </div> 
                             </div>
                         </ng-template>
                     </ngb-tab>

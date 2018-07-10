@@ -328,17 +328,16 @@ export class VglService {
     return this.vglRequest('updateDownloadOptions.do', options);        
   }
 
-  //gets csw record information based on fileter parameters such as file identifier and service id
-  public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {
+//gets csw record information based on fileter parameters such as file identifier and service id 
+public getFilteredCSWRecord(fileIdentifier : string, serviceId : string): Observable<CSWRecordModel[]> {
     const options = {
             params: {
-                key: fields,
-                value: values,            
-                start: startPosition.toString()            
+                fileIdentifier: fileIdentifier,
+                serviceId: serviceId
             }    
     };
-    return this.vglRequest('getFilteredCSWRecords.do', options);           
-}
+    return this.vglRequest('getCSWRecord.do', options);           
+} 
 
 //gets registry information to be used in faceted search and bookmarking of a dataset
 public getAvailableRegistries(): Observable<any> {  

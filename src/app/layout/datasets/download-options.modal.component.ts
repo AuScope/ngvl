@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy,ViewChild,ElementRef } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,7 +6,6 @@ import { UserStateService } from '../../shared';
 import { DownloadOptions, BookMark } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
-import { startWith } from 'rxjs/operators';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,10 +29,9 @@ export class DownloadOptionsModalContent implements OnInit {
     @Input() cswRecord: CSWRecordModel;
     private hasFormChanged: boolean = false;
     private saveOptionsChecked: boolean;
-
     downloadOptionsForm: FormGroup;
-
     dataTypes: any[] = [];
+    @ViewChild('saveCheckbox') private saveCheckbox: ElementRef;
 
 
     constructor(private formBuilder: FormBuilder,
@@ -169,9 +167,9 @@ export class DownloadOptionsModalContent implements OnInit {
      * Revert any form input changes back to their original state
      */
     public revertChanges(): void {
-        this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
-        const checkBox = <HTMLInputElement>document.getElementById('saveBookMark');
-        checkBox.checked = false;
+        this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });        
+        if(this.saveCheckbox.nativeElement.checked)
+            this.saveCheckbox.nativeElement.checked = false;        
     }
 
 

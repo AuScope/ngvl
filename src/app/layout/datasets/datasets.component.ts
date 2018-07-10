@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
-import { Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
 import { routerTransition } from '../../router.animations';
@@ -74,10 +74,10 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         private authService: AuthService) { }
 
 
-    ngOnInit() {        
-        this.userStateService.setView(DATA_VIEW);        
+    ngOnInit() {
+        this.userStateService.setView(DATA_VIEW);
         // Load available registries
-        this.cswSearchService.updateRegistries().subscribe(data => {              
+        this.cswSearchService.updateRegistries().subscribe(data => {
             this.availableRegistries = data;
             for (let registry of this.availableRegistries) {
                 registry.checked = true;
@@ -88,18 +88,18 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
             this.facetedSearch();
-            this.getFacetedKeywords();    
-             //get bookmark data only if the user is logged in
-             if (this.isValidUser())            
-                this.getBookMarkCSWRecords();       
+            this.getFacetedKeywords();
+            //get bookmark data only if the user is logged in
+            if (this.isValidUser())
+                this.getBookMarkCSWRecords();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
-        });   
-                 
-                 
-           
-       
+        });
+
+
+
+
         // Define available services
         this.availableServices = [
             { 'id': 'wcs', 'name': 'WCS', 'checked': false },
@@ -110,7 +110,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
         this.anyTextIsCollapsed = false;
         this.searchResultsIsCollapsed = false;
-    }   
+    }
 
     ngAfterViewChecked() {
         this.userStateService.setView(DATA_VIEW);
@@ -438,35 +438,29 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     /**
      * Check if the user is logged in and not anonymous
      */
-    isValidUser(): boolean {             
+    isValidUser(): boolean {
         return this.authService.isLoggedIn;
     }
 
     /**
      * get user's information for book marks and book marked csw records
      */
-    public getBookMarkCSWRecords() {                
-        let startPosition: number = 0;      
+    public getBookMarkCSWRecords() {
+        let startPosition: number = 0;
         this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
-            }, error => {
-                console.log(error.message);
-            });              
-            // empty the book marked csw record list before gettting updated list
-            this.bookMarkCSWRecords = [];                
-            this.bookMarks.forEach(bookMark => {
-                let fields: string[] = [];
-                let values: string[] = [];
-                fields.push('fileIdentifier');
-                values.push(bookMark.fileIdentifier);
-                fields.push('cswServiceId');
-                values.push(bookMark.serviceId);
-                this.cswSearchService.getFilteredCSWRecord(fields, values, startPosition).subscribe(response => {
-                    if (response && response.length == 1) {
-                        this.bookMarkCSWRecords.push(response.pop());
-                    }
-                });
-            });                                      
+        }, error => {
+            console.log(error.message);
+        });
+        // empty the book marked csw record list before gettting updated list
+        this.bookMarkCSWRecords = [];
+        this.bookMarks.forEach(bookMark => {
+            this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
+                if (response && response.length == 1) {
+                    this.bookMarkCSWRecords.push(response.pop());
+                }
+            });
+        });
     }
 
     /**
@@ -492,7 +486,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             });
             if (pos > -1)
                 this.bookMarkCSWRecords.splice(pos, 1);
-        }        
+        }
     }
 
 }

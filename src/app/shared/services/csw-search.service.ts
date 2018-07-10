@@ -123,8 +123,8 @@ export class CSWSearchService {
         return serviceId; 
     }
 
-    public getFilteredCSWRecord(fields: string[], values: string[],startPosition: number): Observable<CSWRecordModel[]> {         
-        return this.vgl.getFilteredCSWRecord(fields,values,startPosition);
+    public getFilteredCSWRecord(fileIdentifier : string, serviceId : string): Observable<CSWRecordModel[]> {         
+        return this.vgl.getFilteredCSWRecord(fileIdentifier,serviceId);
     }
 
     public getBookMarks(): Observable <BookMark[]> {       

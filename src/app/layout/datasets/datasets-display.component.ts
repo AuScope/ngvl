@@ -12,9 +12,9 @@ import olExtent from 'ol/extent';
 @Component({
     selector: 'app-datasets-display',
     templateUrl: './datasets-display.component.html',
-    styleUrls: ['./datasets-display.component.scss']
+    styleUrls: ['./datasets-display.component.scss']    
 })
-export class DatasetsDisplayComponent implements OnInit {
+export class DatasetsDisplayComponent {
 
     @Input() registries: any = [];
     @Input() cswRecordList: CSWRecordModel[] = [];    
@@ -24,11 +24,8 @@ export class DatasetsDisplayComponent implements OnInit {
     @Output() bookMarkChoice = new EventEmitter();    
 
     constructor(private olMapService: OlMapService,
-        private cswSearchService: CSWSearchService,
+        private cswSearchService: CSWSearchService,        
         private modalService: NgbModal) { }
-
-    ngOnInit() {       
-    }
 
     /**
      *
@@ -39,7 +36,7 @@ export class DatasetsDisplayComponent implements OnInit {
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
-            alert(error.message);
+            alert(error.message);            
         }
     }
 

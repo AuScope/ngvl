@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { ConfirmDatasetsModalContent } from '../../confirm-datasets.modal.component';
-import { UserStateService } from '../../../../shared';
 import { DownloadOptions } from '../../../../shared/modules/vgl/models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
@@ -8,7 +7,6 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import olExtent from 'ol/extent';
-import olLayer from 'ol/layer/layer';
 import olProj from 'ol/proj';
 
 
@@ -49,7 +47,6 @@ export class OlMapDataSelectComponent {
 
 
     constructor(private olMapService: OlMapService,
-        private userStateService: UserStateService,
         private modalService: NgbModal) { }
 
 
@@ -75,13 +72,6 @@ export class OlMapDataSelectComponent {
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
                 const modelRef = this.modalService.open(ConfirmDatasetsModalContent, { size: 'lg' });
-                /*
-                this.userStateService.datasetDownloads.subscribe(
-                    datasetDownloads => {
-                        modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent, datasetDownloads);
-                    }
-                );
-                */
                 modelRef.componentInstance.cswRecordTreeData = this.buildTreeData(cswRecords, extent);
             }
             this.buttonText = 'Select Data';
@@ -90,6 +80,8 @@ export class OlMapDataSelectComponent {
 
 
     /**
+     * Return a count of the active layers on the map
+     * 
      * TODO: This is used elsewhere, should make a map service method
      */
     public getActiveLayerCount(): number {
@@ -129,6 +121,7 @@ export class OlMapDataSelectComponent {
 
 
     /**
+     * Create default download options for a given online resource
      * 
      * @param or 
      * @param cswRecord 
@@ -205,6 +198,7 @@ export class OlMapDataSelectComponent {
 
 
     /**
+     * Is the online resource of a supported type
      * 
      * @param onlineResource 
      */
@@ -222,10 +216,9 @@ export class OlMapDataSelectComponent {
 
 
     /**
-     * Builds TreeTable from supplied CSWRecords
+     * Builds TreeTable from supplied CSWRecords for display in the confirm
+     * datasets modal
      *
-     * TODO: Currently only looks at NCSS data
-     * 
      * @param cswRecords list of CSWRecords from which to construct a list of
      *                   TreeNodes
      * @param region the user selected region, may be the entire CSWRecord
@@ -260,28 +253,6 @@ export class OlMapDataSelectComponent {
             }
 
             for (let record of cswRecords) {
-
-                // See if this record has already been selected
-                /*
-                const datasetDownload = datasetDownloads.find(dataDl => dataDl.cswRecord === record);
-                if(datasetDownload) {
-                    console.log("Adding existing DL to tree");
-                    let node: TreeNode = {};
-                    node.data = {
-                        "name": datasetDownload.onlineResource.name,
-                        "url": datasetDownload.onlineResource.url,
-                        "cswRecord": datasetDownload.cswRecord,
-                        "onlineResource": datasetDownload.onlineResource,
-                        "downloadOptions": datasetDownload.downloadOptions,
-                        "leaf": true
-                    }
-                    
-                    //node.selected = true;
-                    const rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === datasetDownload.onlineResource.type);
-                    if(rootResourceNode) {
-                        rootResourceNode.children.push(node);
-                    }
-                }*/
                 let foundResourceTypeForRecord: boolean = false;
                 for (let resourceType in this.onlineResources) {
                     let rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === resourceType);

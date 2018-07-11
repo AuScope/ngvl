@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TreeJobs, TreeJobNode, JobDownload, JobFile, CloudFileInformation } from '../../../shared/modules/vgl/models';
+import { JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
 import { UserStateService } from '../../../shared';
 import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.component';
 import { TreeNode } from 'primeng/api';
@@ -195,7 +195,7 @@ export class JobSubmissionDatasetsComponent {
         );
 
         // Job files copied from jobs
-        const copiedJobFiles = this.userStateService.jobCloudFiles.subscribe(
+        this.userStateService.jobCloudFiles.subscribe(
             jobCloudFiles => {
                 for (const jobFile of jobCloudFiles) {
                     this.addJobCloudFileToTree(jobFile);
@@ -265,7 +265,7 @@ export class JobSubmissionDatasetsComponent {
     private deleteSelectedInput(): void {
         if (this.selectedJobInputNode.parent.data.id === 'upload') {
             if (this.selectedJobInputNode.data.input.hasOwnProperty('cloudKey')) {
-                this.userStateService.removeCloudFile(this.selectedJobInputNode.data.input);
+                this.userStateService.removeJobCloudFile(this.selectedJobInputNode.data.input);
             } else {
                 this.userStateService.removeUploadedFile(this.selectedJobInputNode.data.input);
             }
@@ -290,7 +290,7 @@ export class JobSubmissionDatasetsComponent {
                     }
                     for (let cloudFile of result.jobCloudFiles) {
                         cloudFile.jobId = result.jobId;
-                        this.userStateService.addCloudFile(cloudFile);
+                        this.userStateService.addJobCloudFile(cloudFile);
                     }
                     // TODO: Can probably just add new ones instead of full reload,
                     // but will help keep in sync until better logic is added

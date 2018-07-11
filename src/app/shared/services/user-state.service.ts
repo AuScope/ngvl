@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation } from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
-
-import { environment } from '../../../environments/environment';
 
 import { saveAs } from 'file-saver/FileSaver';
 
@@ -166,13 +163,13 @@ export class UserStateService {
     this._jobCloudFiles.next(jobCloudFiles);
   }
 
-  public addCloudFile(cloudFile: CloudFileInformation) {
+  public addJobCloudFile(cloudFile: CloudFileInformation) {
       let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
       cloudFiles.push(cloudFile);
       this._jobCloudFiles.next(cloudFiles);
   }
 
-  public removeCloudFile(cloudFile: CloudFileInformation): void {
+  public removeJobCloudFile(cloudFile: CloudFileInformation): void {
     let cloudFiles: any[] = this._jobCloudFiles.getValue();
     cloudFiles.forEach((item, index) => {
       if(item === cloudFile) {

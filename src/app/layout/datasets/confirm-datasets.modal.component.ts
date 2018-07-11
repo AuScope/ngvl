@@ -1,13 +1,10 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { DownloadOptionsModalContent } from './download-options.modal.component';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from '../../shared';
-import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 

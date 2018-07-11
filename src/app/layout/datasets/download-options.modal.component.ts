@@ -14,7 +14,7 @@ import { VglService } from '../../shared/modules/vgl/vgl.service';
 
 export class DownloadOptionsModalContent implements OnInit {
 
-    // TODO: We may want to move these if needed by other classes
+    // Validator patterns
     LATITUDE_PATTERN = '^(\\+|-)?(?:90(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,20})?))$';
     LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,20})?))$';
 
@@ -165,8 +165,6 @@ export class DownloadOptionsModalContent implements OnInit {
                 }
             }
             this.activeModal.close();
-        } else {
-
         }
     }
     

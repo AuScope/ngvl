@@ -176,7 +176,9 @@ export class ConfirmDatasetsModalContent {
                 forkJoin(makeUrls).subscribe(results => {
                     this.capturedJobDownloadCount = results.length;
                     // Persist data selections to user state service
-                    this.userStateService.setJobDownloads(<JobDownload[]>results);
+                    for(let result of results) {
+                        this.userStateService.addJobDownload(<JobDownload>result);
+                    }
                     // Display selection OK modal
                     this.modalService.open(this.selectedDatasetsOkModal);
                     this.activeModal.close();

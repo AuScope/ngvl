@@ -119,14 +119,14 @@ export class ConfirmDatasetsModalContent {
      * 
      * TODO: Do
      */
-    public editDownload(onlineResource: any, cswRecord: CSWRecordModel, downloadOptions: DownloadOptions): void {
+    public editDownload(onlineResource: any, cswRecord: CSWRecordModel,defaultOptions:DownloadOptions,downloadOptions: DownloadOptions): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
         let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
-        modelRef.componentInstance.defaultDownloadOptions = downloadOptions;
+        modelRef.componentInstance.defaultDownloadOptions = defaultOptions;
         if (isBookMarkRecord) {
             let savedDwnldOptions: DownloadOptions = this.cswSearchService.getDownloadOptions(cswRecord);            
             if (this.areOptionsStored(savedDwnldOptions)) {         

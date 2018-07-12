@@ -166,10 +166,10 @@ export class DownloadOptionsModalContent implements OnInit {
     /**
      * Revert any form input changes back to their original state
      */
-    public revertChanges(): void {
-        this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });        
-        if(this.saveCheckbox.nativeElement.checked)
-            this.saveCheckbox.nativeElement.checked = false;        
+    public revertChanges(): void {      
+            this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });              
+            if(this.saveCheckbox && this.saveCheckbox.nativeElement.checked)
+                this.saveCheckbox.nativeElement.checked = false;                
     }
 
 

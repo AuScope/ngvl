@@ -1,7 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { ViewChild } from '@angular/core';
 import { UserStateService, ViewType } from '../../../shared';
-import { OverlayPanel } from 'primeng/overlaypanel';
 
 
 
@@ -85,31 +83,3 @@ export class SidebarComponent implements OnInit {
     }
 
 }
-
-
-// /**
-//   * Retrieve csw records from the service and organize them by group
-//   * @returns a observable object that returns the list of csw record organized in groups
-//   */
-//  public getLayerRecord(): Observable<any> {
-//    const me = this;
-//    if (this.layerRecord.length > 0) {
-//        return Observable.of(this.layerRecord);
-//    } else {
-//      return this.http.get(this.env.portalBaseUrl + this.env.getCSWRecordUrl)
-//        .map(response => {
-//            const cswRecord = response['data'];
-//            cswRecord.forEach(function(item, i, ar) {
-//              if (me.layerRecord[item.group] === undefined) {
-//                me.layerRecord[item.group] = [];
-//              }
-//              // VT: attempted to cast the object into a typescript class however it doesn't seem like its possible
-//              // all examples points to casting from json to interface but not object to interface.
-//              item.expanded = false;
-//              item.hide = false;
-//              me.layerRecord[item.group].push(item);
-//            });
-//            return me.layerRecord;
-//        });
-//    }
-//  }

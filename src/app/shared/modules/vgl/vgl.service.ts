@@ -137,12 +137,6 @@ export class VglService {
         return this.vglRequest('secure/getPlaintextPreview.do', options);
     }
 
-    /*
-    public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
-      return this.vglRequest('secure/getImagePreview.do');
-    }
-    */
-
     public deleteJob(jobId: number): Observable<any> {
         const options = {
             params: { jobId: jobId.toString() }
@@ -242,6 +236,7 @@ export class VglService {
      *
      * @param url
      */
+    /*
     private createParamsFromUrl(url: string): any {
         let params: {};
         const urlParameters: string[] = url.split('?');
@@ -252,6 +247,7 @@ export class VglService {
         }
         return params;
     }
+    */
 
     public makeErddapUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {

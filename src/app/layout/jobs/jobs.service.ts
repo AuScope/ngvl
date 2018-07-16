@@ -51,10 +51,4 @@ export class JobsService {
         return this.vgl.getAuditLogs(jobId);
     }
 
-    /*
-    public getImagePreview(jobId: number, filename: string): Observable<ImageData> {
-      return this.vgl.getImagePreview(jobId, filename);
-    }
-    */
-
 }

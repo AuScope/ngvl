@@ -14,21 +14,38 @@ export class ImagePreview implements PreviewComponent {
     // Data will be a URL to the server's getImagePreview endpoint
     data: any;
 
+    // Is fit to preview checkbox selected, currently unused
+    fitImageToPreview: boolean = false;
+
 
     constructor() {
     }
 
 
     /**
-     * 
-     * @param cbElement TODO: Have this called from the footer of the preview panel, use it to change style
+     * Currently unused, can be used to apply style change to img element
      */
-    public actualSizeChanged(cbElement: HTMLInputElement): void {
-        if(cbElement.checked) {
-            
+    public setStyles(): any {
+        let styles = {};
+        if(this.fitImageToPreview) {
+            styles = {
+                'width': '100%',
+                'height': '100%'
+            }
         } else {
-            
+            styles = {
+                'overflow': 'hidden'
+            }
         }
+        return styles;
+    }
+
+    /**
+     * 
+     * @param cbElement The "fit to preview" checkbox
+     */
+    public fitPreviewCheckboxChanged(cbElement: HTMLInputElement): void {
+        this.fitImageToPreview = cbElement.checked;
     }
 
 

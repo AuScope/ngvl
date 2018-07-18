@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation } from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, Job } from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
 
 import { saveAs } from 'file-saver/FileSaver';
@@ -18,7 +18,10 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 @Injectable()
 export class UserStateService {
 
-    constructor(private vgl: VglService) { }
+    constructor(private vgl: VglService) {
+        // Initialise a new Job object for the User
+        this._job.next(this.createEmptyJob());
+    }
 
     private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
     public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
@@ -40,6 +43,9 @@ export class UserStateService {
 
     private _jobCloudFiles: BehaviorSubject<CloudFileInformation[]> = new BehaviorSubject([]);
     public readonly jobCloudFiles: Observable<CloudFileInformation[]> = this._jobCloudFiles.asObservable();
+
+    private _job: BehaviorSubject<Job> = new BehaviorSubject(null);
+    public readonly job: Observable<Job> = this._job.asObservable();
 
     public setView(viewType: ViewType): Observable<ViewType> {
         this._currentView.next(viewType);
@@ -177,6 +183,41 @@ export class UserStateService {
       }
     });
     this._jobCloudFiles.next(cloudFiles);
+  }
+
+  private createEmptyJob(): Job {
+    let job = {
+        id: -1,
+        name: "",
+        description: "",
+        emailAddress: "",
+        user: "",
+        submitDate: null,
+        processDate: null,
+        status: "",
+        computeVmId: "",
+        computeInstanceId: null,
+        computeInstanceType: "",
+        computeInstanceKey: "",
+        computeServiceId: "",
+        storageBaseKey: "",
+        storageServiceId: "",
+        registeredUrl: "",
+        seriesId: null,
+        emailNotification: false,
+        processTimeLog: "",
+        storageBucket: "",
+        promsReportUrl: "",
+        computeVmRunCommand: "",
+        useWalltime: false, // Not part of VEGLJob, but needed for job object UI
+        walltime: null,
+        containsPersistentVolumes: false,
+        executeDate: null,
+        jobParameters: [],
+        jobDownloads: [],
+        jobFiles: []
+    }
+    return job;
   }
 
 }

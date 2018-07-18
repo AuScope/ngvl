@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, ComputeService, MachineImage, ComputeType } from './models';
 
 import { environment } from '../../../../environments/environment';
 
@@ -211,6 +211,27 @@ export class VglService {
             params.set('', );
         */
         return this.vglRequest('secure/updateOrCreateJob.do', { params: httpParams });
+    }
+
+    public getComputeServices(): Observable<ComputeService[]> {
+        return this.vglRequest('secure/getComputeServices.do');
+    }
+
+    public getMachineImages(computeServiceId: string): Observable<MachineImage[]> {
+        const options = {
+            params: { computeServiceId: computeServiceId }
+        }
+        return this.vglRequest('secure/getVmImagesForComputeService.do', options);
+    }
+    
+    public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
+        const options = {
+            params: {
+                computeServiceId: computeServiceId,
+                machineImageId: machineImageId
+            }
+        }
+        return this.vglRequest('secure/getVmTypesForComputeService.do', options);
     }
 
     public submitJob(jobId: number): Observable<any> {

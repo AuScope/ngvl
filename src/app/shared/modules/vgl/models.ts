@@ -133,7 +133,7 @@ export interface Job {
     submitDate: Date;
     processDate: Date;
     status: string;
-    computeVmI: string;
+    computeVmId: string;
     computeInstanceId: null,
     computeInstanceType: string;
     computeInstanceKey: string;
@@ -154,6 +154,43 @@ export interface Job {
     jobDownloads: JobDownload[];
     jobFiles: JobFile[];
     //jobSolutions: Solution[]; // XXX needed?
+}
+
+export interface ComputeService {
+    id: string;
+    name: string;
+}
+
+export interface MachineImage {
+    // The unique id of the cloud image - will be used for spawning instances of this image
+    imageId: string;
+    // Descriptive short name of this image
+    name: string;
+    // Longer description of this image
+    description: string;
+    // (Possibly empty) List of descriptive keywords for this image
+    keywords: string[];
+    // The minimum root disk size (in GB) that this image can be run on. Null if this is N/A
+    minimumDiskGB: number;
+    // The (possibly null) run command that should be used to execute python scripts. If null, most providers will default to 'python'
+    runCommand: string;
+    // Permissions
+    permissions: string[];
+}
+
+export interface ComputeType {
+    /** Name of this compute type (valid only at parent compute provider) */
+    id: string;
+    /** Human readable short description of this compute type */
+    description: string;
+    /** How many virtual CPU's does this compute type offer */
+    vcpus: number;
+    /** How much RAM (roughly) in MB does this compute type offer */
+    ramMB: number;
+    /** How much does the root disk of this compute type offer (in GB) */
+    rootDiskGB: number;
+    /** How much does the Ephemeral disk of this compute type offer (in GB) */
+    ephemeralDiskGB: number;
 }
 
 export interface CloudFileInformation {

@@ -11,6 +11,8 @@
     </select>
 
   </div>
-
   <div class="errorMessage" *ngIf="!isValid">{{binding.label}} is required</div>
+
+  <p class="help-block">{{ binding.description }}</p>
+
 </div>

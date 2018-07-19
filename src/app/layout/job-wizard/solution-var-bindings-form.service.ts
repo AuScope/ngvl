@@ -12,7 +12,7 @@ export class SolutionVarBindingsFormService {
     let group: any = {};
 
     bindings.forEach(binding => {
-      group[binding.key] = group.required
+      group[binding.key] = binding.required
         ? new FormControl(binding.value || '', Validators.required)
         : new FormControl(binding.value || '');
     });

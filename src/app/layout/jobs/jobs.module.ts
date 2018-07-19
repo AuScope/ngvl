@@ -24,10 +24,11 @@ import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
 import { JobStatusModalContent } from './job-status.modal.component';
 import { JobInputsBrowserModalContent } from './submission/job-inputs-browser.modal.component';
-
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
     imports: [
+        AngularSplitModule,
         CommonModule,
         FormsModule,
         JobsRoutingModule,

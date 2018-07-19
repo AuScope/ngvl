@@ -2,116 +2,127 @@
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
     <!-- TODO: Translations -->
     <!-- TODO: Move styles to CSS -->
-    <div class="row" style="height: calc(100vh - 200px);">
+    <div class="col" style="height: calc(100vh - 200px);padding: 0px; width: 100%;">
+        <!-- <div class="row" style="height: calc(100vh - 200px);"> -->
         <!-- Job tree -->
-        <div class="col-lg-4">
-            <div class="card" style="padding: 0px; height: 100%;">
-                <div class="card-header">Your Jobs</div>
-                <div class="card-body" style="overflow-y:auto;padding:0px;">
-                    <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
-                </div>
-                <div class="card-footer">
-                    <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
-                        <i class="fa fa-refresh">&nbsp;Refresh</i>
-                    </button>
-                    <button class="btn btn-sm pull-right" (click)="showAddFolderModal(addFolderModal)">
-                        <i class="fa fa-folder">&nbsp;Add Folder</i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Selected job -->
-        <div class="col">
-            <div class="card" style="height: 100%;">
-                <!-- Header: Selected job details or prompt user to select a job -->
-                <div *ngIf="!jobBrowser.selectedJob">
-                    <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
-                </div>
-                <div *ngIf="jobBrowser.selectedJob">
-                    <div class="card-header">{{ jobBrowser.selectedJob.name }}</div>
-                </div>
-                <div class="card-body" *ngIf="jobBrowser.selectedJob" style="padding:0px;">
-                    <div class="container">
-                        <!-- General job details -->
-                        <div class="row">
-                            <div class="col">
-                                <table>
-                                    <tr>
-                                        <!-- TODO: Display status==="Error" in red -->
-                                        <td>
-                                            <strong>{{ jobBrowser.selectedJob.status }}</strong>
-                                        </td>
-                                        <td>
-                                            <strong>{{ jobBrowser.selectedJob.id }}</strong>
-                                        </td>
-                                        <td *ngIf="jobBrowser.selectedJob.computeInstanceId">
-                                            <strong>{{ jobBrowser.selectedJob.computeInstanceId }}</strong>
-                                        </td>
-                                        <td *ngIf="!jobBrowser.selectedJob.computeInstanceId">
-                                            <strong>N/A</strong>
-                                        </td>
-                                        <td *ngIf="jobBrowser.selectedJob.computeInstanceType">
-                                            <strong>{{ jobBrowser.selectedJob.computeInstanceType }}</strong>
-                                        </td>
-                                        <td *ngIf="!jobBrowser.selectedJob.computeInstanceType">
-                                            <strong>N/A</strong>
-                                        </td>
-                                        <td>
-                                            <strong>{{ jobBrowser.selectedJob.submitDate | date }}</strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <small>Status</small>
-                                        </td>
-                                        <td>
-                                            <small>Job ID</small>
-                                        </td>
-                                        <td>
-                                            <small>Instance ID</small>
-                                        </td>
-                                        <td>
-                                            <small>Instance Type</small>
-                                        </td>
-                                        <td>
-                                            <small>Submitted</small>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
+        <split direction='horizontal'>
+            <split-area size="30">
+                <div class="col" style="padding: 0px; width: 100%;">
+                    <div class="card" style="padding: 0px; width: 100%; height: 100%;">
+                        <div class="card-header">Your Jobs</div>
+                        <div class="card-body" style="overflow-y:auto;padding:0px;">
+                            <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
                         </div>
+                        <div class="card-footer">
+                            <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
+                                <i class="fa fa-refresh">&nbsp;Refresh</i>
+                            </button>
+                            <button class="btn btn-sm pull-right" (click)="showAddFolderModal(addFolderModal)">
+                                <i class="fa fa-folder">&nbsp;Add Folder</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="row">
-                            <!-- File panel -->
-                            <!-- Issue with padding changing after navigating to Datasets -->
-                            <div class="col">
-                                <div class="card" style="height: calc(100vh - 304px);">
-                                    <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
-                                        <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
-                                    </div>
+            </split-area>
+            <split-area size="70">
+                <!-- Selected job -->
+                <div class="col" style="padding:0px;">
+                    <div class="card" style="height: 100%;">
+                        <!-- Header: Selected job details or prompt user to select a job -->
+                        <div *ngIf="!jobBrowser.selectedJob">
+                            <div class="card-header" style="margin-top:0px;margin-bottom:0px;">Select a job on the left to view more details</div>
+                        </div>
+                        <div *ngIf="jobBrowser.selectedJob">
+                            <div class="card-header">{{ jobBrowser.selectedJob.name }}</div>
+                        </div>
+                        <div class="card-body" *ngIf="jobBrowser.selectedJob" style="padding:0px;">
+                            <!-- General job details -->
+                            <div class="row">
+                                <div class="col">
+                                    <table>
+                                        <tr>
+                                            <!-- TODO: Display status==="Error" in red -->
+                                            <td>
+                                                <strong>{{ jobBrowser.selectedJob.status }}</strong>
+                                            </td>
+                                            <td>
+                                                <strong>{{ jobBrowser.selectedJob.id }}</strong>
+                                            </td>
+                                            <td *ngIf="jobBrowser.selectedJob.computeInstanceId">
+                                                <strong>{{ jobBrowser.selectedJob.computeInstanceId }}</strong>
+                                            </td>
+                                            <td *ngIf="!jobBrowser.selectedJob.computeInstanceId">
+                                                <strong>N/A</strong>
+                                            </td>
+                                            <td *ngIf="jobBrowser.selectedJob.computeInstanceType">
+                                                <strong>{{ jobBrowser.selectedJob.computeInstanceType }}</strong>
+                                            </td>
+                                            <td *ngIf="!jobBrowser.selectedJob.computeInstanceType">
+                                                <strong>N/A</strong>
+                                            </td>
+                                            <td>
+                                                <strong>{{ jobBrowser.selectedJob.submitDate | date }}</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <small>Status</small>
+                                            </td>
+                                            <td>
+                                                <small>Job ID</small>
+                                            </td>
+                                            <td>
+                                                <small>Instance ID</small>
+                                            </td>
+                                            <td>
+                                                <small>Instance Type</small>
+                                            </td>
+                                            <td>
+                                                <small>Submitted</small>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
-
-                            <!-- Preview panel (no longer a card, match card style)-->
-                            <div class="col" style="height: calc(100vh - 304px);border: 1px solid #ddd;border-radius: 0.25rem;padding: 0px;margin-right: 10px;">
-                                <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
-                                    <div style="text-align: center;vertical-align: middle;display:table-cell;">
-                                        Select a file to the left to preview it here.
-                                    </div>
+    
+                            <div class="row" style="margin-right: 0px;margin-left: 0px;">
+                                <!-- File panel -->
+                                <!-- Issue with padding changing after navigating to Datasets -->
+                                <div class="col" style="height: calc(100vh - 304px);border: 1px solid #ddd;border-radius: 0.25rem;padding: 0px;margin-right: 10px;">
+                                    <split direction='horizontal'>
+                                        <split-area size="30">
+                                                <div class="card" >
+                                                    <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
+                                                        <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
+                                                    </div>
+                                                </div>
+                                        </split-area>
+                                        <split-area size="70" style="overflow-y: hidden;">
+                                            <!-- Preview panel (no longer a card, match card style)-->
+                                                <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
+                                                    <div style="height:100%;width:100%;text-align: center;vertical-align: middle;display:table-cell;">
+                                                        Select a file to the left to preview it here.
+                                                    </div>
+                                                </div>
+                                                <div *ngIf="filePreviewLoading" class="spinner">
+                                                    <div class="bounce1"></div>
+                                                    <div class="bounce2"></div>
+                                                    <div class="bounce3"></div>
+                                                </div>
+                                                <div style="height: 99%;min-height: 100px;">
+                                                    <!-- <div style="height: 100%;align-items: stretch;min-height: 100px"> -->
+                                                    <ng-template preview-host></ng-template>
+                                                </div>
+                                        </split-area>
+                                    </split>
                                 </div>
-                                <div *ngIf="filePreviewLoading" class="spinner">
-                                    <div class="bounce1"></div>
-                                    <div class="bounce2"></div>
-                                    <div class="bounce3"></div>
-                                </div>
-                                <ng-template preview-host></ng-template>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </split-area>
+        </split>
     </div>
 </div>
 

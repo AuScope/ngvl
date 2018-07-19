@@ -16,7 +16,9 @@ interface VglResponse<T> {
 }
 
 function vglData<T>(response: VglResponse<T>): T {
-    return response.data;
+  const data = response.data;
+
+  return data;
 }
 
 @Injectable()

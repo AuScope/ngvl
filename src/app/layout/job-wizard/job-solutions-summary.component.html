@@ -1,5 +1,5 @@
 <div class="row" *ngIf="(solutions$ | async) as solutions; else noSolutions">
-  <div class="col-md">
+  <div class="col-md-4">
     <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
       <button *ngFor="let solution of solutions"
         type="button"
@@ -20,11 +20,13 @@
       </button>
     </div>
   </div>
-  <div class="col-md">
+  <div class="col-md-8">
     <app-job-solution-vars
       *ngFor="let solution of solutions"
+      [ngbCollapse]="!solution.isActive"
       [solution]="solution"
-      (solutionChange)="updateTemplate()"></app-job-solution-vars>
+      [bindings]="varBindings[solution['@id']]"
+      (bindingsChange)="updateTemplate()"></app-job-solution-vars>
   </div>
 </div>
 

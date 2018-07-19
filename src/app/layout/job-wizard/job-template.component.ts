@@ -32,8 +32,6 @@ export class JobTemplateComponent implements OnInit, OnDestroy {
       map(solutions => solutions.map(this.makeRequest()))
     ).subscribe(requests => {
       forkJoin(requests).subscribe(templates => {
-        console.log('Got templates: ');
-        templates.forEach(console.log);
         this.template = templates.join('\n\n');
       });
     });

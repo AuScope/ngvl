@@ -47,7 +47,7 @@ export class JobsComponent implements OnInit {
     previewItems: PreviewItem[] = [
         new PreviewItem("data-service", DataServicePreview, {}, []),
         new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh', 'log']),
-        new PreviewItem("log", LogPreview, {}, ['log']),
+        new PreviewItem("log", LogPreview, {}, ['.sh.log']),
         new PreviewItem("ttl", TtlPreview, {}, ['ttl']),
         new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
     ];
@@ -116,6 +116,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Event fired when an input (JobDownload or CloudFileInformation) is selected
      * 
      * @param event 
      */
@@ -134,6 +135,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Add the specified PreviewItem to the container
      * 
      * @param previewItem 
      * @param data 
@@ -149,6 +151,8 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Preview a JobDownload object
+     * 
      * TODO: Are there other types of Data Service Downloads?
      * 
      * @param jobDownload 
@@ -193,6 +197,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Preview a CloudFileInformation object
      * 
      * @param cloudFile 
      */
@@ -200,9 +205,18 @@ export class JobsComponent implements OnInit {
         this.cancelCurrentSubscription();
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
-        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
-        let previewItem: PreviewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+
+        let previewItem: PreviewItem = undefined;
+
+        // Job log file is a special case, look for this first
+        if(cloudFile.name === "vl.sh.log") {
+            previewItem = this.previewItems.find(item => item.type === 'log');
+        } else {
+            const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
+            previewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
+        }
         // If the type can't be found, we'll try plain text
+        // TODO: What if it's binary, check this out
         if(previewItem === undefined) {
             previewItem = this.previewItems.find(item => item.type === 'plaintext');
         }
@@ -217,10 +231,9 @@ export class JobsComponent implements OnInit {
         // sectioned logs in tabs per section)
         else if (previewItem && (previewItem.type === 'log')) {
             this.filePreviewLoading = true;
-            // TODO: Max file size to config
-            this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
-                preview => {
-                    this.previewFile(previewItem, preview);
+            this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
+                logData => {
+                    this.previewFile(previewItem, logData);
                     this.currentPreviewObject = cloudFile;
                     this.filePreviewLoading = false;
                 },
@@ -237,8 +250,8 @@ export class JobsComponent implements OnInit {
             this.filePreviewLoading = true;
             // TODO: Max file size to config
             this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
-                preview => {
-                    this.previewFile(previewItem, preview);
+                previewData => {
+                    this.previewFile(previewItem, previewData);
                     this.currentPreviewObject = cloudFile;
                     this.filePreviewLoading = false;
                 },
@@ -254,7 +267,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
-     * 
+     * Refresh the preview panel
      */
     refreshPreview(): void {
         if (this.currentPreviewObject) {
@@ -269,6 +282,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Add a folder to the Job tree new Jobs can be added to
      * 
      * @param folderName the name of the folder to be added
      */
@@ -286,6 +300,7 @@ export class JobsComponent implements OnInit {
 
 
     /**
+     * Show a dialog for adding a folder to the Job tree
      * 
      * @param content the add folder modal content
      */

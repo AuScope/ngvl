@@ -140,6 +140,16 @@ export class VglService {
         return this.vglRequest('secure/getPlaintextPreview.do', options);
     }
 
+    public getSectionedLogs(jobId: number): Observable<any> {
+        const options = {
+            params: {
+                jobId: jobId.toString()
+            }
+        };
+
+        return this.vglRequest('secure/getSectionedLogs.do', options);
+    }
+
     public deleteJob(jobId: number): Observable<any> {
         const options = {
             params: { jobId: jobId.toString() }

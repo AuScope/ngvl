@@ -224,7 +224,10 @@ export interface DownloadOptions {
     coverageName?: string,
     serviceUrl?: string,
     srsName?: string,
-    featureType?: string
+    featureType?: string,
+    id?: string,
+    bookmarkId?: string,
+    bookmarkOptionName?: string;
 }
 
 /* book marks information for a dataset*/
@@ -232,14 +235,7 @@ export interface BookMark {
     fileIdentifier: string;
     serviceId: string;
     userId?: string;   
-    url?: string;
-    localPath?: string;
-    name?: string;
-    description?: string;    
-    eastBoundLongitude?: number;
-    northBoundLatitude?: number;
-    southBoundLatitude?: number;
-    westBoundLongitude?: number;     
+    id?: string;
 }
 
 /* Registry information used in faceted search and for book marks*/

@@ -10,6 +10,7 @@ import { DownloadOptionsModalContent } from './download-options.modal.component'
 import { NgbCollapseModule, NgbDatepickerModule, NgbModalModule, NgbTypeaheadModule,NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
+import {DropdownModule} from 'primeng/dropdown';
 import { DatasetsDisplayComponent } from './datasets-display.component';
 
 
@@ -23,6 +24,7 @@ import { DatasetsDisplayComponent } from './datasets-display.component';
     OlMapModule,
     TableModule,    // Note: PrimeNG v6.0.0 needs this for TreeTable to display correctly
     TreeTableModule,
+    DropdownModule,
     NgbCollapseModule.forRoot(),
     NgbDatepickerModule.forRoot(),
     NgbModalModule.forRoot(),

@@ -322,10 +322,35 @@ export class VglService {
 
   /**
    * update / save download optiions for a bookmarked dataset
-   */
+   
   public updateDownloadOptions(bookMark : BookMark) :  Observable <any> {    
     const options = { params:bookMark };   
     return this.vglRequest('updateDownloadOptions.do', options);        
+  } */
+
+
+  /**   
+   * @param bookMark get download options associated with a book mark
+   */
+  public getDownloadOptions(bookMark : BookMark) :  Observable <DownloadOptions[]> {    
+    const options = { params:bookMark };   
+    return this.vglRequest('getDownloadOptions.do', options);        
+  }
+
+  /**   
+   * @param bookMark update download options associated with a book mark
+   */
+  public updateDownloadOptions(downloadOptions : DownloadOptions) :  Observable <any> {    
+    const options = { params:downloadOptions };   
+    return this.vglRequest('updateDownloadOptions.do', options);        
+  }
+
+  /**   
+   * @param bookMark update download options associated with a book mark
+   */
+  public deleteDownloadOptions(downloadOptions : DownloadOptions) :  Observable <any> {    
+    const options = { params:downloadOptions };   
+    return this.vglRequest('deleteDownloadOptions.do', options);        
   }
 
 //gets csw record information based on fileter parameters such as file identifier and service id 

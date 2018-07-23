@@ -1,6 +1,6 @@
 <!-- TODO: Styles to CSS -->
 <!-- TODO: Translations -->
-<form [formGroup]="downloadOptionsForm" (ngSubmit)="saveChanges()" >
+<form [formGroup]="downloadOptionsForm" (ngSubmit)="saveChanges()">
 
     <div class="modal-header" style="background: #EEE">
         <h5 class="modal-title">Download Options</h5>
@@ -147,24 +147,28 @@
             </div>
         </div>
 
-        <div *ngIf="isBMarked" class="row">
+        <div *ngIf="isBMarked" class="row">         
             <div class="col-lg-2">
-                <label>Save Options</label>
+                <label>Saved Options </label>
             </div>
-            <div class="col-lg-10">
-                <div class="input-group-sm">
-                    <input #saveCheckbox type="checkbox" [checked]="selectSaveOptions()" [disabled]="disableBMOption()" (change)="isChecked($event)" id="saveBookMark">                  
-                    <label for="checkFavourite" class="small">&nbsp;Save as Defaults</label>
-                </div>
+           
+            <div class="col-lg-10">                        
+                    <p-dropdown #dropDown [options]="dropDownItems" [(ngModel)]="selectedOptions" editable="true" placeholder="Select from saved options " [ngModelOptions]="{standalone: true}" (onChange)="selectSaveOptions()"  >                                           
+                    </p-dropdown>                 
+                    &nbsp;
+                    <button #addButton type="button" class="btn btn-secondary" (click)="addSavedOptions()">Add</button> 
+                    &nbsp;                    
+                    <button #deleteButton type="button" class="btn btn-secondary" (click)="deleteSavedOptions()">Remove</button>
+                    <br>    
+                    <small>Select default or saved options. Alternatively,enter a new name to save options for future requests.</small>
             </div>
         </div>
-
     </div>
-
-    <div class="modal-footer" style="background: #EEE"> 
-        <button type="button" class="btn btn-secondary" (click)="revertChanges()">Restore defaults</button>
-        <button type="button" type="submit" [disabled]="!downloadOptionsForm.valid"  class="btn btn-secondary">
-            <i class="fa fa-plus-circle"></i>&nbsp;Save Changes
+    <div class="modal-footer" style="background: #EEE">      
+            
+        <button *ngIf="!isBMarked" type="button" class="btn btn-secondary" (click)="revertChanges()">Restore defaults</button>
+        <button type="button" type="submit" [disabled]="!downloadOptionsForm.valid" class="btn btn-secondary">
+            <i class="fa fa-plus-circle"></i>&nbsp;Confirm Changes
         </button>
     </div>
 

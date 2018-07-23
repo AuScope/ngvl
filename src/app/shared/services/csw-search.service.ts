@@ -162,11 +162,10 @@ export class CSWSearchService {
      * Gets download options from book marked csw record.
      * @param cswRecord 
      */
-    public getDownloadOptions(cswRecord: CSWRecordModel): DownloadOptions {
+    public getDownloadOptions(cswRecord: CSWRecordModel): Observable<DownloadOptions[]> {
         let bookMarkList: BookMark[] = [];
         let bookMark: BookMark;
-        let match: boolean = false;
-        let savedOptions: DownloadOptions = { url: "", localPath: "", name: "", description: "" };
+        let match: boolean = false;        
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
         this.userStateService.bookmarks.subscribe(data => {
@@ -177,19 +176,7 @@ export class CSWSearchService {
                 return match;
             });
         });
-        savedOptions.url = bookMark.url;
-        savedOptions.localPath = bookMark.localPath;
-        savedOptions.name = bookMark.name;
-        savedOptions.description = bookMark.description;
-        if (bookMark.eastBoundLongitude)
-            savedOptions.eastBoundLongitude = bookMark.eastBoundLongitude;
-        if (bookMark.northBoundLatitude)
-            savedOptions.northBoundLatitude = bookMark.northBoundLatitude;
-        if (bookMark.southBoundLatitude)
-            savedOptions.southBoundLatitude = bookMark.southBoundLatitude;
-        if (bookMark.westBoundLongitude)
-            savedOptions.westBoundLongitude = bookMark.westBoundLongitude;
-        return savedOptions;
+        return this.vgl.getDownloadOptions(bookMark);      
     }
 
 }

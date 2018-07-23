@@ -23,9 +23,9 @@ export class ConfirmDatasetsModalContent {
     // TreeData, columns and selection
     @Input() public cswRecordTreeData: TreeNode[] = [];
     treeCols: any[] = [
-        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
-        { field: 'url', header: 'URL', colStyle: {'width': '40%'} },
-        { header: 'Download', colStyle: {'width': '20%'} }
+        { field: 'name', header: 'Name', colStyle: { 'width': '40%' } },
+        { field: 'url', header: 'URL', colStyle: { 'width': '40%' } },
+        { header: 'Download', colStyle: { 'width': '20%' } }
     ];
     selectedDatasetNodes: TreeNode[] = [];
 
@@ -35,7 +35,7 @@ export class ConfirmDatasetsModalContent {
     // Selections saved dialog
     @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
-    constructor(public activeModal: NgbActiveModal, 
+    constructor(public activeModal: NgbActiveModal,
         private modalService: NgbModal,
         private vglService: VglService,
         private userStateService: UserStateService,
@@ -111,7 +111,7 @@ export class ConfirmDatasetsModalContent {
                 break;
         }
     }
-   
+
 
     /**
      * Edit the download options for the resource.
@@ -119,29 +119,32 @@ export class ConfirmDatasetsModalContent {
      * 
      * TODO: Do
      */
-    public editDownload(onlineResource: any, cswRecord: CSWRecordModel,defaultOptions:DownloadOptions,downloadOptions: DownloadOptions): void {
+    public editDownload(onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        //  const modelRef = this.modalService.open(DownloadOptionsModalContent,  { windowClass : "myCustomModalClass"});  
         modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
         let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
         modelRef.componentInstance.defaultDownloadOptions = defaultOptions;
         if (isBookMarkRecord) {
-            let savedDwnldOptions: DownloadOptions = this.cswSearchService.getDownloadOptions(cswRecord);            
-            if (this.areOptionsStored(savedDwnldOptions)) {         
-                modelRef.componentInstance.downloadOptions = savedDwnldOptions;
-                modelRef.componentInstance.hasSavedOptions = true;
+            this.cswSearchService.getDownloadOptions(cswRecord).subscribe(data => {
+                modelRef.componentInstance.bookmarkOptions = data;
+            });
+            defaultOptions.bookmarkOptionName = 'Default Options';
+            modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: defaultOptions });           
+            if (modelRef.componentInstance.bookmarkOptions && modelRef.componentInstance.bookmarkOptions.length > 0) {
+                console.log("THE BOOK MARK OPTIONS ARE PRESENT");
+                modelRef.componentInstance.bookmarkOptions.forEach(option => {
+                    modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
+                });
             }
-            else {
-                modelRef.componentInstance.hasSavedOptions = false;
-                modelRef.componentInstance.downloadOptions = downloadOptions;
-            }
+            else
+            console.log("THE BOOK MARK OPTIONS ARE NOT PRESENT");            
         }
-        else
-            modelRef.componentInstance.downloadOptions = downloadOptions;
+        modelRef.componentInstance.downloadOptions = downloadOptions;
     }
-
     /**
      * Checks if the Book mark stored in DB has saved download options data 
      * @param savedDwnldOptions 
@@ -207,11 +210,11 @@ export class ConfirmDatasetsModalContent {
                     }
                 }
             }
-            if(makeUrls.length > 0) {
+            if (makeUrls.length > 0) {
                 forkJoin(makeUrls).subscribe(results => {
                     this.capturedJobDownloadCount = results.length;
                     // Persist data selections to user state service
-                    for(let result of results) {
+                    for (let result of results) {
                         this.userStateService.addJobDownload(<JobDownload>result);
                     }
                     // Display selection OK modal

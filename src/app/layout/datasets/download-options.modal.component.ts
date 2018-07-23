@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy,ViewChild,ElementRef } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,6 +6,10 @@ import { UserStateService } from '../../shared';
 import { DownloadOptions, BookMark } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { Dropdown } from "primeng/components/dropdown/dropdown";
+import { SelectItem } from 'primeng/api';
+import { ButtonsComponent } from '../bs-component/components';
+
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,23 +26,27 @@ export class DownloadOptionsModalContent implements OnInit {
     LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,20})?))$';
 
     @Input() public downloadOptions: DownloadOptions;
+    @Input() public bookmarkOptions: DownloadOptions[];
     @Input() public defaultDownloadOptions: DownloadOptions;
     @Input() public onlineResource: any;
     @Input() isBMarked: boolean;
-    @Input() hasSavedOptions: boolean;
     @Input() cswRecord: CSWRecordModel;
-    private hasFormChanged: boolean = false;
-    private saveOptionsChecked: boolean;
     downloadOptionsForm: FormGroup;
     dataTypes: any[] = [];
-    @ViewChild('saveCheckbox') private saveCheckbox: ElementRef;
+    @Input() dropDownItems: SelectItem[] = [];
+    selectedOptions: DownloadOptions;
+
+    @ViewChild('dropDown') private dropDown: Dropdown;
+    @ViewChild('addButton') private addButton: ElementRef;
+    @ViewChild('deleteButton') private deleteButton: ElementRef;
 
 
     constructor(private formBuilder: FormBuilder,
         public activeModal: NgbActiveModal,
         private vglService: VglService,
         private userStateService: UserStateService,
-        private cswSearchService: CSWSearchService) { }
+        private cswSearchService: CSWSearchService) {
+    }
 
 
     ngOnInit() {
@@ -47,14 +55,6 @@ export class DownloadOptionsModalContent implements OnInit {
         }
         this.createForm();
     }
-
-    subscribeToFormChanges() {
-        this.downloadOptionsForm.valueChanges.subscribe(val => {
-            this.hasFormChanged = true;
-        });
-    }
-
-
 
     /**
      * Retrieve the output formats for WFS online resource type.
@@ -159,17 +159,14 @@ export class DownloadOptionsModalContent implements OnInit {
             }
         }
         this.downloadOptionsForm = this.formBuilder.group(optionsGroup);
-        this.subscribeToFormChanges();
     }
 
 
     /**
      * Revert any form input changes back to their original state
      */
-    public revertChanges(): void {      
-            this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });              
-            if(this.saveCheckbox && this.saveCheckbox.nativeElement.checked)
-                this.saveCheckbox.nativeElement.checked = false;                
+    public revertChanges(): void {
+        this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
     }
 
 
@@ -184,63 +181,76 @@ export class DownloadOptionsModalContent implements OnInit {
                     this.downloadOptions[option] = this.downloadOptionsForm.controls[option].value;
                 }
             }
-            if (this.isBMarked && this.saveOptionsChecked) {
-                var bookMark: BookMark;
-                if (this.downloadOptions.eastBoundLongitude == undefined &&
-                    this.downloadOptions.northBoundLatitude == undefined &&
-                    this.downloadOptions.southBoundLatitude == undefined &&
-                    this.downloadOptions.westBoundLongitude == undefined)
-                    bookMark = {
-                        fileIdentifier: this.cswRecord.id,
-                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),
-                        url: this.downloadOptions.url,
-                        localPath: this.downloadOptions.localPath,
-                        name: this.downloadOptions.name,
-                        description: this.downloadOptions.description
-                    };
-                else
-                    bookMark = {
-                        fileIdentifier: this.cswRecord.id,
-                        serviceId: this.cswSearchService.getServiceId(this.cswRecord),
-                        url: this.downloadOptions.url,
-                        localPath: this.downloadOptions.localPath,
-                        name: this.downloadOptions.name,
-                        description: this.downloadOptions.description,
-                        eastBoundLongitude: this.downloadOptions.eastBoundLongitude,
-                        northBoundLatitude: this.downloadOptions.northBoundLatitude,
-                        southBoundLatitude: this.downloadOptions.southBoundLatitude,
-                        westBoundLongitude: this.downloadOptions.westBoundLongitude
-                    };
-                this.vglService.updateDownloadOptions(bookMark).subscribe(data => {
-                    this.userStateService.updateBookMarks();
-                }, error => {
-                    console.log(error.message);
-                });
-            }
             this.activeModal.close();
         }
     }
 
     /**
-     * disables and enables the checkbox depending on user input changes 
-    */
-    public disableBMOption(): boolean {
-        return (this.isBMarked && this.hasSavedOptions && !this.hasFormChanged);
+     * 
+     */
+    public selectSaveOptions() {
+        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName)
+            this.downloadOptionsForm.reset(this.selectedOptions, { onlySelf: true, emitEvent: true });
+        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName && (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') >= 0)) {
+            this.deleteButton.nativeElement.disabled = true;
+            this.addButton.nativeElement.disabled = true;
+        }
+        if (this.selectedOptions && !this.selectedOptions.bookmarkOptionName) {
+            this.deleteButton.nativeElement.disabled = false;
+            this.addButton.nativeElement.disabled = false;
+        }
+
     }
 
     /**
-     * selects the check box if it has saved download options in  DB and
-     * deselects when the user makes changes to the form
+     * 
      */
-    public selectSaveOptions(): boolean {
-        return (this.hasSavedOptions && !this.hasFormChanged);
+    public addSavedOptions() {
+        let savedOptionsName: any = this.selectedOptions;
+        this.downloadOptions.bookmarkOptionName = savedOptionsName;
+        this.dropDownItems.push({ label: savedOptionsName, value: this.downloadOptions });
+        //this.vglService.updateDownloadOptions(this.downloadOptions);        
     }
 
     /**
-     * gets the value of the checkbox to decide if the values need to be saved in DB
-     * @param event 
+     * 
      */
-    public isChecked(event): void {
-        this.saveOptionsChecked = event.target.checked;
+    public deleteSavedOptions() {
+        console.log("deleted  option" + this.selectedOptions);
+        console.log(JSON.stringify(this.selectedOptions));
+        if (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') === -1) {
+            let index = this.dropDownItems.findIndex(item => {
+                return (item.value.bookmarkOptionName.indexOf(this.selectedOptions.bookmarkOptionName) >= 0);
+            });
+            if (index > -1)
+                this.dropDownItems.splice(index, 1);
+
+            this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
+            this.dropDown.clear(event);
+        }
+        console.log("addSavedOptions " + JSON.stringify(this.dropDownItems));
+
+
+        //get tthe dropdown value
+        //remove from the drop down
+        //do vgl reequest to do database change
+
     }
+
+    public blurEvent() {
+        console.log("blur event++++++++++++++");
+
+    }
+
+    public focusEvent() {
+        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName && (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') >= 0)) {
+            this.deleteButton.nativeElement.disabled = true;
+            this.addButton.nativeElement.disabled = true;
+        }
+       else {
+            this.deleteButton.nativeElement.disabled = false;
+            this.addButton.nativeElement.disabled = false;
+        }
+    }
+
 }

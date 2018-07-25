@@ -153,12 +153,12 @@
             </div>
            
             <div class="col-lg-10">                        
-                    <p-dropdown #dropDown [options]="dropDownItems" [(ngModel)]="selectedOptions" editable="true" placeholder="Select from saved options " [ngModelOptions]="{standalone: true}" (onChange)="selectSaveOptions()"  >                                           
+                    <p-dropdown #dropDown [options]="dropDownItems" [(ngModel)]="selectedOptions" editable="true" placeholder="Select from saved options " [ngModelOptions]="{standalone: true}" (onChange)="selectBookMarkOptions()"  >                                           
                     </p-dropdown>                 
                     &nbsp;
-                    <button #addButton type="button" class="btn btn-secondary" (click)="addSavedOptions()">Add</button> 
+                    <button #addButton type="button" class="btn btn-secondary" (click)="addBookMarkOptions()">Add</button> 
                     &nbsp;                    
-                    <button #deleteButton type="button" class="btn btn-secondary" (click)="deleteSavedOptions()">Remove</button>
+                    <button #deleteButton type="button" class="btn btn-secondary" (click)="deleteBookMarkOptions()" disabled="disabled">Remove</button>
                     <br>    
                     <small>Select default or saved options. Alternatively,enter a new name to save options for future requests.</small>
             </div>

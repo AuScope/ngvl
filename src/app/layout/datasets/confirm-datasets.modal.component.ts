@@ -115,50 +115,38 @@ export class ConfirmDatasetsModalContent {
 
     /**
      * Edit the download options for the resource.
-     * If the record is book marked and has saved options, loads the downloadoptions from DB 
+     * Several iput parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.  
+     * If the record is book marked and has saved options, loads the downloadoptions from DB, 
+     * and sets the drop down items for DownloadOptionsModal in the format (label, value)     
      * 
      * TODO: Do
      */
     public editDownload(onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
-        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
-        //  const modelRef = this.modalService.open(DownloadOptionsModalContent,  { windowClass : "myCustomModalClass"});  
+        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });        
         modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
+        //checks if a csw record belongs to a bookmarked dataset
         let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
         modelRef.componentInstance.defaultDownloadOptions = defaultOptions;
-        if (isBookMarkRecord) {
-            this.cswSearchService.getDownloadOptions(cswRecord).subscribe(data => {
-                modelRef.componentInstance.bookmarkOptions = data;
-            });
-            defaultOptions.bookmarkOptionName = 'Default Options';
-            modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: defaultOptions });           
-            if (modelRef.componentInstance.bookmarkOptions && modelRef.componentInstance.bookmarkOptions.length > 0) {
-                console.log("THE BOOK MARK OPTIONS ARE PRESENT");
-                modelRef.componentInstance.bookmarkOptions.forEach(option => {
-                    modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
-                });
-            }
-            else
-            console.log("THE BOOK MARK OPTIONS ARE NOT PRESENT");            
-        }
         modelRef.componentInstance.downloadOptions = downloadOptions;
-    }
-    /**
-     * Checks if the Book mark stored in DB has saved download options data 
-     * @param savedDwnldOptions 
-     */
-    private areOptionsStored(savedDwnldOptions: DownloadOptions) {
-        return ((savedDwnldOptions.url && savedDwnldOptions.url.length != 0) ||
-            (savedDwnldOptions.localPath && savedDwnldOptions.localPath.length != 0) ||
-            (savedDwnldOptions.name && savedDwnldOptions.name.length != 0) ||
-            (savedDwnldOptions.description && savedDwnldOptions.description.length != 0) ||
-            (savedDwnldOptions.northBoundLatitude && savedDwnldOptions.northBoundLatitude != 0) ||
-            (savedDwnldOptions.southBoundLatitude && savedDwnldOptions.southBoundLatitude != 0) ||
-            (savedDwnldOptions.eastBoundLongitude && savedDwnldOptions.eastBoundLongitude != 0) ||
-            (savedDwnldOptions.westBoundLongitude && savedDwnldOptions.westBoundLongitude != 0));
-    }
+        defaultOptions.bookmarkOptionName = 'Default Options';
+        modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: defaultOptions });
+        if (isBookMarkRecord) {
+            //gets id of the bookmark using csw record information
+            let bookMarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
+            //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
+            this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {                
+                if (data.length > 0) {
+                    //updates dropdown component with download options data that were bookmarked in the format(label, value)
+                    data.forEach(option => {
+                        modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
+                    });
+                }
+            });
+        }
+    } 
 
 
     /**

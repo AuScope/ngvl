@@ -156,27 +156,26 @@ export class CSWSearchService {
             }); 
         });        
         return match;
-    } 
+    }   
 
     /**
-     * Gets download options from book marked csw record.
+     * Gets the book mark id information for a csw record.  
+     * This is made use of while storing multiple sets of download options as bookmarks for a particular dataset that has been bookmarked
      * @param cswRecord 
      */
-    public getDownloadOptions(cswRecord: CSWRecordModel): Observable<DownloadOptions[]> {
-        let bookMarkList: BookMark[] = [];
-        let bookMark: BookMark;
-        let match: boolean = false;        
+    public getBookMarkId(cswRecord: CSWRecordModel) : number {
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
+        let bookMarkId: number;
         this.userStateService.bookmarks.subscribe(data => {
-            bookMarkList = data;
-            bookMarkList.some(rec => {
-                match = ((fileIdentifier.indexOf(rec.fileIdentifier) >= 0) && (serviceId.indexOf(rec.serviceId) >= 0));
-                bookMark = rec;
-                return match;
+            data.forEach(bookMark => {
+                if ((bookMark.fileIdentifier.indexOf(fileIdentifier) === 0) && (bookMark.serviceId.indexOf(serviceId) === 0))
+                    bookMarkId = bookMark.id;
             });
+        }, error => {
+            console.log(error.message);
         });
-        return this.vgl.getDownloadOptions(bookMark);      
+        return bookMarkId;
     }
 
 }

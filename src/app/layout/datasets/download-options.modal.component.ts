@@ -26,16 +26,20 @@ export class DownloadOptionsModalContent implements OnInit {
     LONGITUDE_PATTERN = '^(\\+|-)?(?:180(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,20})?))$';
 
     @Input() public downloadOptions: DownloadOptions;
-    @Input() public bookmarkOptions: DownloadOptions[];
+    /* Default options are passed as a separate object so that defaults can be restored */
     @Input() public defaultDownloadOptions: DownloadOptions;
     @Input() public onlineResource: any;
     @Input() isBMarked: boolean;
     @Input() cswRecord: CSWRecordModel;
     downloadOptionsForm: FormGroup;
     dataTypes: any[] = [];
+
+    /* array for the drop down */
     @Input() dropDownItems: SelectItem[] = [];
+    /* selected item in the drop down */
     selectedOptions: DownloadOptions;
 
+    /*decorators used to acccess drop down, add and remove buttons in html */
     @ViewChild('dropDown') private dropDown: Dropdown;
     @ViewChild('addButton') private addButton: ElementRef;
     @ViewChild('deleteButton') private deleteButton: ElementRef;
@@ -186,71 +190,103 @@ export class DownloadOptionsModalContent implements OnInit {
     }
 
     /**
+     * Checks if a object is of type interface Downloadoptions.
+     * This was necessary as primeng editable dropdown component was 
+     * returning select item as a string when the drop down is edited to enter a new value.
+     * 
+     * @param obj 
+     */
+    private isDownloadOptions(obj: any): obj is DownloadOptions {
+        return obj && obj.bookmarkOptionName !== undefined;
+    }
+
+    /**
+     * Checks if item selected is of default download options 
+     * @param obj 
+     */
+    private isDefaultDownloadOptions(obj: DownloadOptions) {
+        return obj && (obj.bookmarkOptionName.indexOf('Default Options') === 0);
+    }
+
+    /**
+     * Checks if download options are bookmarked and returns the index.
+     * Used when adding and removing bookmarks for download options
+     * @param bookmarkOptionName 
+     */
+    private bookmarkExists(bookmarkOptionName: string) {
+        let index = this.dropDownItems.findIndex(item => {
+            return (item.value.bookmarkOptionName.indexOf(bookmarkOptionName) === 0);
+        });
+        return index;
+    }
+
+
+    /**
+     * This is executed on onChange event of the dropdown. Changes the form fields based on the
+     * selection in the dropdown. Also enables and disables add/ remove buttons based on user input
+     * like enetering a new book mark or selection of existing book marks for the download options.
      * 
      */
-    public selectSaveOptions() {
-        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName)
+    public selectBookMarkOptions() {
+        if (this.isDownloadOptions(this.selectedOptions)) {
             this.downloadOptionsForm.reset(this.selectedOptions, { onlySelf: true, emitEvent: true });
-        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName && (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') >= 0)) {
-            this.deleteButton.nativeElement.disabled = true;
             this.addButton.nativeElement.disabled = true;
+            if (this.isDefaultDownloadOptions(this.selectedOptions))
+                this.deleteButton.nativeElement.disabled = true;
+            else
+                this.deleteButton.nativeElement.disabled = false;
         }
-        if (this.selectedOptions && !this.selectedOptions.bookmarkOptionName) {
-            this.deleteButton.nativeElement.disabled = false;
+        if (!this.isDownloadOptions(this.selectedOptions)) {
             this.addButton.nativeElement.disabled = false;
+            this.deleteButton.nativeElement.disabled = true;
         }
 
     }
 
     /**
-     * 
+     * Adds a bookmark for the download options in the drop down.
      */
-    public addSavedOptions() {
-        let savedOptionsName: any = this.selectedOptions;
-        this.downloadOptions.bookmarkOptionName = savedOptionsName;
-        this.dropDownItems.push({ label: savedOptionsName, value: this.downloadOptions });
-        //this.vglService.updateDownloadOptions(this.downloadOptions);        
-    }
-
-    /**
-     * 
-     */
-    public deleteSavedOptions() {
-        console.log("deleted  option" + this.selectedOptions);
-        console.log(JSON.stringify(this.selectedOptions));
-        if (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') === -1) {
-            let index = this.dropDownItems.findIndex(item => {
-                return (item.value.bookmarkOptionName.indexOf(this.selectedOptions.bookmarkOptionName) >= 0);
+    public addBookMarkOptions() {
+        //primeng component returns selectedOptions as a string object when user edits the dropdown to enter a new value.
+        //Hence it was necessary to check the type of the object
+        if ((typeof this.selectedOptions === "string") && (this.bookmarkExists(this.selectedOptions) === -1)) {
+            let savedOptionsName: string = this.selectedOptions;
+            //Get updated options from the form fields
+            for (let option in this.downloadOptions) {
+                if (this.downloadOptionsForm.controls.hasOwnProperty(option)) {
+                    this.downloadOptions[option] = this.downloadOptionsForm.controls[option].value;
+                }
+            }
+            this.downloadOptions.bookmarkOptionName = savedOptionsName;
+            //saves the download options as a bookmark under the user entered bookmark name. 
+            this.vglService.bookMarkDownloadOptions(this.cswSearchService.getBookMarkId(this.cswRecord), this.downloadOptions).subscribe(id => {
+                //updates downloadload options object with id and includes it in the drop down items
+                this.downloadOptions.id = id;
+                this.dropDownItems.push({ label: savedOptionsName, value: JSON.parse(JSON.stringify(this.downloadOptions)) });
+            }, error => {
+                console.log(error.message);
             });
-            if (index > -1)
+        }
+    }
+
+    /**
+     * removes bookmarked options from the bookmarks in the drop down.
+     */
+    public deleteBookMarkOptions() {
+        //Gets the index of item to be removed from the dropdown items
+        let index: number;
+        if ((typeof this.selectedOptions === "string"))
+            index = this.bookmarkExists(this.selectedOptions);
+        else
+            index = this.bookmarkExists(this.selectedOptions.bookmarkOptionName);
+        //proceed to remove if item is present both from DB and dropdown SelctItems[]
+        if (index > -1) {
+            let optionsId = this.dropDownItems[index].value.id;
+            this.vglService.deleteDownloadOptions(optionsId).subscribe(data => {
                 this.dropDownItems.splice(index, 1);
-
-            this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
-            this.dropDown.clear(event);
-        }
-        console.log("addSavedOptions " + JSON.stringify(this.dropDownItems));
-
-
-        //get tthe dropdown value
-        //remove from the drop down
-        //do vgl reequest to do database change
-
-    }
-
-    public blurEvent() {
-        console.log("blur event++++++++++++++");
-
-    }
-
-    public focusEvent() {
-        if (this.selectedOptions && this.selectedOptions.bookmarkOptionName && (this.selectedOptions.bookmarkOptionName.indexOf('Default Options') >= 0)) {
-            this.deleteButton.nativeElement.disabled = true;
-            this.addButton.nativeElement.disabled = true;
-        }
-       else {
-            this.deleteButton.nativeElement.disabled = false;
-            this.addButton.nativeElement.disabled = false;
+                this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
+                this.dropDown.clear(event);
+            });
         }
     }
-
 }

@@ -235,7 +235,7 @@ export interface BookMark {
     fileIdentifier: string;
     serviceId: string;
     userId?: string;   
-    id?: string;
+    id?: number;
 }
 
 /* Registry information used in faceted search and for book marks*/

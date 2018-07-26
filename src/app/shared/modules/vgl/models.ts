@@ -225,7 +225,7 @@ export interface DownloadOptions {
     serviceUrl?: string,
     srsName?: string,
     featureType?: string,
-    id?: string,
+    id?: number,
     bookmarkId?: string,
     bookmarkOptionName?: string;
 }

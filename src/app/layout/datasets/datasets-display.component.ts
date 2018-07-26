@@ -98,8 +98,8 @@ export class DatasetsDisplayComponent {
     public addBookMark(cswRecord: CSWRecordModel) {
         let serviceId: string = this.cswSearchService.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;       
-        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(data => {            
-            this.bookMarkChoice.emit({ choice: "add", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
+        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(id => {            
+            this.bookMarkChoice.emit({ choice: "add", bookmark: {id: id, fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
         }, error => {         
             console.log(error.message);
         });
@@ -117,11 +117,10 @@ export class DatasetsDisplayComponent {
      * remove dataset as favourite and emit the event "remove" to be processed by datasets.component
      * @param cswRecord 
      */
-    public removeBookMark(cswRecord: CSWRecordModel) {
-        let serviceId: string = this.cswSearchService.getServiceId(cswRecord);
-        let fileIdentifier: string = cswRecord.id;
-        this.cswSearchService.removeBookMark(fileIdentifier, serviceId).subscribe(data => {            
-            this.bookMarkChoice.emit({ choice: "remove", mark: {fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
+    public removeBookMark(cswRecord: CSWRecordModel) {       
+       let bookmarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
+        this.cswSearchService.removeBookMark(bookmarkId).subscribe(data => {            
+            this.bookMarkChoice.emit({ choice: "remove", bookmark: {id : bookmarkId }, cswRecord: cswRecord });                       
         }, error => {            
             console.log(error.message);
         });

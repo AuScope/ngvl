@@ -449,18 +449,19 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         let startPosition: number = 0;
         this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
+            // empty the book marked csw record list before gettting updated list
+            this.bookMarkCSWRecords = [];
+            this.bookMarks.forEach(bookMark => {
+                this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
+                    if (response && response.length == 1) {
+                        this.bookMarkCSWRecords.push(response.pop());
+                    }
+                });
+            });            
         }, error => {
             console.log(error.message);
         });
-        // empty the book marked csw record list before gettting updated list
-        this.bookMarkCSWRecords = [];
-        this.bookMarks.forEach(bookMark => {
-            this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
-                if (response && response.length == 1) {
-                    this.bookMarkCSWRecords.push(response.pop());
-                }
-            });
-        });
+
     }
 
     /**
@@ -472,12 +473,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      */
     onBookMarkChoice(selection) {
         if (selection.choice === "add") {
-            this.bookMarks.push(selection.mark);
+            this.bookMarks.push(selection.bookmark);
             this.bookMarkCSWRecords.push(selection.cswRecord);
         }
         else if (selection.choice === "remove") {
             let index = this.bookMarks.findIndex(item => {
-                return ((item.fileIdentifier.indexOf(selection.mark.fileIdentifier) >= 0) && (item.serviceId.indexOf(selection.mark.serviceId) >= 0));
+                return (item.id === selection.bookmark.id)
             });
             if (index > -1)
                 this.bookMarks.splice(index, 1);

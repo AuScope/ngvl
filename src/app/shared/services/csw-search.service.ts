@@ -131,12 +131,12 @@ export class CSWSearchService {
         return this.vgl.getBookMarks();
     }
 
-    public addBookMark(fileIdentifier : string, serviceId : string ) {           
+    public addBookMark(fileIdentifier : string, serviceId : string ) : Observable<number> {           
         return this.vgl.addBookMark(fileIdentifier,serviceId);
     }
 
-    public removeBookMark(fileIdentifier : string, serviceId : string ) {           
-        return this.vgl.removeBookMark(fileIdentifier,serviceId);
+    public removeBookMark(id : number ) {           
+        return this.vgl.removeBookMark(id);
     }
 
     /**

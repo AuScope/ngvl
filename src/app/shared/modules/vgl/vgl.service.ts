@@ -294,7 +294,7 @@ export class VglService {
     }
 
     // Add to database dataset information that is bookmarked    
-    public addBookMark(fileIdentifier: string, serviceId: string) {
+    public addBookMark(fileIdentifier: string, serviceId: string) : Observable<number> {
         const options = {
             params: {
                 fileIdentifier: fileIdentifier,
@@ -305,11 +305,10 @@ export class VglService {
     }
 
     //remove book mark information from database
-    public removeBookMark(fileIdentifier: string, serviceId: string) {
+    public removeBookMark(id : number) {
         const options = {
             params: {
-                fileIdentifier: fileIdentifier,
-                serviceId: serviceId
+                id: id.toString()
             }
         };
         return this.vglRequest('deleteBookMark.do', options);
@@ -335,7 +334,7 @@ export class VglService {
     /**   
      * @param bookMark save download options associated with a book mark
      */
-    public bookMarkDownloadOptions(bookmarkId: number, downloadOptions: DownloadOptions): Observable<any> {
+    public bookMarkDownloadOptions(bookmarkId: number, downloadOptions: DownloadOptions): Observable<number> {
         const options = {
             params: {
                 bookmarkId: bookmarkId.toString(),

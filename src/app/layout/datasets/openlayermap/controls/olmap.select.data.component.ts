@@ -267,6 +267,7 @@ export class OlMapDataSelectComponent {
                                     "url": resource.url,
                                     "cswRecord": record,
                                     "onlineResource": resource,
+                                    "defaultOptions":JSON.parse(JSON.stringify(downloadOptions)),
                                     "downloadOptions": downloadOptions,
                                     "leaf": true
                                 }

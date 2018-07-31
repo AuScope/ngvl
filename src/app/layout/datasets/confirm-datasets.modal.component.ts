@@ -3,8 +3,10 @@ import { DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { DownloadOptionsModalContent } from './download-options.modal.component';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
-import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from '../../shared';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 
@@ -21,9 +23,9 @@ export class ConfirmDatasetsModalContent {
     // TreeData, columns and selection
     @Input() public cswRecordTreeData: TreeNode[] = [];
     treeCols: any[] = [
-        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
-        { field: 'url', header: 'URL', colStyle: {'width': '40%'} },
-        { header: 'Download', colStyle: {'width': '20%'} }
+        { field: 'name', header: 'Name', colStyle: { 'width': '40%' } },
+        { field: 'url', header: 'URL', colStyle: { 'width': '40%' } },
+        { header: 'Download', colStyle: { 'width': '20%' } }
     ];
     selectedDatasetNodes: TreeNode[] = [];
 
@@ -33,9 +35,11 @@ export class ConfirmDatasetsModalContent {
     // Selections saved dialog
     @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
-
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal,
-        private vglService: VglService, private userStateService: UserStateService) { }
+    constructor(public activeModal: NgbActiveModal,
+        private modalService: NgbModal,
+        private vglService: VglService,
+        private userStateService: UserStateService,
+        private cswSearchService: CSWSearchService) { }
 
 
     /**
@@ -108,17 +112,42 @@ export class ConfirmDatasetsModalContent {
         }
     }
 
+
     /**
-     * Edit the download options for the resource
+     * Edit the download options for the resource.
+     * Several iput parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.  
+     * If the record is book marked and has saved options, loads the downloadoptions from DB, 
+     * and sets the drop down items for DownloadOptionsModal in the format (label, value)     
      * 
      * TODO: Do
      */
-    public editDownload(onlineResource: any, downloadOptions: DownloadOptions): void {
+    public editDownload(onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
-        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });        
+        modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
+        //checks if a csw record belongs to a bookmarked dataset
+        let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
+        modelRef.componentInstance.isBMarked = isBookMarkRecord;
+        modelRef.componentInstance.defaultDownloadOptions = defaultOptions;
         modelRef.componentInstance.downloadOptions = downloadOptions;
-    }
+        defaultOptions.bookmarkOptionName = 'Default Options';
+        modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: defaultOptions });
+        if (isBookMarkRecord) {
+            //gets id of the bookmark using csw record information
+            let bookMarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
+            //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
+            this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {                
+                if (data.length > 0) {
+                    //updates dropdown component with download options data that were bookmarked in the format(label, value)
+                    data.forEach(option => {
+                        modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
+                    });
+                }
+            });
+        }
+    } 
+
 
     /**
      * 
@@ -169,11 +198,11 @@ export class ConfirmDatasetsModalContent {
                     }
                 }
             }
-            if(makeUrls.length > 0) {
+            if (makeUrls.length > 0) {
                 forkJoin(makeUrls).subscribe(results => {
                     this.capturedJobDownloadCount = results.length;
                     // Persist data selections to user state service
-                    for(let result of results) {
+                    for (let result of results) {
                         this.userStateService.addJobDownload(<JobDownload>result);
                     }
                     // Display selection OK modal

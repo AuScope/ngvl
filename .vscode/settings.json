@@ -8,5 +8,5 @@
 				"when": "$(basename).ts"
 			}
 	},
-	"eslint.enable": false
+	"eslint.enable": false	
 }

@@ -3,7 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry } from './models';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
 
@@ -76,7 +77,7 @@ export class VglService {
 
     public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
         let formData: FormData = new FormData();
-        if(nciKeyfile) {
+        if (nciKeyfile) {
             formData.append('nciKey', nciKeyfile);
         }
         const options = {
@@ -284,11 +285,95 @@ export class VglService {
         return this.vglRequest('getFeatureRequestOutputFormats.do', options);
     }
 
-  public getEntry<T>(url: string): Observable<T> {
-    return url ? this.http.get<T>(url) : Observable.empty();
-  }
+    public getEntry<T>(url: string): Observable<T> {
+        return url ? this.http.get<T>(url) : Observable.empty();
+    }
 
-  public getSolution(url: string): Observable<Solution> {
-    return this.getEntry<Solution>(url);
-  }
+    public getSolution(url: string): Observable<Solution> {
+        return this.getEntry<Solution>(url);
+    }
+
+    // Add to database dataset information that is bookmarked    
+    public addBookMark(fileIdentifier: string, serviceId: string) : Observable<number> {
+        const options = {
+            params: {
+                fileIdentifier: fileIdentifier,
+                serviceId: serviceId
+            }
+        };
+        return this.vglRequest('addBookMark.do', options);
+    }
+
+    //remove book mark information from database
+    public removeBookMark(id : number) {
+        const options = {
+            params: {
+                id: id.toString()
+            }
+        };
+        return this.vglRequest('deleteBookMark.do', options);
+    }
+
+    //get list of bookmarks for a user
+    public getBookMarks(): Observable<BookMark[]> {
+        return this.vglRequest('getBookMarks.do');
+    }
+
+    /**   
+     * @param bookMark get download options associated with a book mark
+     */
+    public getDownloadOptions(bookmarkId: number): Observable<DownloadOptions[]> {
+        const options = {
+            params: {
+                bookmarkId: bookmarkId.toString()
+            }
+        }
+        return this.vglRequest('getDownloadOptions.do', options);
+    }
+
+    /**   
+     * @param bookMark save download options associated with a book mark
+     */
+    public bookMarkDownloadOptions(bookmarkId: number, downloadOptions: DownloadOptions): Observable<number> {
+        const options = {
+            params: {
+                bookmarkId: bookmarkId.toString(),
+                bookmarkOptionName: downloadOptions.bookmarkOptionName,
+                url: downloadOptions.url,
+                localPath: downloadOptions.localPath,
+                name: downloadOptions.name,
+                description: downloadOptions.description,
+                northBoundLatitude: downloadOptions.northBoundLatitude,
+                eastBoundLongitude: downloadOptions.eastBoundLongitude,
+                southBoundLatitude: downloadOptions.southBoundLatitude,
+                westBoundLongitude: downloadOptions.westBoundLongitude
+            }
+        };
+        return this.vglRequest('saveDownloadOptions.do', options);
+    }
+
+    /**   
+     * @param bookMark delete download options associated with a book mark
+     */
+    public deleteDownloadOptions(optionsId: number): Observable<any> {
+        const options = { params: { id: optionsId } };
+        return this.vglRequest('deleteDownloadOptions.do', options);
+    }
+
+    //gets csw record information based on fileter parameters such as file identifier and service id 
+    public getFilteredCSWRecord(fileIdentifier: string, serviceId: string): Observable<CSWRecordModel[]> {
+        const options = {
+            params: {
+                fileIdentifier: fileIdentifier,
+                serviceId: serviceId
+            }
+        };
+        return this.vglRequest('getCSWRecord.do', options);
+    }
+
+    //gets registry information to be used in faceted search and bookmarking of a dataset
+    public getAvailableRegistries(): Observable<any> {
+        return this.vglRequest('getFacetedCSWServices.do');
+    }
+
 }

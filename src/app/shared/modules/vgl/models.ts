@@ -149,6 +149,8 @@ export class JobDownload {
     owner: string;
     parentUrl: string;
     parentName: string;
+    onlineResource?: any;    
+    cswRecord?: CSWRecordModel;
 }
 
 export interface Job {
@@ -291,7 +293,7 @@ export interface DownloadOptions {
     srsName?: string,
     featureType?: string,
     id?: number,
-    bookmarkId?: string,
+    bookmarkId?: number,
     bookmarkOptionName?: string;
 }
 

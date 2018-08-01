@@ -22,9 +22,15 @@
                         <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
                     <td>{{ rowData.location }}</td>
                     <td title="{{ rowData.description }}">{{ rowData.description }}</td>
-                    <td title="{{ rowData.details }}">
-                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'" title="{{ rowData.details }}">Service call to
+                    <td title="{{ rowData.details }}" >
+                        <span class="d-inline-block text-truncate" style="max-width:220px" *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'"
+                            title="{{ rowData.details }}">Service call to
                             <a href="{{ rowData.details }}">{{ rowData.details }}</a>
+                        </span>
+                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'">
+                            <button title="Edit the download options" (click)="editDownload(rowData.input)" >
+                                <i class="fa fa-edit"></i>
+                            </button>
                         </span>
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='upload'" title="{{ rowData.details }}">{{ rowData.details }}</span>
                     </td>

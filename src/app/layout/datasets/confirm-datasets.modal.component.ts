@@ -9,6 +9,7 @@ import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
+import { isNgTemplate } from '../../../../node_modules/@angular/compiler';
 
 
 @Component({
@@ -121,9 +122,9 @@ export class ConfirmDatasetsModalContent {
      * 
      * TODO: Do
      */
-    public editDownload(onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
+    public editDownload(rowData: any, onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
-        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });        
+        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
         //checks if a csw record belongs to a bookmarked dataset
@@ -137,7 +138,7 @@ export class ConfirmDatasetsModalContent {
             //gets id of the bookmark using csw record information
             let bookMarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
             //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
-            this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {                
+            this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {
                 if (data.length > 0) {
                     //updates dropdown component with download options data that were bookmarked in the format(label, value)
                     data.forEach(option => {
@@ -146,40 +147,20 @@ export class ConfirmDatasetsModalContent {
                 }
             });
         }
-    } 
-
-
-    /**
-     * 
-     * @param onlineResource 
-     * @param dlOptions 
-     */
-    private makeJobDownload(onlineResource: any, dlOptions: DownloadOptions): Observable<JobDownload> {
-        switch (onlineResource.type) {
-            case 'WCS':
-                //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
-                //will fail. To workaround this, we need to crop our selection to the dataset bounds
-                if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
-                    dlOptions.eastBoundLongitude = dlOptions.dsEastBoundLongitude;
-                }
-                if (dlOptions.dsWestBoundLongitude != null && (dlOptions.dsWestBoundLongitude > dlOptions.westBoundLongitude)) {
-                    dlOptions.westBoundLongitude = dlOptions.dsWestBoundLongitude;
-                }
-                if (dlOptions.dsNorthBoundLatitude != null && (dlOptions.dsNorthBoundLatitude < dlOptions.northBoundLatitude)) {
-                    dlOptions.northBoundLatitude = dlOptions.dsNorthBoundLatitude;
-                }
-                if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
-                    dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
-                }
-                return this.vglService.makeErddapUrl(dlOptions);
-            case 'WFS':
-                return this.vglService.makeWfsUrl(dlOptions);
-            case 'NCSS':
-                return this.vglService.makeNetcdfsubseserviceUrl(dlOptions);
-            default:
-                return this.vglService.makeDownloadUrl(dlOptions);
-        }
+        //After the user confirm changes, updated name and url are reflected in the page.
+        modelRef.result.then((userResponse) => {
+            this.cswRecordTreeData.forEach((node) => {
+                node.children.forEach((item) => {
+                    if (item.data === rowData) {
+                        item.data.name = downloadOptions.name;
+                        item.data.url = downloadOptions.url;
+                    }
+                });
+            });
+        },() => console.log('Modal Closed!'));
     }
+
+
 
     /**
      * User has selected to save the selected datasets
@@ -194,7 +175,7 @@ export class ConfirmDatasetsModalContent {
             for (let record of this.selectedDatasetNodes) {
                 if (record.data.leaf) {
                     if (record.data.onlineResource && record.data.downloadOptions) {
-                        makeUrls.push(this.makeJobDownload(record.data.onlineResource, record.data.downloadOptions));
+                        makeUrls.push(this.cswSearchService.makeJobDownload(record.data.onlineResource, record.data.cswRecord, record.data.downloadOptions));
                     }
                 }
             }

@@ -4,7 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { of } from 'rxjs/observable/of';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, defaultIfEmpty, map, switchMap } from 'rxjs/operators';
 
 import { Solution } from '../../shared/modules/vgl/models';
 import { UserStateService } from '../../shared';
@@ -31,7 +31,7 @@ export class JobTemplateComponent implements OnInit, OnDestroy {
     this.subscription = this.userStateService.selectedSolutions.pipe(
       map(solutions => solutions.map(this.makeRequest()))
     ).subscribe(requests => {
-      forkJoin(requests).subscribe(templates => {
+      forkJoin(requests).pipe(defaultIfEmpty([])).subscribe(templates => {
         this.template = templates.join('\n\n');
       });
     });

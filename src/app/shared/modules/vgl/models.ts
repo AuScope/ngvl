@@ -36,8 +36,10 @@ export const ENTRY_TYPES: EntryType[] = ['Problem', 'Toolbox', 'Solution', 'Appl
 export type DependencyType = 'TOOLBOX' | 'PYTHON';
 export const DEP_TYPES: DependencyType[] = ['TOOLBOX' , 'PYTHON'];
 
-export type VariableType = 'file' | 'integer' | 'string';
-export const VAR_TYPES: VariableType[] = ['file' , 'integer' , 'string'];
+export type VariableType = 'file' | 'int' | 'double' | 'string' | 'boolean';
+export const VAR_TYPES: VariableType[] = ['file' , 'int', 'double' , 'string', 'boolean'];
+
+export type VarBindingType = string | number | boolean;
 
 export interface Dependency {
   type: DependencyType;
@@ -49,13 +51,37 @@ export interface Dependency {
 export interface Variable {
   name: string;
   label: string;
-  description: string;
-  optional: boolean;
+  description?: string;
+  optional?: boolean;
   type: VariableType;
+  default?: VarBindingType;
+  max?: number;
+  min?: number;
+  step?: number;
+  values?: VarBindingType[];
+}
+
+export interface FileVariable extends Variable {
+  type: 'file';
+}
+
+export interface IntegerVariable extends Variable {
+  type: 'int';
+}
+
+export interface StringVariable extends Variable {
+  type: 'string';
+}
+
+export interface BooleanVariable extends Variable {
+  type: 'boolean';
+}
+
+export interface DoubleVariable extends Variable {
+  type: 'double';
 }
 
 export interface Entry {
-  id: string;
   entryType: EntryType;
   created_at: Date;
   author: string;
@@ -63,6 +89,7 @@ export interface Entry {
   description: string;
   url: string;
   icon?: string;
+  '@id': string;
 }
 
 export interface Problem extends Entry {

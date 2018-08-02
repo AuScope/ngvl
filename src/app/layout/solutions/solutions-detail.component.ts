@@ -22,7 +22,7 @@ export class SolutionsDetailComponent implements OnInit {
   solution$: Observable<Solution>;
 
   constructor(private route: ActivatedRoute,
-              private location: Location,
+              public location: Location,
               private http: HttpClient,
               private vgl: VglService,
               private userStateService: UserStateService) {}

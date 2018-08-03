@@ -1,0 +1,21 @@
+<div>
+  <h3>Variables for {{ solution.name }}</h3>
+
+  <form (ngSubmit)="onSubmit()" [formGroup]="form">
+
+    <div *ngFor="let binding of bindings" class="form-row">
+      <app-solution-var-binding
+        [binding]="binding"
+        [form]="form"></app-solution-var-binding>
+    </div>
+
+    <div class="form-row">
+      <button type="submit" [disabled]="!form.valid">Save</button>
+    </div>
+  </form>
+
+  <div *ngIf="payLoad" class="form-row">
+    <strong>Saved the following values</strong><br>{{payLoad}}
+  </div>
+
+</div>

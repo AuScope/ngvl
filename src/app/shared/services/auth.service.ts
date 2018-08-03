@@ -19,8 +19,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('isLoggedIn');
-
+    localStorage.removeItem('isLoggedIn');    
     // Hit the VGL logout endpoint, then navigate to the dashboard.
     this.http.get('/VGL-Portal/j_spring_security_logout')
       // VGL redirects from the spring logout to the old portal page, which 404's,
@@ -47,6 +46,7 @@ export class AuthService {
         // Trigger an update in the user state service to get the new username, then
         // navigate to the dashboard.
         this.userStateService.updateAnonymousUser();
+        this.userStateService.updateBookMarks();
         this.router.navigate(['/dashboard']);
       });
   }
@@ -59,6 +59,7 @@ export class AuthService {
     // navigate to the saved url. Reset the saved url so it isn't retained for
     // later logins.
     this.userStateService.updateUser();
+    this.userStateService.updateBookMarks();
     const savedUrl = this.resetRedirectUrl();
     const redirect = savedUrl ? savedUrl : '/dashboard';
     this.router.navigate([redirect]);

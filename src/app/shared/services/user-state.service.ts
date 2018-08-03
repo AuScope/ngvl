@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-
-import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation } from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation,BookMark} from '../modules/vgl/models';
 import { VglService } from '../modules/vgl/vgl.service';
-
 import { saveAs } from 'file-saver/FileSaver';
 
 export const DASHBOARD_VIEW = 'dashboard-view';
@@ -40,6 +37,9 @@ export class UserStateService {
 
     private _jobCloudFiles: BehaviorSubject<CloudFileInformation[]> = new BehaviorSubject([]);
     public readonly jobCloudFiles: Observable<CloudFileInformation[]> = this._jobCloudFiles.asObservable();
+    
+    private _bookmarks: BehaviorSubject<BookMark[]> = new BehaviorSubject([]);
+    public readonly bookmarks: Observable<BookMark[]> = this._bookmarks.asObservable();
 
     public setView(viewType: ViewType): Observable<ViewType> {
         this._currentView.next(viewType);
@@ -52,6 +52,10 @@ export class UserStateService {
 
     public updateAnonymousUser() {
         this._user.next(ANONYMOUS_USER);
+    }
+
+    public updateBookMarks() {
+        this.vgl.getBookMarks().subscribe(bookmarklist => this._bookmarks.next(bookmarklist));
     }
 
     public setUserAwsDetails(arnExecution: string, arnStorage: string, acceptedTermsConditions: number, awsKeyName: string): Observable<any> {

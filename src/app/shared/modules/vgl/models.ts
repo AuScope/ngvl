@@ -5,7 +5,7 @@ import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.mo
  * User Models
  */
 export interface User {
-  fullName: string;
+  fullName: string;  
   acceptedTermsConditions: number;
   // AWS details
   arnExecution: string;
@@ -14,7 +14,7 @@ export interface User {
 }
 
 export const ANONYMOUS_USER: User = {
-  fullName: 'Anonymous User',
+  fullName: 'Anonymous User',  
   acceptedTermsConditions: 0,
   arnExecution: undefined,
   arnStorage: undefined,
@@ -36,8 +36,10 @@ export const ENTRY_TYPES: EntryType[] = ['Problem', 'Toolbox', 'Solution', 'Appl
 export type DependencyType = 'TOOLBOX' | 'PYTHON';
 export const DEP_TYPES: DependencyType[] = ['TOOLBOX' , 'PYTHON'];
 
-export type VariableType = 'file' | 'integer' | 'string';
-export const VAR_TYPES: VariableType[] = ['file' , 'integer' , 'string'];
+export type VariableType = 'file' | 'int' | 'double' | 'string' | 'boolean';
+export const VAR_TYPES: VariableType[] = ['file' , 'int', 'double' , 'string', 'boolean'];
+
+export type VarBindingType = string | number | boolean;
 
 export interface Dependency {
   type: DependencyType;
@@ -49,13 +51,37 @@ export interface Dependency {
 export interface Variable {
   name: string;
   label: string;
-  description: string;
-  optional: boolean;
+  description?: string;
+  optional?: boolean;
   type: VariableType;
+  default?: VarBindingType;
+  max?: number;
+  min?: number;
+  step?: number;
+  values?: VarBindingType[];
+}
+
+export interface FileVariable extends Variable {
+  type: 'file';
+}
+
+export interface IntegerVariable extends Variable {
+  type: 'int';
+}
+
+export interface StringVariable extends Variable {
+  type: 'string';
+}
+
+export interface BooleanVariable extends Variable {
+  type: 'boolean';
+}
+
+export interface DoubleVariable extends Variable {
+  type: 'double';
 }
 
 export interface Entry {
-  id: string;
   entryType: EntryType;
   created_at: Date;
   author: string;
@@ -63,6 +89,7 @@ export interface Entry {
   description: string;
   url: string;
   icon?: string;
+  '@id': string;
 }
 
 export interface Problem extends Entry {
@@ -208,21 +235,42 @@ export interface DownloadOptions {
     name: string,
     description: string,
     url: string,
-    method: string,
+    method?: string,
     localPath: string,
-    crs: string,
-    eastBoundLongitude: number,
-    northBoundLatitude: number,
-    southBoundLatitude: number,
-    westBoundLongitude: number,
-    dsEastBoundLongitude: number,
-    dsNorthBoundLatitude: number,
-    dsSouthBoundLatitude: number,
-    dsWestBoundLongitude: number,
-    format: string,
-    layerName: string,
-    coverageName: string,
-    serviceUrl: string,
-    srsName: string,
-    featureType: string
+    crs?: string,
+    eastBoundLongitude?: number,
+    northBoundLatitude?: number,
+    southBoundLatitude?: number,
+    westBoundLongitude?: number,
+    dsEastBoundLongitude?: number,
+    dsNorthBoundLatitude?: number,
+    dsSouthBoundLatitude?: number,
+    dsWestBoundLongitude?: number,
+    format?: string,
+    layerName?: string,
+    coverageName?: string,
+    serviceUrl?: string,
+    srsName?: string,
+    featureType?: string,
+    id?: number,
+    bookmarkId?: string,
+    bookmarkOptionName?: string;
+}
+
+/* book marks information for a dataset*/
+export interface BookMark {    
+    fileIdentifier: string;
+    serviceId: string;
+    userId?: string;   
+    id?: number;
+}
+
+/* Registry information used in faceted search and for book marks*/
+export interface Registry {
+    title: string;
+    id: string;
+    url: string;
+    checked?: boolean;
+    startIndex?: number;
+    prevIndices?: number[]
 }

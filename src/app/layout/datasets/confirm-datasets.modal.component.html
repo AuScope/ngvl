@@ -35,7 +35,7 @@
                     <button pButton *ngIf="rowData.leaf" (click)="downloadDataset(rowData.onlineResource, rowData.downloadOptions)">
                         <i class="fa fa-download" title="Download this data to your local machine"></i>
                     </button>
-                    <button pButton *ngIf="rowData.leaf" (click)="editDownload(rowData.onlineResource, rowData.downloadOptions)" title="Edit the download options">
+                    <button pButton *ngIf="rowData.leaf" (click)="editDownload(rowData.onlineResource,rowData.cswRecord,rowData.defaultOptions,rowData.downloadOptions)" title="Edit the download options">                       
                         <i class="fa fa-edit"></i>
                     </button>
                 </td>

@@ -1,18 +1,18 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
-import { RecordModalContent } from './record.modal.component';
 import { routerTransition } from '../../router.animations';
-import { UserStateService, DATA_VIEW } from '../../shared';
+import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { ANONYMOUS_USER, BookMark, Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
 
-import { NgbTypeahead, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -26,10 +26,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     readonly CSW_RECORD_PAGE_LENGTH = 10;
     currentCSWRecordPage: number = 1;
 
-    // Search results
+    // Search results   
     cswSearchResults: CSWRecordModel[] = [];
-    selectedCSWRecord = null;
+    //selectedCSWRecord = null;
     recordsLoading = false;
+
+    //BookMarks    
+    bookMarks: BookMark[] = [];
+    bookMarkCSWRecords: CSWRecordModel[] = [];
 
     // Collapsable menus
     anyTextIsCollapsed: boolean = true;
@@ -49,8 +53,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     availableServices: any = [];
     dateTo: any = null;
     dateFrom: any = null;
-    availableRegistries: any = [];
-
+    availableRegistries: Registry[] = [];
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     click$ = new Subject<string>();
@@ -68,14 +71,13 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     constructor(private olMapService: OlMapService,
         private userStateService: UserStateService,
         private cswSearchService: CSWSearchService,
-        private modalService: NgbModal) { }
+        private authService: AuthService) { }
 
 
     ngOnInit() {
         this.userStateService.setView(DATA_VIEW);
-
         // Load available registries
-        this.cswSearchService.getAvailableRegistries().subscribe(data => {
+        this.cswSearchService.updateRegistries().subscribe(data => {
             this.availableRegistries = data;
             for (let registry of this.availableRegistries) {
                 registry.checked = true;
@@ -87,10 +89,16 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // selecting a registry will populate results)
             this.facetedSearch();
             this.getFacetedKeywords();
+            //get bookmark data only if the user is logged in
+            if (this.isValidUser())
+                this.getBookMarkCSWRecords();
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
         });
+
+
+
 
         // Define available services
         this.availableServices = [
@@ -103,7 +111,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.anyTextIsCollapsed = false;
         this.searchResultsIsCollapsed = false;
     }
-
 
     ngAfterViewChecked() {
         this.userStateService.setView(DATA_VIEW);
@@ -260,111 +267,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
 
-    /**
-     * Are there more results to display?
-     *
-     * @returns true if at least one registry has (nextIndex > 0), false
-     *          otherwise
-     */
-    public hasNextResultsPage(): boolean {
-        for (let registry of this.availableRegistries) {
-            if (registry.startIndex != 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     *
-     */
-    public previousResultsPage(): void {
-        if (this.currentCSWRecordPage != 1) {
-            this.currentCSWRecordPage -= 1;
-            for (let registry of this.availableRegistries) {
-                if (registry.prevIndices.length >= 2) {
-                    registry.startIndex = registry.prevIndices[registry.prevIndices.length - 2];
-                    registry.prevIndices.splice(registry.prevIndices.length - 2, 2);
-                }
-            }
-            this.facetedSearch();
-        }
-    }
-
-
-    /**
-     *
-     */
-    public nextResultsPage(): void {
-        this.currentCSWRecordPage += 1;
-        this.facetedSearch();
-    }
-
-
-    /**
-     *
-     * @param cswRecord
-     */
-    public addCSWRecord(cswRecord: CSWRecordModel): void {
-        try {
-            this.olMapService.addCSWRecord(cswRecord);
-        } catch (error) {
-            // TODO: Proper error reporting
-            alert(error.message);
-        }
-    }
-
-
-    /**
-     *
-     * @param recordId
-     */
-    public removeCSWRecord(recordId: string): void {
-        this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
-    }
-
-
-    /**
-     *
-     * @param cswRecord
-     */
-    public displayRecordInformation(cswRecord) {
-        if (cswRecord) {
-            const modelRef = this.modalService.open(RecordModalContent, {size: 'lg'});
-            modelRef.componentInstance.record = cswRecord;
-        }
-    }
-
-
-    /**
-     *
-     * @param cswRecord
-     */
-    public showCSWRecordBounds(cswRecord: CSWRecordModel): void {
-        if (cswRecord.geographicElements.length > 0) {
-            let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
-            const bbox: [number, number, number, number] =
-                [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
-            const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-            this.olMapService.displayExtent(extent);
-        }
-    }
-
-
-    /**
-     *
-     * @param cswRecord
-     */
-    public zoomToCSWRecordBounds(cswRecord: CSWRecordModel): void {
-        if (cswRecord.geographicElements.length > 0) {
-            let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
-            const bbox: [number, number, number, number] =
-                [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
-            const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-            this.olMapService.fitView(extent);
-        }
-    }
 
 
     /**
@@ -481,6 +383,48 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
+    * Are there more results to display?
+    *
+    * @returns true if at least one registry has (nextIndex > 0), false
+    *          otherwise
+    */
+    public hasNextResultsPage(): boolean {
+        for (let registry of this.availableRegistries) {
+            if (registry.startIndex != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     *
+     */
+    public previousResultsPage(): void {
+        if (this.currentCSWRecordPage != 1) {
+            this.currentCSWRecordPage -= 1;
+            for (let registry of this.availableRegistries) {
+                if (registry.prevIndices.length >= 2) {
+                    registry.startIndex = registry.prevIndices[registry.prevIndices.length - 2];
+                    registry.prevIndices.splice(registry.prevIndices.length - 2, 2);
+                }
+            }
+            this.facetedSearch();
+        }
+    }
+
+
+    /**
+     *
+     */
+    public nextResultsPage(): void {
+        this.currentCSWRecordPage += 1;
+        this.facetedSearch();
+    }
+
+
+    /**
      * TODO: Maybe switch event to lose focus, this will check after every key press.
      *       Tried to use (change) but ngbDatepicker hijacks the event.
      * @param date
@@ -489,6 +433,61 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         if (date && date.year && date.month)
             return true;
         return false;
+    }
+
+    /**
+     * Check if the user is logged in and not anonymous
+     */
+    isValidUser(): boolean {
+        return this.authService.isLoggedIn;
+    }
+
+    /**
+     * get user's information for book marks and book marked csw records
+     */
+    public getBookMarkCSWRecords() {
+        let startPosition: number = 0;
+        this.userStateService.bookmarks.subscribe(data => {
+            this.bookMarks = data;
+            // empty the book marked csw record list before gettting updated list
+            this.bookMarkCSWRecords = [];
+            this.bookMarks.forEach(bookMark => {
+                this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
+                    if (response && response.length == 1) {
+                        this.bookMarkCSWRecords.push(response.pop());
+                    }
+                });
+            });            
+        }, error => {
+            console.log(error.message);
+        });
+
+    }
+
+    /**
+     * processes the event emitted from the datasets-display component 
+     * by adding/removing from bookmarks and related csw records. 
+     * helps update the datasets-display component.
+     * 
+     * @param selection 
+     */
+    onBookMarkChoice(selection) {
+        if (selection.choice === "add") {
+            this.bookMarks.push(selection.bookmark);
+            this.bookMarkCSWRecords.push(selection.cswRecord);
+        }
+        else if (selection.choice === "remove") {
+            let index = this.bookMarks.findIndex(item => {
+                return (item.id === selection.bookmark.id)
+            });
+            if (index > -1)
+                this.bookMarks.splice(index, 1);
+            let pos = this.bookMarkCSWRecords.findIndex(rec => {
+                return (rec.id === selection.cswRecord.id);
+            });
+            if (pos > -1)
+                this.bookMarkCSWRecords.splice(pos, 1);
+        }
     }
 
 }

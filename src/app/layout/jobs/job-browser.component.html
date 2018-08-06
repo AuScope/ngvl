@@ -1,31 +1,33 @@
-<div *ngIf="jobsLoading" class="spinner">
-    <div class="bounce1"></div>
-    <div class="bounce2"></div>
-    <div class="bounce3"></div>
-</div>
-<div *ngIf="treeJobsData.length > 0 && !jobsLoading" class="job-browser-table">
-    <p-treeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true"
-        [rows]="10" selectionMode="{{ selectionMode }}" [(selection)]="selectedJobNodes" [(contextMenuSelection)]="selectedContextNode"
-        metaKeySelection="true" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="contextMenuSelected($event)" [contextMenu]="jobContextMenu">
-        <ng-template pTemplate="header" let-columns>
-            <tr>
-                <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn [ttSortableColumn]="col.field">{{col.header}}
-                    <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
-                </th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
-            <tr [ttSelectableRow]="rowNode" [ttContextMenuRow]="rowNode">
-                <td>
-                    <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
-                <td>{{ rowData.submitDate | date:'medium' }}</td>
-                <td>{{ rowData.status }}</td>
-            </tr>
-        </ng-template>
-    </p-treeTable>
-</div>
-<div *ngIf="treeJobsData.length === 0 && ! jobsLoading" style="padding:8px;">
-    You have no jobs.
+<div style="min-height: 200px;">
+    <div *ngIf="jobsLoading" class="spinner" style="display:relative;">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+    <div *ngIf="treeJobsData.length > 0 && !jobsLoading" class="job-browser-table">
+        <p-treeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true"
+            [rows]="10" selectionMode="{{ selectionMode }}" [(selection)]="selectedJobNodes" [(contextMenuSelection)]="selectedContextNode"
+            metaKeySelection="true" (onNodeSelect)="jobSelected($event)" (onContextMenuSelect)="contextMenuSelected($event)" [contextMenu]="jobContextMenu">
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn [ttSortableColumn]="col.field">{{col.header}}
+                        <p-treeTableSortIcon [field]="col.field"></p-treeTableSortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                <tr [ttSelectableRow]="rowNode" [ttContextMenuRow]="rowNode">
+                    <td>
+                        <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>{{ rowData.name }}</td>
+                    <td>{{ rowData.submitDate | date:'medium' }}</td>
+                    <td>{{ rowData.status }}</td>
+                </tr>
+            </ng-template>
+        </p-treeTable>
+    </div>
+    <div *ngIf="treeJobsData.length === 0 && ! jobsLoading" style="padding:8px;">
+        You have no jobs.
+    </div>
 </div>
 
 <!-- Job context menu -->

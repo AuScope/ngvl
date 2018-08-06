@@ -7,3 +7,14 @@ table {
         text-overflow: ellipsis;
     }
 }
+
+split-area {
+    overflow-y: hidden !important;
+}
+
+::ng-deep {
+    /* File input preview panel shouldn't have any y-overflow */
+    split-area#preview-panel {
+        overflow-y: hidden !important;
+    }
+}

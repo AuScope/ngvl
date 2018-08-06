@@ -14,6 +14,7 @@ import { JobTemplateComponent } from './job-template.component';
 import { JobSolutionVarsComponent } from './job-solution-vars.component';
 import { SolutionVarBindingComponent } from './solution-var-binding.component';
 import { SolutionVarBindingsFormService } from './solution-var-bindings-form.service';
+import { JobObjectComponent } from './job-object.component';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { SolutionVarBindingsFormService } from './solution-var-bindings-form.ser
     JobSolutionsSummaryComponent,
     JobTemplateComponent,
     JobSolutionVarsComponent,
+    JobObjectComponent,
     SolutionVarBindingComponent
   ],
   exports: [JobWizardComponent],

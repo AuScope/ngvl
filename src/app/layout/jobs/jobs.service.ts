@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-import { TreeJobs, Series, CloudFileInformation } from '../../shared/modules/vgl/models';
+import { TreeJobs, Series, CloudFileInformation, ComputeService, MachineImage, ComputeType } from '../../shared/modules/vgl/models';
 
 
 @Injectable()
@@ -49,6 +49,18 @@ export class JobsService {
 
     public getAuditLogs(jobId: number): Observable<any> {
         return this.vgl.getAuditLogs(jobId);
+    }
+
+    public getComputeServices(): Observable<ComputeService[]> {
+        return this.vgl.getComputeServices();
+    }
+
+    public getMachineImages(computeServiceId: string): Observable<MachineImage[]> {
+        return this.vgl.getMachineImages(computeServiceId);
+    }
+    
+    public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
+        return this.vgl.getComputeTypes(computeServiceId, machineImageId);
     }
 
 }

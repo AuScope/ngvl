@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry } from './models';
+import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -216,6 +216,27 @@ export class VglService {
         return this.vglRequest('secure/updateOrCreateJob.do', { params: httpParams });
     }
 
+    public getComputeServices(): Observable<ComputeService[]> {
+        return this.vglRequest('secure/getComputeServices.do');
+    }
+
+    public getMachineImages(computeServiceId: string): Observable<MachineImage[]> {
+        const options = {
+            params: { computeServiceId: computeServiceId }
+        }
+        return this.vglRequest('secure/getVmImagesForComputeService.do', options);
+    }
+
+    public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
+        const options = {
+            params: {
+                computeServiceId: computeServiceId,
+                machineImageId: machineImageId
+            }
+        }
+        return this.vglRequest('secure/getVmTypesForComputeService.do', options);
+    }
+
     public submitJob(jobId: number): Observable<any> {
         const options = {
             params: { jobId: jobId.toString() }
@@ -295,7 +316,7 @@ export class VglService {
         return this.getEntry<Solution>(url);
     }
 
-    // Add to database dataset information that is bookmarked    
+    // Add to database dataset information that is bookmarked
     public addBookMark(fileIdentifier: string, serviceId: string) : Observable<number> {
         const options = {
             params: {
@@ -321,7 +342,7 @@ export class VglService {
         return this.vglRequest('getBookMarks.do');
     }
 
-    /**   
+    /**
      * @param bookMark get download options associated with a book mark
      */
     public getDownloadOptions(bookmarkId: number): Observable<DownloadOptions[]> {
@@ -333,7 +354,7 @@ export class VglService {
         return this.vglRequest('getDownloadOptions.do', options);
     }
 
-    /**   
+    /**
      * @param bookMark save download options associated with a book mark
      */
     public bookMarkDownloadOptions(bookmarkId: number, downloadOptions: DownloadOptions): Observable<number> {
@@ -354,7 +375,7 @@ export class VglService {
         return this.vglRequest('saveDownloadOptions.do', options);
     }
 
-    /**   
+    /**
      * @param bookMark delete download options associated with a book mark
      */
     public deleteDownloadOptions(optionsId: number): Observable<any> {
@@ -362,7 +383,7 @@ export class VglService {
         return this.vglRequest('deleteDownloadOptions.do', options);
     }
 
-    //gets csw record information based on fileter parameters such as file identifier and service id 
+    //gets csw record information based on fileter parameters such as file identifier and service id
     public getFilteredCSWRecord(fileIdentifier: string, serviceId: string): Observable<CSWRecordModel[]> {
         const options = {
             params: {

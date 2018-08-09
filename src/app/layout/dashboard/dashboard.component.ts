@@ -5,7 +5,7 @@ import { UserStateService, DASHBOARD_VIEW } from '../../shared';
 
 @Component({
     selector: 'app-dashboard',
-    templateUrl: './dashboard.component.html',
+    templateUrl: './landingpage.component.html',
     styleUrls: ['./dashboard.component.scss'],
     animations: [routerTransition()]
 })

@@ -38,7 +38,7 @@ export function createTranslateLoader(http: HttpClient) {
         useFactory: createTranslateLoader,
         deps: [HttpClient]
       }
-    }),
+    }),   
     AppRoutingModule,
     VglModule,
     UserModule

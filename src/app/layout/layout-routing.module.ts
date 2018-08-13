@@ -8,8 +8,7 @@ const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
-    children: [
-      { path: '', redirectTo: 'dashboard' },
+    children: [      
       { path: 'dashboard', loadChildren: './dashboard/dashboard.module#DashboardModule' },
       { path: 'data', loadChildren: './datasets/datasets.module#DatasetsModule' },
       { path: 'solutions', loadChildren: './solutions/solutions.module#SolutionsModule', canActivate: [AuthGuard] },
@@ -22,7 +21,8 @@ const routes: Routes = [
       { path: 'grid', loadChildren: './grid/grid.module#GridModule' },
       { path: 'components', loadChildren: './bs-component/bs-component.module#BsComponentModule' },
       { path: 'blank-page', loadChildren: './blank-page/blank-page.module#BlankPageModule' },
-      { path: 'user', loadChildren: './user/user.module#UserModule'}
+      { path: 'user', loadChildren: './user/user.module#UserModule'},
+      { path: '', redirectTo: '/landing' },
     ]
   }
 ];

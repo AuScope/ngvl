@@ -40,7 +40,7 @@ export function createTranslateLoader(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
-    LandingpageModule,
+   // LandingpageModule,
     AppRoutingModule,
     VglModule,
     UserModule

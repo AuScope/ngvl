@@ -5,8 +5,7 @@ import { AuthGuard } from './shared';
 import { LandingpageComponent } from './landingpage/landingpage.component';
 
 const routes: Routes = [
-  { path: '', loadChildren: './layout/layout.module#LayoutModule' },
-  //{ path: 'landing', loadChildren: './landingpage/landingpage.module#LandingpageModule' },
+  { path: '', loadChildren: './layout/layout.module#LayoutModule' },  
   { path: 'landing', component: LandingpageComponent },
   { path: 'login', loadChildren: './login/login.module#LoginModule' },
   { path: 'signup', loadChildren: './signup/signup.module#SignupModule' },

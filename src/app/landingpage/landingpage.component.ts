@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-
+import { routerTransition } from '../router.animations';
 
 @Component({
   selector: 'app-landingpage',
   templateUrl: './landingpage.component.html',
-  styleUrls: ['./landingpage.component.scss']  
+  styleUrls: ['./landingpage.component.scss'],
+  animations: [routerTransition()]  
 })
 export class LandingpageComponent implements OnInit {
 

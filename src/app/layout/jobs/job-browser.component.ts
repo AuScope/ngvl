@@ -132,6 +132,7 @@ export class JobBrowserComponent implements OnInit {
     refreshJobs() {
         this.cancelCurrentSubscription();
         this.jobsLoading = true;
+        this.selectedJob = null;
         this.httpSubscription = this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
                 this.treeJobsData = this.createJobsTreeNodes(treeJobs);

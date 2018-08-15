@@ -17,6 +17,7 @@ import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
 import { UserModule } from './layout/user/user.module';
+import { LandingpageModule } from './landingpage/landingpage.module';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -38,7 +39,8 @@ export function createTranslateLoader(http: HttpClient) {
         useFactory: createTranslateLoader,
         deps: [HttpClient]
       }
-    }),
+    }),   
+    LandingpageModule,
     AppRoutingModule,
     VglModule,
     UserModule

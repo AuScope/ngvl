@@ -22,7 +22,7 @@ const routes: Routes = [
       { path: 'components', loadChildren: './bs-component/bs-component.module#BsComponentModule' },
       { path: 'blank-page', loadChildren: './blank-page/blank-page.module#BlankPageModule' },
       { path: 'user', loadChildren: './user/user.module#UserModule'},
-      { path: '', redirectTo: '/landing' },
+      { path: '', redirectTo: '/landing', pathMatch: 'full' },
     ]
   }
 ];

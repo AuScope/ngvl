@@ -15,7 +15,6 @@ import { PageHeaderModule } from '../../shared';
 import { JobsService } from './jobs.service';
 import { NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-import { LogPreview } from './preview/log-preview.component';
 import { DataServicePreview } from './preview/data-service-preview.component';
 import { PlainTextPreview } from './preview/plaintext-preview.component';
 import { ImagePreview } from './preview/image-preview.component';
@@ -47,8 +46,7 @@ import { AngularSplitModule } from 'angular-split';
     ],
     declarations: [
         JobsComponent, JobBrowserComponent, JobInputsComponent,
-        JobSubmissionDatasetsComponent, JobInputsBrowserModalContent,
-        LogPreview,
+        JobSubmissionDatasetsComponent, JobInputsBrowserModalContent,       
         PreviewDirective, DataServicePreview, ImagePreview,
         PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent
     ],

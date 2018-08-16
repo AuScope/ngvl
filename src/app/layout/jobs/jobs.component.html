@@ -85,7 +85,7 @@
                                     </table>
                                 </div>
                             </div>
-    
+
                             <div class="row" style="margin-right: -10px; margin-left: -2px; margin-top:-1px;">
                                 <!-- File panel -->
                                 <!-- Issue with padding changing after navigating to Datasets -->
@@ -117,27 +117,30 @@
                                         </split-area>
                                     </split>
 
-                        <div class="row">
-                            <!-- File panel -->
-                            <div class="col">
-                                <div class="card" style="height: calc(100vh - 304px);">
-                                    <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
-                                        <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
-                                    </div>
-                                </div>
-                            </div>
+                                    <div class="row">
+                                        <!-- File panel -->
+                                        <div class="col">
+                                            <div class="card" style="height: calc(100vh - 304px);">
+                                                <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
+                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            <!-- Preview panel (no longer a card, match card style) -->
-                            <div class="col" style="height: calc(100vh - 304px);border: 1px solid #ddd;border-radius: 0.25rem;padding: 0px;margin-right: 10px;">
-                                <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
-                                    <div style="text-align: center;vertical-align: middle;display:table-cell;">
-                                        Select a file to the left to preview it here.
+                                        <!-- Preview panel (no longer a card, match card style) -->
+                                        <div class="col" style="height: calc(100vh - 304px);border: 1px solid #ddd;border-radius: 0.25rem;padding: 0px;margin-right: 10px;">
+                                            <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
+                                                <div style="text-align: center;vertical-align: middle;display:table-cell;">
+                                                    Select a file to the left to preview it here.
+                                                </div>
+                                            </div>
+                                            <div *ngIf="filePreviewLoading" class="spinner">
+                                                <div class="bounce1"></div>
+                                                <div class="bounce2"></div>
+                                                <div class="bounce3"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div *ngIf="filePreviewLoading" class="spinner">
-                                    <div class="bounce1"></div>
-                                    <div class="bounce2"></div>
-                                    <div class="bounce3"></div>
                                 </div>
                             </div>
                         </div>
@@ -146,24 +149,24 @@
             </split-area>
         </split>
     </div>
-</div>
 
-<!-- Add Folder modal -->
-<ng-template #addFolderModal let-c="close">
-    <div class="modal-header">
-        <h4 class="modal-title">Add Folder</h4>
-        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <div class="input-group">
-            <label for="folderName">Folder Name&nbsp;</label>
-            <input type="text" class="form-control" id="folderName" [(ngModel)]="newFolderName" style="display:flex;flex:1;">
+
+    <!-- Add Folder modal -->
+    <ng-template #addFolderModal let-c="close">
+        <div class="modal-header">
+            <h4 class="modal-title">Add Folder</h4>
+            <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn" (click)="c('OK click')">OK</button>
-        <button type="button" class="btn" (click)="c('Close click')">Cancel</button>
-    </div>
-</ng-template>
+        <div class="modal-body">
+            <div class="input-group">
+                <label for="folderName">Folder Name&nbsp;</label>
+                <input type="text" class="form-control" id="folderName" [(ngModel)]="newFolderName" style="display:flex;flex:1;">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn" (click)="c('OK click')">OK</button>
+            <button type="button" class="btn" (click)="c('Close click')">Cancel</button>
+        </div>
+    </ng-template>

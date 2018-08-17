@@ -6,7 +6,7 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 @Component({
     selector: 'app-log-preview',
     templateUrl: 'log-preview.component.html',
-    styleUrls: []
+    styleUrls: ['log-preview.component.scss']
 })
 
 
@@ -17,6 +17,9 @@ export class LogPreview implements PreviewComponent {
 
     // Data will be the plaintext string
     data: any;
+
+    // Expose log keys to template
+    logKeys = Object.keys;
 
 
     constructor() { }

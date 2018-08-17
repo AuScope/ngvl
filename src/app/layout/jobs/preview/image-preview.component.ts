@@ -5,7 +5,7 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 @Component({
     selector: 'app-image-preview',
     templateUrl: 'image-preview.component.html',
-    styleUrls: []
+    styleUrls: ['image-preview.component.scss']
 })
 
 
@@ -14,8 +14,8 @@ export class ImagePreview implements PreviewComponent {
     // Data will be a URL to the server's getImagePreview endpoint
     data: any;
 
-    // Is fit to preview checkbox selected, currently unused
-    fitImageToPreview: boolean = false;
+    // Image modal is hidden by default
+    showingImageModal: boolean = false;
 
 
     constructor() {
@@ -23,30 +23,29 @@ export class ImagePreview implements PreviewComponent {
 
 
     /**
-     * Currently unused, can be used to apply style change to img element
+     * Toggle whether image modal is displayed
      */
-    public setStyles(): any {
+    public isShowingImageModal(showModal: boolean): void {
+        this.showingImageModal = showModal;
+    }
+
+
+    /**
+     * Set the image modal style based on whether image is being previewed
+     * full screen or not
+     */
+    public setModalStyle(): any {
         let styles = {};
-        if(this.fitImageToPreview) {
+        if(this.showingImageModal) {
             styles = {
-                'width': '100%',
-                'height': '100%'
+                'display': 'block'
             }
         } else {
             styles = {
-                'overflow': 'hidden'
+                'display': 'none'
             }
         }
         return styles;
     }
-
-    /**
-     * 
-     * @param cbElement The "fit to preview" checkbox
-     */
-    public fitPreviewCheckboxChanged(cbElement: HTMLInputElement): void {
-        this.fitImageToPreview = cbElement.checked;
-    }
-
 
 }

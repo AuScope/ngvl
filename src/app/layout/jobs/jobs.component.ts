@@ -290,6 +290,7 @@ export class JobsComponent implements OnInit {
         this.jobsService.addFolder(folderName).subscribe(
             series => {
                 console.log(JSON.stringify(series));
+                this.jobBrowser.refreshJobs();   
             },
             // TODO: Proper error reporting
             error => {
@@ -310,7 +311,7 @@ export class JobsComponent implements OnInit {
             if (result === 'OK click' && this.newFolderName !== '') {
                 this.addFolder(this.newFolderName);
             }
-        });
+        }, () => {});
     }
 
 }

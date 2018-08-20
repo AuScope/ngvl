@@ -1,10 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ElementRef, ViewChild } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { JobStatusModalContent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode } from "primeng/api";
 import { Subscription } from "rxjs";
+import { TimerObservable } from "rxjs/observable/TimerObservable";
 
 
 @Component({
@@ -26,13 +27,14 @@ export class JobBrowserComponent implements OnInit {
 
     // HttpCLient request (for cancelling)
     httpSubscription: Subscription;
+    private timerSubscription: Subscription;
 
     // Job tree, columns, selection and context items
     treeJobsData: TreeNode[] = [];
     treeCols: any[] = [
-        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
-        { field: 'submitDate', header: 'Submit Date', colStyle: {'width': '40%'} },
-        { field: 'status', header: 'Status', colStyle: {'width': '20%'} }
+        { field: 'name', header: 'Name', colStyle: { 'width': '40%' } },
+        { field: 'submitDate', header: 'Submit Date', colStyle: { 'width': '40%' } },
+        { field: 'status', header: 'Status', colStyle: { 'width': '20%' } }
     ];
     selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
@@ -44,6 +46,9 @@ export class JobBrowserComponent implements OnInit {
 
     // Flag for job loading in progress
     jobsLoading: boolean = false;
+
+    @ViewChild('rowInformation') rowInfo: ElementRef;
+
 
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
@@ -57,9 +62,15 @@ export class JobBrowserComponent implements OnInit {
 
 
     ngOnInit() {
-        this.refreshJobs();
+        let timer = TimerObservable.create(0, 60000);
+        this.timerSubscription = timer.subscribe(timer => {
+            this.refreshJobs();
+        })
     }
 
+    ngOnDestroy() {
+        this.timerSubscription.unsubscribe();
+    }
 
     /**
      *
@@ -378,5 +389,34 @@ export class JobBrowserComponent implements OnInit {
     public editSelectedJob(): void {
 
     }
+
+    drop(data: any) {
+        if (this.selectedJob) {
+           // var node: any = (this.selectedJobNodes[0];
+            this.jobsService.setJobFolder(this.selectedJobNodes[0].data.id, data.seriesId).subscribe(
+                data => {
+                    this.refreshJobs();
+                 //   this.expandChildren(this.treeJobsData[0]);
+                },
+                // TODO: Proper error reporting
+                error => {
+                    console.log(error.message);
+                }
+            );
+        }
+    }
+
+    allowDrop(event) {
+        event.preventDefault();
+    }
+
+    expandChildren(node:TreeNode){
+        if(node.children){
+          node.expanded=true;
+          for(let cn of node.children){
+            this.expandChildren(cn);
+          }
+        }
+      }
 
 }

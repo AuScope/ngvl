@@ -54,7 +54,18 @@ export class UserStateService {
     }
 
     public updateUser() {
-        this.vgl.user.subscribe(user => this._user.next(user));
+        this.vgl.user.subscribe(
+            user => {
+                // If full name is empty (as with AAF login), use email address as name
+                if(user.fullName == undefined || user.fullName === "") {
+                    user.fullName = user.email;
+                }
+                this._user.next(user);
+            },
+            error => {
+                this.updateAnonymousUser();
+            }
+        );
     }
 
     public updateAnonymousUser() {

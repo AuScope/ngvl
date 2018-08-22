@@ -1,9 +1,10 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { routerTransition } from "../../router.animations";
-import { UserStateService } from "../../shared";
+import { UserStateService, AuthService } from "../../shared";
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { User } from "../../shared/modules/vgl/models";
-
 
 
 @Component({
@@ -23,11 +24,45 @@ export class UserManagementComponent implements OnInit {
     nciKey: string = "";
     nciKeyfile: any = undefined;
 
+    @ViewChild('termsAndConditionsModal')
+    private tacsDialog;
 
-    constructor(private userStateService: UserStateService, private messageService: MessageService) { }
+
+    constructor(private route: ActivatedRoute, private userStateService: UserStateService,
+                private messageService: MessageService, private modalService: NgbModal,
+                private authService: AuthService) { }
 
 
     ngOnInit() {
+
+        // Retrieve the NCI details
+        this.loadNciDetails();
+
+        // Check if we've been routed here because T&C's have not been accepted
+        setTimeout(() => {  // Skip a tick to avoid ExpressionChangedAfterItHasBeenCheckedError
+            this.route.queryParams
+                .filter(params => params.notacs)
+                .subscribe(params => {
+                    // T&C's have not been agreed to, show dialog
+                    if(params.hasOwnProperty('notacs') && params['notacs']==='1') {
+                        this.modalService.open(this.tacsDialog, { backdrop: 'static', keyboard:false }).result.then((result) => {
+                            if (result === 'accept') {
+                                this.acceptTermsAndConditions();
+                            } else if(result==='reject') {
+                                this.authService.logout();
+                            }
+                        });
+                    }
+            });
+        });
+    }
+
+
+    /**
+     * Retrieve the User's NCI details
+     */
+    private loadNciDetails(): void {
+        // Retrieve user details
         this.userStateService.user.subscribe(
             user => {
                 this.user = user;
@@ -37,7 +72,7 @@ export class UserManagementComponent implements OnInit {
                             this.nciUsername = response.nciUsername;
                             this.nciProjectCode = response.nciProject;
                             this.nciKeyfile = null;
-                            if(response.nciKey) {
+                            if (response.nciKey) {
                                 this.nciKey = "-- Saved --";
                             } else {
                                 this.nciKey = "";
@@ -51,6 +86,15 @@ export class UserManagementComponent implements OnInit {
         );
     }
 
+
+    /**
+     * User has accepted T&C's. Leverage existing AWS function to write this back to DB
+     */
+    private acceptTermsAndConditions(): void {
+        this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe();
+    }
+
+    
     /**
      * Download the Cloud Formation Policy (AWS)
      */

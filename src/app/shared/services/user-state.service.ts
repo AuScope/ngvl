@@ -88,6 +88,39 @@ export class UserStateService {
         return this.vgl.setUserNciDetails(nciUsername, nciProjectCode, nciKeyfile);
     }
 
+    public acceptTermsAndConditions(): void {
+        this.vgl.user.subscribe(
+            user => {
+                console.log("Accepting...");
+                if(user.acceptedTermsConditions !== 1) {
+                    console.log("Confirm not selected, selecting...");
+                    user.acceptedTermsConditions = 1;
+                    console.log("Writing...");
+                    this._user.next(user);
+                    console.log("Written?");
+                }
+            },
+            error => {
+                // TODO: Proper error reporting
+                console.log(error.message);
+            }
+        );
+    }
+
+    /* Currently unused */
+    /*
+    public configuredServices(): Observable<boolean> {
+      // Gist (TODO: but depends on what services are available in the back-end):
+      // AWS
+      const awsConfigured: boolean = user.arnExecution !== undefined && user.arnExecution !== "" && user.arnStorage !== undefined && user.arnStorage !== "";
+      // NCI-Raijin
+      const nciConfigured: boolean = nciDetails.nciKey;
+      // Nova
+      const noveConfigured = user.id.contains('@');
+      return awsConfigured || nciConfigured || novaConfigured;
+    }
+    */
+
     public downloadCloudFormationScript() {
         this.vgl.downloadCloudFormationScript().subscribe(
             response => {

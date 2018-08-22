@@ -41,7 +41,7 @@ export class JobBrowserComponent implements OnInit {
     selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
     selectedContextNode: TreeNode;
-    shiftingNode: TreeNode;
+    //shiftingNode: TreeNode;
 
     // Jobs
     jobs: Job[] = [];
@@ -166,7 +166,7 @@ export class JobBrowserComponent implements OnInit {
     /**
      * Refresh Jobs Status (Refresh button)
      */
-    refreshJobStatus() {      
+    refreshJobStatus() {
         this.statusSubscription = this.jobsService.getJobStatuses().subscribe(statusUpdates => {
             for (var key in statusUpdates) {
                 let job: Job = this.jobs.find(j => j.id === statusUpdates[key].jobId);
@@ -408,31 +408,19 @@ export class JobBrowserComponent implements OnInit {
     }
 
     drop(node: any) {
-        if (this.selectedJob) {
-            console.log("this.selectedJobNodes.id "+this.selectedJobNodes[0].data.id);
-            console.log("this.shiftingNode.data.id "+this.shiftingNode.data.id);
+        if (this.selectedJobNodes.length > 0) {
+            var jobIds: number[] = [];
+            this.selectedJobNodes.map(node => {
+                if (node.data.id)
+                    jobIds.push(node.data.id);
+            });
             let newFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === node.data.seriesId);
-            let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === this.shiftingNode.parent.data.seriesId);
-            this.jobsService.setJobFolder(this.selectedJob.id, newFolder.data.seriesId).subscribe(
+            this.jobsService.setJobFolder(jobIds, newFolder.data.seriesId).subscribe(
                 data => {
-                    if (oldFolder.children) {
-                        let shiftingNodeIndex = oldFolder.children.findIndex(childNode => childNode.data.id === this.shiftingNode.data.id);
-                        //delete from old folder
-                        if (shiftingNodeIndex > -1) {
-                            oldFolder.children.splice(shiftingNodeIndex, 1);
-                            //add to the new folder
-                            this.shiftingNode.parent = newFolder;
-                            this.shiftingNode.data.seriesId = newFolder.data.seriesId;
-                            if (newFolder.children)
-                                newFolder.children.push(this.shiftingNode);
-                            else {
-                                newFolder.children = [];
-                                newFolder.children.push(this.shiftingNode);
-                            }
-                            this.treeJobsData = [...this.treeJobsData];
-                        }
-                    }
-                    newFolder.expanded = true;
+                    this.selectedJobNodes.forEach(shiftingNode => {
+                        if (shiftingNode.data.id)
+                            this.moveFolder(newFolder, shiftingNode);
+                    });
                 },
                 // TODO: Proper error reporting
                 error => {
@@ -443,17 +431,38 @@ export class JobBrowserComponent implements OnInit {
         }
     }
 
+    moveFolder(newFolder: TreeNode, jobNode: TreeNode) {
+        let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === jobNode.parent.data.seriesId);
+        if (oldFolder.children) {
+            let shiftingNodeIndex = oldFolder.children.findIndex(childNode => childNode.data.id === jobNode.data.id);
+            //delete from old folder
+            if (shiftingNodeIndex > -1) {
+                oldFolder.children.splice(shiftingNodeIndex, 1);
+                //add to the new folder
+                jobNode.parent = newFolder;
+                jobNode.data.seriesId = newFolder.data.seriesId;
+                if (newFolder.children)
+                    newFolder.children.push(jobNode);
+                else {
+                    newFolder.children = [];
+                    newFolder.children.push(jobNode);
+                }
+                this.treeJobsData = [...this.treeJobsData];
+            }
+        }
+        newFolder.expanded = true;
+    }
+
     allowDrop(event) {
         event.preventDefault();
     }
 
     handleDragstart(node: any) {
-        this.selectedJobNodes.push(node);        
+        this.selectedJobNodes.push(node);
         if (node && node.data.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === node.data.id);
             this.jobSelectionChanged.emit(event);
         }
-        this.shiftingNode = node;
+        // this.shiftingNode = node;
     }
-
 }

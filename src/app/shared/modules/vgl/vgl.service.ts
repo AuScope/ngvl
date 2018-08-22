@@ -89,10 +89,10 @@ export class VglService {
         return this.vglRequest('secure/createFolder.do', options);
     }
 
-    public setJobFolder(jobId: number,seriesId: number): Observable<any> {
+    public setJobFolder(jobId: number[],seriesId: number): Observable<any> {
         const options = {
             params: {
-                jobIds: jobId,
+                jobIds: jobId.join(','),  
                 seriesId: seriesId
             }
         };

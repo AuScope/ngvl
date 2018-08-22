@@ -100,6 +100,10 @@ export class VglService {
         return this.vglRequest('secure/setJobFolder.do', options);
     }
 
+    public getJobStatuses(): Observable<any> {
+        return this.vglRequest('/secure/jobsStatuses.do');
+    }
+
     public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
         const options = { params: { jobId: jobId.toString() } };
         return this.vglRequest('secure/jobCloudFiles.do', options);

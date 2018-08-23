@@ -288,8 +288,7 @@ export class JobsComponent implements OnInit {
      */
     public addFolder(folderName: string): void {
         this.jobsService.addFolder(folderName).subscribe(
-            series => {
-                console.log(JSON.stringify(series));
+            series => {                
                 this.jobBrowser.refreshJobs();   
             },
             // TODO: Proper error reporting

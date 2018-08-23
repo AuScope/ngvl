@@ -6,8 +6,6 @@ import { JobStatusModalContent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode } from "primeng/api";
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
-import { forEach } from "../../../../node_modules/@angular/router/src/utils/collection";
-
 
 @Component({
     selector: 'job-browser',
@@ -41,7 +39,6 @@ export class JobBrowserComponent implements OnInit {
     selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
     selectedContextNode: TreeNode;
-    //shiftingNode: TreeNode;
 
     // Jobs
     jobs: Job[] = [];
@@ -50,9 +47,7 @@ export class JobBrowserComponent implements OnInit {
     // Flag for job loading in progress
     jobsLoading: boolean = false;
 
-    @ViewChild('rowInformation') rowInfo: ElementRef;
 
-    selectedRow: ElementRef;
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
     duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
@@ -65,10 +60,11 @@ export class JobBrowserComponent implements OnInit {
 
 
     ngOnInit() {
-        this.refreshJobs();
+        //this.refreshJobs();
         let timer = TimerObservable.create(0, 60000);
         this.timerSubscription = timer.subscribe(timer => {
-            this.refreshJobStatus();
+            //this.refreshJobStatus();
+            this.refreshJobs();
         })
     }
 
@@ -282,7 +278,7 @@ export class JobBrowserComponent implements OnInit {
                 for (let i = 0; i < this.selectedJobNodes.length; i++) {
                     // Job
                     const node: TreeNode = this.selectedJobNodes[i];
-                    if (node.data.leaf) {
+                    if (node.data.leaf) {                        
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
                                 if (i === this.selectedJobNodes.length - 1) {
@@ -415,29 +411,50 @@ export class JobBrowserComponent implements OnInit {
                     jobIds.push(node.data.id);
             });
             let newFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === node.data.seriesId);
-            this.jobsService.setJobFolder(jobIds, newFolder.data.seriesId).subscribe(
-                data => {
-                    this.selectedJobNodes.forEach(shiftingNode => {
-                        if (shiftingNode.data.id)
-                            this.moveFolder(newFolder, shiftingNode);
-                    });
-                },
-                // TODO: Proper error reporting
-                error => {
-                    console.log(error.message);
-                }
+            if (newFolder.data.seriesId) {
+                this.jobsService.setJobFolder(jobIds, newFolder.data.seriesId).subscribe(
+                    data => {
+                        this.selectedJobNodes.forEach(shiftingNode => {
+                            if (shiftingNode.data.id)
+                                this.moveFolder(newFolder, shiftingNode);
+                        });
+                    },
+                    // TODO: Proper error reporting
+                    error => {
+                        console.log(error.message);
+                    }
 
-            );
+                );
+            }
         }
     }
 
     moveFolder(newFolder: TreeNode, jobNode: TreeNode) {
-        let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === jobNode.parent.data.seriesId);
-        if (oldFolder.children) {
-            let shiftingNodeIndex = oldFolder.children.findIndex(childNode => childNode.data.id === jobNode.data.id);
-            //delete from old folder
+        if (jobNode.parent) {
+            let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === jobNode.parent.data.seriesId);
+            if (oldFolder.children) {
+                let shiftingNodeIndex = oldFolder.children.findIndex(childNode => childNode.data.id === jobNode.data.id);
+                //delete from old folder
+                if (shiftingNodeIndex > -1) {
+                    oldFolder.children.splice(shiftingNodeIndex, 1);
+                    //add to the new folder
+                    jobNode.parent = newFolder;
+                    jobNode.data.seriesId = newFolder.data.seriesId;
+                    if (newFolder.children)
+                        newFolder.children.push(jobNode);
+                    else {
+                        newFolder.children = [];
+                        newFolder.children.push(jobNode);
+                    }
+                    this.treeJobsData = [...this.treeJobsData];
+                }
+            }
+        }
+        else {
+            let shiftingNodeIndex = this.treeJobsData.findIndex(row => row.data.id === jobNode.data.id);
+            //delete from the tree
             if (shiftingNodeIndex > -1) {
-                oldFolder.children.splice(shiftingNodeIndex, 1);
+                this.treeJobsData.splice(shiftingNodeIndex, 1);
                 //add to the new folder
                 jobNode.parent = newFolder;
                 jobNode.data.seriesId = newFolder.data.seriesId;
@@ -463,6 +480,5 @@ export class JobBrowserComponent implements OnInit {
             this.selectedJob = this.jobs.find(j => j.id === node.data.id);
             this.jobSelectionChanged.emit(event);
         }
-        // this.shiftingNode = node;
     }
 }

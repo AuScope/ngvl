@@ -16,7 +16,7 @@ export class AuthService {
 
   login(): void {
     // Navigate to the VGL login screen.
-    window.location.href = '/VGL-Portal/oauth/google_login.html';
+    window.location.href = '/login';
   }
 
   logout(): void {

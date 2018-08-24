@@ -362,7 +362,7 @@ export class JobSubmissionDatasetsComponent {
      * Edit Download options and update the jobdownload object.
      * @param jobDownload 
      */
-    public editDownload(jobDownload: JobDownload): void {
+    public editDownload(event: any, jobDownload: JobDownload): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = jobDownload.cswRecord;

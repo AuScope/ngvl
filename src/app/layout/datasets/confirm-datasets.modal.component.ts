@@ -122,7 +122,7 @@ export class ConfirmDatasetsModalContent {
      * 
      * TODO: Do
      */
-    public editDownload(rowData: any, onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
+    public editDownload(event: any,rowData: any, onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = cswRecord;

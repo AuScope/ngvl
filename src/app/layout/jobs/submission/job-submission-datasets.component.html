@@ -28,7 +28,7 @@
                             <a href="{{ rowData.details }}">{{ rowData.details }}</a>
                         </span>
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'">
-                            <button title="Edit the download options" (click)="editDownload(rowData.input)" >
+                            <button title="Edit the download options" (click)="editDownload($event,rowData.input)" >
                                 <i class="fa fa-edit"></i>
                             </button>
                         </span>

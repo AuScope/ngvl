@@ -91,6 +91,7 @@ export class JobsComponent implements OnInit {
      */
     public refreshJobs(): void {
         this.currentPreviewObject = null;
+        //this.jobBrowser.refreshJobs();
         this.jobBrowser.refreshJobStatus();
     }
 

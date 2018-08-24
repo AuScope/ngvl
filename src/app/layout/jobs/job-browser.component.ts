@@ -60,11 +60,10 @@ export class JobBrowserComponent implements OnInit {
 
 
     ngOnInit() {
-        //this.refreshJobs();
+        this.refreshJobs();
         let timer = TimerObservable.create(0, 60000);
         this.timerSubscription = timer.subscribe(timer => {
-            //this.refreshJobStatus();
-            this.refreshJobs();
+            this.refreshJobStatus();
         })
     }
 
@@ -165,9 +164,9 @@ export class JobBrowserComponent implements OnInit {
     refreshJobStatus() {
         this.statusSubscription = this.jobsService.getJobStatuses().subscribe(statusUpdates => {
             for (var key in statusUpdates) {
-                let job: Job = this.jobs.find(j => j.id === statusUpdates[key].jobId);
-                if (job)
-                    job.status = statusUpdates[key].status;
+                let jobNode: TreeNode = this.treeJobsData.find(node => node.data.id === statusUpdates[key].jobId);
+                if (jobNode)
+                    jobNode.data.status = statusUpdates[key].status;
             }
         });
     }
@@ -274,17 +273,16 @@ export class JobBrowserComponent implements OnInit {
             message: confirmMessage,
             icon: 'fa fa-trash',
             accept: () => {
-                //for(let node of this.selectedJobNodes) {
-                for (let i = 0; i < this.selectedJobNodes.length; i++) {
-                    // Job
-                    const node: TreeNode = this.selectedJobNodes[i];
-                    if (node.data.leaf) {                        
+                for (let node of this.selectedJobNodes) {
+                    if (node.data.leaf) {
+                        this.cancelCurrentSubscription();
+
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
-                                if (i === this.selectedJobNodes.length - 1) {
-                                    this.refreshJobs();
-                                    // TODO: Success message
-                                }
+                                let index = this.treeJobsData.findIndex(row => row.data.id === node.data.id);
+                                //delete from the tree
+                                this.deleteNode(index);
+                                // TODO: Success message
                             },
                             error => {
                                 // TODO: Proper error reporting
@@ -296,10 +294,9 @@ export class JobBrowserComponent implements OnInit {
                     else if (!node.data.leaf) {
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
                             response => {
-                                if (i === this.selectedJobNodes.length - 1) {
-                                    this.refreshJobs();
-                                    // TODO: Success message
-                                }
+                                let index = this.treeJobsData.findIndex(row => row.data.seriesId === node.data.seriesId);
+                                //delete from the tree
+                                this.deleteNode(index);
                             },
                             error => {
                                 // TODO: Proper error reporting
@@ -312,6 +309,16 @@ export class JobBrowserComponent implements OnInit {
         });
     }
 
+    /**
+     * delete a node from the TreeNode[] using index
+     * @param index 
+     */
+    deleteNode(index: number) {
+        if (index > -1) {
+            this.treeJobsData.splice(index, 1);
+            this.treeJobsData = [...this.treeJobsData];
+        }
+    }
 
     /**
      * Cancel the selected job (job context menu)
@@ -403,17 +410,25 @@ export class JobBrowserComponent implements OnInit {
 
     }
 
+    /**
+     * drop selected nodes from old position to a new folder.
+     * @param node 
+     */
     drop(node: any) {
         if (this.selectedJobNodes.length > 0) {
             var jobIds: number[] = [];
+            //get the list of jobs ids to be moved
             this.selectedJobNodes.map(node => {
                 if (node.data.id)
                     jobIds.push(node.data.id);
             });
+            //get the new location series id
             let newFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === node.data.seriesId);
             if (newFolder.data.seriesId) {
+                //make the dragged jobs series id to be the new folder id
                 this.jobsService.setJobFolder(jobIds, newFolder.data.seriesId).subscribe(
                     data => {
+                        //make the front end node changes for shiftig from old folder to new folder.
                         this.selectedJobNodes.forEach(shiftingNode => {
                             if (shiftingNode.data.id)
                                 this.moveFolder(newFolder, shiftingNode);
@@ -429,7 +444,11 @@ export class JobBrowserComponent implements OnInit {
         }
     }
 
+    /**
+     * Move a node to new folder by deleting from existing location
+     */   
     moveFolder(newFolder: TreeNode, jobNode: TreeNode) {
+        //if the node is inside a folder
         if (jobNode.parent) {
             let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === jobNode.parent.data.seriesId);
             if (oldFolder.children) {
@@ -438,47 +457,65 @@ export class JobBrowserComponent implements OnInit {
                 if (shiftingNodeIndex > -1) {
                     oldFolder.children.splice(shiftingNodeIndex, 1);
                     //add to the new folder
-                    jobNode.parent = newFolder;
-                    jobNode.data.seriesId = newFolder.data.seriesId;
-                    if (newFolder.children)
-                        newFolder.children.push(jobNode);
-                    else {
-                        newFolder.children = [];
-                        newFolder.children.push(jobNode);
-                    }
-                    this.treeJobsData = [...this.treeJobsData];
+                    this.addToNewFolder(newFolder, jobNode);
                 }
             }
         }
         else {
+            //if the node is not inside a folder, it in the main tree
             let shiftingNodeIndex = this.treeJobsData.findIndex(row => row.data.id === jobNode.data.id);
-            //delete from the tree
+            //delete from the main tree and and add to new folder
             if (shiftingNodeIndex > -1) {
                 this.treeJobsData.splice(shiftingNodeIndex, 1);
                 //add to the new folder
-                jobNode.parent = newFolder;
-                jobNode.data.seriesId = newFolder.data.seriesId;
-                if (newFolder.children)
-                    newFolder.children.push(jobNode);
-                else {
-                    newFolder.children = [];
-                    newFolder.children.push(jobNode);
-                }
-                this.treeJobsData = [...this.treeJobsData];
+                this.addToNewFolder(newFolder, jobNode);
             }
         }
         newFolder.expanded = true;
     }
 
+    /**
+     * add a node to a new folder
+     * @param newFolder 
+     * @param jobNode 
+     */
+    addToNewFolder(newFolder: TreeNode, jobNode: TreeNode) {
+        //add to the new folder
+        jobNode.parent = newFolder;
+        jobNode.data.seriesId = newFolder.data.seriesId;
+        if (newFolder.children)
+            newFolder.children.push(jobNode);
+        else {
+            newFolder.children = [];
+            newFolder.children.push(jobNode);
+        }
+        this.treeJobsData = [...this.treeJobsData];
+    }
+
+    /**
+     * Drag over event
+     * @param event 
+     */
     allowDrop(event) {
         event.preventDefault();
     }
 
+    /**
+     * Prepare a node for dragging if it is a job node. 
+     * When user drags a unselected node,make it selected and unselecting other selected rows.
+     * @param node 
+     */
     handleDragstart(node: any) {
-        this.selectedJobNodes.push(node);
         if (node && node.data.leaf) {
-            this.selectedJob = this.jobs.find(j => j.id === node.data.id);
-            this.jobSelectionChanged.emit(event);
+            let index = this.selectedJobNodes.findIndex(elem => elem.data.id === node.data.id)
+            //row chosen not present in selected nodes, so unselect other selected nodes and make this row selected.
+            if (index === -1) {                
+                this.selectedJobNodes.splice(0, this.selectedJobNodes.length);
+                this.selectedJobNodes.push(node);
+                this.selectedJob = this.jobs.find(j => j.id === node.data.id);
+                this.jobSelectionChanged.emit(event);
+            }
+
         }
     }
 }

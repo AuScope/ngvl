@@ -1,0 +1,23 @@
+// CSS sorcery to get tab panel to fill parent
+#logViewTab {
+    ::ng-deep {
+        .ui-tabview {
+            height: 100%;
+            width: 100%;
+            padding: 0px;
+            display: table;
+
+            .ui-tabview-nav {
+                display: table-row;
+            }
+            .ui-tabview-panels {
+                height: 100%;
+                display: table-row;
+
+                .ui-tabview-panel {
+                    display: contents;
+                }
+            }
+        }
+    }
+}

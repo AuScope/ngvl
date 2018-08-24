@@ -1,13 +1,9 @@
-<img src="{{ data }}" style="display:block;overflow:auto;margin:auto;max-width:100%;max-height:100%;">
+<!-- Image in preview panel -->
+<img id="previewImage" src="{{ data }}" (click)="isShowingImageModal(true)">
 
-<!-- TODO: Set correct style based on checkbox
-<div class="card" style="width:100%;height:100%;overflow:auto;">
-    <div class="card-body" style="padding: 2px;">
-        <img src="{{ data }}" [ngStyle]="setStyles()">
-    </div>
-    <div class="card-footer">
-        <input #fitToPreviewCb type="checkbox" id="fitToPreview" (change)="fitPreviewCheckboxChanged(fitToPreviewCb)">
-        <label for="actualSize">Fit to preview area</label>
-    </div>
+<!-- Modal to view image full screen, hidden by default -->
+<div #imageModal id="imageModal" class="image-modal" [ngStyle]="setModalStyle()">
+    <span class="close-button" (click)="isShowingImageModal(false)" >&times;</span>
+    <img class="image-modal-content" src="{{ data }}">
+    <div id="imageCaption"></div>
 </div>
--->

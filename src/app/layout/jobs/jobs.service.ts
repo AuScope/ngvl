@@ -35,6 +35,10 @@ export class JobsService {
         return this.vgl.getPlaintextPreview(jobId, file, maxSize);
     }
 
+    public getSectionedLogs(jobId: number): Observable<any> {
+        return this.vgl.getSectionedLogs(jobId);
+    }
+
     public deleteJob(jobId: number): Observable<any> {
         return this.vgl.deleteJob(jobId);
     }

@@ -4,6 +4,8 @@ import { DownloadOptions } from '../../../../shared/modules/vgl/models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { CSWSearchService } from '../../../../shared/services/csw-search.service';
+'../../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import olExtent from 'ol/extent';
@@ -46,7 +48,7 @@ export class OlMapDataSelectComponent {
     buttonText = 'Select Data';
 
 
-    constructor(private olMapService: OlMapService,
+    constructor(private olMapService: OlMapService,private cswSearchService: CSWSearchService,
         private modalService: NgbModal) { }
 
 
@@ -119,83 +121,7 @@ export class OlMapDataSelectComponent {
         return serviceList;
     }
 
-
-    /**
-     * Create default download options for a given online resource
-     * 
-     * @param or 
-     * @param cswRecord 
-     * @param defaultBbox 
-     */
-    public createDownloadOptionsForResource(or, cswRecord, defaultBbox): any {
-        const dsBounds = cswRecord.geographicElements.length ? cswRecord.geographicElements[0] : null;
-
-        //Set the defaults of our new item
-        let downloadOptions: DownloadOptions = {
-            name: 'Subset of ' + or.name,
-            description: or.description,
-            url: or.url,
-            method: 'POST',
-            localPath: './' + or.name,
-            crs: (defaultBbox ? defaultBbox.crs : ''),
-            eastBoundLongitude: (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
-            northBoundLatitude: (defaultBbox ? defaultBbox.northBoundLatitude : 0),
-            southBoundLatitude: (defaultBbox ? defaultBbox.southBoundLatitude : 0),
-            westBoundLongitude: (defaultBbox ? defaultBbox.westBoundLongitude : 0),
-            dsEastBoundLongitude: (dsBounds ? dsBounds.eastBoundLongitude : null),
-            dsNorthBoundLatitude: (dsBounds ? dsBounds.northBoundLatitude : null),
-            dsSouthBoundLatitude: (dsBounds ? dsBounds.southBoundLatitude : null),
-            dsWestBoundLongitude: (dsBounds ? dsBounds.westBoundLongitude : null),
-            format: undefined,
-            layerName: undefined,
-            coverageName: undefined,
-            serviceUrl: undefined,
-            srsName: undefined,
-            featureType: undefined
-        };
-
-        //Add/subtract info based on resource type
-        switch (or.type) {
-            case 'WCS':
-                delete downloadOptions.url;
-                delete downloadOptions.serviceUrl;
-                delete downloadOptions.srsName;
-                delete downloadOptions.featureType;
-                downloadOptions.format = 'nc';
-                downloadOptions.layerName = or.name;
-                downloadOptions.coverageName = downloadOptions.layerName;
-                break;
-            case 'WFS':
-                delete downloadOptions.url;
-                delete downloadOptions.format;
-                delete downloadOptions.layerName;
-                delete downloadOptions.coverageName;
-                downloadOptions.serviceUrl = or.url;
-                downloadOptions.featureType = or.name;
-                downloadOptions.srsName = '';
-                break;
-            case 'NCSS':
-                delete downloadOptions.format;
-                delete downloadOptions.serviceUrl;
-                delete downloadOptions.srsName;
-                delete downloadOptions.featureType;
-                downloadOptions.name = or.name;
-                downloadOptions.method = 'GET';
-                downloadOptions.layerName = or.name;
-                downloadOptions.coverageName = downloadOptions.layerName;
-                break;
-            case 'WWW':
-                delete downloadOptions.format;
-                delete downloadOptions.srsName;
-                break;
-            //We don't support EVERY type
-            default:
-                break;
-        }
-
-        return downloadOptions;
-    };
-
+   
 
     /**
      * Is the online resource of a supported type
@@ -260,11 +186,11 @@ export class OlMapDataSelectComponent {
                     if (onlineResources.length > 0) {
                         for (const resource of onlineResources) {
                             if (this.isResourceSupported(resource)) {
-                                let downloadOptions: DownloadOptions = this.createDownloadOptionsForResource(resource, record, defaultBbox);
+                                let downloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(resource, record, defaultBbox);
                                 let node: TreeNode = {};
                                 node.data = {
-                                    "name": resource.name,
-                                    "url": resource.url,
+                                    "name": downloadOptions.name,
+                                     "url": downloadOptions.url,
                                     "cswRecord": record,
                                     "onlineResource": resource,
                                     "defaultOptions":JSON.parse(JSON.stringify(downloadOptions)),

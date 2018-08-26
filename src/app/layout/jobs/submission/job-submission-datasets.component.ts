@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
-import { JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
+import { DownloadOptions, JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
 import { UserStateService } from '../../../shared';
 import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.component';
+import { DownloadOptionsModalContent } from './../../datasets/download-options.modal.component';
 import { TreeNode } from 'primeng/api';
 import { JobsService } from '../jobs.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
+import { CSWSearchService } from '../../../shared/services/csw-search.service';
 
 
 @Component({
     selector: 'job-submission-datasets',
     templateUrl: './job-submission-datasets.component.html',
-    styleUrls: ['./job-submission-datasets.component.scss']
+    styleUrls: ['./job-submission-datasets.component.scss'],
 })
 
 
@@ -79,7 +81,7 @@ export class JobSubmissionDatasetsComponent {
 
 
     constructor(private jobsService: JobsService, private userStateService: UserStateService,
-        private vglService: VglService, private modalService: NgbModal) {
+        private vglService: VglService, private modalService: NgbModal, private cswSearchService: CSWSearchService) {
         this.loadJobInputs();
     }
 
@@ -355,4 +357,56 @@ export class JobSubmissionDatasetsComponent {
         this.loadJobInputs();
     }
 
+
+    /**
+     * Edit Download options and update the jobdownload object.
+     * @param jobDownload 
+     */
+    public editDownload(event: any, jobDownload: JobDownload): void {
+        event.stopPropagation();
+        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        modelRef.componentInstance.cswRecord = jobDownload.cswRecord;
+        modelRef.componentInstance.onlineResource = jobDownload.onlineResource;
+        //checks if a csw record belongs to a bookmarked dataset
+        let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(jobDownload.cswRecord);
+        modelRef.componentInstance.isBMarked = isBookMarkRecord;
+        let defaultBbox: any = { eastBoundLongitude: jobDownload.eastBoundLongitude, northBoundLatitude: jobDownload.northBoundLatitude, southBoundLatitude: jobDownload.southBoundLatitude, westBoundLongitude: jobDownload.westBoundLongitude };
+        let downloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(jobDownload.onlineResource, jobDownload.cswRecord, defaultBbox);
+        modelRef.componentInstance.defaultDownloadOptions = JSON.parse(JSON.stringify(downloadOptions));
+        downloadOptions.name = jobDownload.name;
+        downloadOptions.description = jobDownload.description;
+        downloadOptions.localPath = jobDownload.localPath;
+        downloadOptions.url = jobDownload.url;
+        downloadOptions.northBoundLatitude = jobDownload.northBoundLatitude;
+        downloadOptions.southBoundLatitude = jobDownload.southBoundLatitude;
+        downloadOptions.eastBoundLongitude = jobDownload.eastBoundLongitude;
+        downloadOptions.westBoundLongitude = jobDownload.westBoundLongitude;
+        modelRef.componentInstance.downloadOptions = downloadOptions;
+        modelRef.componentInstance.defaultDownloadOptions.bookmarkOptionName = 'Default Options';
+        modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: modelRef.componentInstance.defaultDownloadOptions });
+        if (isBookMarkRecord) {
+            //gets id of the bookmark using csw record information
+            let bookMarkId: number = this.cswSearchService.getBookMarkId(jobDownload.cswRecord);
+            //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
+            this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {
+                if (data.length > 0) {
+                    //updates dropdown component with download options data that were bookmarked in the format(label, value)
+                    data.forEach(option => {
+                        modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
+                    });
+                }
+            });
+        }
+        //after the user conforim changes update the job download object 
+        modelRef.result.then((userResponse) => {
+            this.userStateService.removeJobDownload(jobDownload);
+            if (jobDownload.onlineResource && downloadOptions) {
+                this.cswSearchService.makeJobDownload(jobDownload.onlineResource, jobDownload.cswRecord, downloadOptions).subscribe(data => {
+                    jobDownload = data;
+                    this.userStateService.addJobDownload(jobDownload);
+                    this.loadJobInputs();
+                });
+            }
+        },() => console.log('Modal Closed!'));
+    }
 }

@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { BookMark,Registry,DownloadOptions } from '../../shared/modules/vgl/models';
+import { BookMark,Registry,DownloadOptions,JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
 
@@ -177,5 +177,131 @@ export class CSWSearchService {
         });
         return bookMarkId;
     }
+
+
+    /**
+     * Create default download options for a given online resource
+     * 
+     * @param or 
+     * @param cswRecord 
+     * @param defaultBbox 
+     */
+    public createDownloadOptionsForResource(or, cswRecord, defaultBbox): any {
+        const dsBounds = cswRecord.geographicElements.length ? cswRecord.geographicElements[0] : null;
+
+        //Set the defaults of our new item
+        let downloadOptions: DownloadOptions = {
+            name: 'Subset of ' + or.name,
+            description: or.description,
+            url: or.url,
+            method: 'POST',
+            localPath: './' + or.name,
+            crs: (defaultBbox ? defaultBbox.crs : ''),
+            eastBoundLongitude: (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
+            northBoundLatitude: (defaultBbox ? defaultBbox.northBoundLatitude : 0),
+            southBoundLatitude: (defaultBbox ? defaultBbox.southBoundLatitude : 0),
+            westBoundLongitude: (defaultBbox ? defaultBbox.westBoundLongitude : 0),
+            dsEastBoundLongitude: (dsBounds ? dsBounds.eastBoundLongitude : null),
+            dsNorthBoundLatitude: (dsBounds ? dsBounds.northBoundLatitude : null),
+            dsSouthBoundLatitude: (dsBounds ? dsBounds.southBoundLatitude : null),
+            dsWestBoundLongitude: (dsBounds ? dsBounds.westBoundLongitude : null),
+            format: undefined,
+            layerName: undefined,
+            coverageName: undefined,
+            serviceUrl: undefined,
+            srsName: undefined,
+            featureType: undefined
+        };
+
+        //Add/subtract info based on resource type
+        switch (or.type) {
+            case 'WCS':
+                delete downloadOptions.url;
+                delete downloadOptions.serviceUrl;
+                delete downloadOptions.srsName;
+                delete downloadOptions.featureType;
+                downloadOptions.format = 'nc';
+                downloadOptions.layerName = or.name;
+                downloadOptions.coverageName = downloadOptions.layerName;
+                break;
+            case 'WFS':
+                delete downloadOptions.url;
+                delete downloadOptions.format;
+                delete downloadOptions.layerName;
+                delete downloadOptions.coverageName;
+                downloadOptions.serviceUrl = or.url;
+                downloadOptions.featureType = or.name;
+                downloadOptions.srsName = '';
+                break;
+            case 'NCSS':
+                delete downloadOptions.format;
+                delete downloadOptions.serviceUrl;
+                delete downloadOptions.srsName;
+                delete downloadOptions.featureType;
+                downloadOptions.name = or.name;
+                downloadOptions.method = 'GET';
+                downloadOptions.layerName = or.name;
+                downloadOptions.coverageName = downloadOptions.layerName;
+                break;
+            case 'WWW':
+                delete downloadOptions.format;
+                delete downloadOptions.srsName;
+                break;
+            //We don't support EVERY type
+            default:
+                break;
+        }
+
+        return downloadOptions;
+    };
+
+    /**
+     * 
+     * @param onlineResource 
+     * @param dlOptions 
+     */
+    public makeJobDownload(onlineResource: any, cswRecord: CSWRecordModel, dlOptions: DownloadOptions): Observable<JobDownload> {
+        switch (onlineResource.type) {
+            case 'WCS':
+                //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
+                //will fail. To workaround this, we need to crop our selection to the dataset bounds
+                if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
+                    dlOptions.eastBoundLongitude = dlOptions.dsEastBoundLongitude;
+                }
+                if (dlOptions.dsWestBoundLongitude != null && (dlOptions.dsWestBoundLongitude > dlOptions.westBoundLongitude)) {
+                    dlOptions.westBoundLongitude = dlOptions.dsWestBoundLongitude;
+                }
+                if (dlOptions.dsNorthBoundLatitude != null && (dlOptions.dsNorthBoundLatitude < dlOptions.northBoundLatitude)) {
+                    dlOptions.northBoundLatitude = dlOptions.dsNorthBoundLatitude;
+                }
+                if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
+                    dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
+                }
+                return this.vgl.makeErddapUrl(dlOptions).map(jobDownload => {
+                    jobDownload.cswRecord = cswRecord;
+                    jobDownload.onlineResource = onlineResource;
+                    return jobDownload;
+                });
+            case 'WFS':
+                return this.vgl.makeWfsUrl(dlOptions).map(jobDownload => {
+                    jobDownload.cswRecord = cswRecord;
+                    jobDownload.onlineResource = onlineResource;
+                    return jobDownload;
+                });
+            case 'NCSS':
+                return this.vgl.makeNetcdfsubseserviceUrl(dlOptions).map(jobDownload => {
+                    jobDownload.cswRecord = cswRecord;
+                    jobDownload.onlineResource = onlineResource;
+                    return jobDownload;
+                });
+            default:
+                return this.vgl.makeDownloadUrl(dlOptions).map(jobDownload => {
+                    jobDownload.cswRecord = cswRecord;
+                    jobDownload.onlineResource = onlineResource;
+                    return jobDownload;
+                });
+        }
+    }
+
 
 }

@@ -297,10 +297,10 @@ export class JobBrowserComponent implements OnInit {
             accept: () => {
                 for (let node of this.selectedJobNodes) {
                     if (node.data.leaf) {
-                        this.cancelCurrentSubscription();
-                        //delete from the tree                        
+                        this.cancelCurrentSubscription();                        
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
+                                //delete from the tree                        
                                 let index;
                                 if (!node.parent) {
                                     index = this.treeJobsData.findIndex(row => row.data.id === node.data.id);
@@ -319,11 +319,12 @@ export class JobBrowserComponent implements OnInit {
                     }
                     // Series
                     else if (!node.data.leaf) {
+                        this.cancelCurrentSubscription();
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
                             response => {
                                 let index = this.treeJobsData.findIndex(row => row.data.seriesId === node.data.seriesId);
                                 //delete from the tree
-                                this.deleteNode(index, this.treeJobsData);
+                                this.deleteNode(index, this.treeJobsData);                            
                             },
                             error => {
                                 // TODO: Proper error reporting

@@ -10,11 +10,11 @@ import { UserStateService, DASHBOARD_VIEW } from '../../shared';
     animations: [routerTransition()]
 })
 export class DashboardComponent implements OnInit {
-    public alerts: Array<any> = [];
+/*     public alerts: Array<any> = [];
     public sliders: Array<any> = [];
-
+*/
     constructor(private userStateService: UserStateService) {
-        this.sliders.push(
+/*        this.sliders.push(
             {
                 imagePath: 'assets/images/slider1.jpg',
                 label: 'First slide label',
@@ -52,14 +52,16 @@ export class DashboardComponent implements OnInit {
                 voluptatum veritatis quod aliquam! Rerum placeat necessitatibus, vitae dolorum`
             }
         );
+ */
+    }
+    
+    ngOnInit() {
+        this.userStateService.setView(DASHBOARD_VIEW);
     }
 
-  ngOnInit() {
-    this.userStateService.setView(DASHBOARD_VIEW);
-  }
-
-    public closeAlert(alert: any) {
+/*     public closeAlert(alert: any) {
         const index: number = this.alerts.indexOf(alert);
         this.alerts.splice(index, 1);
     }
+ */
 }

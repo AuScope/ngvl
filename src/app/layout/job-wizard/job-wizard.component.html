@@ -37,8 +37,8 @@
     <hr>
   </div>
   <p>
-    <button class="btn btn-secondary" [disabled]="jobIncomplete">Submit</button>
-    <button class="btn btn-secondary">Cancel</button>
+    <button class="btn btn-secondary" [disabled]="jobIncomplete" (click)="submit()">Submit</button>
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   </p>
 
 </div>

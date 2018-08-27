@@ -36,6 +36,9 @@ export class UserStateService {
     private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
     public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
 
+    private _jobTemplate: BehaviorSubject<string> = new BehaviorSubject('');
+    public readonly jobTemplate: Observable<string> = this._jobTemplate.asObservable();
+
     private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
     public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
 
@@ -171,6 +174,10 @@ export class UserStateService {
     return solutions;
   }
 
+  public updateJobTemplate(template: string) {
+    this._jobTemplate.next(template);
+  }
+
   // Files User has uploaded for a Job
   public setUploadedFiles(files: any[]): void {
       this._uploadedFiles.next(files);
@@ -234,6 +241,10 @@ export class UserStateService {
       }
     });
     this._jobCloudFiles.next(cloudFiles);
+  }
+
+  public updateJob(job: Job) {
+    this._job.next(job);
   }
 
   private createEmptyJob(): Job {

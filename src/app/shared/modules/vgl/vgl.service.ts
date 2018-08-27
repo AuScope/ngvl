@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
+import { catchError, switchMap, map } from 'rxjs/operators';
 
-import { Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -193,46 +194,71 @@ export class VglService {
         return this.vglRequest('secure/duplicateJob.do', options);
     }
 
-    public updateOrCreateJob(name: string, description: string, seriesId: number,
-        computeServiceId, string, computeVmId: string,
-        computeVmRunCommand: string, computeTypeId: string, ncpus: number,
-        jobfs: number, mem: number, registeredUrl: string,
-        emailNotification: boolean, walltime: number): Observable<any> {
-        let httpParams: HttpParams = new HttpParams();
+  public submitJob(job: Job, template: string, solutions: Solution[]): Observable<any> {
+    let jobWithId: Job;
 
-        for (let arg in arguments) {
-            //params.set(arg.toString(), )
-        }
-        /*
-        if (name)
-            params.set('name', name);
-        if(description)
-            params.set('description', description);
-        if(seriesId)
-            params.set('seriesId', seriesId);
-        if(computeServiceId)
-            params.set('', );
-        if(computeVmId)
-            params.set('', );
-        if(computeVmRunCommand)
-            params.set('', );
-        if(computeTypeId)
-            params.set('', );
-        if(ncpus)
-            params.set('', );
-        if(jobfs)
-            params.set('', );
-        if(mem)
-            params.set('', );
-        if(registeredUrl)
-            params.set('', );
-        if(emailNotification)
-            params.set('', );
-        if(walltime)
-            params.set('', );
-        */
-        return this.vglRequest('secure/updateOrCreateJob.do', { params: httpParams });
+    // Ensure the job object is created/updated first
+    return this.updateJob(job).pipe(
+      // Next associate the template with the job, which now has an id.
+      switchMap(job => {
+        jobWithId = job;
+        return this.saveScript(template, job, solutions);
+      }),
+
+      // Finally submit the job! Note that the response from the previous call
+      // will be null if it succeeded, so we ignore it and use the closed-over
+      // jobWithId.
+      switchMap(x => this.vglRequest('secure/submitJob.do', { params: { jobId: jobWithId.id }})),
+
+      catchError((err, observable) => {
+        console.log('Submission error: ' + JSON.stringify(err));
+        return Observable.of(null);
+      })
+    );
+
+  }
+
+  public saveScript(template: string, job: Job, solutions: Solution[]): Observable<any> {
+    const params = {
+      sourceText: template,
+      jobId: job.id,
+      solutions: solutions.map(s => s['@id'])
+    };
+
+    return this.vglRequest('secure/saveScript.do', { params: params });
+  }
+
+  public updateJob(job: Job): Observable<Job> {
+    // Copy the properties of the job for the request parameters.
+    const params = {...job};
+
+    // Remove any properties that are undefined, so they do not get included in
+    // the request parameters.
+    for (const p of Object.getOwnPropertyNames(job)) {
+      if (params[p] == undefined) {
+        delete params[p];
+      }
     }
+
+    // If no job id is supplied then updateOrCreateJob.do will create a new job
+    // with the supplied parameters. So remove the id from job if it's not a
+    // valid job id.
+    if (params.hasOwnProperty('id') && params.id == -1) {
+      delete params.id;
+    }
+
+    return this.vglRequest('secure/updateOrCreateJob.do', { params: params })
+      .pipe(
+        map((jobs: Job[]) => {
+          // Should always be only 1 job.
+          if (jobs.length > 0) {
+            return jobs[0];
+          }
+
+          return null;
+        })
+      );
+  }
 
     public getComputeServices(): Observable<ComputeService[]> {
         return this.vglRequest('secure/getComputeServices.do');
@@ -253,14 +279,6 @@ export class VglService {
             }
         }
         return this.vglRequest('secure/getVmTypesForComputeService.do', options);
-    }
-
-    public submitJob(jobId: number): Observable<any> {
-        const options = {
-            params: { jobId: jobId.toString() }
-        };
-
-        return this.vglRequest('secure/submitJob.do', options);
     }
 
     public getAuditLogs(jobId: number): Observable<any> {

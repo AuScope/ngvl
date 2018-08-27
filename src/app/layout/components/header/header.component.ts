@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
   pushRightClass: string = 'push-right';
 
   username$: Observable<string>;
+  isUserConfigured$: Observable<boolean>;
 
   constructor(private translate: TranslateService,
               private userStateService: UserStateService,
@@ -32,6 +33,7 @@ export class HeaderComponent implements OnInit {
     });
 
     this.username$ = this.userStateService.user.map(user => user.fullName);
+    this.isUserConfigured$ = this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success);
   }
 
     ngOnInit() {}
@@ -67,6 +69,10 @@ export class HeaderComponent implements OnInit {
 
     changeLang(language: string) {
         this.translate.use(language);
+    }
+
+    public configureComputeServices(): void {
+        this.router.navigate(['/user'], { queryParams: { noconfig: 1 } });
     }
 
 }

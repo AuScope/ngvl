@@ -27,6 +27,9 @@ export class UserStateService {
     private _user: BehaviorSubject<User> = new BehaviorSubject(ANONYMOUS_USER);
     public readonly user: Observable<User> = this._user.asObservable();
 
+    private _nciDetails: BehaviorSubject<NCIDetails> = new BehaviorSubject(null);
+    public readonly nciDetails: Observable<NCIDetails> = this._nciDetails.asObservable();
+
     private _solutionQuery: BehaviorSubject<SolutionQuery> = new BehaviorSubject({});
     public readonly solutionQuery: Observable<SolutionQuery> = this._solutionQuery.asObservable();
 
@@ -66,10 +69,23 @@ export class UserStateService {
                 this.updateAnonymousUser();
             }
         );
+        this.vgl.nciDetails.subscribe(
+            nciDetails => {
+                this._nciDetails.next(nciDetails);
+            }
+        );
     }
 
     public updateAnonymousUser() {
         this._user.next(ANONYMOUS_USER);
+    }
+
+    public updateNciDetails() {
+        this.vgl.nciDetails.subscribe(
+            nciDetails => {
+                this._nciDetails.next(nciDetails);
+            }
+        );
     }
 
     public updateBookMarks() {
@@ -80,24 +96,24 @@ export class UserStateService {
         return this.vgl.setUserDetails(arnExecution, arnStorage, acceptedTermsConditions, awsKeyName);
     }
 
-    public getUserNciDetails(): Observable<NCIDetails> {
-        return this.vgl.nciDetails;
-    }
-
     public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
         return this.vgl.setUserNciDetails(nciUsername, nciProjectCode, nciKeyfile);
+    }
+
+    public getTermsAndConditions(): Observable<any> {
+        return this.vgl.getTermsAndConditions();
+    }
+
+    public getHasConfiguredComputeServices(): Observable<any> {
+        return this.vgl.getHasConfiguredComputeServices();
     }
 
     public acceptTermsAndConditions(): void {
         this.vgl.user.subscribe(
             user => {
-                console.log("Accepting...");
                 if(user.acceptedTermsConditions !== 1) {
-                    console.log("Confirm not selected, selecting...");
                     user.acceptedTermsConditions = 1;
-                    console.log("Writing...");
                     this._user.next(user);
-                    console.log("Written?");
                 }
             },
             error => {
@@ -106,20 +122,6 @@ export class UserStateService {
             }
         );
     }
-
-    /* Currently unused */
-    /*
-    public configuredServices(): Observable<boolean> {
-      // Gist (TODO: but depends on what services are available in the back-end):
-      // AWS
-      const awsConfigured: boolean = user.arnExecution !== undefined && user.arnExecution !== "" && user.arnStorage !== undefined && user.arnStorage !== "";
-      // NCI-Raijin
-      const nciConfigured: boolean = nciDetails.nciKey;
-      // Nova
-      const noveConfigured = user.id.contains('@');
-      return awsConfigured || nciConfigured || novaConfigured;
-    }
-    */
 
     public downloadCloudFormationScript() {
         this.vgl.downloadCloudFormationScript().subscribe(

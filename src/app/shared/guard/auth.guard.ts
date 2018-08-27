@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { MessageService } from 'primeng/api';
-
 import { AuthService } from '../services/auth.service';
 import { UserStateService } from '../services';
 
@@ -17,10 +15,6 @@ export class AuthGuard implements CanActivate {
   canActivate(router: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
     const url: string = state.url;
     return this.checkLogin(url);
-  }
-
-  redirectUnconfiguredUserToConfig() {
-      this.router.navigate(['/user']);
   }
 
   checkLogin(url: string): Observable<boolean> | boolean {

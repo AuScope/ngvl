@@ -5,7 +5,7 @@ import { PageHeaderModule } from '../../shared';
 import { UserManagementComponent } from './user-management.component';
 import { UserRoutingModule } from './user-routing.module';
 import { NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
-import { GrowlModule } from 'primeng/growl';
+import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/components/common/messageservice';
 
 
@@ -16,7 +16,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
     PageHeaderModule,
     UserRoutingModule,
     NgbTabsetModule.forRoot(),
-    GrowlModule
+    ToastModule
   ],
   declarations: [ UserManagementComponent ],
   providers: [ MessageService ],

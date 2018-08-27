@@ -1,15 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { AuthService } from '../shared/services/auth.service';
 
 @Component({
   selector: 'app-logged-in',
-  template: `
-    <p>
-      logged-in works!
-    </p>
-  `,
+  template: ``,
   styles: []
 })
 export class LoggedInComponent implements OnInit {

@@ -91,6 +91,14 @@ export class VglService {
         return this.http.post(environment.portalBaseUrl + 'secure/setNCIDetails.do', formData, options);
     }
 
+    public getTermsAndConditions(): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + "getTermsConditions.do");
+    }
+
+    public getHasConfiguredComputeServices(): Observable<any> {
+        return this.http.get(environment.portalBaseUrl + "secure/getHasConfiguredComputeServices.do");
+    }
+
     public downloadCloudFormationScript(): Observable<any> {
         return this.http.get(environment.portalBaseUrl + 'secure/getCloudFormationScript.do', {
             responseType: 'blob'

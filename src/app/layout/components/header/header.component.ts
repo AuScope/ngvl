@@ -15,16 +15,12 @@ export class HeaderComponent implements OnInit {
   pushRightClass: string = 'push-right';
 
   username$: Observable<string>;
+  isUserConfigured$: Observable<boolean>;
 
   constructor(private translate: TranslateService,
               private userStateService: UserStateService,
               private authService: AuthService,
               public router: Router) {
-
-    this.translate.addLangs(['en', 'fr', 'ur', 'es', 'it', 'fa', 'de']);
-    this.translate.setDefaultLang('en');
-    const browserLang = this.translate.getBrowserLang();
-    this.translate.use(browserLang.match(/en|fr|ur|es|it|fa|de/) ? browserLang : 'en');
 
     this.router.events.subscribe(val => {
       if (
@@ -37,6 +33,7 @@ export class HeaderComponent implements OnInit {
     });
 
     this.username$ = this.userStateService.user.map(user => user.fullName);
+    this.isUserConfigured$ = this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success);
   }
 
     ngOnInit() {}
@@ -72,6 +69,10 @@ export class HeaderComponent implements OnInit {
 
     changeLang(language: string) {
         this.translate.use(language);
+    }
+
+    public configureComputeServices(): void {
+        this.router.navigate(['/user'], { queryParams: { noconfig: 1 } });
     }
 
 }

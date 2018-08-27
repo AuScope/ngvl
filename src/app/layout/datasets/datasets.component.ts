@@ -7,7 +7,7 @@ import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { ANONYMOUS_USER, BookMark, Registry } from '../../shared/modules/vgl/models';
+import { BookMark, Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import olProj from 'ol/proj';
 import olExtent from 'ol/extent';

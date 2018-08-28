@@ -151,7 +151,7 @@ export class JobDownload {
     owner: string;
     parentUrl: string;
     parentName: string;
-    onlineResource?: any;    
+    onlineResource?: any;
     cswRecord?: CSWRecordModel;
 }
 
@@ -315,4 +315,12 @@ export interface Registry {
     checked?: boolean;
     startIndex?: number;
     prevIndices?: number[]
+}
+
+export function isSolution(x) {
+  if (x && x.problem != undefined) {
+    return true;
+  }
+
+  return false;
 }

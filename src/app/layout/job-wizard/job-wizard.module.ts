@@ -10,10 +10,9 @@ import { JobWizardComponent } from './job-wizard.component';
 import { JobsModule } from '../jobs/jobs.module';
 import { SolutionsModule } from '../solutions/solutions.module';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
-import { JobTemplateComponent } from './job-template.component';
 import { JobSolutionVarsComponent } from './job-solution-vars.component';
 import { SolutionVarBindingComponent } from './solution-var-binding.component';
-import { SolutionVarBindingsFormService } from './solution-var-bindings-form.service';
+import { SolutionVarBindingsService } from './solution-var-bindings.service';
 import { JobObjectComponent } from './job-object.component';
 
 @NgModule({
@@ -30,12 +29,11 @@ import { JobObjectComponent } from './job-object.component';
   declarations: [
     JobWizardComponent,
     JobSolutionsSummaryComponent,
-    JobTemplateComponent,
     JobSolutionVarsComponent,
     JobObjectComponent,
     SolutionVarBindingComponent
   ],
   exports: [JobWizardComponent],
-  providers: [SolutionVarBindingsFormService]
+  providers: [SolutionVarBindingsService]
 })
 export class JobWizardModule { }

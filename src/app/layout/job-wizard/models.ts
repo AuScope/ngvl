@@ -1,6 +1,6 @@
 import { Solution, VarBindingType, Variable, VariableType } from '../../shared/modules/vgl/models';
 
-export interface SolutionVarBindings {
+export interface SolutionVarBindingTypes {
   solution: Solution;
   bindings: { [varName: string]: VarBindingType }
 }
@@ -38,6 +38,8 @@ export class VarBinding<T> {
     this.controlType = options.controlType || '';
   }
 }
+
+export type SolutionVarBindings = { [key: string]: VarBinding<any>[] };
 
 export class TextboxBinding extends VarBinding<string> {
   controlType = 'textbox';

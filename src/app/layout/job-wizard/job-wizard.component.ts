@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
@@ -7,7 +8,7 @@ import { routerTransition } from '../../router.animations';
 
 import { Job, Solution } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';
-import { JobTemplateComponent } from './job-template.component';
+import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 
 @Component({
   selector: 'app-job-wizard',
@@ -26,12 +27,13 @@ export class JobWizardComponent implements OnInit {
   @ViewChild(JobObjectComponent)
   private jobObject: JobObjectComponent;
 
-  @ViewChild(JobTemplateComponent)
-  private jobTemplate: JobTemplateComponent;
+  @ViewChild(JobSolutionsSummaryComponent)
+  private solutionsComponent: JobSolutionsSummaryComponent;
 
   constructor(private userStateService: UserStateService,
               private vglService: VglService,
-              private location: Location) {}
+              private location: Location,
+              private router: Router) {}
 
   ngOnInit() {
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
@@ -58,7 +60,8 @@ export class JobWizardComponent implements OnInit {
 
     // Submit the job to the backend
     this.vglService.submitJob(job, template, this.solutions).subscribe(resp => {
-      console.log(resp);
+      console.log('Submitted: ' + resp);
+      this.router.navigate(['/jobs']);
     });
 
   }
@@ -74,7 +77,7 @@ export class JobWizardComponent implements OnInit {
   }
 
   getTemplate(): string {
-    return this.jobTemplate.template;
+    return this.solutionsComponent.template;
   }
 
   private stashUserState() {

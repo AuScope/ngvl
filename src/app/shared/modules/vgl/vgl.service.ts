@@ -194,28 +194,23 @@ export class VglService {
         return this.vglRequest('secure/duplicateJob.do', options);
     }
 
-  public submitJob(job: Job, template: string, solutions: Solution[]): Observable<any> {
-    let jobWithId: Job;
+  public submitJob(job: Job): Observable<any> {
+    return this.vglRequest('secure/submitJob.do', { params: { jobId: job.id }});
+  }
 
+  public saveJob(job: Job, template: string, solutions: Solution[]): Observable<any> {
     // Ensure the job object is created/updated first
     return this.updateJob(job).pipe(
       // Next associate the template with the job, which now has an id.
       switchMap(job => {
-        jobWithId = job;
         return this.saveScript(template, job, solutions);
       }),
-
-      // Finally submit the job! Note that the response from the previous call
-      // will be null if it succeeded, so we ignore it and use the closed-over
-      // jobWithId.
-      switchMap(x => this.vglRequest('secure/submitJob.do', { params: { jobId: jobWithId.id }})),
 
       catchError((err, observable) => {
         console.log('Submission error: ' + JSON.stringify(err));
         return Observable.of(null);
       })
     );
-
   }
 
   public saveScript(template: string, job: Job, solutions: Solution[]): Observable<any> {

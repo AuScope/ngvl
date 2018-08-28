@@ -51,19 +51,26 @@ export class JobWizardComponent implements OnInit {
     this._solutionsSub.unsubscribe();
   }
 
+  save() {
+    this.doSave().subscribe(resp => {
+      console.log('Saved: ' + resp);
+    });
+  }
+
   submit() {
+    // Save the job first, then submit it an navigate away.
+    this.doSave().subscribe(saved => this.vglService.submitJob(this.getJobObject()));
+  }
+
+  private doSave() {
     // Store the current user state.
     this.stashUserState();
 
     const job: Job = this.getJobObject();
     const template: string = this.getTemplate();
 
-    // Submit the job to the backend
-    this.vglService.submitJob(job, template, this.solutions).subscribe(resp => {
-      console.log('Submitted: ' + resp);
-      this.router.navigate(['/jobs']);
-    });
-
+    // Save the job to the backend
+    return this.vglService.saveJob(job, template, this.solutions);
   }
 
   cancel() {

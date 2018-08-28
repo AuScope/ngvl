@@ -13,7 +13,6 @@ import { AppComponent } from './app.component';
 import { CustomReuseStrategy } from './app-custom-reuse-strategy';
 import { AuthGuard, AuthService } from './shared';
 import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
-import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
 import { UserModule } from './layout/user/user.module';

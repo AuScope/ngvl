@@ -1,4 +1,7 @@
 <div [@routerTransition]>
+    <!-- Messages -->
+    <p-toast [baseZIndex]="99999"></p-toast>
+    <!-- Header -->
     <app-page-header [heading]="'User Profile'" [icon]="'fa-user'"></app-page-header>
     <div class="row" style="margin-left:0px;width:100%;">
         <!-- User Management -->
@@ -62,14 +65,14 @@
                                     <div class="card-header">Enter Your NCI Credentials</div>
                                     <div class="card-body">
                                         <label class="required" for="username" class="required">NCI Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" [(ngModel)]="nciUsername" required>
+                                        <input type="text" class="form-control" id="username" name="username" [(ngModel)]="nciDetails.nciUsername" required>
                                         <p><small class="text-muted">The username for the NCI account.</small></p>
                                         <label class="required" for="projectCode" class="required">NCI Project Code</label>
-                                        <input type="text" class="form-control" id="projectCode" name="projectCode" [(ngModel)]="nciProjectCode" required>
+                                        <input type="text" class="form-control" id="projectCode" name="projectCode" [(ngModel)]="nciDetails.nciProject" required>
                                         <p><small class="text-muted">The default NCI project code.</small></p>
                                         <label class="required" for="key">NCI Key</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" id="key" name="key" [(ngModel)]="nciKey" placeholder="Select SSH file" readonly required>
+                                            <input type="text" class="form-control" id="key" name="key" [(ngModel)]="nciDetails.nciKey" placeholder="Select SSH file" readonly required>
                                             <input class="inputfile" id="fileinput" type="file" multiple="single" (change)="nciKeyFileChanged($event)">
                                             <div class="input-group-append">
                                                 <label for="fileinput" class="btn btn-primary btn-sm" style="height:100%;text-align:center;">
@@ -92,4 +95,35 @@
     </div>
 </div>
 
-<!-- <p-growl [(value)]="msgs" [baseZIndex]="9999999"></p-growl> -->
+<!-- T&C's dialog -->
+<ng-template #termsAndConditionsModal let-c="close">
+    <div class="modal-header">
+        <h4 class="modal-title">Terms and Conditions</h4>
+    </div>
+    <div class="modal-body">
+        <div innerHTML="{{ tacsHTML }}" style="height: 300px; overflow-y:auto;"></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="c('reject')">Reject</button>
+        <button type="button" class="btn btn-success" (click)="c('accept')">Accept</button>
+    </div>
+</ng-template>
+
+<!-- Compute services not configured dialog -->
+<ng-template #computeServicesNotConfiguredModal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Setup Required</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div>
+            You haven't setup any compute providers.
+            You will need to configure at least one before submitting a job.
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="c('OK')">OK</button>
+    </div>
+</ng-template>

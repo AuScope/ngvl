@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { UserStateService } from './user-state.service';
+import { ANONYMOUS_USER } from '../modules/vgl/models';
 
 @Injectable()
 export class AuthService {
@@ -15,11 +16,11 @@ export class AuthService {
 
   login(): void {
     // Navigate to the VGL login screen.
-    window.location.href = '/VGL-Portal/oauth/google_login.html';
+    window.location.href = '/login';
   }
 
   logout(): void {
-    localStorage.removeItem('isLoggedIn');    
+    localStorage.removeItem('isLoggedIn');
     // Hit the VGL logout endpoint, then navigate to the dashboard.
     this.http.get('/VGL-Portal/j_spring_security_logout')
       // VGL redirects from the spring logout to the old portal page, which 404's,
@@ -49,6 +50,24 @@ export class AuthService {
         this.userStateService.updateBookMarks();
         this.router.navigate(['/dashboard']);
       });
+  }
+
+  /**
+   * Update the local user object to see if the User has been logged out of
+   * the server, but the front end doesn't know it yet
+   */
+  checkServerLogin(): void {
+    this.userStateService.updateUser();
+    this.userStateService.updateBookMarks();
+    this.userStateService.user.subscribe(
+      user => {
+          if(user === ANONYMOUS_USER) {
+            localStorage.removeItem('isLoggedIn');
+          } else {
+            localStorage.setItem('isLoggedIn', 'true');
+          }
+      }
+    )
   }
 
   onLoggedIn() {

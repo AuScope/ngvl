@@ -27,6 +27,9 @@ export class UserStateService {
     private _user: BehaviorSubject<User> = new BehaviorSubject(ANONYMOUS_USER);
     public readonly user: Observable<User> = this._user.asObservable();
 
+    private _nciDetails: BehaviorSubject<NCIDetails> = new BehaviorSubject(null);
+    public readonly nciDetails: Observable<NCIDetails> = this._nciDetails.asObservable();
+
     private _solutionQuery: BehaviorSubject<SolutionQuery> = new BehaviorSubject({});
     public readonly solutionQuery: Observable<SolutionQuery> = this._solutionQuery.asObservable();
 
@@ -54,11 +57,35 @@ export class UserStateService {
     }
 
     public updateUser() {
-        this.vgl.user.subscribe(user => this._user.next(user));
+        this.vgl.user.subscribe(
+            user => {
+                // If full name is empty (as with AAF login), use email address as name
+                if(user.fullName == undefined || user.fullName === "") {
+                    user.fullName = user.email;
+                }
+                this._user.next(user);
+            },
+            error => {
+                this.updateAnonymousUser();
+            }
+        );
+        this.vgl.nciDetails.subscribe(
+            nciDetails => {
+                this._nciDetails.next(nciDetails);
+            }
+        );
     }
 
     public updateAnonymousUser() {
         this._user.next(ANONYMOUS_USER);
+    }
+
+    public updateNciDetails() {
+        this.vgl.nciDetails.subscribe(
+            nciDetails => {
+                this._nciDetails.next(nciDetails);
+            }
+        );
     }
 
     public updateBookMarks() {
@@ -69,12 +96,31 @@ export class UserStateService {
         return this.vgl.setUserDetails(arnExecution, arnStorage, acceptedTermsConditions, awsKeyName);
     }
 
-    public getUserNciDetails(): Observable<NCIDetails> {
-        return this.vgl.nciDetails;
-    }
-
     public setUserNciDetails(nciUsername: string, nciProjectCode: string, nciKeyfile: any): Observable<any> {
         return this.vgl.setUserNciDetails(nciUsername, nciProjectCode, nciKeyfile);
+    }
+
+    public getTermsAndConditions(): Observable<any> {
+        return this.vgl.getTermsAndConditions();
+    }
+
+    public getHasConfiguredComputeServices(): Observable<any> {
+        return this.vgl.getHasConfiguredComputeServices();
+    }
+
+    public acceptTermsAndConditions(): void {
+        this.vgl.user.subscribe(
+            user => {
+                if(user.acceptedTermsConditions !== 1) {
+                    user.acceptedTermsConditions = 1;
+                    this._user.next(user);
+                }
+            },
+            error => {
+                // TODO: Proper error reporting
+                console.log(error.message);
+            }
+        );
     }
 
     public downloadCloudFormationScript() {

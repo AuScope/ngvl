@@ -4,8 +4,12 @@ import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { JobStatusModalContent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode } from "primeng/api";
+//import {ToastModule} from 'primeng';
+
+import { MessageService } from 'primeng/components/common/messageservice';
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
+
 
 @Component({
     selector: 'job-browser',
@@ -56,7 +60,7 @@ export class JobBrowserComponent implements OnInit {
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
 
 
-    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal, public renderer: Renderer) { }
+    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal, public renderer: Renderer,private messageService: MessageService) { }
 
 
     ngOnInit() {
@@ -314,6 +318,7 @@ export class JobBrowserComponent implements OnInit {
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
+                                this.messageService.add({severity:'error', summary: 'Error Message', detail:'Error deleting job'});
                             }
                         )
                     }
@@ -329,6 +334,7 @@ export class JobBrowserComponent implements OnInit {
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
+                                this.messageService.add({severity:'error', summary: 'Error Message', detail:'Error deleting folder'});
                             }
                         )
                     }

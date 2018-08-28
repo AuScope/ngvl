@@ -27,6 +27,8 @@ import { JobInputsComponent } from './job-inputs.component';
 import { JobStatusModalContent } from './job-status.modal.component';
 import { JobInputsBrowserModalContent } from './submission/job-inputs-browser.modal.component';
 import { AngularSplitModule } from 'angular-split';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @NgModule({
     imports: [
@@ -42,7 +44,8 @@ import { AngularSplitModule } from 'angular-split';
         TreeTableModule,
         OlMapModule,
         NgbDropdownModule.forRoot(),
-        NgbCollapseModule.forRoot()
+        NgbCollapseModule.forRoot(),
+        ToastModule
     ],
     declarations: [
         JobsComponent, JobBrowserComponent, JobInputsComponent,
@@ -51,7 +54,7 @@ import { AngularSplitModule } from 'angular-split';
         PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent
     ],
     entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent, JobInputsBrowserModalContent ],
-    providers: [ JobsService, ConfirmationService ],
+    providers: [ JobsService, ConfirmationService, MessageService ],
     exports: [ JobSubmissionDatasetsComponent ]
 })
 export class JobsModule { }

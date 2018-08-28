@@ -4,11 +4,9 @@ import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { JobStatusModalContent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode } from "primeng/api";
-//import {ToastModule} from 'primeng';
-
-import { MessageService } from 'primeng/components/common/messageservice';
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
+import { MessageService } from 'primeng/components/common/messageservice';
 
 
 @Component({
@@ -301,7 +299,7 @@ export class JobBrowserComponent implements OnInit {
             accept: () => {
                 for (let node of this.selectedJobNodes) {
                     if (node.data.leaf) {
-                        this.cancelCurrentSubscription();                        
+                        this.cancelCurrentSubscription();                         
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
                                 //delete from the tree                        
@@ -318,7 +316,7 @@ export class JobBrowserComponent implements OnInit {
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
-                                this.messageService.add({severity:'error', summary: 'Error Message', detail:'Error deleting job'});
+                                this.messageService.add({severity:'error', summary: 'There was an error deleting this job', detail: error.message});                                
                             }
                         )
                     }
@@ -334,7 +332,7 @@ export class JobBrowserComponent implements OnInit {
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
-                                this.messageService.add({severity:'error', summary: 'Error Message', detail:'Error deleting folder'});
+                                this.messageService.add({severity:'error', summary: 'There was an error deleting the jobs for the selected series', detail: error.message});                                
                             }
                         )
                     }

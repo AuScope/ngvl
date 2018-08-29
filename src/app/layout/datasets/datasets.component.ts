@@ -28,7 +28,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     // Search results   
     cswSearchResults: CSWRecordModel[] = [];
-    //selectedCSWRecord = null;
     recordsLoading = false;
 
     //BookMarks    

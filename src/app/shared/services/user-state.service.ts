@@ -222,6 +222,10 @@ export class UserStateService {
     this._jobDownloads.next(jobDownloads);
   }
 
+  public getJobDownloads(): JobDownload[] {
+    return this._jobDownloads.getValue();
+  }
+
   // Copied cloud files User requests for a Job (input)
   public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
     this._jobCloudFiles.next(jobCloudFiles);

@@ -6,7 +6,10 @@ import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { routerTransition } from '../../router.animations';
 
-import { Job, Solution } from '../../shared/modules/vgl/models';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { Job, Solution, JobDownload } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 
@@ -59,18 +62,27 @@ export class JobWizardComponent implements OnInit {
 
   submit() {
     // Save the job first, then submit it an navigate away.
-    this.doSave().subscribe(saved => this.vglService.submitJob(this.getJobObject()));
+    this.doSave().subscribe(savedJob => {
+      this.vglService.submitJob(savedJob).subscribe(
+        submitted => {
+          this.router.navigate(['/jobs']);
+        },
+        error => {
+          console.log('Failed to submit job: ' + error);
+        }
+      );
+    });
   }
 
-  private doSave() {
+  private doSave(): Observable<Job> {
     // Store the current user state.
     this.stashUserState();
 
-    const job: Job = this.getJobObject();
-    const template: string = this.getTemplate();
-
     // Save the job to the backend
-    return this.vglService.saveJob(job, template, this.solutions);
+    return this.vglService.saveJob(this.getJobObject(),
+                                   this.userStateService.getJobDownloads(),
+                                   this.getTemplate(),
+                                   this.solutions);
   }
 
   cancel() {

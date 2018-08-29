@@ -30,15 +30,40 @@ function vglData<T>(response: VglResponse<T>): Observable<T> {
 @Injectable()
 export class VglService {
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    private vglRequest<T>(endpoint: string, options?): Observable<T> {
-      const url = environment.portalBaseUrl + endpoint;
-      const opts: { observe: 'body' } = options ? { ...options, observe: 'body' } : { observe: 'body' };
-      return this.http.get<VglResponse<T>>(url, opts).pipe(
-        switchMap(vglData)
-      );
+  private vglRequest<T>(endpoint: string, options: any = {}): Observable<T> {
+    const params = options.params || {};
+    const opts = {...options};
+    delete opts.params;
+    return this.vglGet<T>(endpoint, params, opts);
+  }
+
+  private vglPost<T>(endpoint: string, params = {}, options = {}): Observable<T> {
+    const url = environment.portalBaseUrl + endpoint;
+
+    const body = new FormData();
+    for (const key in params) {
+      const val = params[key];
+      if (Array.isArray(val)) {
+        val.forEach(v => body.append(key, v))
+      }
+      else {
+        body.append(key, val);
+      }
     }
+
+    const opts: { observe: 'body' } = { ...options, observe: 'body' };
+
+    return this.http.post<VglResponse<T>>(url, body, opts).pipe(switchMap(vglData));
+  }
+
+  private vglGet<T>(endpoint: string, params = {}, options?): Observable<T> {
+    const url = environment.portalBaseUrl + endpoint;
+    const opts: { observe: 'body' } = { ...options, observe: 'body', params: params };
+
+    return this.http.get<VglResponse<T>>(url, opts).pipe(switchMap(vglData));
+  }
 
     public get user(): Observable<User> {
         return this.vglRequest('secure/getUser.do');
@@ -202,7 +227,8 @@ export class VglService {
     }
 
   public submitJob(job: Job): Observable<any> {
-    return this.vglRequest('secure/submitJob.do', { params: { jobId: job.id }});
+    const params = { jobId: job.id };
+    return this.vglGet('secure/submitJob.do', params);
   }
 
   public saveJob(job: Job,
@@ -247,17 +273,19 @@ export class VglService {
       localPath: localPaths
     };
 
-    return this.vglRequest('secure/updateJobDownloads.do', { params: params });
+    // Use a POST request since the download descriptions could get very large.
+    return this.vglPost('secure/updateJobDownloads.do', params);
   }
 
   public saveScript(template: string, job: Job, solutions: Solution[]): Observable<any> {
     const params = {
-      sourceText: template,
       jobId: job.id,
+      sourceText: template,
       solutions: solutions.map(s => s['@id'])
     };
 
-    return this.vglRequest('secure/saveScript.do', { params: params });
+    // Use a POST request since the template is arbitrarily large.
+    return this.vglPost('secure/saveScript.do', params);
   }
 
   public updateJob(job: Job): Observable<Job> {
@@ -279,7 +307,7 @@ export class VglService {
       delete params.id;
     }
 
-    return this.vglRequest('secure/updateOrCreateJob.do', { params: params })
+    return this.vglGet('secure/updateOrCreateJob.do', params)
       .pipe(
         map((jobs: Job[]) => {
           // Should always be only 1 job.

@@ -6,7 +6,7 @@ import { Subscription, combineLatest } from 'rxjs';
 import { Solution, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
 
 import { SolutionVarBindings, VarBinding, DropdownBinding } from './models';
-import { SolutionVarBindingsFormService } from './solution-var-bindings-form.service';
+import { SolutionVarBindingsService } from './solution-var-bindings.service';
 
 import { UserStateService } from '../../shared';
 
@@ -27,7 +27,7 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   private subscription: Subscription;
 
   constructor(
-    private vbs: SolutionVarBindingsFormService,
+    private vbs: SolutionVarBindingsService,
     private uss: UserStateService
   ) {}
 
@@ -46,7 +46,17 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   }
 
   onSubmit() {
-    this.payLoad = JSON.stringify(this.form.value);
+    this.bindingsChange.emit(this.formBindings());
+  }
+
+  formBindings(): VarBinding<any>[] {
+    const bindings = [...this.bindings];
+
+    for (const b of bindings) {
+      b.value = this.form.value[b.key];
+    }
+
+    return bindings;
   }
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {

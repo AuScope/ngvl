@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { UserStateService } from '../../shared';
 import { JobsService } from '../jobs/jobs.service';
@@ -12,8 +12,9 @@ import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/mod
 })
 export class JobObjectComponent implements OnInit {
 
-    // Local copy of the UserStateService Job object
-    job: Job;
+  // Local copy of the UserStateService Job object
+  job: Job;
+
     // Use walltime flag. Display purposes only, not stored in Job
     // (but actual walltime will be if useWalltime==true)
     useWalltime: boolean;
@@ -27,51 +28,46 @@ export class JobObjectComponent implements OnInit {
 
 
     /**
-     * Retrieve the current Job object from UserStateService, and load the
-     * compute options (providers, toolboxes andf resources) from the server.
-     * Some options are only loaded when a previous option selection has been
-     * made, so we check for this and load more options if required.
+     * Load the compute options (providers, toolboxes andf resources) from the
+     * server. Some options are only loaded when a previous option selection has
+     * been made, so we check for this and load more options if required.
      */
-    ngOnInit() {
-        // Load existing Job from UserStateService
-        this.userStateService.job.subscribe(
-            job => {
-                this.job = job;
-                // Assign a default name if there isn't one
-                if(this.job.name === "") {
-                    const datePipe = new DatePipe('en-AU');
-                    this.job.name = "VGL Job - " + datePipe.transform(new Date(), 'medium')
-                }
-                // Load compute services
-                this.jobsService.getComputeServices().subscribe(
-                    computeServices => {
-                        this.computeProviders = computeServices;
-                        // Load toolboxes if the user had already selected one
-                        if(this.job.computeServiceId && this.job.computeServiceId !== "") {
-                            this.jobsService.getMachineImages(job.computeServiceId).subscribe(
-                                machineImages => {
-                                    this.toolboxes = machineImages;
-                                    // Load the resources if User had already selected one
-                                    if(this.job.computeVmId && this.job.computeVmId !== "") {
-                                        this.userStateService.job.subscribe(
-                                            job => {
-                                                this.jobsService.getComputeTypes(job.computeServiceId, this.job.computeVmId).subscribe(
-                                                    computeTypes => {
-                                                        this.resources = computeTypes;
-                                                    }
-                                                );
-                                            }
-                                        );
-                                    }
-                                }
-                            );
-                        }
-                    }
-                );
-            }
-        );
-    }
+  ngOnInit() {
+    this.userStateService.job.subscribe(job => {
+      this.job = job;
 
+      // Assign a default name if there isn't one
+      if(this.job.name === "") {
+        const datePipe = new DatePipe('en-AU');
+        this.job.name = "VGL Job - " + datePipe.transform(new Date(), 'medium')
+      }
+
+      // Load compute services
+      this.jobsService.getComputeServices().subscribe(
+        computeServices => {
+          this.computeProviders = computeServices;
+        }
+      );
+
+      // Load toolboxes if the user had already selected one
+      if(this.job.computeServiceId && this.job.computeServiceId !== "") {
+        this.jobsService.getMachineImages(this.job.computeServiceId).subscribe(
+          machineImages => {
+            this.toolboxes = machineImages;
+          }
+        );
+
+        // Load the resources if User had already selected one
+        if(this.job.computeVmId && this.job.computeVmId !== "") {
+          this.jobsService.getComputeTypes(this.job.computeServiceId, this.job.computeVmId).subscribe(
+            computeTypes => {
+              this.resources = computeTypes;
+            }
+          );
+        }
+      }
+    });
+  }
 
     /**
      * Make the Job available to the wizard

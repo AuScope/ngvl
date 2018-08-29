@@ -62,7 +62,7 @@ export class JobBrowserComponent implements OnInit {
 
 
     /**
-     * 
+     *
      */
     public getSelectedJob(): Job {
         return this.selectedJob;
@@ -71,7 +71,7 @@ export class JobBrowserComponent implements OnInit {
 
     /**
      * Convert a VGL TreeNode to an p-treetable TreeNode
-     * 
+     *
      * @param treeNode the TreeNode to convert to an p-treetable TreeNode
      */
     private createJobTreeNode(treeNode: TreeJobNode): TreeNode {
@@ -97,10 +97,10 @@ export class JobBrowserComponent implements OnInit {
     /**
      * Transform the TreeJobs data that VGL returns into the TreeNode data
      * that p-treetable requires
-     * 
+     *
      * TODO: Sort. No column sorting available, but ng-treetable alternative
      * to p-table may be able to do this
-     * 
+     *
      * @param treeJobs the TreeJobs data returned from VGL
      */
     private createJobsTreeNodes(treeJobs: TreeJobs): TreeNode[] {
@@ -187,7 +187,7 @@ export class JobBrowserComponent implements OnInit {
      * Handle the context menu selection. Will add selection to the job
      * selection list and call the job selection method so the correct
      * context menu can be constructed
-     * 
+     *
      * @param event job tree node context menu was called from
      */
     public contextMenuSelected(event) {
@@ -201,7 +201,7 @@ export class JobBrowserComponent implements OnInit {
 
     /**
      * Job has been selected, fire selection event
-     * @param event 
+     * @param event
      */
     public jobSelected(event) {
         this.cancelCurrentSubscription();
@@ -318,7 +318,7 @@ export class JobBrowserComponent implements OnInit {
 
     /**
      * Duplicate selected job (job context menu)
-     * 
+     *
      * TODO: Do. This will replicate a lot of submission functionality, so delaying
      */
     public duplicateSelectedJob(): void {
@@ -348,7 +348,26 @@ export class JobBrowserComponent implements OnInit {
      * Submit selected job (job context menu)
      */
     public submitSelectedJob(): void {
-
+      if (this.selectedJob) {
+        const message = 'Are you sure want to submit the job <strong>' + this.selectedJob.name + '</strong>';
+        this.confirmationService.confirm({
+          message: message,
+          header: 'Submit Job',
+          icon: 'fa fa-times',
+          accept: () => {
+            this.jobsService.submitJob(this.selectedJob).subscribe(
+              response => {
+                this.refreshJobs();
+                // TODO: Success message
+              },
+              error => {
+                // TODO: Proper error reporting
+                console.log(error.message);
+              }
+            )
+          }
+        });
+      }
     }
 
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, BehaviorSubject, forkJoin } from 'rxjs';
+import { map, catchError, defaultIfEmpty } from 'rxjs/operators';
 
 import { UserStateService } from '../../shared';
 import { Solution,
@@ -22,8 +22,11 @@ import {
   DropdownBinding,
   TextboxBinding,
   NumberboxBinding,
-  CheckboxBinding
+  CheckboxBinding,
+  SolutionVarBindings
 } from './models';
+import { SolutionVarBindingsService } from './solution-var-bindings.service';
+import { HttpClient } from '@angular/common/http';
 
 class SolutionSummary implements Solution {
   public entryType: 'Solution';
@@ -51,32 +54,48 @@ class SolutionSummary implements Solution {
 })
 export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
-  solutions$: Observable<SolutionSummary[]>;
   solutions: SolutionSummary[];
   activeSolution: SolutionSummary;
 
-  varBindings: { [key: string]: VarBinding<any>[] } = {};
+  template: string = '';
+  varBindings: SolutionVarBindings = {};
+
+  editorOptions = {
+    theme: 'vs-light',
+    language: 'python'
+  };
 
   private solutionsSubscription;
+  private bindingsSubscription;
 
-  constructor(private userStateService: UserStateService) {}
+  constructor(private userStateService: UserStateService,
+              private vbs: SolutionVarBindingsService,
+              private http: HttpClient) {}
 
   ngOnInit() {
-    this.solutions$ = this.userStateService.selectedSolutions.pipe(
+    this.solutionsSubscription = this.userStateService.selectedSolutions.pipe(
+      // Map each Solution to a SolutionSummary so we get the nice id accessor.
       map((solutions: Solution[]) => solutions.map(solution => {
         return Object.assign(new SolutionSummary(false), solution);
       }))
-    );
-
-    this.solutionsSubscription = this.solutions$.subscribe(solutions => {
+    ).subscribe(solutions => {
       this.solutions = solutions;
       this.mergeBindings(solutions);
     });
+
+    this.bindingsSubscription = this.vbs.templateBindings
+      .subscribe(bindings => {
+        this.varBindings = bindings;
+        this.updateTemplate();
+      });
   }
 
   ngOnDestroy() {
     if (this.solutionsSubscription) {
       this.solutionsSubscription.unsubscribe();
+    }
+    if (this.bindingsSubscription) {
+      this.bindingsSubscription.unsubscribe();
     }
   }
 
@@ -88,8 +107,46 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
     this.activeSolution = solution;
   }
 
+  updateBindings(solution: Solution, bindings: VarBinding<any>[]) {
+    this.vbs.updateTemplateBindings(solution, bindings);
+  }
+
   updateTemplate() {
-    console.log('Update the template!');
+    // Update the current job template based on the current solutions and bindings.
+    const requests = this.solutions.map(solution => this.makeRequest(solution));
+    forkJoin(requests).pipe(defaultIfEmpty([])).subscribe(templates => {
+      this.template = templates.join('\n\n');
+    });
+  }
+
+  private subIntoTemplate(solution) {
+    const bindings: VarBinding<any>[] = this.varBindings[solution.id] || [];
+
+    return template => {
+      return template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g,
+                              (match, p1, offset, string) => {
+                                const b = bindings.find(it => it.key === p1);
+                                if (b && b.value !== undefined) {
+                                  return b.value;
+                                }
+                                return match;
+                              });
+    }
+  }
+
+  private makeRequest(solution: Solution): Observable<string> {
+    const subf = this.subIntoTemplate(solution);
+
+    return this.http.get(solution.template, { responseType: 'text' }).pipe(
+      // Substitute current bindings for solution into template.
+      map(subf),
+
+      // Catch http errors
+      catchError(err => {
+        console.log('Request error in job-template-component: ' + err.error.error.message);
+        return Observable.of<string>('');
+      })
+    );
   }
 
   removeSolution(solution: Solution) {
@@ -113,7 +170,7 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
       }
     });
 
-    this.varBindings = varBindings;
+    this.vbs.updateTemplateBindings(varBindings);
   }
 
   createBinding(v: Variable): VarBinding<any> {

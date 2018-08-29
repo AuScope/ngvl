@@ -17,14 +17,6 @@
   </p>
 
   <div class="page-header">
-    <h1>Job Template</h1>
-    <hr>
-  </div>
-  <p>
-    <app-job-template></app-job-template>
-  </p>
-
-  <div class="page-header">
     <h1>Job object</h1>
     <hr>
   </div>
@@ -37,8 +29,9 @@
     <hr>
   </div>
   <p>
-    <button class="btn btn-secondary" [disabled]="jobIncomplete">Submit</button>
-    <button class="btn btn-secondary">Cancel</button>
+    <button class="btn btn-secondary" (click)="save()">Save</button>
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    <button class="btn btn-secondary" [disabled]="jobIncomplete" (click)="submit()">Submit</button>
   </p>
 
 </div>

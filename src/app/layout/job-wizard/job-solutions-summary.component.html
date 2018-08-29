@@ -1,32 +1,40 @@
-<div class="row" *ngIf="(solutions$ | async) as solutions; else noSolutions">
-  <div class="col-md-4">
-    <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
-      <button *ngFor="let solution of solutions"
-        type="button"
-        class="list-group-item list-group-item-action flex-column align-items-start"
-        [class.active]="solution.isActive"
-        (click)="activateSolution(solution)">
-        <div class="d-flex w-100 justify-content-between" style="width:100%">
-          <h5 class="mb-1">{{ solution.name }}</h5>
-          <small>
-            <a role="button" (click)="removeSolution(solution)">
-              <i class="fa fa-times"></i>
-            </a>
-          </small>
-        </div>
-        <p class="mb-1" [ngbCollapse]="!solution.isActive">
-          {{ solution.description }}
-        </p>
-      </button>
+<div *ngIf="solutions; else noSolutions">
+  <div class="row">
+    <div class="col-md-4">
+      <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
+        <button *ngFor="let solution of solutions"
+          type="button"
+          class="list-group-item list-group-item-action flex-column align-items-start"
+          [class.active]="solution.isActive"
+          (click)="activateSolution(solution)">
+          <div class="d-flex w-100 justify-content-between" style="width:100%">
+            <h5 class="mb-1">{{ solution.name }}</h5>
+            <small>
+              <a role="button" (click)="removeSolution(solution)">
+                <i class="fa fa-times"></i>
+              </a>
+            </small>
+          </div>
+          <p class="mb-1" [ngbCollapse]="!solution.isActive">
+            {{ solution.description }}
+          </p>
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <app-job-solution-vars
+        *ngFor="let solution of solutions"
+        [ngbCollapse]="!solution.isActive"
+        [solution]="solution"
+        [bindings]="varBindings[solution.id]"
+        (bindingsChange)="updateBindings(solution, $event)"></app-job-solution-vars>
     </div>
   </div>
-  <div class="col-md-8">
-    <app-job-solution-vars
-      *ngFor="let solution of solutions"
-      [ngbCollapse]="!solution.isActive"
-      [solution]="solution"
-      [bindings]="varBindings[solution['@id']]"
-      (bindingsChange)="updateTemplate()"></app-job-solution-vars>
+
+  <div class="row">
+    <div class="col-md-12">
+      <ngx-monaco-editor class="template-code-editor" [options]="editorOptions" [(ngModel)]="template"></ngx-monaco-editor>
+    </div>
   </div>
 </div>
 

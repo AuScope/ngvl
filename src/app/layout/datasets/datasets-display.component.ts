@@ -9,6 +9,9 @@ import olProj from 'ol/proj';
 import olExtent from 'ol/extent';
 
 
+// List of valid online resource types that can be added to the map
+const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
+
 @Component({
     selector: 'app-datasets-display',
     templateUrl: './datasets-display.component.html',
@@ -21,7 +24,7 @@ export class DatasetsDisplayComponent {
     @Input() bookMarkList: BookMark[] = []; 
     @Input() validUser = false;
     
-    @Output() bookMarkChoice = new EventEmitter();    
+    @Output() bookMarkChoice = new EventEmitter();   
 
     constructor(private olMapService: OlMapService,
         private cswSearchService: CSWSearchService,        
@@ -124,5 +127,24 @@ export class DatasetsDisplayComponent {
         }, error => {            
             console.log(error.message);
         });
+    }
+
+    /**
+     * Determine if a CSWRecord meets the criteria to be added to the map:
+     * 
+     *   1. Has online resource.
+     *   2. Has at least one defined geographicElement.
+     *   3. Layer does not already exist on map.
+     *   4. One online resource is of type WMS, WFS, CSW or WWW.
+     * 
+     * @param cswRecord the CSWRecord to verify
+     * @return true is CSWRecord can be added, false otherwise
+     */
+    public canRecordBeAdded(cswRecord: CSWRecordModel): boolean {
+        return cswRecord.hasOwnProperty('onlineResources') &&
+               cswRecord.onlineResources.length > 0 &&
+               cswRecord.geographicElements.length > 0 &&
+               !this.olMapService.layerExists(cswRecord.id) &&
+               cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1);
     }
 }

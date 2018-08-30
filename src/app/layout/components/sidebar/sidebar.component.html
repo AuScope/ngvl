@@ -20,11 +20,11 @@
             <i class="fa fa-fw fa-send" [attr.title]="isSidebarExpanded ? null : ('Contact us' | translate)"></i>
             <span *ngIf="isSidebarExpanded">&nbsp;{{ 'Contact us' | translate }}</span>
         </a>
-        <a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <!--<a [routerLink]="['/about']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-info" [attr.title]="isSidebarExpanded ? null : ('About' | translate)"></i>
             <span *ngIf="isSidebarExpanded">&nbsp;{{ 'About' | translate }}</span>
         </a>
-        <!-- <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+         <a [routerLink]="['/charts']" [routerLinkActive]="['router-link-active']" class="list-group-item">
          <i class="fa fa-fw fa-bar-chart-o"></i>&nbsp;{{ 'Charts' | translate }}
          </a>
          <a [routerLink]="['/tables']" [routerLinkActive]="['router-link-active']" class="list-group-item">

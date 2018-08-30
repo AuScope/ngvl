@@ -14,10 +14,10 @@ import { StatModule } from '../../shared';
 @NgModule({
     imports: [
         CommonModule,
-        NgbCarouselModule.forRoot(),
-        NgbAlertModule.forRoot(),
         DashboardRoutingModule,
-        StatModule
+        // NgbCarouselModule.forRoot(),
+        // NgbAlertModule.forRoot(),
+        // StatModule
     ],
     declarations: [
         DashboardComponent,

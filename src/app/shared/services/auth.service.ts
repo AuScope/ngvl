@@ -71,7 +71,6 @@ export class AuthService {
   }
 
   onLoggedIn() {
-    console.log('AuthService.onLoggedIn()');
     localStorage.setItem('isLoggedIn', 'true');
 
     // Trigger an update in the user state service to get the new username, then
@@ -101,4 +100,5 @@ export class AuthService {
     localStorage.removeItem('redirectUrl');
     return url;
   }
+
 }

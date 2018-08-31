@@ -90,9 +90,7 @@ export class UserManagementComponent implements OnInit {
                         } else {
                             this.nciDetails = this.createEmptyNciDetailsObject();
                         }
-                    }, error => {
-                        this.messageService.add({ severity: 'error', summary: 'Error Retreiving NCI Details', detail: error.message });
-                    }
+                    }, error => {}
                 );
             }, error => {
                 this.messageService.add({ severity: 'error', summary: 'Error Retreiving User Details', detail: error.message });
@@ -117,7 +115,11 @@ export class UserManagementComponent implements OnInit {
      * User has accepted T&C's. Leverage existing AWS function to write this back to DB
      */
     private acceptTermsAndConditions(): void {
-        this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe();
+      this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe(
+        result => {
+          this.userStateService.updateUser();
+        }
+      );
     }
 
     

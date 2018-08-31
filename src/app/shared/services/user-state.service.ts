@@ -67,14 +67,16 @@ export class UserStateService {
                     user.fullName = user.email;
                 }
                 this._user.next(user);
+                // Update NCI details (if they exist)
+                this.vgl.nciDetails.subscribe(
+                    nciDetails => {
+                        this._nciDetails.next(nciDetails);
+                    }, error => {}
+                );
             },
+            // Failure to retrieve User means no User logged in
             error => {
                 this.updateAnonymousUser();
-            }
-        );
-        this.vgl.nciDetails.subscribe(
-            nciDetails => {
-                this._nciDetails.next(nciDetails);
             }
         );
     }

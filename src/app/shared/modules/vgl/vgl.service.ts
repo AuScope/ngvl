@@ -90,12 +90,14 @@ export class VglService {
     }
 
     public setJobFolder(jobId: number[],seriesId: number): Observable<any> {
+        
         const options = {
             params: {
-                jobIds: jobId.join(','),  
-                seriesId: seriesId
+                jobIds: jobId.join(','),                 
             }
         };
+        if(seriesId)
+            options.params['seriesId'] = seriesId;        
 
         return this.vglRequest('secure/setJobFolder.do', options);
     }

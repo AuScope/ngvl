@@ -56,9 +56,10 @@ export class JobBrowserComponent implements OnInit {
     deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() };
     submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
+    moveJobAction = { label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() };
 
 
-    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal, public renderer: Renderer,private messageService: MessageService) { }
+    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal, public renderer: Renderer, private messageService: MessageService) { }
 
 
     ngOnInit() {
@@ -200,6 +201,10 @@ export class JobBrowserComponent implements OnInit {
      */
     public createJobContextMenu(node): any[] {
         let items: any[] = [];
+        //one or more job nodes are selected to move to top level
+        if (this.selectedJobNodes.length >= 1 && (node.data.id)) {
+            items.push({ label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() });
+        }
         // If more than 1 item is selected, or only a series is selected, delete is only action
         if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
             items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
@@ -299,7 +304,7 @@ export class JobBrowserComponent implements OnInit {
             accept: () => {
                 for (let node of this.selectedJobNodes) {
                     if (node.data.leaf) {
-                        this.cancelCurrentSubscription();                         
+                        this.cancelCurrentSubscription();
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
                                 //delete from the tree                        
@@ -316,7 +321,7 @@ export class JobBrowserComponent implements OnInit {
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
-                                this.messageService.add({severity:'error', summary: 'There was an error deleting this job', detail: error.message});                                
+                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting this job', detail: error.message });
                             }
                         )
                     }
@@ -327,12 +332,12 @@ export class JobBrowserComponent implements OnInit {
                             response => {
                                 let index = this.treeJobsData.findIndex(row => row.data.seriesId === node.data.seriesId);
                                 //delete from the tree
-                                this.deleteNode(index, this.treeJobsData);                            
+                                this.deleteNode(index, this.treeJobsData);
                             },
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
-                                this.messageService.add({severity:'error', summary: 'There was an error deleting the jobs for the selected series', detail: error.message});                                
+                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting the jobs for the selected series', detail: error.message });
                             }
                         )
                     }
@@ -442,11 +447,45 @@ export class JobBrowserComponent implements OnInit {
 
     }
 
+
+    /**
+     * move selected job to the top level(job context menu)
+     */
+
+    public moveSelectedJob(): void {
+        let rootNode: TreeNode = {};
+        rootNode.data = {
+            "id": null,
+            "seriesId": null,
+            "name": null,
+            "submitDate": null,
+            "status": null,
+            "leaf": false,
+        };
+        if (this.selectedJobNodes.length > 0) {
+            var jobIds: number[] = [];
+            this.selectedJobNodes.map(job => {
+                if (job.data.id)
+                    jobIds.push(job.data.id);
+            });
+            this.jobsService.setJobFolder(jobIds, null).subscribe(data => {
+                this.selectedJobNodes.forEach(jobNode => {
+                    let parentNode = jobNode.parent;
+                    if (jobNode.data.id)
+                        this.moveToNewFolder(rootNode, jobNode);
+                    if (parentNode && parentNode.children.length === 0)
+                        parentNode.expanded = false;
+                });
+            });
+        }
+    }
+
     /**
      * drop selected nodes from old position to a new folder.
      * @param node 
      */
-    drop(node: any) {
+    drop(node: any, event: any) {
+        event.preventDefault();
         if (this.selectedJobNodes.length > 0) {
             var jobIds: number[] = [];
             //get the list of jobs ids to be moved
@@ -454,25 +493,27 @@ export class JobBrowserComponent implements OnInit {
                 if (job.data.id)
                     jobIds.push(job.data.id);
             });
-            //get the new location series id
+            //get the new location 
             let newFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === node.data.seriesId);
-            if (newFolder.data.seriesId) {
-                //make the dragged jobs series id to be the new folder id
-                this.jobsService.setJobFolder(jobIds, newFolder.data.seriesId).subscribe(
-                    data => {
-                        //make the front end node changes for shiftig from old folder to new folder.
-                        this.selectedJobNodes.forEach(shiftingNode => {
-                            if (shiftingNode.data.id)
-                                this.moveToNewFolder(newFolder, shiftingNode);
-                        });
-                    },
-                    // TODO: Proper error reporting
-                    error => {
-                        console.log(error.message);
-                    }
+            let seriesId: number = newFolder.data.seriesId;
+            //make the dragged jobs series id to be the new folder id
+            this.jobsService.setJobFolder(jobIds, seriesId).subscribe(
+                data => {
+                    //make the front end node changes for shiftig from old folder to new folder.                   
+                    this.selectedJobNodes.forEach(shiftingNode => {
+                        let parentNode = shiftingNode.parent;
+                        if (shiftingNode.data.id)
+                            this.moveToNewFolder(newFolder, shiftingNode);
+                        if (parentNode && parentNode.children.length === 0)
+                            parentNode.expanded = false;
+                    });
+                },
+                // TODO: Proper error reporting
+                error => {
+                    console.log(error.message);
+                }
 
-                );
-            }
+            );
         }
     }
 
@@ -512,14 +553,23 @@ export class JobBrowserComponent implements OnInit {
      * @param jobNode 
      */
     addToNewFolder(newFolder: TreeNode, jobNode: TreeNode) {
-        //add to the new folder
-        jobNode.parent = newFolder;
-        jobNode.data.seriesId = newFolder.data.seriesId;
-        if (newFolder.children)
-            newFolder.children.push(jobNode);
+        if (!newFolder.data.id && newFolder.data.seriesId) {
+            //add to the new folder
+            jobNode.parent = newFolder;
+            jobNode.data.seriesId = newFolder.data.seriesId;
+            if (newFolder.children)
+                newFolder.children.push(jobNode);
+            else {
+                newFolder.children = [];
+                newFolder.children.push(jobNode);
+            }
+        }
         else {
-            newFolder.children = [];
-            newFolder.children.push(jobNode);
+            //new position is not a folder and is a job node, so append to main tree
+            let toIndex = this.treeJobsData.findIndex(row => row.data.id === newFolder.data.id);
+            jobNode.parent = null;
+            jobNode.data.seriesId = null;
+            this.treeJobsData.splice(toIndex + 1, 0, jobNode);
         }
         this.treeJobsData = [...this.treeJobsData];
     }
@@ -537,8 +587,10 @@ export class JobBrowserComponent implements OnInit {
      * When user drags a unselected node,make it selected and unselecting other selected rows.
      * @param node 
      */
-    handleDragstart(node: any) {
+    handleDragstart(node: any, event: any) {
         if (node && node.data.leaf) {
+            //set as firefox does not fire drag and drop without this statement
+            event.dataTransfer.setData("text", node.data.id);
             let index = this.selectedJobNodes.findIndex(elem => elem.data.id === node.data.id)
             //row chosen not present in selected nodes, so unselect other selected nodes and make this row selected.
             if (index === -1) {

@@ -91,7 +91,8 @@ export class JobsComponent implements OnInit {
      */
     public refreshJobs(): void {
         this.currentPreviewObject = null;
-        this.jobBrowser.refreshJobs();
+        //this.jobBrowser.refreshJobs();
+        this.jobBrowser.refreshJobStatus();
     }
 
 
@@ -288,8 +289,8 @@ export class JobsComponent implements OnInit {
      */
     public addFolder(folderName: string): void {
         this.jobsService.addFolder(folderName).subscribe(
-            series => {
-                console.log(JSON.stringify(series));
+            series => {                
+                this.jobBrowser.refreshJobs();   
             },
             // TODO: Proper error reporting
             error => {
@@ -310,7 +311,7 @@ export class JobsComponent implements OnInit {
             if (result === 'OK click' && this.newFolderName !== '') {
                 this.addFolder(this.newFolderName);
             }
-        });
+        }, () => {});
     }
 
 }

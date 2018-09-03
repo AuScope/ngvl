@@ -1,10 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ElementRef, ViewChild, Renderer } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { JobStatusModalContent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode } from "primeng/api";
 import { Subscription } from "rxjs";
+import { TimerObservable } from "rxjs/observable/TimerObservable";
+import { MessageService } from 'primeng/components/common/messageservice';
 
 
 @Component({
@@ -26,13 +28,15 @@ export class JobBrowserComponent implements OnInit {
 
     // HttpCLient request (for cancelling)
     httpSubscription: Subscription;
+    private timerSubscription: Subscription;
+    private statusSubscription: Subscription;
 
     // Job tree, columns, selection and context items
     treeJobsData: TreeNode[] = [];
     treeCols: any[] = [
-        { field: 'name', header: 'Name', colStyle: {'width': '40%'} },
-        { field: 'submitDate', header: 'Submit Date', colStyle: {'width': '40%'} },
-        { field: 'status', header: 'Status', colStyle: {'width': '20%'} }
+        { field: 'name', header: 'Name', colStyle: { 'width': '40%' } },
+        { field: 'submitDate', header: 'Submit Date', colStyle: { 'width': '40%' } },
+        { field: 'status', header: 'Status', colStyle: { 'width': '20%' } }
     ];
     selectedJobNodes: TreeNode[] = [];
     jobContextMenuItems = [];
@@ -45,21 +49,30 @@ export class JobBrowserComponent implements OnInit {
     // Flag for job loading in progress
     jobsLoading: boolean = false;
 
+
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
     duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
     deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() };
     submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: (event) => this.submitSelectedJob() };
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
+    moveJobAction = { label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() };
 
 
-    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal) { }
+    constructor(private jobsService: JobsService, private confirmationService: ConfirmationService, private modalService: NgbModal, public renderer: Renderer, private messageService: MessageService) { }
 
 
     ngOnInit() {
         this.refreshJobs();
+        let timer = TimerObservable.create(0, 60000);
+        this.timerSubscription = timer.subscribe(timer => {
+            this.refreshJobStatus();
+        })
     }
 
+    ngOnDestroy() {
+        this.timerSubscription.unsubscribe();
+    }
 
     /**
      *
@@ -82,7 +95,7 @@ export class JobBrowserComponent implements OnInit {
             "name": treeNode.name,
             "submitDate": treeNode.submitDate,
             "status": treeNode.status,
-            "leaf": treeNode.leaf
+            "leaf": treeNode.leaf,
         }
         if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
             node.children = [];
@@ -127,7 +140,7 @@ export class JobBrowserComponent implements OnInit {
 
 
     /**
-     * Reload user jobs (Refresh button)
+     * Reload user jobs 
      */
     refreshJobs() {
         this.cancelCurrentSubscription();
@@ -135,6 +148,7 @@ export class JobBrowserComponent implements OnInit {
         this.selectedJob = null;
         this.httpSubscription = this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
+
                 this.treeJobsData = this.createJobsTreeNodes(treeJobs);
                 this.jobs = treeJobs.jobs;
                 this.jobsLoading = false;
@@ -147,12 +161,50 @@ export class JobBrowserComponent implements OnInit {
         );
     }
 
+    /**
+     * Refresh Jobs Status (Refresh button)
+     */
+    refreshJobStatus() {
+        this.statusSubscription = this.jobsService.getJobStatuses().subscribe(statusUpdates => {
+            for (var key in statusUpdates) {
+                var jobNode = this.findJobNode(statusUpdates[key].jobId);
+                if (jobNode)
+                    jobNode.data.status = statusUpdates[key].status;
+            }
+        });
+    }
 
+    /**
+     * find a node for a given job id in this.treeJobsData
+     * @param jobId 
+     */
+    findJobNode(jobId: number): TreeNode {
+        let node: TreeNode;
+        for (var index = 0; index < this.treeJobsData.length; index++) {
+            node = this.treeJobsData[index];
+            //Job not in a folder
+            if ((node.data.id) && (node.data.id === jobId)) {
+                return node;
+            }
+            //Job may be present inside a folder
+            if (node.children) {
+                for (var pos = 0; pos < node.children.length; pos++) {
+                    if ((node.children[pos].data.id) && (node.children[pos].data.id === jobId))
+                        return node.children[pos];
+
+                }
+            }
+        }
+    }
     /**
      * Build the job context menu based on job status
      */
     public createJobContextMenu(node): any[] {
         let items: any[] = [];
+        //one or more job nodes are selected to move to top level
+        if (this.selectedJobNodes.length >= 1 && (node.data.id)) {
+            items.push({ label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() });
+        }
         // If more than 1 item is selected, or only a series is selected, delete is only action
         if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
             items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
@@ -250,36 +302,42 @@ export class JobBrowserComponent implements OnInit {
             message: confirmMessage,
             icon: 'fa fa-trash',
             accept: () => {
-                //for(let node of this.selectedJobNodes) {
-                for (let i = 0; i < this.selectedJobNodes.length; i++) {
-                    // Job
-                    const node: TreeNode = this.selectedJobNodes[i];
+                for (let node of this.selectedJobNodes) {
                     if (node.data.leaf) {
+                        this.cancelCurrentSubscription();
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
-                                if (i === this.selectedJobNodes.length - 1) {
-                                    this.refreshJobs();
-                                    // TODO: Success message
+                                //delete from the tree                        
+                                let index;
+                                if (!node.parent) {
+                                    index = this.treeJobsData.findIndex(row => row.data.id === node.data.id);
+                                    this.deleteNode(index, this.treeJobsData);
+                                } else {
+                                    index = node.parent.children.findIndex(row => row.data.id === node.data.id);
+                                    this.deleteNode(index, node.parent.children);
                                 }
+                                // TODO: Success message
                             },
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
+                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting this job', detail: error.message });
                             }
                         )
                     }
                     // Series
                     else if (!node.data.leaf) {
+                        this.cancelCurrentSubscription();
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
                             response => {
-                                if (i === this.selectedJobNodes.length - 1) {
-                                    this.refreshJobs();
-                                    // TODO: Success message
-                                }
+                                let index = this.treeJobsData.findIndex(row => row.data.seriesId === node.data.seriesId);
+                                //delete from the tree
+                                this.deleteNode(index, this.treeJobsData);
                             },
                             error => {
                                 // TODO: Proper error reporting
                                 console.log(error.message);
+                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting the jobs for the selected series', detail: error.message });
                             }
                         )
                     }
@@ -288,6 +346,16 @@ export class JobBrowserComponent implements OnInit {
         });
     }
 
+    /**
+     * delete a node from the TreeNode[] using index
+     * @param index 
+     */
+    deleteNode(index: number, nodes: TreeNode[]) {
+        if (index > -1) {
+            nodes.splice(index, 1);
+            this.treeJobsData = [...this.treeJobsData];
+        }
+    }
 
     /**
      * Cancel the selected job (job context menu)
@@ -379,4 +447,159 @@ export class JobBrowserComponent implements OnInit {
 
     }
 
+
+    /**
+     * move selected job to the top level(job context menu)
+     */
+
+    public moveSelectedJob(): void {
+        let rootNode: TreeNode = {};
+        rootNode.data = {
+            "id": null,
+            "seriesId": null,
+            "name": null,
+            "submitDate": null,
+            "status": null,
+            "leaf": false,
+        };
+        if (this.selectedJobNodes.length > 0) {
+            var jobIds: number[] = [];
+            this.selectedJobNodes.map(job => {
+                if (job.data.id)
+                    jobIds.push(job.data.id);
+            });
+            this.jobsService.setJobFolder(jobIds, null).subscribe(data => {
+                this.selectedJobNodes.forEach(jobNode => {
+                    let parentNode = jobNode.parent;
+                    if (jobNode.data.id)
+                        this.moveToNewFolder(rootNode, jobNode);
+                    if (parentNode && parentNode.children.length === 0)
+                        parentNode.expanded = false;
+                });
+            });
+        }
+    }
+
+    /**
+     * drop selected nodes from old position to a new folder.
+     * @param node 
+     */
+    drop(node: any, event: any) {
+        event.preventDefault();
+        if (this.selectedJobNodes.length > 0) {
+            var jobIds: number[] = [];
+            //get the list of jobs ids to be moved
+            this.selectedJobNodes.map(job => {
+                if (job.data.id)
+                    jobIds.push(job.data.id);
+            });
+            //get the new location 
+            let newFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === node.data.seriesId);
+            let seriesId: number = newFolder.data.seriesId;
+            //make the dragged jobs series id to be the new folder id
+            this.jobsService.setJobFolder(jobIds, seriesId).subscribe(
+                data => {
+                    //make the front end node changes for shiftig from old folder to new folder.                   
+                    this.selectedJobNodes.forEach(shiftingNode => {
+                        let parentNode = shiftingNode.parent;
+                        if (shiftingNode.data.id)
+                            this.moveToNewFolder(newFolder, shiftingNode);
+                        if (parentNode && parentNode.children.length === 0)
+                            parentNode.expanded = false;
+                    });
+                },
+                // TODO: Proper error reporting
+                error => {
+                    console.log(error.message);
+                }
+
+            );
+        }
+    }
+
+    /**
+     * Move a node to new folder by deleting from existing location
+     */
+    moveToNewFolder(newFolder: TreeNode, jobNode: TreeNode) {
+        //if the node is inside a folder
+        if (jobNode.parent) {
+            let oldFolder: TreeNode = this.treeJobsData.find(nodeElement => nodeElement.data.seriesId === jobNode.parent.data.seriesId);
+            if (oldFolder.children) {
+                let shiftingNodeIndex = oldFolder.children.findIndex(childNode => childNode.data.id === jobNode.data.id);
+                //delete from old folder
+                if (shiftingNodeIndex > -1) {
+                    oldFolder.children.splice(shiftingNodeIndex, 1);
+                    //add to the new folder
+                    this.addToNewFolder(newFolder, jobNode);
+                }
+            }
+        }
+        else {
+            //if the node is not inside a folder, it in the main tree
+            let shiftingNodeIndex = this.treeJobsData.findIndex(row => row.data.id === jobNode.data.id);
+            //delete from the main tree and and add to new folder
+            if (shiftingNodeIndex > -1) {
+                this.treeJobsData.splice(shiftingNodeIndex, 1);
+                //add to the new folder
+                this.addToNewFolder(newFolder, jobNode);
+            }
+        }
+        newFolder.expanded = true;
+    }
+
+    /**
+     * add a node to a new folder
+     * @param newFolder 
+     * @param jobNode 
+     */
+    addToNewFolder(newFolder: TreeNode, jobNode: TreeNode) {
+        if (!newFolder.data.id && newFolder.data.seriesId) {
+            //add to the new folder
+            jobNode.parent = newFolder;
+            jobNode.data.seriesId = newFolder.data.seriesId;
+            if (newFolder.children)
+                newFolder.children.push(jobNode);
+            else {
+                newFolder.children = [];
+                newFolder.children.push(jobNode);
+            }
+        }
+        else {
+            //new position is not a folder and is a job node, so append to main tree
+            let toIndex = this.treeJobsData.findIndex(row => row.data.id === newFolder.data.id);
+            jobNode.parent = null;
+            jobNode.data.seriesId = null;
+            this.treeJobsData.splice(toIndex + 1, 0, jobNode);
+        }
+        this.treeJobsData = [...this.treeJobsData];
+    }
+
+    /**
+     * Drag over event
+     * @param event 
+     */
+    allowDrop(event) {
+        event.preventDefault();
+    }
+
+    /**
+     * Prepare a node for dragging if it is a job node. 
+     * When user drags a unselected node,make it selected and unselecting other selected rows.
+     * @param node 
+     */
+    handleDragstart(node: any, event: any) {
+        if (node && node.data.leaf) {
+            //set as firefox does not fire drag and drop without this statement
+            event.dataTransfer.setData("text", node.data.id);
+            let index = this.selectedJobNodes.findIndex(elem => elem.data.id === node.data.id)
+            //row chosen not present in selected nodes, so unselect other selected nodes and make this row selected.
+            if (index === -1) {
+                this.selectedJobNodes.splice(0, this.selectedJobNodes.length);
+                this.selectedJobNodes.push(node);
+                this.selectedJob = this.jobs.find(j => j.id === node.data.id);
+                this.jobSelectionChanged.emit(event);
+            }
+
+        }
+    }
 }

@@ -71,4 +71,11 @@ export class JobsService {
         return this.vgl.getComputeTypes(computeServiceId, machineImageId);
     }
 
+    public setJobFolder(jobId: number[],seriesId: number): Observable<any> {
+        return this.vgl.setJobFolder(jobId,seriesId);
+    }
+
+    public getJobStatuses(): Observable<any> {
+        return this.vgl.getJobStatuses();
+    }
 }

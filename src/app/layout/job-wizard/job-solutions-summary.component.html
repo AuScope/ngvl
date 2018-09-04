@@ -1,7 +1,9 @@
 <div *ngIf="solutions; else noSolutions">
-  <div class="row">
+  <div class="row"> 
     <div class="col-md-4">
+        <a [routerLink]="['/solutions']" role="button" class="btn btn-secondary">Choose a solution</a>         
       <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
+        <br/>
         <button *ngFor="let solution of solutions"
           type="button"
           class="list-group-item list-group-item-action flex-column align-items-start"
@@ -19,9 +21,10 @@
             {{ solution.description }}
           </p>
         </button>
+        <br/>
       </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-8">    
       <app-job-solution-vars
         *ngFor="let solution of solutions"
         [ngbCollapse]="!solution.isActive"
@@ -39,6 +42,5 @@
 </div>
 
 <ng-template #noSolutions>
-  <p class="missing-info">No solution has been selected for this job. Please choose a solution to provide the template, then return here to create a new job.</p>
-  <a [routerLink]="['/solutions']" role="button" class="btn btn-secondary">Choose a solution</a>
+  <p class="missing-info">No solution has been selected for this job. Please choose a solution to provide the template, then return here to create a new job.</p>  
 </ng-template>

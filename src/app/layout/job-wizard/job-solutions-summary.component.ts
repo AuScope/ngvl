@@ -143,7 +143,7 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
       // Catch http errors
       catchError(err => {
-        console.log('Request error in job-template-component: ' + err.error.error.message);
+        console.log('Request error in job-template-component: ' + err.message);      
         return Observable.of<string>('');
       })
     );

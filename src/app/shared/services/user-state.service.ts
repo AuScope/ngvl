@@ -146,25 +146,18 @@ export class UserStateService {
     public addSolutionToCart(solution: Solution) {
         // Add solution to the cart, unless it's already in.
         if (solution) {
+            const check = (s: Solution) => { 
+                return s["@id"] === solution["@id"];
+              };
+          
             this.updateSolutionsCart((cart: Solution[]) => {
-                if (!this.check(cart, solution)) {
+                if (!cart.find(check)) {
                     return [...cart, solution];
                 }
                 return cart;
             });
         }
 
-    }
-
-    private check(cart: Solution[], solution: Solution): boolean {
-        var found = false;
-        for (var i = 0; i < cart.length; i++) {
-            if (cart[i].name === solution.name) {
-                found = true;
-                break;
-            }
-        }
-        return found;
     }
 
     public removeSolutionFromCart(solution: Solution) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
-import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job } from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
 import { saveAs } from 'file-saver/FileSaver';
@@ -63,7 +63,7 @@ export class UserStateService {
         this.vgl.user.subscribe(
             user => {
                 // If full name is empty (as with AAF login), use email address as name
-                if(user.fullName == undefined || user.fullName === "") {
+                if (user.fullName == undefined || user.fullName === "") {
                     user.fullName = user.email;
                 }
                 this._user.next(user);
@@ -116,7 +116,7 @@ export class UserStateService {
     public acceptTermsAndConditions(): void {
         this.vgl.user.subscribe(
             user => {
-                if(user.acceptedTermsConditions !== 1) {
+                if (user.acceptedTermsConditions !== 1) {
                     user.acceptedTermsConditions = 1;
                     this._user.next(user);
                 }
@@ -143,150 +143,153 @@ export class UserStateService {
         this._solutionQuery.next(query);
     }
 
-  public addSolutionToCart(solution: Solution) {
-    // Add solution to the cart, unless it's already in.
-    if (solution) {
-      this.updateSolutionsCart((cart: Solution[]) => {
-        if (!cart.includes(solution)) {
-          return [...cart, solution];
+    public addSolutionToCart(solution: Solution) {
+        // Add solution to the cart, unless it's already in.
+        if (solution) {
+            const check = (s: Solution) => { 
+                return s["@id"] === solution["@id"];
+              };
+          
+            this.updateSolutionsCart((cart: Solution[]) => {
+                if (!cart.find(check)) {
+                    return [...cart, solution];
+                }
+                return cart;
+            });
         }
 
-        return cart;
-      });
-    }
-  }
-
-  public removeSolutionFromCart(solution: Solution) {
-    if (solution) {
-      this.updateSolutionsCart((cart: Solution[]) => cart.filter(s => s['@id'] !== solution['@id']));
-    }
-  }
-
-  public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
-    // Call the passed function to update the current selection.
-    const solutions = f(this._selectedSolutions.getValue());
-
-    // If we got a sensible value back (i.e. defined, empty is valid) then
-    // update the current cart with the new value.
-    if (solutions) {
-      this._selectedSolutions.next(solutions);
     }
 
-    // Return the new value so the caller can check that it worked.
-    return solutions;
-  }
-
-  public updateJobTemplate(template: string) {
-    this._jobTemplate.next(template);
-  }
-
-  // Files User has uploaded for a Job
-  public setUploadedFiles(files: any[]): void {
-      this._uploadedFiles.next(files);
-  }
-
-  public addUploadedFile(file: any) {
-      let uploadedFiles: any[] = this._uploadedFiles.getValue();
-      uploadedFiles.push(file);
-      this._uploadedFiles.next(uploadedFiles);
-  }
-
-  public removeUploadedFile(file: any): void {
-      let uploadedFiles: any[] = this._uploadedFiles.getValue();
-      uploadedFiles.forEach((item, index) => {
-        if(item === file) {
-            uploadedFiles.splice(index, 1);
+    public removeSolutionFromCart(solution: Solution) {
+        if (solution) {
+            this.updateSolutionsCart((cart: Solution[]) => cart.filter(s => s['@id'] !== solution['@id']));
         }
-      });
-      this._uploadedFiles.next(uploadedFiles);
-  }
-
-  // Remote web services User requests as Job inputs. Whether parent (Job)
-  // field is set determines if it's newly selected or copied from an existing
-  // Job
-  public setJobDownloads(jobDownloads: JobDownload[]) {
-      this._jobDownloads.next(jobDownloads);
-  }
-
-  public addJobDownload(jobDownload: JobDownload) {
-      let jobDownloads: JobDownload[] = this._jobDownloads.getValue();
-      jobDownloads.push(jobDownload);
-      this._jobDownloads.next(jobDownloads);
-  }
-
-  public removeJobDownload(jobDownload: JobDownload): void {
-    let jobDownloads: any[] = this._jobDownloads.getValue();
-    jobDownloads.forEach((item, index) => {
-      if(item === jobDownload) {
-          jobDownloads.splice(index, 1);
-      }
-    });
-    this._jobDownloads.next(jobDownloads);
-  }
-
-  public getJobDownloads(): JobDownload[] {
-    return this._jobDownloads.getValue();
-  }
-
-  // Copied cloud files User requests for a Job (input)
-  public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
-    this._jobCloudFiles.next(jobCloudFiles);
-  }
-
-  public addJobCloudFile(cloudFile: CloudFileInformation) {
-      let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
-      cloudFiles.push(cloudFile);
-      this._jobCloudFiles.next(cloudFiles);
-  }
-
-  public removeJobCloudFile(cloudFile: CloudFileInformation): void {
-    let cloudFiles: any[] = this._jobCloudFiles.getValue();
-    cloudFiles.forEach((item, index) => {
-      if(item === cloudFile) {
-          cloudFiles.splice(index, 1);
-      }
-    });
-    this._jobCloudFiles.next(cloudFiles);
-  }
-
-  public updateJob(job: Job) {
-    this._job.next(job);
-  }
-
-  private createEmptyJob(): Job {
-    let job = {
-        id: -1,
-        name: "",
-        description: "",
-        emailAddress: "",
-        user: "",
-        submitDate: null,
-        processDate: null,
-        status: "",
-        computeVmId: "",
-        computeInstanceId: null,
-        computeInstanceType: "",
-        computeInstanceKey: "",
-        computeServiceId: "",
-        computeTypeId: "",
-        storageBaseKey: "",
-        storageServiceId: "",
-        registeredUrl: "",
-        seriesId: null,
-        emailNotification: false,
-        processTimeLog: "",
-        storageBucket: "",
-        promsReportUrl: "",
-        computeVmRunCommand: "",
-        useWalltime: false, // Not part of VEGLJob, but needed for job object UI
-        walltime: null,
-        containsPersistentVolumes: false,
-        executeDate: null,
-        jobParameters: [],
-        jobDownloads: [],
-        jobFiles: []
     }
-    return job;
-  }
+
+    public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
+
+        // Call the passed function to update the current selection.
+        const solutions = f(this._selectedSolutions.getValue());
+        // If we got a sensible value back (i.e. defined, empty is valid) then
+        // update the current cart with the new value.
+        if (solutions) {
+            this._selectedSolutions.next(solutions);
+        }        
+        // Return the new value so the caller can check that it worked.
+        return solutions;
+    }
+
+    public updateJobTemplate(template: string) {
+        this._jobTemplate.next(template);
+    }
+
+    // Files User has uploaded for a Job
+    public setUploadedFiles(files: any[]): void {
+        this._uploadedFiles.next(files);
+    }
+
+    public addUploadedFile(file: any) {
+        let uploadedFiles: any[] = this._uploadedFiles.getValue();
+        uploadedFiles.push(file);
+        this._uploadedFiles.next(uploadedFiles);
+    }
+
+    public removeUploadedFile(file: any): void {
+        let uploadedFiles: any[] = this._uploadedFiles.getValue();
+        uploadedFiles.forEach((item, index) => {
+            if (item === file) {
+                uploadedFiles.splice(index, 1);
+            }
+        });
+        this._uploadedFiles.next(uploadedFiles);
+    }
+
+    // Remote web services User requests as Job inputs. Whether parent (Job)
+    // field is set determines if it's newly selected or copied from an existing
+    // Job
+    public setJobDownloads(jobDownloads: JobDownload[]) {
+        this._jobDownloads.next(jobDownloads);
+    }
+
+    public addJobDownload(jobDownload: JobDownload) {
+        let jobDownloads: JobDownload[] = this._jobDownloads.getValue();
+        jobDownloads.push(jobDownload);
+        this._jobDownloads.next(jobDownloads);
+    }
+
+    public removeJobDownload(jobDownload: JobDownload): void {
+        let jobDownloads: any[] = this._jobDownloads.getValue();
+        jobDownloads.forEach((item, index) => {
+            if (item === jobDownload) {
+                jobDownloads.splice(index, 1);
+            }
+        });
+        this._jobDownloads.next(jobDownloads);
+    }
+
+    public getJobDownloads(): JobDownload[] {
+        return this._jobDownloads.getValue();
+    }
+
+    // Copied cloud files User requests for a Job (input)
+    public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
+        this._jobCloudFiles.next(jobCloudFiles);
+    }
+
+    public addJobCloudFile(cloudFile: CloudFileInformation) {
+        let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
+        cloudFiles.push(cloudFile);
+        this._jobCloudFiles.next(cloudFiles);
+    }
+
+    public removeJobCloudFile(cloudFile: CloudFileInformation): void {
+        let cloudFiles: any[] = this._jobCloudFiles.getValue();
+        cloudFiles.forEach((item, index) => {
+            if (item === cloudFile) {
+                cloudFiles.splice(index, 1);
+            }
+        });
+        this._jobCloudFiles.next(cloudFiles);
+    }
+
+    public updateJob(job: Job) {
+        this._job.next(job);
+    }
+
+    private createEmptyJob(): Job {
+        let job = {
+            id: -1,
+            name: "",
+            description: "",
+            emailAddress: "",
+            user: "",
+            submitDate: null,
+            processDate: null,
+            status: "",
+            computeVmId: "",
+            computeInstanceId: null,
+            computeInstanceType: "",
+            computeInstanceKey: "",
+            computeServiceId: "",
+            computeTypeId: "",
+            storageBaseKey: "",
+            storageServiceId: "",
+            registeredUrl: "",
+            seriesId: null,
+            emailNotification: false,
+            processTimeLog: "",
+            storageBucket: "",
+            promsReportUrl: "",
+            computeVmRunCommand: "",
+            useWalltime: false, // Not part of VEGLJob, but needed for job object UI
+            walltime: null,
+            containsPersistentVolumes: false,
+            executeDate: null,
+            jobParameters: [],
+            jobDownloads: [],
+            jobFiles: []
+        }
+        return job;
+    }
 
 }

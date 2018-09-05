@@ -4,7 +4,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { JobWizardComponent } from './job-wizard.component';
 
 const routes: Routes = [
-  { path: '', component: JobWizardComponent }
+  { path: 'new', component: JobWizardComponent },
+  { path: 'job/:id', component: JobWizardComponent },
+  { path: '', redirectTo: 'new', pathMatch: 'full' }
 ];
 
 @NgModule({

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError, combineLatest, forkJoin } from 'rxjs';
 import { catchError, mergeMap, switchMap, map } from 'rxjs/operators';
 
 import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType } from './models';
@@ -90,14 +90,14 @@ export class VglService {
     }
 
     public setJobFolder(jobId: number[],seriesId: number): Observable<any> {
-        
+
         const options = {
             params: {
-                jobIds: jobId.join(','),                 
+                jobIds: jobId.join(','),
             }
         };
         if(seriesId)
-            options.params['seriesId'] = seriesId;        
+            options.params['seriesId'] = seriesId;
 
         return this.vglRequest('secure/setJobFolder.do', options);
     }
@@ -224,6 +224,14 @@ export class VglService {
         return this.vglRequest('secure/deleteSeriesJobs.do', options);
     }
 
+  /**
+   * Return the Job object for the specified job id if available.
+   *
+   */
+  public getJob(jobId: number): Observable<Job> {
+    return this.vglGet('secure/getJobObject.do', { jobId: jobId });
+  }
+
     public cancelJob(jobId: number): Observable<any> {
         const options = {
             params: { jobId: jobId.toString() }
@@ -341,12 +349,36 @@ export class VglService {
         return this.vglRequest('secure/getComputeServices.do');
     }
 
-    public getMachineImages(computeServiceId: string): Observable<MachineImage[]> {
-        const options = {
-            params: { computeServiceId: computeServiceId }
-        }
-        return this.vglRequest('secure/getVmImagesForComputeService.do', options);
+  /**
+   * Retrieve toolbox images for specified compute service and job or solutions.
+   *
+   * If a list of solutions is specified, that will be used to determine valid
+   * images. If no solutions are provided and a job id is, then the solutions
+   * saved with the job will be used to determine valid images. At least one of
+   * jobId and solutions must be provided.
+   *
+   * @param computeServiceId string id of the compute service provider
+   * @param solutions array of solution ids to use
+   * @param jobId number id for the job to use
+   * @returns Observable<MachineImage[]> with valid machine images
+   *
+   */
+  public getMachineImages(computeServiceId: string, solutions: string[] = [], jobId?: number): Observable<MachineImage[]> {
+    const params: {
+      computeServiceId: string,
+      solutions?: string[],
+      jobId?: number
+    } = {
+      computeServiceId: computeServiceId,
+      solutions: solutions
+    };
+
+    if (jobId != null) {
+      params.jobId = jobId;
     }
+
+    return this.vglPost('secure/getVmImagesForComputeService.do', params);
+  }
 
     public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
         const options = {
@@ -428,6 +460,11 @@ export class VglService {
     public getSolution(url: string): Observable<Solution> {
         return this.getEntry<Solution>(url);
     }
+
+  public getSolutions(urls: string[]): Observable<Solution[]> {
+    const requests = urls.map(url => this.getSolution(url));
+    return forkJoin(requests);
+  }
 
     // Add to database dataset information that is bookmarked
     public addBookMark(fileIdentifier: string, serviceId: string) : Observable<number> {

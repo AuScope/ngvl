@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { UserStateService } from '../../shared';
 import { JobsService } from '../jobs/jobs.service';
 import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/modules/vgl/models';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 
 
 @Component({
@@ -24,7 +25,9 @@ export class JobObjectComponent implements OnInit {
     resources: ComputeType[] = [];
 
 
-    constructor(private userStateService: UserStateService, private jobsService: JobsService) { }
+  constructor(private userStateService: UserStateService,
+              private jobsService: JobsService,
+              private vgl: VglService) { }
 
 
     /**
@@ -50,22 +53,7 @@ export class JobObjectComponent implements OnInit {
       );
 
       // Load toolboxes if the user had already selected one
-      if(this.job.computeServiceId && this.job.computeServiceId !== "") {
-        this.jobsService.getMachineImages(this.job.computeServiceId).subscribe(
-          machineImages => {
-            this.toolboxes = machineImages;
-          }
-        );
-
-        // Load the resources if User had already selected one
-        if(this.job.computeVmId && this.job.computeVmId !== "") {
-          this.jobsService.getComputeTypes(this.job.computeServiceId, this.job.computeVmId).subscribe(
-            computeTypes => {
-              this.resources = computeTypes;
-            }
-          );
-        }
-      }
+      this.computeProviderChanged(this.job.computeServiceId);
     });
   }
 
@@ -84,17 +72,24 @@ export class JobObjectComponent implements OnInit {
     /**
      * When compute provider is changed, load toolboxes
      *
-     * @param event the compute provider select change event
+     * @param computeServiceId the new compute provider id.
      */
-    public computeProviderChanged(cp): void {
-        // Load machine images (Toolbox)
-        if(cp && cp !== "") {
-            this.jobsService.getMachineImages(cp).subscribe(
-                machineImages => {
-                    this.toolboxes = machineImages;
-                }
-            );
+    public computeProviderChanged(computeServiceId): void {
+      if (computeServiceId && computeServiceId !== "") {
+        // If we have a list of solutions use that, otherwise use the job id if
+        // one has been assigned. If neither is available, don't load any
+        // toolboxes yet.
+        const solutions = this.userStateService.getSolutionsCart().map(s => s['@id']);
+        this.vgl.getMachineImages(computeServiceId, solutions, this.job.id)
+          .subscribe(images => this.toolboxes = images);
+
+        // Load the resources if User had already selected one
+        const computeVmId = this.job.computeVmId;
+        if(computeVmId && computeVmId !== "") {
+          this.jobsService.getComputeTypes(computeServiceId, computeVmId)
+            .subscribe(computeTypes => this.resources = computeTypes);
         }
+      }
     }
 
     /**

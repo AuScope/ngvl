@@ -185,7 +185,7 @@ export interface Job {
     jobParameters: JobParameter[];
     jobDownloads: JobDownload[];
     jobFiles: JobFile[];
-    //jobSolutions: Solution[]; // XXX needed?
+    jobSolutions: string[]; // XXX needed?
 }
 
 export interface ComputeService {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
@@ -16,10 +17,7 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 @Injectable()
 export class UserStateService {
 
-    constructor(private vgl: VglService) {
-        // Initialise a new Job object for the User
-        this._job.next(this.createEmptyJob());
-    }
+    constructor(private vgl: VglService) {}
 
     private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
     public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
@@ -176,8 +174,32 @@ export class UserStateService {
     return solutions;
   }
 
+  /**
+   * Return the current contents of the user's solutions cart.
+   */
+  public getSolutionsCart(): Solution[] {
+    return this._selectedSolutions.getValue();
+  }
+
+  /**
+   * Sets the current selection in the cart to the passed solutions.
+   *
+   * @param solutions Array of Solution objects to use as the current selection.
+   */
+  public setSolutionsCart(solutions: Solution[]) {
+    const newCart = solutions ? solutions : [];
+    this._selectedSolutions.next(newCart);
+  }
+
   public updateJobTemplate(template: string) {
     this._jobTemplate.next(template);
+  }
+
+  /**
+   * Return the current value of the job template.
+   */
+  public getJobTemplate(): string {
+    return this._jobTemplate.getValue();
   }
 
   // Files User has uploaded for a Job
@@ -249,11 +271,28 @@ export class UserStateService {
     this._jobCloudFiles.next(cloudFiles);
   }
 
-  public updateJob(job: Job) {
+  /**
+   * Update the user's current job object with job.
+   *
+   * @param job The new Job object
+   * @returns The new Job object
+   */
+  public updateJob(job: Job): Job {
     this._job.next(job);
+    return job;
   }
 
-  private createEmptyJob(): Job {
+  /**
+   * Return the current state of the user Job object.
+   */
+  public getJob(): Job {
+    return this._job.getValue();
+  }
+
+  /**
+   * Return a new, empty Job object.
+   */
+  public createEmptyJob(): Job {
     let job = {
         id: -1,
         name: "",
@@ -284,9 +323,59 @@ export class UserStateService {
         executeDate: null,
         jobParameters: [],
         jobDownloads: [],
-        jobFiles: []
+        jobFiles: [],
+        jobSolutions: []
     }
     return job;
   }
 
+  /**
+   * Load the job specified by id from the server into the current
+   * user state. By default reset the user selections (solutions and datasets)
+   * to match the loaded job. If keepUserSelections is true then do not update
+   * the current selections, and just load the job object.
+   *
+   * @param id The id for the job to load
+   * @param keepUserSelections  whether to keep current user selections (default false)
+   *
+   */
+  public loadJob(id: number, keepUserSelections = false): Observable<Job> {
+    return this.vgl.getJob(id).pipe(
+      // Update the current job object
+      map(job => this.updateJob(job)),
+
+      map(job => {
+        if (!keepUserSelections) {
+          // Update the cart with the new solutions, ignoring any existing
+          // selections, unless requested not to.
+          if (job.jobSolutions) {
+            this.vgl.getSolutions(job.jobSolutions)
+              .subscribe(solutions => this.setSolutionsCart(solutions));
+          }
+
+          // Update dataset selections unless requested not to
+          if (job.jobDownloads) {
+            this.setJobDownloads(job.jobDownloads);
+          }
+        }
+
+        return job;
+      }),
+
+      catchError((err, caught) => {
+        console.log('Failed to load job ' + id);
+        console.log(err);
+        console.log(caught);
+        return EMPTY;
+      })
+    );
+  }
+
+  /**
+   * Create and load a new empty job, keeping any existing user selections. Note
+   * that this does not persist the job object on the server.
+   */
+  public newJob(): Observable<Job> {
+    return Observable.of(this.updateJob(this.createEmptyJob()))
+  }
 }

@@ -117,4 +117,12 @@ export class JobObjectComponent implements OnDestroy, OnInit {
         }
     }
 
+  public isCloudProvider(providerId: string): boolean {
+    return providerId !== 'nci-raijin-compute';
+  }
+
+  public isHPCProvider(providerId: string): boolean {
+    return providerId === 'nci-raijin-compute';
+  }
+
 }

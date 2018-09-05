@@ -56,9 +56,9 @@
             </div>
         </div>
         <!-- Resources (Job.computeTypeId) -->
-        <div class="row">
+        <div class="row" *ngIf="isCloudProvider(job.computeServiceId)">
             <div class="col-lg-2">
-                <label class="required">Resources:</label>
+                <label class="required">Cloud resources:</label>
             </div>
             <div class="col-lg-10">
                 <div class="input-group">
@@ -69,6 +69,42 @@
                 <small>Select a compute resource configuration that is sufficient for your needs.</small>
             </div>
         </div>
+
+        <ng-container *ngIf="isHPCProvider(job.computeServiceId)">
+          <div class="row">
+            <div class="col-lg-2">
+              <label class="required">Number of CPUs:</label>
+            </div>
+            <div class="col-lg-10">
+              <div class="input-group">
+                <input type="number" [(ngModel)]="job.CPUs">
+              </div>
+              <small>This will be the number of CPUs that the job scripts will request from the HPC.</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-2">
+              <label class="required">Memory (GB):</label>
+            </div>
+            <div class="col-lg-10">
+              <div class="input-group">
+                <input type="number" [(ngModel)]="job.memory">
+              </div>
+              <small>How much memory (in GB) should be requested for the running job.</small>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-2">
+              <label class="required">Disk Space (GB):</label>
+            </div>
+            <div class="col-lg-10">
+              <div class="input-group">
+                <input type="number" [(ngModel)]="job.jobfs">
+              </div>
+              <small>How much working disk space (in GB) should be requested for the running jobs.</small>
+            </div>
+          </div>
+        </ng-container>
         <!-- Email notification -->
         <div class="row">
             <div class="col-lg-2">

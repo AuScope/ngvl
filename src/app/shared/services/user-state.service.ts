@@ -297,7 +297,7 @@ export class UserStateService {
    */
   public createEmptyJob(initialValues = {}): Job {
     const job = {
-        id: -1,
+        id: null,
         name: "",
         description: "",
         emailAddress: "",

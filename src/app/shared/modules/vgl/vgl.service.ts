@@ -229,7 +229,10 @@ export class VglService {
    *
    */
   public getJob(jobId: number): Observable<Job> {
-    return this.vglGet('secure/getJobObject.do', { jobId: jobId });
+    return this.vglGet<Job[]>('secure/getJobObject.do', { jobId: jobId }).pipe(
+      // getJobObject.do returns an array of one job, so extract it from the array.
+      map(jobs => jobs[0])
+    );
   }
 
     public cancelJob(jobId: number): Observable<any> {

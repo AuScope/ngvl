@@ -58,12 +58,6 @@ export class OlMapDataSelectComponent {
     public selectDataClick() {
         this.buttonText = 'Click on Map';
         this.olMapService.drawBound().subscribe((vector) => {
-            // Zoom to features
-            const features = vector.getSource().getFeatures();
-            const me = this;
-            features.forEach(function (feature) {
-                me.olMapService.fitView(feature.getGeometry().getExtent());
-            });
             // Check for intersections with active layer CSW record extents
             let extent: olExtent = vector.getSource().getExtent();
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);

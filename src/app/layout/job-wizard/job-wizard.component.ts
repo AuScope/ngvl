@@ -44,19 +44,19 @@ export class JobWizardComponent implements OnInit {
   ngOnInit() {
     // Check the URL and parameters to determine whether we're creating a new
     // job or loading an existing one.
-    this.routeSub = combineLatest(this.route.url, this.route.paramMap).subscribe(
-      ([parts, params]) => {
+    this.routeSub = combineLatest(this.route.url, this.route.paramMap).pipe(
+      switchMap(([parts, params]) => {
         if (parts[0].path == 'new') {
           // Load a new, empty job object for the user to manage.
-          this.userStateService.newJob();
+          return this.userStateService.newJob();
         }
         else if (parts[0].path == 'job' && params.has('id')) {
           // Load the specified job from the server
           const id = parseInt(params.get('id'));
-          this.userStateService.loadJob(id);
+          return this.userStateService.loadJob(id);
         }
-      }
-    );
+      })
+    ).subscribe();
 
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions

@@ -27,7 +27,11 @@ export class JobObjectComponent implements OnInit {
 
   constructor(private userStateService: UserStateService,
               private jobsService: JobsService,
-              private vgl: VglService) { }
+              private vgl: VglService) {
+    // Initialise the job object so we can bind to it and copy parameters as
+    // required.
+    this.job = this.userStateService.createEmptyJob();
+  }
 
 
     /**
@@ -37,7 +41,7 @@ export class JobObjectComponent implements OnInit {
      */
   ngOnInit() {
     this.userStateService.job.subscribe(job => {
-      this.job = job;
+      Object.assign(this.job, job || this.userStateService.createEmptyJob());
 
       // Assign a default name if there isn't one
       if(this.job.name === "") {

@@ -348,9 +348,14 @@ export class VglService {
       );
   }
 
-    public getComputeServices(): Observable<ComputeService[]> {
-        return this.vglRequest('secure/getComputeServices.do');
+  public getComputeServices(jobId?: number): Observable<ComputeService[]> {
+    const params: {jobId?: number} = {};
+    if (jobId != null) {
+      params.jobId = jobId;
     }
+
+    return this.vglGet('secure/getComputeServices.do', params);
+  }
 
   /**
    * Retrieve toolbox images for specified compute service and job or solutions.

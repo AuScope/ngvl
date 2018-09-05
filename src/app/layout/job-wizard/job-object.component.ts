@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+
 import { UserStateService } from '../../shared';
 import { JobsService } from '../jobs/jobs.service';
 import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/modules/vgl/models';
@@ -11,19 +11,20 @@ import { VglService } from '../../shared/modules/vgl/vgl.service';
     templateUrl: './job-object.component.html',
     styleUrls: ['./job-object.component.scss']
 })
-export class JobObjectComponent implements OnInit {
+export class JobObjectComponent implements OnDestroy, OnInit {
 
   // Local copy of the UserStateService Job object
   job: Job;
 
-    // Use walltime flag. Display purposes only, not stored in Job
-    // (but actual walltime will be if useWalltime==true)
-    useWalltime: boolean;
-    // Job compute parameters loaded from server
-    computeProviders: ComputeService[] = [];
-    toolboxes: MachineImage[] = [];
-    resources: ComputeType[] = [];
+  // Use walltime flag. Display purposes only, not stored in Job
+  // (but actual walltime will be if useWalltime==true)
+  useWalltime: boolean;
+  // Job compute parameters loaded from server
+  computeProviders: ComputeService[] = [];
+  toolboxes: MachineImage[] = [];
+  resources: ComputeType[] = [];
 
+  private _jobSub;
 
   constructor(private userStateService: UserStateService,
               private jobsService: JobsService,
@@ -34,23 +35,17 @@ export class JobObjectComponent implements OnInit {
   }
 
 
-    /**
-     * Load the compute options (providers, toolboxes andf resources) from the
-     * server. Some options are only loaded when a previous option selection has
-     * been made, so we check for this and load more options if required.
-     */
+  /**
+   * Load the compute options (providers, toolboxes andf resources) from the
+   * server. Some options are only loaded when a previous option selection has
+   * been made, so we check for this and load more options if required.
+   */
   ngOnInit() {
-    this.userStateService.job.subscribe(job => {
-      Object.assign(this.job, job || this.userStateService.createEmptyJob());
+    this._jobSub = this.userStateService.job.subscribe(job => {
+      Object.assign(this.job, job || {});
 
-      // Assign a default name if there isn't one
-      if(this.job.name === "") {
-        const datePipe = new DatePipe('en-AU');
-        this.job.name = "VGL Job - " + datePipe.transform(new Date(), 'medium')
-      }
-
-      // Load compute services
-      this.jobsService.getComputeServices().subscribe(
+      // Update compute services list for new job.
+      this.vgl.getComputeServices(this.job.id).subscribe(
         computeServices => {
           this.computeProviders = computeServices;
         }
@@ -59,6 +54,12 @@ export class JobObjectComponent implements OnInit {
       // Load toolboxes if the user had already selected one
       this.computeProviderChanged(this.job.computeServiceId);
     });
+  }
+
+  ngOnDestroy() {
+    if (this._jobSub) {
+      this._jobSub.unsubscribe();
+    }
   }
 
     /**

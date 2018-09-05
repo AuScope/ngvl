@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable } from 'rxjs';
+import { DatePipe } from '@angular/common';
+
+import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
@@ -16,8 +18,9 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 
 @Injectable()
 export class UserStateService {
+  private datePipe = new DatePipe('en-AU');
 
-    constructor(private vgl: VglService) {}
+  constructor(private vgl: VglService) {}
 
     private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
     public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
@@ -292,8 +295,8 @@ export class UserStateService {
   /**
    * Return a new, empty Job object.
    */
-  public createEmptyJob(): Job {
-    let job = {
+  public createEmptyJob(initialValues = {}): Job {
+    const job = {
         id: -1,
         name: "",
         description: "",
@@ -326,7 +329,8 @@ export class UserStateService {
         jobFiles: [],
         jobSolutions: []
     }
-    return job;
+
+    return Object.assign(job, initialValues);
   }
 
   /**
@@ -376,6 +380,10 @@ export class UserStateService {
    * that this does not persist the job object on the server.
    */
   public newJob(): Observable<Job> {
-    return Observable.of(this.updateJob(this.createEmptyJob()))
+    // Create a new job with a default name
+    const name = "VGL Job - " + this.datePipe.transform(new Date(), 'medium')
+    const job = this.createEmptyJob({name: name});
+
+    return of(this.updateJob(job));
   }
 }

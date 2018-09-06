@@ -77,7 +77,7 @@
             </div>
             <div class="col-lg-10">
               <div class="input-group">
-                <input type="number" [(ngModel)]="job.CPUs">
+                <input type="number" [(ngModel)]="job.ncpus">
               </div>
               <small>This will be the number of CPUs that the job scripts will request from the HPC.</small>
             </div>
@@ -88,7 +88,7 @@
             </div>
             <div class="col-lg-10">
               <div class="input-group">
-                <input type="number" [(ngModel)]="job.memory">
+                <input type="number" [(ngModel)]="job.mem">
               </div>
               <small>How much memory (in GB) should be requested for the running job.</small>
             </div>

@@ -348,6 +348,33 @@ export class VglService {
       );
   }
 
+  /**
+   * If job is an HPC job update it with ncpus/mem/jobfs parameters decoded from the "instance type".
+   * If not an HPC job then no change.
+   *
+   * @param job The Job object to update
+   * @returns the updated Job.
+   */
+  public decodeHPCInstanceType(job: Job): Job {
+    if (this.isHPCProvider(job.computeServiceId)) {
+      for (const kvp of job.computeInstanceType.split('&')) {
+        const [key, value] = kvp.split('=');
+
+        // Values should all be numbers, after stripping off any units
+        // designator ('gb').
+        const num = parseInt(value.endsWith('gb') ? value.slice(0, -2) : value);
+        if (isNaN(num)) {
+          console.log('Bad HPC instance type parameter: ' + key + ' = ' + value);
+        }
+        else {
+          job[key] = num;
+        }
+      }
+    }
+
+    return job;
+  }
+
   public getComputeServices(jobId?: number): Observable<ComputeService[]> {
     const params: {jobId?: number} = {};
     if (jobId != null) {
@@ -556,5 +583,19 @@ export class VglService {
     public getAvailableRegistries(): Observable<any> {
         return this.vglRequest('getFacetedCSWServices.do');
     }
+
+  /**
+   * Return true if providerId identifies a cloud compute service provider.
+   */
+  public isCloudProvider(providerId: string): boolean {
+    return providerId !== 'nci-raijin-compute';
+  }
+
+  /**
+   * Return true if providerId identifies an HPC compute service provider.
+   */
+  public isHPCProvider(providerId: string): boolean {
+    return providerId === 'nci-raijin-compute';
+  }
 
 }

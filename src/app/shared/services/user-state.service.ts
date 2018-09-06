@@ -345,8 +345,9 @@ export class UserStateService {
    */
   public loadJob(id: number, keepUserSelections = false): Observable<Job> {
     return this.vgl.getJob(id).pipe(
-      // Update the current job object
-      map(job => this.updateJob(job)),
+      // Update the current job object, after "decoding" any HPC style instance
+      // type into cpu/ram/fs.
+      map(job => this.updateJob(this.vgl.decodeHPCInstanceType(job))),
 
       map(job => {
         if (!keepUserSelections) {

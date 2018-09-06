@@ -157,7 +157,7 @@ export class ConfirmDatasetsModalContent {
                     }
                 });
             });
-        },() => console.log('Modal Closed!'));
+        },() => {});
     }
 
 

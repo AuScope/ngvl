@@ -9,6 +9,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
+import { RemoteDatasetsModalContent } from '../../datasets/remote-datasets.modal.component';
 
 
 @Component({
@@ -308,33 +309,17 @@ export class JobSubmissionDatasetsComponent {
 
 
     /**
-     * Add remote download. Displays dialog, on "OK" will create and add a
+     * Add remote download. Displays dialog, "OK" will create and add a
      * remote download to the data selection service (local storage)
      * 
      * @param content the add remote download modal, defined in HTML
      */
-    public showAddRemoteDownloadDialog(content): void {
-        this.modalService.open(content).result.then((result) => {
-            if (result === 'OK click') {
-                const jobDownload: JobDownload = {
-                    name: this.remoteName,
-                    description: this.remoteDescription,
-                    url: this.remoteUrl,
-                    localPath: this.remoteLocation,
-                    northBoundLatitude: -1,
-                    southBoundLatitude: -1,
-                    eastBoundLongitude: -1,
-                    westBoundLongitude: -1,
-                    owner: '',
-                    parentUrl: '',
-                    parentName: '',
-                    parent: undefined   // No Job associated with this download at this stage
-                }
-                this.addJobDownloadToTree(jobDownload);
-                this.userStateService.addJobDownload(jobDownload);
-                this.loadJobInputs();
-            }
-        });
+    public showAddRemoteDownloadDialog(): void {
+        this.modalService.open(RemoteDatasetsModalContent).result.then((jobDownload) => {
+            this.addJobDownloadToTree(jobDownload);
+            this.userStateService.addJobDownload(jobDownload);
+            this.loadJobInputs();
+        }, () => {});
     }
 
 
@@ -407,6 +392,6 @@ export class JobSubmissionDatasetsComponent {
                     this.loadJobInputs();
                 });
             }
-        },() => console.log('Modal Closed!'));
+        },() => {});
     }
 }

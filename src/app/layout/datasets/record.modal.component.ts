@@ -1,12 +1,15 @@
 import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+import { UserStateService } from '../../shared';
 
 
 @Component({
     selector: 'record-modal-content',
-    templateUrl: './record.modal.component.html'
+    templateUrl: './record.modal.component.html',
+    styleUrls: ['./record.modal.component.scss']
 })
 
 export class RecordModalContent {
@@ -38,7 +41,8 @@ export class RecordModalContent {
     };
 
 
-    constructor(public activeModal: NgbActiveModal) { }
+    constructor(private userStateService: UserStateService, private modalService: NgbModal,
+                public activeModal: NgbActiveModal) { }
 
 
     /**
@@ -65,6 +69,22 @@ export class RecordModalContent {
             }
         }
         return serviceList;
+    }
+
+
+    /**
+     * Add remote download. Displays dialog, "OK" will create and add a
+     * remote download to the data selection service (local storage)
+     * 
+     * @param content the add remote download modal, defined in HTML
+     */
+    public addDatasetToJob(cswRecord: CSWRecordModel, url: string): void {
+        const modalRef = this.modalService.open(RemoteDatasetsModalContent);
+        modalRef.componentInstance.remoteUrl = url;
+        modalRef.result.then(jobDownload => {
+            jobDownload.cswRecord = cswRecord;
+            this.userStateService.addJobDownload(jobDownload);
+        }, () => {});
     }
 
 }

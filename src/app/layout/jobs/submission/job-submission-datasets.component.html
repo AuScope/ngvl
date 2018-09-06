@@ -25,7 +25,7 @@
                     <td title="{{ rowData.details }}" >
                         <span class="d-inline-block text-truncate" style="max-width:220px" *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'"
                             title="{{ rowData.details }}">Service call to
-                            <a href="{{ rowData.details }}">{{ rowData.details }}</a>
+                            <a href="{{ rowData.details }}" target="_blank">{{ rowData.details }}</a>
                         </span>
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'">
                             <button title="Edit the download options" (click)="editDownload($event,rowData.input)" >
@@ -43,7 +43,7 @@
         <label style="margin-left:10px;" for="fileinput" class="btn btn-sm btn-primary pull-right">
             <i class="fa fa-upload"></i>&nbsp;Upload File(s)
         </label>
-        <button style="margin-left:10px;" class="btn btn-sm btn-primary pull-right" (click)="showAddRemoteDownloadDialog(addRemoteDownloadModal)">
+        <button style="margin-left:10px;" class="btn btn-sm btn-primary pull-right" (click)="showAddRemoteDownloadDialog()">
             <i class="fa fa-download"></i>&nbsp;Remote Download</button>
         <button type="button" class="btn btn-sm btn-primary pull-right" (click)="copyFromJob()">
             <i class="fa fa-copy"></i>&nbsp;Copy From Job</button>
@@ -53,35 +53,3 @@
 
 <!-- Job download context menu -->
 <p-contextMenu #jobInputContextMenu [model]="jobInputContextMenuItems" appendTo="body"></p-contextMenu>
-
-
-<!-- Add remote download modal -->
-<ng-template #addRemoteDownloadModal let-c="close">
-    <div class="modal-header">
-        <h4 class="modal-title">Download from remote service</h4>
-        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    <form #downloadForm="ngForm">
-        <div class="modal-body">
-            <div class="form-group">
-                <label class="required" for="url">URL</label>
-                <!-- TODO: URL validation -->
-                <input type="text" class="form-control" id="url" [(ngModel)]="remoteUrl" name="remoteUrl" placeholder="URL for the job to download"
-                    required>
-                <label class="required" for="location" style="margin-top:5px;">Location</label>
-                <!-- TODO: Path validation -->
-                <input type="text" class="form-control" id="location" [(ngModel)]="remoteLocation" name="remoteLocation" placeholder="File path where the downloaded data will be stored"
-                    required>
-                <label class="required" for="name" style="margin-top:5px;">Name</label>
-                <input type="text" class="form-control" id="name" [(ngModel)]="remoteName" name="remoteName" required>
-                <label class="required" for="description" style="margin-top:5px;">Description</label>
-                <input type="text" class="form-control" id="description" [(ngModel)]="remoteDescription" name="remoteDescription" required>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn" [disabled]="!downloadForm.valid" (click)="c('OK click')">Create Input</button>
-        </div>
-    </form>
-</ng-template>

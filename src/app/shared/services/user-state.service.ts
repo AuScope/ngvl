@@ -64,7 +64,7 @@ export class UserStateService {
         this.vgl.user.subscribe(
             user => {
                 // If full name is empty (as with AAF login), use email address as name
-                if(user.fullName == undefined || user.fullName === "") {
+                if (user.fullName == undefined || user.fullName === "") {
                     user.fullName = user.email;
                 }
                 this._user.next(user);
@@ -117,7 +117,7 @@ export class UserStateService {
     public acceptTermsAndConditions(): void {
         this.vgl.user.subscribe(
             user => {
-                if(user.acceptedTermsConditions !== 1) {
+                if (user.acceptedTermsConditions !== 1) {
                     user.acceptedTermsConditions = 1;
                     this._user.next(user);
                 }
@@ -144,29 +144,32 @@ export class UserStateService {
         this._solutionQuery.next(query);
     }
 
-  public addSolutionToCart(solution: Solution) {
-    // Add solution to the cart, unless it's already in.
-    if (solution) {
-      this.updateSolutionsCart((cart: Solution[]) => {
-        if (!cart.includes(solution)) {
-          return [...cart, solution];
+    public addSolutionToCart(solution: Solution) {
+        // Add solution to the cart, unless it's already in.
+        if (solution) {
+            const check = (s: Solution) => {
+                return s["@id"] === solution["@id"];
+              };
+
+            this.updateSolutionsCart((cart: Solution[]) => {
+                if (!cart.find(check)) {
+                    return [...cart, solution];
+                }
+                return cart;
+            });
         }
 
-        return cart;
-      });
     }
-  }
 
-  public removeSolutionFromCart(solution: Solution) {
-    if (solution) {
-      this.updateSolutionsCart((cart: Solution[]) => cart.filter(s => s['@id'] !== solution['@id']));
+    public removeSolutionFromCart(solution: Solution) {
+        if (solution) {
+            this.updateSolutionsCart((cart: Solution[]) => cart.filter(s => s['@id'] !== solution['@id']));
+        }
     }
-  }
 
   public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
     // Call the passed function to update the current selection.
     const solutions = f(this._selectedSolutions.getValue());
-
     // If we got a sensible value back (i.e. defined, empty is valid) then
     // update the current cart with the new value.
     if (solutions) {

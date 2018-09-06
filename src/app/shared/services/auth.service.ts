@@ -72,15 +72,25 @@ export class AuthService {
 
   onLoggedIn() {
     localStorage.setItem('isLoggedIn', 'true');
-
-    // Trigger an update in the user state service to get the new username, then
-    // navigate to the saved url. Reset the saved url so it isn't retained for
-    // later logins.
+    // Trigger an update in the user state service to get the new username
     this.userStateService.updateUser();
-    this.userStateService.updateBookMarks();
-    const savedUrl = this.resetRedirectUrl();
-    const redirect = savedUrl ? savedUrl : '/dashboard';
-    this.router.navigate([redirect]);
+    // Check is User has accpeted T&C's
+    this.userStateService.user.subscribe(
+        user => {
+            // Navigate to the saved url. Reset the saved url so it isn't retained for
+            // later logins.
+            if(user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
+                this.userStateService.updateBookMarks();
+                const savedUrl = this.resetRedirectUrl();
+                const redirect = savedUrl ? savedUrl : '/dashboard';
+                this.router.navigate([redirect]);
+            }
+            // Redirect User to Profile to accept T&C's if they haven't already
+            else {
+                this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
+            }
+        }
+    );
   }
 
   public get isLoggedIn(): boolean {

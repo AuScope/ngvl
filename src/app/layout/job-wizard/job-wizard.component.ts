@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, ParamMap, UrlSegment } from '@angular/router';
 
 import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { routerTransition } from '../../router.animations';
 
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { Job, Solution, JobDownload } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';
@@ -27,6 +27,8 @@ export class JobWizardComponent implements OnInit {
   solutions: Solution[];
   private _solutionsSub;
 
+  private routeSub;
+
   @ViewChild(JobObjectComponent)
   private jobObject: JobObjectComponent;
 
@@ -36,9 +38,26 @@ export class JobWizardComponent implements OnInit {
   constructor(private userStateService: UserStateService,
               private vglService: VglService,
               private location: Location,
-              private router: Router) {}
+              private router: Router,
+              private route: ActivatedRoute) {}
 
   ngOnInit() {
+    // Check the URL and parameters to determine whether we're creating a new
+    // job or loading an existing one.
+    this.routeSub = combineLatest(this.route.url, this.route.paramMap).pipe(
+      switchMap(([parts, params]) => {
+        if (parts[0].path == 'new') {
+          // Load a new, empty job object for the user to manage.
+          return this.userStateService.newJob();
+        }
+        else if (parts[0].path == 'job' && params.has('id')) {
+          // Load the specified job from the server
+          const id = parseInt(params.get('id'));
+          return this.userStateService.loadJob(id);
+        }
+      })
+    ).subscribe();
+
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions
     );
@@ -52,6 +71,7 @@ export class JobWizardComponent implements OnInit {
 
     // Clean up subs
     this._solutionsSub.unsubscribe();
+    this.routeSub.unsubscribe();
   }
 
   save() {
@@ -79,10 +99,10 @@ export class JobWizardComponent implements OnInit {
     this.stashUserState();
 
     // Save the job to the backend
-    return this.vglService.saveJob(this.getJobObject(),
+    return this.vglService.saveJob(this.userStateService.getJob(),
                                    this.userStateService.getJobDownloads(),
-                                   this.getTemplate(),
-                                   this.solutions);
+                                   this.userStateService.getJobTemplate(),
+                                   this.userStateService.getSolutionsCart());
   }
 
   cancel() {

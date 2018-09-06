@@ -185,7 +185,12 @@ export interface Job {
     jobParameters: JobParameter[];
     jobDownloads: JobDownload[];
     jobFiles: JobFile[];
-    //jobSolutions: Solution[]; // XXX needed?
+    jobSolutions: string[];
+
+    // These are only required for an HPC job, and won't be populated by VGL
+    ncpus?: number;
+    jobfs?: number;
+    mem?: number;
 }
 
 export interface ComputeService {

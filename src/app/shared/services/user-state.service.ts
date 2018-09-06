@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job } from '../modules/vgl/models';
+import { DatePipe } from '@angular/common';
+
+import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+
+import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
 import { saveAs } from 'file-saver/FileSaver';
@@ -15,11 +18,9 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 
 @Injectable()
 export class UserStateService {
+  private datePipe = new DatePipe('en-AU');
 
-    constructor(private vgl: VglService) {
-        // Initialise a new Job object for the User
-        this._job.next(this.createEmptyJob());
-    }
+  constructor(private vgl: VglService) {}
 
     private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
     public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
@@ -146,10 +147,10 @@ export class UserStateService {
     public addSolutionToCart(solution: Solution) {
         // Add solution to the cart, unless it's already in.
         if (solution) {
-            const check = (s: Solution) => { 
+            const check = (s: Solution) => {
                 return s["@id"] === solution["@id"];
               };
-          
+
             this.updateSolutionsCart((cart: Solution[]) => {
                 if (!cart.find(check)) {
                     return [...cart, solution];
@@ -166,130 +167,227 @@ export class UserStateService {
         }
     }
 
-    public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
-
-        // Call the passed function to update the current selection.
-        const solutions = f(this._selectedSolutions.getValue());
-        // If we got a sensible value back (i.e. defined, empty is valid) then
-        // update the current cart with the new value.
-        if (solutions) {
-            this._selectedSolutions.next(solutions);
-        }        
-        // Return the new value so the caller can check that it worked.
-        return solutions;
+  public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
+    // Call the passed function to update the current selection.
+    const solutions = f(this._selectedSolutions.getValue());
+    // If we got a sensible value back (i.e. defined, empty is valid) then
+    // update the current cart with the new value.
+    if (solutions) {
+      this._selectedSolutions.next(solutions);
     }
 
-    public updateJobTemplate(template: string) {
-        this._jobTemplate.next(template);
-    }
+    // Return the new value so the caller can check that it worked.
+    return solutions;
+  }
 
-    // Files User has uploaded for a Job
-    public setUploadedFiles(files: any[]): void {
-        this._uploadedFiles.next(files);
-    }
+  /**
+   * Return the current contents of the user's solutions cart.
+   */
+  public getSolutionsCart(): Solution[] {
+    return this._selectedSolutions.getValue();
+  }
 
-    public addUploadedFile(file: any) {
-        let uploadedFiles: any[] = this._uploadedFiles.getValue();
-        uploadedFiles.push(file);
-        this._uploadedFiles.next(uploadedFiles);
-    }
+  /**
+   * Sets the current selection in the cart to the passed solutions.
+   *
+   * @param solutions Array of Solution objects to use as the current selection.
+   */
+  public setSolutionsCart(solutions: Solution[]) {
+    const newCart = solutions ? solutions : [];
+    this._selectedSolutions.next(newCart);
+  }
 
-    public removeUploadedFile(file: any): void {
-        let uploadedFiles: any[] = this._uploadedFiles.getValue();
-        uploadedFiles.forEach((item, index) => {
-            if (item === file) {
-                uploadedFiles.splice(index, 1);
-            }
-        });
-        this._uploadedFiles.next(uploadedFiles);
-    }
+  public updateJobTemplate(template: string) {
+    this._jobTemplate.next(template);
+  }
 
-    // Remote web services User requests as Job inputs. Whether parent (Job)
-    // field is set determines if it's newly selected or copied from an existing
-    // Job
-    public setJobDownloads(jobDownloads: JobDownload[]) {
-        this._jobDownloads.next(jobDownloads);
-    }
+  /**
+   * Return the current value of the job template.
+   */
+  public getJobTemplate(): string {
+    return this._jobTemplate.getValue();
+  }
 
-    public addJobDownload(jobDownload: JobDownload) {
-        let jobDownloads: JobDownload[] = this._jobDownloads.getValue();
-        jobDownloads.push(jobDownload);
-        this._jobDownloads.next(jobDownloads);
-    }
+  // Files User has uploaded for a Job
+  public setUploadedFiles(files: any[]): void {
+      this._uploadedFiles.next(files);
+  }
 
-    public removeJobDownload(jobDownload: JobDownload): void {
-        let jobDownloads: any[] = this._jobDownloads.getValue();
-        jobDownloads.forEach((item, index) => {
-            if (item === jobDownload) {
-                jobDownloads.splice(index, 1);
-            }
-        });
-        this._jobDownloads.next(jobDownloads);
-    }
+  public addUploadedFile(file: any) {
+      let uploadedFiles: any[] = this._uploadedFiles.getValue();
+      uploadedFiles.push(file);
+      this._uploadedFiles.next(uploadedFiles);
+  }
 
-    public getJobDownloads(): JobDownload[] {
-        return this._jobDownloads.getValue();
-    }
-
-    // Copied cloud files User requests for a Job (input)
-    public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
-        this._jobCloudFiles.next(jobCloudFiles);
-    }
-
-    public addJobCloudFile(cloudFile: CloudFileInformation) {
-        let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
-        cloudFiles.push(cloudFile);
-        this._jobCloudFiles.next(cloudFiles);
-    }
-
-    public removeJobCloudFile(cloudFile: CloudFileInformation): void {
-        let cloudFiles: any[] = this._jobCloudFiles.getValue();
-        cloudFiles.forEach((item, index) => {
-            if (item === cloudFile) {
-                cloudFiles.splice(index, 1);
-            }
-        });
-        this._jobCloudFiles.next(cloudFiles);
-    }
-
-    public updateJob(job: Job) {
-        this._job.next(job);
-    }
-
-    private createEmptyJob(): Job {
-        let job = {
-            id: -1,
-            name: "",
-            description: "",
-            emailAddress: "",
-            user: "",
-            submitDate: null,
-            processDate: null,
-            status: "",
-            computeVmId: "",
-            computeInstanceId: null,
-            computeInstanceType: "",
-            computeInstanceKey: "",
-            computeServiceId: "",
-            computeTypeId: "",
-            storageBaseKey: "",
-            storageServiceId: "",
-            registeredUrl: "",
-            seriesId: null,
-            emailNotification: false,
-            processTimeLog: "",
-            storageBucket: "",
-            promsReportUrl: "",
-            computeVmRunCommand: "",
-            useWalltime: false, // Not part of VEGLJob, but needed for job object UI
-            walltime: null,
-            containsPersistentVolumes: false,
-            executeDate: null,
-            jobParameters: [],
-            jobDownloads: [],
-            jobFiles: []
+  public removeUploadedFile(file: any): void {
+      let uploadedFiles: any[] = this._uploadedFiles.getValue();
+      uploadedFiles.forEach((item, index) => {
+        if(item === file) {
+            uploadedFiles.splice(index, 1);
         }
-        return job;
+      });
+      this._uploadedFiles.next(uploadedFiles);
+  }
+
+  // Remote web services User requests as Job inputs. Whether parent (Job)
+  // field is set determines if it's newly selected or copied from an existing
+  // Job
+  public setJobDownloads(jobDownloads: JobDownload[]) {
+      this._jobDownloads.next(jobDownloads);
+  }
+
+  public addJobDownload(jobDownload: JobDownload) {
+      let jobDownloads: JobDownload[] = this._jobDownloads.getValue();
+      jobDownloads.push(jobDownload);
+      this._jobDownloads.next(jobDownloads);
+  }
+
+  public removeJobDownload(jobDownload: JobDownload): void {
+    let jobDownloads: any[] = this._jobDownloads.getValue();
+    jobDownloads.forEach((item, index) => {
+      if(item === jobDownload) {
+          jobDownloads.splice(index, 1);
+      }
+    });
+    this._jobDownloads.next(jobDownloads);
+  }
+
+  public getJobDownloads(): JobDownload[] {
+    return this._jobDownloads.getValue();
+  }
+
+  // Copied cloud files User requests for a Job (input)
+  public setJobCloudFiles(jobCloudFiles: CloudFileInformation[]) {
+    this._jobCloudFiles.next(jobCloudFiles);
+  }
+
+  public addJobCloudFile(cloudFile: CloudFileInformation) {
+      let cloudFiles: CloudFileInformation[] = this._jobCloudFiles.getValue();
+      cloudFiles.push(cloudFile);
+      this._jobCloudFiles.next(cloudFiles);
+  }
+
+  public removeJobCloudFile(cloudFile: CloudFileInformation): void {
+    let cloudFiles: any[] = this._jobCloudFiles.getValue();
+    cloudFiles.forEach((item, index) => {
+      if(item === cloudFile) {
+          cloudFiles.splice(index, 1);
+      }
+    });
+    this._jobCloudFiles.next(cloudFiles);
+  }
+
+  /**
+   * Update the user's current job object with job.
+   *
+   * @param job The new Job object
+   * @returns The new Job object
+   */
+  public updateJob(job: Job): Job {
+    this._job.next(job);
+    return job;
+  }
+
+  /**
+   * Return the current state of the user Job object.
+   */
+  public getJob(): Job {
+    return this._job.getValue();
+  }
+
+  /**
+   * Return a new, empty Job object.
+   */
+  public createEmptyJob(initialValues = {}): Job {
+    const job = {
+        id: null,
+        name: "",
+        description: "",
+        emailAddress: "",
+        user: "",
+        submitDate: null,
+        processDate: null,
+        status: "",
+        computeVmId: "",
+        computeInstanceId: null,
+        computeInstanceType: "",
+        computeInstanceKey: "",
+        computeServiceId: "",
+        computeTypeId: "",
+        storageBaseKey: "",
+        storageServiceId: "",
+        registeredUrl: "",
+        seriesId: null,
+        emailNotification: false,
+        processTimeLog: "",
+        storageBucket: "",
+        promsReportUrl: "",
+        computeVmRunCommand: "",
+        useWalltime: false, // Not part of VEGLJob, but needed for job object UI
+        walltime: null,
+        containsPersistentVolumes: false,
+        executeDate: null,
+        jobParameters: [],
+        jobDownloads: [],
+        jobFiles: [],
+        jobSolutions: []
     }
 
+    return Object.assign(job, initialValues);
+  }
+
+  /**
+   * Load the job specified by id from the server into the current
+   * user state. By default reset the user selections (solutions and datasets)
+   * to match the loaded job. If keepUserSelections is true then do not update
+   * the current selections, and just load the job object.
+   *
+   * @param id The id for the job to load
+   * @param keepUserSelections  whether to keep current user selections (default false)
+   *
+   */
+  public loadJob(id: number, keepUserSelections = false): Observable<Job> {
+    return this.vgl.getJob(id).pipe(
+      // Update the current job object, after "decoding" any HPC style instance
+      // type into cpu/ram/fs.
+      map(job => this.updateJob(this.vgl.decodeHPCInstanceType(job))),
+
+      map(job => {
+        if (!keepUserSelections) {
+          // Update the cart with the new solutions, ignoring any existing
+          // selections, unless requested not to.
+          if (job.jobSolutions) {
+            this.vgl.getSolutions(job.jobSolutions)
+              .subscribe(solutions => this.setSolutionsCart(solutions));
+          }
+
+          // Update dataset selections unless requested not to
+          if (job.jobDownloads) {
+            this.setJobDownloads(job.jobDownloads);
+          }
+        }
+
+        return job;
+      }),
+
+      catchError((err, caught) => {
+        console.log('Failed to load job ' + id);
+        console.log(err);
+        console.log(caught);
+        return EMPTY;
+      })
+    );
+  }
+
+  /**
+   * Create and load a new empty job, keeping any existing user selections. Note
+   * that this does not persist the job object on the server.
+   */
+  public newJob(): Observable<Job> {
+    // Create a new job with a default name
+    const name = "VGL Job - " + this.datePipe.transform(new Date(), 'medium')
+    const job = this.createEmptyJob({name: name});
+
+    return of(this.updateJob(job));
+  }
 }

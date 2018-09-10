@@ -7,9 +7,7 @@ import { UserStateService } from '../../shared';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-import { Observable } from 'rxjs/Observable';
 import { forkJoin } from 'rxjs/observable/forkJoin';
-import { isNgTemplate } from '../../../../node_modules/@angular/compiler';
 
 
 @Component({
@@ -116,13 +114,13 @@ export class ConfirmDatasetsModalContent {
 
     /**
      * Edit the download options for the resource.
-     * Several iput parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.  
+     * Several input parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.  
      * If the record is book marked and has saved options, loads the downloadoptions from DB, 
      * and sets the drop down items for DownloadOptionsModal in the format (label, value)     
-     * 
-     * TODO: Do
      */
-    public editDownload(event: any,rowData: any, onlineResource: any, cswRecord: CSWRecordModel, defaultOptions: DownloadOptions, downloadOptions: DownloadOptions): void {
+    public editDownload(event: any, rowData: any, onlineResource: any,
+                        cswRecord: CSWRecordModel, defaultOptions: DownloadOptions,
+                        downloadOptions: DownloadOptions): void {
         event.stopPropagation();
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = cswRecord;
@@ -159,7 +157,6 @@ export class ConfirmDatasetsModalContent {
             });
         },() => {});
     }
-
 
 
     /**

@@ -134,7 +134,7 @@ export class JobParameter {
     name: string;
     value: string;
     type: string;
-    //parent: Job;  // XXX needed?
+    //parent: Job;
 }
 
 export class JobDownload {
@@ -151,7 +151,10 @@ export class JobDownload {
     owner: string;
     parentUrl: string;
     parentName: string;
-    onlineResource?: any;
+    // CSWRecordModels will contain one or more OnlineResourceModels, this is
+    // the one for the Job, selected as the first supported type found
+    onlineResource?: OnlineResourceModel;
+    // The associated CSW record
     cswRecord?: CSWRecordModel;
 }
 

@@ -27,8 +27,9 @@
                             title="{{ rowData.details }}">Service call to
                             <a href="{{ rowData.details }}" target="_blank">{{ rowData.details }}</a>
                         </span>
-                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote'">
-                            <button title="Edit the download options" (click)="editDownload($event,rowData.input)" >
+                        <!-- CSW record check prevents copied jobs from being edited, as these currently have no associated record -->
+                        <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote' && rowData.input.cswRecord">
+                            <button title="Edit the download options" (click)="editDownload($event, rowData.input)" >
                                 <i class="fa fa-edit"></i>
                             </button>
                         </span>

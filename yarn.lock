@@ -6018,7 +6018,7 @@ pkg-dir@^2.0.0:
 
 portal-core-ui@stuartwoodman/portal-core-ui:
   version "0.0.1"
-  resolved "https://codeload.github.com/stuartwoodman/portal-core-ui/tar.gz/7f27882de879b45709ecc6b79e1c7a9fe845bac3"
+  resolved "https://codeload.github.com/stuartwoodman/portal-core-ui/tar.gz/536c0214afce0ea830c7f78e7d8f32864e7c1597"
 
 portfinder@^1.0.13, portfinder@^1.0.9:
   version "1.0.17"

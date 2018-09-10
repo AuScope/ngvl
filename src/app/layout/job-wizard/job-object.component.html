@@ -63,7 +63,7 @@
             <div class="col-lg-10">
                 <div class="input-group">
                     <select style="width:100%;" [(ngModel)]="job.computeTypeId">
-                        <option *ngFor="let resource of resources" [value]="resource.id">{{ resource.id }}</option>
+                        <option *ngFor="let resource of resources" [value]="resource.id">{{ resource.description }}</option>
                     </select>
                 </div>
                 <small>Select a compute resource configuration that is sufficient for your needs.</small>

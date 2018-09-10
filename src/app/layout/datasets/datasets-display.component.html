@@ -28,17 +28,17 @@
                 <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" readonly style="width: 100%;">
                     {{ cswRecord.name }}
                 </label>
+                <span class="input-group-append" *ngIf="cswRecord.hasOwnProperty('geographicElements') && cswRecord.geographicElements.length>0">                        
+                        <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
+                            (dblclick)="zoomToCSWRecordBounds(cswRecord)">
+                            <i class="fa fa-search"></i>
+                        </button>
+                </span>
                 <span class="input-group-append">
                     <button class="btn btn-sm" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
                         <i class="fa fa-info-circle" style="color:blue;"></i>
                     </button>
-                </span>
-                <span class="input-group-append" *ngIf="cswRecord.hasOwnProperty('geographicElements') && cswRecord.geographicElements.length>0">                        
-                    <button class="btn btn-sm" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
-                        (dblclick)="zoomToCSWRecordBounds(cswRecord)">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </span>
+                </span>                
             </div>
         </li> 
     </div>

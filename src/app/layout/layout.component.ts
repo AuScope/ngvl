@@ -23,7 +23,8 @@ export class LayoutComponent implements OnInit {
      */
     public setMainContainerStyle(): any {
         let styles = {
-            'margin-left': this.isSidebarExpanded ? '280px' : '60px'
+            'margin-left': this.isSidebarExpanded ? '280px' : '60px',
+            'margin-right': '12px'
         }
         return styles;
     }

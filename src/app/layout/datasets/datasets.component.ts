@@ -489,4 +489,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         }
     }
 
+    /* on Dragging of the gutter betnween map and datasets search input area resize the map*/
+    onDrag(event : any) {        
+          this.olMapService.updateSize();
+    }
+
 }

@@ -12,10 +12,11 @@ import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 import {DropdownModule} from 'primeng/dropdown';
 import { DatasetsDisplayComponent } from './datasets-display.component';
-
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
   imports: [
+    AngularSplitModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

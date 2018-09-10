@@ -417,15 +417,21 @@ export class VglService {
     return this.vglPost('secure/getVmImagesForComputeService.do', params);
   }
 
-    public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
-        const options = {
-            params: {
-                computeServiceId: computeServiceId,
-                machineImageId: machineImageId
-            }
-        }
-        return this.vglRequest('secure/getVmTypesForComputeService.do', options);
-    }
+  public getComputeTypes(computeServiceId: string, machineImageId: string): Observable<ComputeType[]> {
+    const params = {
+      computeServiceId: computeServiceId,
+      machineImageId: machineImageId
+    };
+
+    return this.vglGet('secure/getVmTypesForComputeService.do', params).pipe(
+      // VGL is not consistent about whether compute types get descriptions or
+      // not. AWS for example uses "descriptive" ids and no descriptions, while
+      // Nectar has opaque ids and user-friendly descriptions. To work around
+      // this, if no description is provided then copy the id text into the
+      // description field.
+      map(this.updateComputeTypeDescriptions)
+    );
+  }
 
     public getAuditLogs(jobId: number): Observable<any> {
         const options = {
@@ -600,4 +606,13 @@ export class VglService {
     return providerId === 'nci-raijin-compute';
   }
 
+  updateComputeTypeDescriptions(computeTypes: ComputeType[]): ComputeType[] {
+    return computeTypes.map(computeType => {
+      const description = computeType.description || computeType.id;
+      return {
+        ...computeType,
+        description: description
+      };
+    });
+  }
 }

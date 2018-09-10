@@ -94,7 +94,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
           if (this.toolboxes.length > 0) {
             const toolbox = this.toolboxes[0];
             this.job.computeVmId = toolbox.imageId;
-            this.toolboxChanged(toolbox);
+            this.toolboxChanged(toolbox.imageId);
           }
         });
     }

@@ -92,27 +92,35 @@ export class JobObjectComponent implements OnDestroy, OnInit {
 
           // Select the first image in the list by default, and update resources accordingly.
           if (this.toolboxes.length > 0) {
-            const computeVmId = this.toolboxes[0].imageId;
-            this.job.computeVmId = computeVmId;
-            this.toolboxChanged(computeVmId);
+            const toolbox = this.toolboxes[0];
+            this.job.computeVmId = toolbox.imageId;
+            this.toolboxChanged(toolbox.imageId);
           }
         });
     }
   }
 
   /**
-   * When toolbox is changed and we're using a cloud compute provider, reload
-   * the available cloud resources.
+   * Update when user selects a toolbox.
    *
    * @param event the toolbox select change event
    */
-  public toolboxChanged(toolbox): void {
-    if (this.isCloudProvider(this.job.computeServiceId)) {
-      if(toolbox && toolbox !== "") {
-        this.vgl.getComputeTypes(this.job.computeServiceId, toolbox)
-          .subscribe(computeTypes => {
-            this.resources = computeTypes;
-          });
+  public toolboxChanged(imageId): void {
+    const toolbox = this.toolboxes.find(it => it.imageId == imageId);
+
+    if (toolbox) {
+      // Set the computeVmRunCommand on the job to match the new toolbox.
+      this.job.computeVmRunCommand = toolbox.runCommand;
+
+      // When toolbox is changed and we're using a cloud compute provider, reload
+      // the available cloud resources.
+      if (this.isCloudProvider(this.job.computeServiceId)) {
+        if(imageId && imageId !== "") {
+          this.vgl.getComputeTypes(this.job.computeServiceId, imageId)
+            .subscribe(computeTypes => {
+              this.resources = computeTypes;
+            });
+        }
       }
     }
   }

@@ -320,9 +320,11 @@ export class VglService {
     // Copy the properties of the job for the request parameters.
     const params = {...job};
 
-    // Remove any properties that are undefined, so they do not get included in
-    // the request parameters.
+    // Update params object so that it's properties match the parameters
+    // expected by the server.
     for (const p of Object.getOwnPropertyNames(job)) {
+      // Remove any properties that are undefined, so they do not get included in
+      // the request parameters.
       if (params[p] == undefined) {
         delete params[p];
       }

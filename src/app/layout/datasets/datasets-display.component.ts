@@ -75,7 +75,7 @@ export class DatasetsDisplayComponent {
             const bbox: [number, number, number, number] =
                 [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
             const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-            this.olMapService.displayExtent(extent);
+            this.olMapService.displayExtent(extent, 3000);
         }
     }
 

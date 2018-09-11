@@ -91,7 +91,6 @@ export class JobsComponent implements OnInit {
      */
     public refreshJobs(): void {
         this.currentPreviewObject = null;
-        //this.jobBrowser.refreshJobs();
         this.jobBrowser.refreshJobStatus();
     }
 
@@ -141,13 +140,17 @@ export class JobsComponent implements OnInit {
      * @param previewItem 
      * @param data 
      */
-    private previewFile(previewItem: PreviewItem, data: any) {
+    private previewFile(previewItem: PreviewItem, data: any, options?: any) {
         previewItem.data = data;
+        if(options) {
+            previewItem.options = options;
+        }
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
         let componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>componentRef.instance).data = previewItem.data;
+        (<PreviewComponent>componentRef.instance).options = previewItem.options;
     }
 
 
@@ -208,12 +211,13 @@ export class JobsComponent implements OnInit {
         viewContainerRef.clear();
 
         let previewItem: PreviewItem = undefined;
+        // Get the filename extension to determine type of preview required
+        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
 
         // Job log file is a special case, look for this first
         if(cloudFile.name === "vl.sh.log") {
             previewItem = this.previewItems.find(item => item.type === 'log');
         } else {
-            const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
             previewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
         }
         // If the type can't be found, we'll try plain text
@@ -248,11 +252,18 @@ export class JobsComponent implements OnInit {
         }
         // Preview text (default option if type can't be determined by extension)
         else if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+
+            const language = PlainTextPreview.selectLanguageByExtension(extension);
+            const options = {
+                theme: 'vs-light',
+                language: language
+            }
+
             this.filePreviewLoading = true;
             // TODO: Max file size to config
             this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
                 previewData => {
-                    this.previewFile(previewItem, previewData);
+                    this.previewFile(previewItem, previewData, options);
                     this.currentPreviewObject = cloudFile;
                     this.filePreviewLoading = false;
                 },

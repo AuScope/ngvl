@@ -8,6 +8,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 
+import { MonacoEditorModule } from 'ngx-monaco-editor';
+
 import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
 import { JobSubmissionDatasetsComponent } from './submission/job-submission-datasets.component';
@@ -45,6 +47,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
         OlMapModule,
         NgbDropdownModule.forRoot(),
         NgbCollapseModule.forRoot(),
+        MonacoEditorModule.forRoot(),
         ToastModule
     ],
     declarations: [

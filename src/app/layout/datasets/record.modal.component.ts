@@ -1,70 +1,71 @@
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+import { UserStateService } from '../../shared';
+import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 @Component({
     selector: 'record-modal-content',
-    templateUrl: './record.modal.component.html'
+    templateUrl: './record.modal.component.html',
+    styleUrls: ['./record.modal.component.scss']
 })
 
-export class RecordModalContent {
+export class RecordModalContent implements OnInit {
 
     @Input() record: any;
-
-    // Types of online resources
-    onlineResources: any = {
-        'NCSS': {
-            'name': 'NetCDF Subset Service',
-            'expanded': true
-        },
-        'WCS': {
-            'name': 'OGC Web Coverage Service 1.0.0',
-            'expanded': true
-        },
-        'WFS': {
-            'nme': 'OGC Web Feature Service 1.1.0',
-            'expanded': true
-        },
-        'WMS': {
-            'name': 'OGC Web Map Service 1.1.1',
-            'expanded': true
-        },
-        'WWW': {
-            'name': 'Web Link',
-            'expanded': true
-        }
-    };
+    onlineResources: any;
 
 
-    constructor(public activeModal: NgbActiveModal) { }
+    constructor(private userStateService: UserStateService,
+                private cswSearchService: CSWSearchService,
+                private modalService: NgbModal,
+                public activeModal: NgbActiveModal) { }
 
 
-    /**
-     * Get a list of online resource types for iteration
-     */
-    getOnlineResourceTypes(): string[] {
-        return Object.keys(this.onlineResources);
+    ngOnInit() {
+        this.onlineResources = this.cswSearchService.supportedOnlineResources;
     }
 
-
     /**
-     * Get all online resources of a particular resource type for a given
-     * CSW record
+     * Add remote download. Displays dialog, "OK" will create and add a
+     * remote download to the data selection service (local storage)
      * 
-     * @param cswRecord the CSW Record
-     * @param resourceType  the resource type
+     * @param cswRecord the associated CSW record
+     * @param url the URL for the remote download
      */
-    public getOnlineResources(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
-        let serviceList: OnlineResourceModel[] = [];
-        for (const onlineResource of cswRecord.onlineResources) {
-            if (onlineResource.type === resourceType) {
-                let res: OnlineResourceModel = onlineResource;
-                serviceList.push(res);
+    public addDatasetToJob(cswRecord: CSWRecordModel, url: string): void {
+        const modalRef = this.modalService.open(RemoteDatasetsModalContent);
+        modalRef.componentInstance.remoteUrl = url;
+        modalRef.result.then(jobDownload => {
+            jobDownload.cswRecord = cswRecord;
+            // Create a WWW online resource type for the remote download
+            const onlineResource: OnlineResourceModel = {
+                url: url,
+                type: "WWW",
+                name: cswRecord.name,
+                description: cswRecord.description,
+                version: "",
+                applicationProfile: "",
+                geographicElements: cswRecord.geographicElements
+
             }
-        }
-        return serviceList;
+            jobDownload.onlineResource = onlineResource;
+            this.userStateService.addJobDownload(jobDownload);
+        }, () => {});
+    }
+
+    /*
+     * Convenience methods to template to access CSWSearch Service
+     */
+    public getSupportedOnlineResourceTypes(): string[] {
+        return this.cswSearchService.getSupportedOnlineResourceTypes();
+    }
+
+    public getOnlineResourcesByType(cswRecord: CSWRecordModel, type: string): OnlineResourceModel[] {
+        return this.cswSearchService.getOnlineResourcesByType(cswRecord, type);
     }
 
 }

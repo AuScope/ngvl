@@ -20,31 +20,6 @@ import olProj from 'ol/proj';
 
 export class OlMapDataSelectComponent {
 
-    // Types of online resources
-    // TODO: repeated, move to constants
-    onlineResources: any = {
-        'NCSS': {
-            'name': 'NetCDF Subset Service',
-            'expanded': true
-        },
-        'WCS': {
-            'name': 'OGC Web Coverage Service 1.0.0',
-            'expanded': true
-        },
-        'WFS': {
-            'nme': 'OGC Web Feature Service 1.1.0',
-            'expanded': true
-        },
-        'WMS': {
-            'name': 'OGC Web Map Service 1.1.1',
-            'expanded': true
-        },
-        'WWW': {
-            'name': 'Web Link',
-            'expanded': true
-        }
-    };
-
     buttonText = 'Select Data';
 
 
@@ -86,56 +61,6 @@ export class OlMapDataSelectComponent {
 
 
     /**
-     * Get a list of online resource types for iteration
-     * 
-     * TODO: Repeated, better off elsewhere?
-     */
-    getOnlineResourceTypes(): string[] {
-        return Object.keys(this.onlineResources);
-    }
-
-
-    /**
-     * Get all online resources of a particular resource type for a given
-     * CSW record
-     * 
-     * TODO: Repeated, better off elsewhere?
-     * 
-     * @param cswRecord the CSW Record
-     * @param resourceType  the resource type
-     */
-    public getOnlineResources(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
-        let serviceList: OnlineResourceModel[] = [];
-        for (const onlineResource of cswRecord.onlineResources) {
-            if (onlineResource.type === resourceType) {
-                let res: OnlineResourceModel = onlineResource;
-                serviceList.push(res);
-            }
-        }
-        return serviceList;
-    }
-
-   
-
-    /**
-     * Is the online resource of a supported type
-     * 
-     * @param onlineResource 
-     */
-    private isResourceSupported(onlineResource): boolean {
-        switch (onlineResource.type) {
-            case 'WCS':
-            case 'WFS':
-            case 'WWW':
-            case 'NCSS':
-                return true;
-            default:
-                return false;
-        }
-    };
-
-
-    /**
      * Builds TreeTable from supplied CSWRecords for display in the confirm
      * datasets modal
      *
@@ -161,11 +86,11 @@ export class OlMapDataSelectComponent {
 
             // Construct root resource nodes for each type of resource
             let resourceTypeNodes: TreeNode[] = [];
-            for (let resourceType in this.onlineResources) {
+            for (let resourceType in this.cswSearchService.supportedOnlineResources) {
                 let rootResourceNode: TreeNode = {};
                 rootResourceNode.data = {
                     "id": resourceType,
-                    "name": this.onlineResources[resourceType].name,
+                    "name": this.cswSearchService.supportedOnlineResources[resourceType].name,
                     "leaf": false
                 }
                 rootResourceNode.children = [];
@@ -174,17 +99,18 @@ export class OlMapDataSelectComponent {
 
             for (let record of cswRecords) {
                 let foundResourceTypeForRecord: boolean = false;
-                for (let resourceType in this.onlineResources) {
+                for (let resourceType in this.cswSearchService.supportedOnlineResources) {
                     let rootResourceNode = resourceTypeNodes.find(node => node.data['id'] === resourceType);
-                    const onlineResources: OnlineResourceModel[] = this.getOnlineResources(record, resourceType);
+                    const onlineResources: OnlineResourceModel[] = this.cswSearchService.getOnlineResourcesByType(record, resourceType);
                     if (onlineResources.length > 0) {
+                        // Get the first supported online resource
                         for (const resource of onlineResources) {
-                            if (this.isResourceSupported(resource)) {
+                            if (this.cswSearchService.isResourceSupported(resource)) {
                                 let downloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(resource, record, defaultBbox);
                                 let node: TreeNode = {};
                                 node.data = {
                                     "name": downloadOptions.name,
-                                     "url": downloadOptions.url,
+                                    "url": downloadOptions.url,
                                     "cswRecord": record,
                                     "onlineResource": resource,
                                     "defaultOptions":JSON.parse(JSON.stringify(downloadOptions)),

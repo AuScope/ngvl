@@ -6,9 +6,11 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { BookMark,Registry,DownloadOptions,JobDownload } from '../../shared/modules/vgl/models';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
+
 
 @Injectable()
 export class CSWSearchService {
@@ -18,6 +20,29 @@ export class CSWSearchService {
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();
+
+    public supportedOnlineResources: any = {
+        'NCSS': {
+            'name': 'NetCDF Subset Service',
+            'expanded': true
+        },
+        'WCS': {
+            'name': 'OGC Web Coverage Service 1.0.0',
+            'expanded': true
+        },
+        'WFS': {
+            'nme': 'OGC Web Feature Service 1.1.0',
+            'expanded': true
+        },
+        'WMS': {
+            'name': 'OGC Web Map Service 1.1.1',
+            'expanded': true
+        },
+        'WWW': {
+            'name': 'Web Link',
+            'expanded': true
+        }
+    };
 
     /**
      * Returns an array of keywords for specified service IDs
@@ -187,7 +212,8 @@ export class CSWSearchService {
      * @param defaultBbox 
      */
     public createDownloadOptionsForResource(or, cswRecord, defaultBbox): any {
-        const dsBounds = cswRecord.geographicElements.length ? cswRecord.geographicElements[0] : null;
+        // Note that remote downloads may not have an associated CSW record
+        const dsBounds = (cswRecord && cswRecord.geographicElements.length>0) ? cswRecord.geographicElements[0] : null;
 
         //Set the defaults of our new item
         let downloadOptions: DownloadOptions = {
@@ -303,5 +329,74 @@ export class CSWSearchService {
         }
     }
 
+
+    /**
+     * Get a list of online resource types for iteration
+     * 
+     * TODO: Repeated, better off elsewhere?
+     */
+    public getSupportedOnlineResourceTypes(): string[] {
+        return Object.keys(this.supportedOnlineResources);
+    }
+
+
+    /**
+     * Is the online resource of a supported type
+     * 
+     * @param onlineResource 
+     */
+    public isResourceSupported(onlineResource): boolean {
+        switch (onlineResource.type) {
+            case 'WCS':
+            case 'WFS':
+            case 'WWW':
+            case 'NCSS':
+                return true;
+            default:
+                return false;
+        }
+    };
+
+
+    /**
+     * Get all online resources of a particular resource type for a given
+     * CSW record
+     * 
+     * @param cswRecord the CSW Record
+     * @param resourceType  the resource type
+     */
+    public getOnlineResourcesByType(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
+        let serviceList: OnlineResourceModel[] = [];
+        for (const onlineResource of cswRecord.onlineResources) {
+            if (onlineResource.type === resourceType) {
+                let res: OnlineResourceModel = onlineResource;
+                serviceList.push(res);
+            }
+        }
+        return serviceList;
+    }
+
+
+    /**
+     * Return the first supported OnlineResourceModel for a given CSW Record
+     * 
+     * @param cswRecord the CSW Record containing the online resource types
+     * @return the OnlineResourceModel of the first supported resource type,
+     *         or undefined if no such type could be found
+     */
+    public getSupportedOnlineResource(cswRecord: CSWRecordModel): OnlineResourceModel {
+        for (let resourceType in this.supportedOnlineResources) {
+            const onlineResources: OnlineResourceModel[] = this.getOnlineResourcesByType(cswRecord, resourceType);
+            if (onlineResources.length > 0) {
+                // Get the first supported online resource
+                for (const resource of onlineResources) {
+                    if (this.isResourceSupported(resource)) {
+                        return resource;
+                    }
+                }
+            }
+        }
+        return undefined;
+    }
 
 }

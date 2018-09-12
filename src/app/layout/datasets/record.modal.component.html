@@ -87,7 +87,7 @@
                                 </div>
                                 <div class="row">
                                     <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
-                                    <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource.url)" style="background-color:transparent;float:right;">
+                                    <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
                                         <i class="fa fa-plus-circle" style="color:green;"></i>
                                     </button>
                                 </div>
@@ -104,3 +104,22 @@
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-secondary" (click)="activeModal.close('Close click')">Close</button>
 </div>
+
+<!-- Capture data success modal -->
+<!-- TODO: Similarly used in datasets map capture, could make a common modal -->
+<ng-template #selectedDatasetsOkModal let-c="close">
+    <div class="modal-header">
+        <h4 class="modal-title">Request Saved</h4>
+        <button type="button" class="close" aria-label="Close" (click)="c('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        Your dataset has been saved. You can either continue selecting more data or create a job
+        to process your existing selections.
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" (click)="c('New click')">New Job</button>
+        <button type="button" class="btn" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>

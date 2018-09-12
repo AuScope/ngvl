@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
@@ -18,8 +19,12 @@ export class RecordModalContent implements OnInit {
     @Input() record: any;
     onlineResources: any;
 
+    // Selections saved dialog
+    @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
-    constructor(private userStateService: UserStateService,
+
+    constructor(private router: Router,
+                private userStateService: UserStateService,
                 private cswSearchService: CSWSearchService,
                 private modalService: NgbModal,
                 public activeModal: NgbActiveModal) { }
@@ -33,27 +38,38 @@ export class RecordModalContent implements OnInit {
      * Add remote download. Displays dialog, "OK" will create and add a
      * remote download to the data selection service (local storage)
      * 
-     * @param cswRecord the associated CSW record
-     * @param url the URL for the remote download
+     * @param cswRecord the CSW record
+     * @param url the selected online resource for the record
      */
-    public addDatasetToJob(cswRecord: CSWRecordModel, url: string): void {
+    public addDatasetToJob(cswRecord: CSWRecordModel, onlineResource: OnlineResourceModel): void {
+        // Grab last part of URL for name, remove trailing '/' first if there is one
+        let url = onlineResource.url;
+        if(url.charAt(url.length - 1) === '/') {
+            url = url.slice(0, -1);
+        }
+        let name = url.substring(url.lastIndexOf('/')+1);
+        // Failing last part of URL working as a name, use the record ID
+        if(name==='') {
+            name = 'Remote_Dataset_' + cswRecord.id;
+        }
+        let description = cswRecord.name;
+        let location = './' + name;
         const modalRef = this.modalService.open(RemoteDatasetsModalContent);
-        modalRef.componentInstance.remoteUrl = url;
+        modalRef.componentInstance.remoteUrl = onlineResource.url;
+        modalRef.componentInstance.remoteName = name;
+        modalRef.componentInstance.remoteDescription = description;
+        modalRef.componentInstance.remoteLocation = location;
         modalRef.result.then(jobDownload => {
             jobDownload.cswRecord = cswRecord;
-            // Create a WWW online resource type for the remote download
-            const onlineResource: OnlineResourceModel = {
-                url: url,
-                type: "WWW",
-                name: cswRecord.name,
-                description: cswRecord.description,
-                version: "",
-                applicationProfile: "",
-                geographicElements: cswRecord.geographicElements
-
-            }
             jobDownload.onlineResource = onlineResource;
             this.userStateService.addJobDownload(jobDownload);
+            // Show success dialog
+            this.modalService.open(this.selectedDatasetsOkModal).result.then((result) => {
+                if(result==='New click') {
+                    this.router.navigate(['/wizard']);
+                    this.activeModal.close();
+                }
+            }, () => {});
         }, () => {});
     }
 

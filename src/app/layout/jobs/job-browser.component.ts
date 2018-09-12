@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ElementRef, ViewChild, Renderer } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, Renderer } from "@angular/core";
 import { Router } from "@angular/router";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -28,10 +28,9 @@ export class JobBrowserComponent implements OnInit {
     // Job selection change event
     @Output() jobSelectionChanged = new EventEmitter();
 
-    // HttpCLient request (for cancelling)
+    // HttpClient request (for cancelling)
     httpSubscription: Subscription;
     private timerSubscription: Subscription;
-    private statusSubscription: Subscription;
 
     // Job tree, columns, selection and context items
     treeJobsData: TreeNode[] = [];
@@ -96,13 +95,13 @@ export class JobBrowserComponent implements OnInit {
      */
     private createJobTreeNode(treeNode: TreeJobNode): TreeNode {
         let node: TreeNode = {};
+        node.leaf = treeNode.leaf;
         node.data = {
             "id": treeNode.id,              // Jobs only
             "seriesId": treeNode.seriesId,  // Series only
             "name": treeNode.name,
             "submitDate": treeNode.submitDate,
-            "status": treeNode.status,
-            "leaf": treeNode.leaf,
+            "status": treeNode.status
         }
         if (treeNode.hasOwnProperty('children') && treeNode.children.length > 0) {
             node.children = [];
@@ -155,7 +154,6 @@ export class JobBrowserComponent implements OnInit {
         this.selectedJob = null;
         this.httpSubscription = this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
-
                 this.treeJobsData = this.createJobsTreeNodes(treeJobs);
                 this.jobs = treeJobs.jobs;
                 this.jobsLoading = false;
@@ -172,7 +170,7 @@ export class JobBrowserComponent implements OnInit {
      * Refresh Jobs Status (Refresh button)
      */
     refreshJobStatus() {
-        this.statusSubscription = this.jobsService.getJobStatuses().subscribe(statusUpdates => {
+        this.jobsService.getJobStatuses().subscribe(statusUpdates => {
             for (var key in statusUpdates) {
                 var jobNode = this.findJobNode(statusUpdates[key].jobId);
                 if (jobNode)
@@ -203,21 +201,37 @@ export class JobBrowserComponent implements OnInit {
             }
         }
     }
+
+    /**
+     * Test if a specified TreeNode has a parent
+     * 
+     * @param node the TreeNode to test
+     * @return true if TreeNode has a parent, false otherwise
+     */
+    private nodeHasParent(node: TreeNode): boolean {
+        for(let treeJob of this.treeJobsData) {
+            if(treeJob.children && treeJob.children.findIndex(n => n === node)>-1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Build the job context menu based on job status
      */
     public createJobContextMenu(node): any[] {
         let items: any[] = [];
         //one or more job nodes are selected to move to top level
-        if (this.selectedJobNodes.length >= 1 && (node.data.id)) {
+        if (this.selectedJobNodes.length === 1 && (this.nodeHasParent(node))) {
             items.push({ label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() });
         }
         // If more than 1 item is selected, or only a series is selected, delete is only action
-        if (this.selectedJobNodes.length > 1 || !node.data.leaf) {
+        if (this.selectedJobNodes.length > 1 || !node.leaf) {
             items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
         }
         // Otherwise available actions are specific to job status
-        else if (this.selectedJobNodes.length === 1 && node.data.leaf) {
+        else if (this.selectedJobNodes.length === 1 && node.leaf) {
             const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
             if (selectedJob.status.toLowerCase() === 'active') {
                 items.push({ label: 'Cancel', icon: 'fa fa-cross', command: (event) => this.cancelSelectedJob() });
@@ -251,11 +265,15 @@ export class JobBrowserComponent implements OnInit {
      */
     public contextMenuSelected(event) {
         if (this.selectedJobNodes.indexOf(event.node) === -1) {
-            this.selectedJobNodes.push(event.node);
+            // Add to or replace selections depending on whether CTRL key was held down
+            if(event.originalEvent.ctrlKey) {
+                this.selectedJobNodes.push(event.node);
+            } else {
+                this.selectedJobNodes = [event.node];
+            }
         }
         this.jobSelected(event);
     }
-
 
 
     /**
@@ -264,12 +282,12 @@ export class JobBrowserComponent implements OnInit {
      */
     public jobSelected(event) {
         this.cancelCurrentSubscription();
-        if (event.node && event.node.data.leaf) {
+        if (event.node && event.node.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
             this.jobSelectionChanged.emit(event);
         }
         // Folder selected
-        else if (event.node && !event.node.data.leaf) {
+        else if (event.node && !event.node.leaf) {
             // TODO: Do we need ot do anything with folders?
             //console.log("Folder selected");
         }
@@ -291,10 +309,10 @@ export class JobBrowserComponent implements OnInit {
         // Deleting job, series, or multiple jobs and/or series?
         let confirmTitle = '';
         let confirmMessage: string = '';
-        if (this.selectedJobNodes.length === 1 && !this.selectedJobNodes[0].data.leaf) {
+        if (this.selectedJobNodes.length === 1 && !this.selectedJobNodes[0].leaf) {
             confirmTitle = 'Delete Series';
             confirmMessage = 'Are you sure you want to delete the folder <strong>' + this.selectedJobNodes[0].data.name + '</strong> and its jobs?';
-        } else if (this.selectedJobNodes.length === 1 && this.selectedJobNodes[0].data.leaf) {
+        } else if (this.selectedJobNodes.length === 1 && this.selectedJobNodes[0].leaf) {
             confirmTitle = 'Delete Job';
             confirmMessage = 'Are you sure you want to delete the job <strong>' + this.selectedJobNodes[0].data.name + ' </strong>?';
         } else if (this.selectedJobNodes.length > 1) {
@@ -310,7 +328,7 @@ export class JobBrowserComponent implements OnInit {
             icon: 'fa fa-trash',
             accept: () => {
                 for (let node of this.selectedJobNodes) {
-                    if (node.data.leaf) {
+                    if (node.leaf) {
                         this.cancelCurrentSubscription();
                         this.jobsService.deleteJob(node.data.id).subscribe(
                             response => {
@@ -333,7 +351,7 @@ export class JobBrowserComponent implements OnInit {
                         )
                     }
                     // Series
-                    else if (!node.data.leaf) {
+                    else if (!node.leaf) {
                         this.cancelCurrentSubscription();
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
                             response => {
@@ -451,7 +469,7 @@ export class JobBrowserComponent implements OnInit {
      */
     public editSelectedJob(): void {
       if (this.selectedJob) {
-        this.router.navigate(['/wizard/job', this.selectedJob.id]);
+        this.router.navigate(['/wizard/job/' + this.selectedJob.id]);
       }
     }
 
@@ -459,7 +477,6 @@ export class JobBrowserComponent implements OnInit {
     /**
      * move selected job to the top level(job context menu)
      */
-
     public moveSelectedJob(): void {
         let rootNode: TreeNode = {};
         rootNode.data = {
@@ -596,7 +613,7 @@ export class JobBrowserComponent implements OnInit {
      * @param node
      */
     handleDragstart(node: any, event: any) {
-        if (node && node.data.leaf) {
+        if (node && node.leaf) {
             //set as firefox does not fire drag and drop without this statement
             event.dataTransfer.setData("text", node.data.id);
             let index = this.selectedJobNodes.findIndex(elem => elem.data.id === node.data.id)

@@ -5,7 +5,7 @@
         <div class="bounce3"></div>
     </div>
     <div *ngIf="treeJobsData.length > 0 && !jobsLoading" class="job-browser-table">
-        <p-treeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true" [rows]="10" selectionMode="{{ selectionMode }}"
+        <p-treeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]" selectionMode="{{ selectionMode }}"
             [(selection)]="selectedJobNodes" [(contextMenuSelection)]="selectedContextNode" metaKeySelection="true" (onNodeSelect)="jobSelected($event)"
             (onContextMenuSelect)="contextMenuSelected($event)" [contextMenu]="jobContextMenu">
             <ng-template pTemplate="header" let-columns>
@@ -20,8 +20,8 @@
                     (dragstart)="handleDragstart(rowNode.node,$event)">
                     <td>
                         <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-                        <i *ngIf="!rowNode.node.data.leaf && !rowNode.node.expanded" class="fa fa-folder">&nbsp;</i>                       
-                        <i *ngIf="!rowNode.node.data.leaf && rowNode.node.expanded" class="fa fa-folder-open">&nbsp;</i>                       
+                        <i *ngIf="!rowNode.node.leaf && !rowNode.node.expanded" class="fa fa-folder">&nbsp;</i>                       
+                        <i *ngIf="!rowNode.node.leaf && rowNode.node.expanded" class="fa fa-folder-open">&nbsp;</i>                       
                         <span title="{{ rowData.name }}">{{ rowData.name }}</span>
                     </td>
                     <td>{{ rowData.submitDate | date:'medium' }}</td>

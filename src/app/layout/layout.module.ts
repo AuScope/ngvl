@@ -23,22 +23,26 @@ import { JobWizardModule } from './job-wizard/job-wizard.module';
 
 
 @NgModule({
-    imports: [
-        PortalCorePipesModule,
-        CommonModule,
-        FormsModule,
-        LayoutRoutingModule,
-        TranslateModule,
-        NgbModule.forRoot(),
-        SolutionsModule,
-        DatasetsModule,
-        JobsModule,
-        UserModule,
-        OverlayPanelModule,
-        JobWizardModule
-    ],
-    declarations: [ LayoutComponent, SidebarComponent, HeaderComponent, RecordModalContent ],
-    providers: [ CSWSearchService ],
-    entryComponents: [ RecordModalContent ]
+  imports: [
+    PortalCorePipesModule,
+    CommonModule,
+    FormsModule,
+    LayoutRoutingModule,
+    TranslateModule,
+    NgbModule.forRoot(),
+    SolutionsModule,
+    DatasetsModule,
+    JobsModule,
+    UserModule,
+    OverlayPanelModule,
+    JobWizardModule
+  ],
+  declarations: [
+    LayoutComponent,
+    SidebarComponent,
+    HeaderComponent,
+    RecordModalContent ],
+  providers: [ CSWSearchService ],
+  entryComponents: [ RecordModalContent ]
 })
 export class LayoutModule {}

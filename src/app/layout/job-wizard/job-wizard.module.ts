@@ -8,7 +8,7 @@ import { JobWizardRoutingModule } from './job-wizard-routing.module';
 import { JobWizardComponent } from './job-wizard.component';
 
 import { JobsModule } from '../jobs/jobs.module';
-import { SolutionsModule } from '../solutions/solutions.module';
+import { SolutionsModule } from '../../shared/modules';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 import { JobSolutionVarsComponent } from './job-solution-vars.component';
 import { SolutionVarBindingComponent } from './solution-var-binding.component';

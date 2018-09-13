@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Solution } from '../../shared/modules/vgl/models';
-import { UserStateService } from '../../shared';
+import { Solution } from '../vgl/models';
+import { UserStateService } from '../../services';
 
 @Component({
   selector: 'app-solutions-cart',
@@ -10,13 +10,20 @@ import { UserStateService } from '../../shared';
   styleUrls: ['./solutions-cart.component.scss']
 })
 export class SolutionsCartComponent implements OnInit {
+  @Input() selected: string;
+  @Output() selectedChange = new EventEmitter<string>();
 
   cart$: Observable<Solution[]>;
 
-  constructor(private userStateService: UserStateService) { }
+  constructor(private userStateService: UserStateService) {}
 
   ngOnInit() {
     this.cart$ = this.userStateService.selectedSolutions;
+  }
+
+  selectSolution(solution: Solution) {
+    this.selected = solution.id;
+    this.selectedChange.emit(this.selected);
   }
 
   removeSolution(solution: Solution) {

@@ -64,9 +64,13 @@ export class UserStateService {
         this.vgl.user.subscribe(
             user => {
                 // If full name is empty (as with AAF login), use email address as name
-                if (user.fullName == undefined || user.fullName === "") {
+                if (user.fullName === undefined || user.fullName === "") {
                     user.fullName = user.email;
                 }
+                // For a new user AWS details may be null, set to empty string if so
+                user.arnExecution = user.arnExecution ? user.arnExecution : "";
+                user.arnStorage = user.arnStorage ? user.arnStorage : "";
+                user.awsKeyName = user.awsKeyName ? user.awsKeyName : "";
                 this._user.next(user);
                 // Update NCI details (if they exist)
                 this.vgl.nciDetails.subscribe(

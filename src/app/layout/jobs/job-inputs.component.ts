@@ -1,9 +1,9 @@
-import { Component, Input, Output, EventEmitter, OnChanges } from "@angular/core";
+import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, OnInit } from "@angular/core";
 import { CloudFileInformation, JobDownload, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { saveAs } from 'file-saver/FileSaver';
 import { Subscription } from "rxjs";
-
+import { TimerObservable } from "rxjs/observable/TimerObservable";
 
 @Component({
     selector: 'job-inputs',
@@ -12,7 +12,7 @@ import { Subscription } from "rxjs";
 })
 
 
-export class JobInputsComponent implements OnChanges {
+export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
 
     // Selected job the inputs will be retrieved for
     @Input() public selectedJob: Job = null;
@@ -51,9 +51,22 @@ export class JobInputsComponent implements OnChanges {
         { field: 'size', header: 'Details' }
     ]
 
+    private fileUpdateSubscription: Subscription;
 
     constructor(private jobsService: JobsService) { }
 
+
+    ngOnInit() {        
+        let timer = TimerObservable.create(0, 60000);
+        this.fileUpdateSubscription = timer.subscribe(timer => {
+            this.resetInputsForSelectedJob();
+            console.log("Refreshing ........!");
+        })
+    }
+
+    ngOnDestroy() {
+        this.fileUpdateSubscription.unsubscribe();
+    }
 
     /**
      * Reset input details when job is changed

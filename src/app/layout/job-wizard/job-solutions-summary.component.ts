@@ -28,25 +28,6 @@ import {
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
 import { HttpClient } from '@angular/common/http';
 
-class SolutionSummary implements Solution {
-  public entryType: 'Solution';
-  public '@id': string;
-  public created_at: Date;
-  public author: string;
-  public name: string;
-  public description: string;
-  public url: string;
-  public icon?: string;
-  public problem: Problem;
-  public dependencies: Dependency[];
-  public template: string;
-  public variables: Variable[];
-
-  constructor(public isActive: boolean) {}
-
-  get id(): string { return this['@id']; }
-}
-
 @Component({
   selector: 'app-job-solutions-summary',
   templateUrl: './job-solutions-summary.component.html',
@@ -54,15 +35,24 @@ class SolutionSummary implements Solution {
 })
 export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
-  solutions: SolutionSummary[];
-  activeSolution: SolutionSummary;
+  solutions: Solution[];
+  activeSolution: string;
 
   template: string = '';
   varBindings: SolutionVarBindings = {};
 
+  isTemplateEditorCollapsed = true;
+
   editorOptions = {
     theme: 'vs-light',
-    language: 'python'
+    language: 'python',
+
+    // We don't need this enabled if we use *ngIf to show/hide the editor. With
+    // ngbCollapse it is required. Resizing the browser window still works
+    // either way, so prefer the slight hit of re-adding the editor component
+    // each time over a busy-loop polling for changes with the below enabled.
+    //
+    // automaticLayout: true
   };
 
   private solutionsSubscription;
@@ -73,15 +63,22 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
               private http: HttpClient) {}
 
   ngOnInit() {
-    this.solutionsSubscription = this.userStateService.selectedSolutions.pipe(
-      // Map each Solution to a SolutionSummary so we get the nice id accessor.
-      map((solutions: Solution[]) => solutions.map(solution => {
-        return Object.assign(new SolutionSummary(false), solution);
-      }))
-    ).subscribe(solutions => {
-      this.solutions = solutions;
-      this.mergeBindings(solutions);
-    });
+    this.solutionsSubscription = this.userStateService.selectedSolutions
+      .subscribe(solutions => {
+        // Update our solutions array
+        this.solutions = solutions;
+
+        // Merge bindings for any new solutions with existing bindings, which
+        // will also update the template.
+        this.mergeBindings(solutions);
+
+        // If the user hasn't selected a solution that is in the new list then
+        // select the first one by default.
+        if (!this.activeSolution ||
+            !this.solutions.find(s => s.id === this.activeSolution)) {
+          this.activeSolution = this.solutions[0].id;
+        }
+      });
 
     this.bindingsSubscription = this.vbs.templateBindings
       .subscribe(bindings => {
@@ -97,14 +94,6 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
     if (this.bindingsSubscription) {
       this.bindingsSubscription.unsubscribe();
     }
-  }
-
-  activateSolution(solution: SolutionSummary) {
-    if (this.activeSolution) {
-      this.activeSolution.isActive = false;
-    }
-    solution.isActive = true;
-    this.activeSolution = solution;
   }
 
   updateBindings(solution: Solution, bindings: VarBinding<any>[]) {
@@ -143,23 +132,17 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
       // Catch http errors
       catchError(err => {
-        console.log('Request error in job-template-component: ' + err.message);      
+        console.log('Request error in job-template-component: ' + err.message);
         return Observable.of<string>('');
       })
     );
-  }
-
-  removeSolution(solution: Solution) {
-    if (solution) {
-      this.userStateService.removeSolutionFromCart(solution);
-    }
   }
 
   /**
    * Reset the solution variable bindings based on the new solutions, merging in
    * any existing bindings the user has set for the given solutions.
    */
-  mergeBindings(solutions: SolutionSummary[]) {
+  mergeBindings(solutions: Solution[]) {
     let varBindings = {...this.varBindings};
 
     solutions.forEach(solution => {

@@ -5153,9 +5153,9 @@ ng2-charts@^1.6.0:
   dependencies:
     chart.js "^2.6.0"
 
-ngx-monaco-editor@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/ngx-monaco-editor/-/ngx-monaco-editor-5.0.0.tgz#4afbe93a21cd88bf64db83478c52b78edf937a2f"
+ngx-monaco-editor@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/ngx-monaco-editor/-/ngx-monaco-editor-6.0.0.tgz#c427c9a3d6dcd91b8e51a47d6cb3f7b7df899de5"
 
 nice-try@^1.0.4:
   version "1.0.5"

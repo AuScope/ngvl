@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-import { Observable, of, throwError, combineLatest, forkJoin } from 'rxjs';
+import { Observable, of, throwError, combineLatest, forkJoin, EMPTY } from 'rxjs';
 import { catchError, mergeMap, switchMap, map } from 'rxjs/operators';
 
-import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType, Entry } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -69,10 +69,23 @@ export class VglService {
         return this.vglRequest('secure/getUser.do');
     }
 
-    public get problems(): Observable<Problem[]> {
-        return this.vglRequest('secure/getProblems.do')
-            .map((problems: Problems) => problems.configuredProblems);
-    }
+  public get problems(): Observable<Problem[]> {
+    return this.vglRequest('secure/getProblems.do').pipe(
+      // Unwrap the problems from the response.
+      map((resp: Problems) => resp.configuredProblems),
+
+      // As a convenience, update the '@id' properties into 'id' properties.
+      map((problems: Problem[]) => {
+        problems.forEach(problem => {
+          problem.id = problem['@id'];
+          if (problem.solutions) {
+            problem.solutions.forEach(solution => solution.id = solution['@id']);
+          }
+        });
+        return problems;
+      })
+    );
+  }
 
     public get treeJobs(): Observable<TreeJobs> {
         return this.vglRequest('secure/treeJobs.do');
@@ -496,9 +509,19 @@ export class VglService {
         return this.vglRequest('getFeatureRequestOutputFormats.do', options);
     }
 
-    public getEntry<T>(url: string): Observable<T> {
-        return url ? this.http.get<T>(url) : Observable.empty();
+  public getEntry<T extends Entry>(url: string): Observable<T> {
+    if (!url) {
+      return EMPTY;
     }
+
+    return this.http.get<T>(url).pipe(
+      // As a convenience, copy the '@id' property into the 'id' property.
+      map(entry => {
+        entry.id = entry['@id'];
+        return entry;
+      })
+    );
+  }
 
     public getSolution(url: string): Observable<Solution> {
         return this.getEntry<Solution>(url);

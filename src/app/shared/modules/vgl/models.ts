@@ -92,6 +92,7 @@ export interface Entry {
   url: string;
   icon?: string;
   '@id': string;
+  id: string;
 }
 
 export interface Problem extends Entry {

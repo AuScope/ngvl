@@ -1,33 +1,21 @@
-<div *ngIf="solutions; else noSolutions">
-  <div class="row"> 
+<div>
+  <div class="row">
     <div class="col-md-4">
-        <a [routerLink]="['/solutions']" role="button" class="btn btn-secondary">Choose a solution</a>         
-      <div *ngIf="solutions.length > 0; else noSolutions" class="list-group">
-        <br/>
-        <button *ngFor="let solution of solutions"
-          type="button"
-          class="list-group-item list-group-item-action flex-column align-items-start"
-          [class.active]="solution.isActive"
-          (click)="activateSolution(solution)">
-          <div class="d-flex w-100 justify-content-between" style="width:100%">
-            <h5 class="mb-1">{{ solution.name }}</h5>
-            <small>
-              <a role="button" (click)="removeSolution(solution)">
-                <i class="fa fa-times"></i>
-              </a>
-            </small>
-          </div>
-          <p class="mb-1" [ngbCollapse]="!solution.isActive">
-            {{ solution.description }}
-          </p>
-        </button>
-        <br/>
-      </div>
+      <app-solutions-cart *ngIf="solutions.length > 0; else noSolutions" [(selected)]="activeSolution"></app-solutions-cart>
+      <a [routerLink]="['/solutions']" role="button" class="btn btn-primary btn-sm">Add a solution</a>
+      <button type="button" class="btn btn-primary btn-sm"
+              (click)="isTemplateEditorCollapsed = !isTemplateEditorCollapsed"
+              [attr.aria-expanded]="!isTemplateEditorCollapsed"
+              aria-controls="collapseTemplateEditor">
+        {{ isTemplateEditorCollapsed ? 'Edit' : 'Hide' }} template
+        <span *ngIf="!isTemplateEditorCollapsed" aria-hidden="true" title="Edit template">&times;</span>
+        <i *ngIf="isTemplateEditorCollapsed" class="fa fa-fw fa-angle-down" title="Hide template"></i>
+      </button>
     </div>
-    <div class="col-md-8">    
+    <div class="col-md-8">
       <app-job-solution-vars
         *ngFor="let solution of solutions"
-        [ngbCollapse]="!solution.isActive"
+        [ngbCollapse]="solution.id !== activeSolution"
         [solution]="solution"
         [bindings]="varBindings[solution.id]"
         (bindingsChange)="updateBindings(solution, $event)"></app-job-solution-vars>
@@ -36,11 +24,16 @@
 
   <div class="row">
     <div class="col-md-12">
-      <ngx-monaco-editor class="template-code-editor" [options]="editorOptions" [(ngModel)]="template"></ngx-monaco-editor>
+      <!-- Don't use ngbCollapse here becuase the ngx-monaco-editor doesn't size correctly unless we use the automaticLayout option. -->
+      <div *ngIf="!isTemplateEditorCollapsed" id="collapseTemplateEditor">
+        <ngx-monaco-editor class="template-code-editor" [options]="editorOptions" [(ngModel)]="template"></ngx-monaco-editor>
+      </div>
     </div>
   </div>
 </div>
 
 <ng-template #noSolutions>
-  <p class="missing-info">No solution has been selected for this job. Please choose a solution to provide the template, then return here to create a new job.</p>  
+  <p class="missing-info">
+    No solution has been selected for this job. Please choose a solution to provide the template, then return here to create a new job.
+  </p>
 </ng-template>

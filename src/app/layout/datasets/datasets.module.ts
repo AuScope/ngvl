@@ -13,6 +13,8 @@ import { TreeTableModule } from 'primeng/treetable';
 import {DropdownModule} from 'primeng/dropdown';
 import { DatasetsDisplayComponent } from './datasets-display.component';
 import { AngularSplitModule } from 'angular-split';
+import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+
 
 @NgModule({
   imports: [
@@ -32,7 +34,7 @@ import { AngularSplitModule } from 'angular-split';
     NgbTypeaheadModule.forRoot(),
     NgbTabsetModule.forRoot()
   ],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent, DatasetsDisplayComponent],
-  entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent ]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent, DatasetsDisplayComponent, RemoteDatasetsModalContent],
+  entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent, RemoteDatasetsModalContent ]
 })
 export class DatasetsModule { }

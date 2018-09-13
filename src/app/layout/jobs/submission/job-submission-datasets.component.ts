@@ -9,6 +9,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
+import { RemoteDatasetsModalContent } from '../../datasets/remote-datasets.modal.component';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 @Component({
@@ -308,33 +310,29 @@ export class JobSubmissionDatasetsComponent {
 
 
     /**
-     * Add remote download. Displays dialog, on "OK" will create and add a
+     * Add remote download. Displays dialog, "OK" will create and add a
      * remote download to the data selection service (local storage)
      * 
      * @param content the add remote download modal, defined in HTML
      */
-    public showAddRemoteDownloadDialog(content): void {
-        this.modalService.open(content).result.then((result) => {
-            if (result === 'OK click') {
-                const jobDownload: JobDownload = {
-                    name: this.remoteName,
-                    description: this.remoteDescription,
-                    url: this.remoteUrl,
-                    localPath: this.remoteLocation,
-                    northBoundLatitude: -1,
-                    southBoundLatitude: -1,
-                    eastBoundLongitude: -1,
-                    westBoundLongitude: -1,
-                    owner: '',
-                    parentUrl: '',
-                    parentName: '',
-                    parent: undefined   // No Job associated with this download at this stage
-                }
-                this.addJobDownloadToTree(jobDownload);
-                this.userStateService.addJobDownload(jobDownload);
-                this.loadJobInputs();
+    public showAddRemoteDownloadDialog(): void {
+        this.modalService.open(RemoteDatasetsModalContent).result.then((jobDownload) => {
+            // Create an online resource object fro the download
+            const onlineResource: OnlineResourceModel = {
+                url: jobDownload.url,
+                type: "WWW",
+                name: jobDownload.name,
+                description: jobDownload.description,
+                version: "",
+                applicationProfile: "",
+                geographicElements: []
+
             }
-        });
+            jobDownload.onlineResource = onlineResource;
+            this.addJobDownloadToTree(jobDownload);
+            this.userStateService.addJobDownload(jobDownload);
+            this.loadJobInputs();
+        }, () => {});
     }
 
 
@@ -360,6 +358,7 @@ export class JobSubmissionDatasetsComponent {
 
     /**
      * Edit Download options and update the jobdownload object.
+     * 
      * @param jobDownload 
      */
     public editDownload(event: any, jobDownload: JobDownload): void {
@@ -367,21 +366,23 @@ export class JobSubmissionDatasetsComponent {
         const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = jobDownload.cswRecord;
         modelRef.componentInstance.onlineResource = jobDownload.onlineResource;
-        //checks if a csw record belongs to a bookmarked dataset
-        let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(jobDownload.cswRecord);
-        modelRef.componentInstance.isBMarked = isBookMarkRecord;
         let defaultBbox: any = { eastBoundLongitude: jobDownload.eastBoundLongitude, northBoundLatitude: jobDownload.northBoundLatitude, southBoundLatitude: jobDownload.southBoundLatitude, westBoundLongitude: jobDownload.westBoundLongitude };
-        let downloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(jobDownload.onlineResource, jobDownload.cswRecord, defaultBbox);
-        modelRef.componentInstance.defaultDownloadOptions = JSON.parse(JSON.stringify(downloadOptions));
-        downloadOptions.name = jobDownload.name;
-        downloadOptions.description = jobDownload.description;
-        downloadOptions.localPath = jobDownload.localPath;
-        downloadOptions.url = jobDownload.url;
-        downloadOptions.northBoundLatitude = jobDownload.northBoundLatitude;
-        downloadOptions.southBoundLatitude = jobDownload.southBoundLatitude;
-        downloadOptions.eastBoundLongitude = jobDownload.eastBoundLongitude;
-        downloadOptions.westBoundLongitude = jobDownload.westBoundLongitude;
-        modelRef.componentInstance.downloadOptions = downloadOptions;
+
+        //checks if a csw record belongs to a bookmarked dataset
+        let isBookMarkRecord: boolean = jobDownload.cswRecord !== undefined ? this.cswSearchService.isBookMark(jobDownload.cswRecord) : false;
+        modelRef.componentInstance.isBMarked = isBookMarkRecord;
+        let defaultDownloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(jobDownload.onlineResource, jobDownload.cswRecord, defaultBbox);
+        modelRef.componentInstance.defaultDownloadOptions = JSON.parse(JSON.stringify(defaultDownloadOptions));
+        
+        defaultDownloadOptions.name = jobDownload.name;
+        defaultDownloadOptions.description = jobDownload.description;
+        defaultDownloadOptions.localPath = jobDownload.localPath;
+        defaultDownloadOptions.url = jobDownload.url;
+        defaultDownloadOptions.northBoundLatitude = jobDownload.northBoundLatitude;
+        defaultDownloadOptions.southBoundLatitude = jobDownload.southBoundLatitude;
+        defaultDownloadOptions.eastBoundLongitude = jobDownload.eastBoundLongitude;
+        defaultDownloadOptions.westBoundLongitude = jobDownload.westBoundLongitude;
+        modelRef.componentInstance.downloadOptions = defaultDownloadOptions;
         modelRef.componentInstance.defaultDownloadOptions.bookmarkOptionName = 'Default Options';
         modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: modelRef.componentInstance.defaultDownloadOptions });
         if (isBookMarkRecord) {
@@ -400,13 +401,13 @@ export class JobSubmissionDatasetsComponent {
         //after the user conforim changes update the job download object 
         modelRef.result.then((userResponse) => {
             this.userStateService.removeJobDownload(jobDownload);
-            if (jobDownload.onlineResource && downloadOptions) {
-                this.cswSearchService.makeJobDownload(jobDownload.onlineResource, jobDownload.cswRecord, downloadOptions).subscribe(data => {
+            if (jobDownload.onlineResource && defaultDownloadOptions) {
+                this.cswSearchService.makeJobDownload(jobDownload.onlineResource, jobDownload.cswRecord, defaultDownloadOptions).subscribe(data => {
                     jobDownload = data;
                     this.userStateService.addJobDownload(jobDownload);
                     this.loadJobInputs();
                 });
             }
-        },() => console.log('Modal Closed!'));
+        },() => {});
     }
 }

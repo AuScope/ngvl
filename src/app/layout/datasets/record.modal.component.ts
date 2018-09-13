@@ -1,70 +1,87 @@
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+import { UserStateService } from '../../shared';
+import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 @Component({
     selector: 'record-modal-content',
-    templateUrl: './record.modal.component.html'
+    templateUrl: './record.modal.component.html',
+    styleUrls: ['./record.modal.component.scss']
 })
 
-export class RecordModalContent {
+export class RecordModalContent implements OnInit {
 
     @Input() record: any;
+    onlineResources: any;
 
-    // Types of online resources
-    onlineResources: any = {
-        'NCSS': {
-            'name': 'NetCDF Subset Service',
-            'expanded': true
-        },
-        'WCS': {
-            'name': 'OGC Web Coverage Service 1.0.0',
-            'expanded': true
-        },
-        'WFS': {
-            'nme': 'OGC Web Feature Service 1.1.0',
-            'expanded': true
-        },
-        'WMS': {
-            'name': 'OGC Web Map Service 1.1.1',
-            'expanded': true
-        },
-        'WWW': {
-            'name': 'Web Link',
-            'expanded': true
-        }
-    };
+    // Selections saved dialog
+    @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
 
-    constructor(public activeModal: NgbActiveModal) { }
+    constructor(private router: Router,
+                private userStateService: UserStateService,
+                private cswSearchService: CSWSearchService,
+                private modalService: NgbModal,
+                public activeModal: NgbActiveModal) { }
 
 
-    /**
-     * Get a list of online resource types for iteration
-     */
-    getOnlineResourceTypes(): string[] {
-        return Object.keys(this.onlineResources);
+    ngOnInit() {
+        this.onlineResources = this.cswSearchService.supportedOnlineResources;
     }
 
-
     /**
-     * Get all online resources of a particular resource type for a given
-     * CSW record
+     * Add remote download. Displays dialog, "OK" will create and add a
+     * remote download to the data selection service (local storage)
      * 
-     * @param cswRecord the CSW Record
-     * @param resourceType  the resource type
+     * @param cswRecord the CSW record
+     * @param url the selected online resource for the record
      */
-    public getOnlineResources(cswRecord: CSWRecordModel, resourceType: string): OnlineResourceModel[] {
-        let serviceList: OnlineResourceModel[] = [];
-        for (const onlineResource of cswRecord.onlineResources) {
-            if (onlineResource.type === resourceType) {
-                let res: OnlineResourceModel = onlineResource;
-                serviceList.push(res);
-            }
+    public addDatasetToJob(cswRecord: CSWRecordModel, onlineResource: OnlineResourceModel): void {
+        // Grab last part of URL for name, remove trailing '/' first if there is one
+        let url = onlineResource.url;
+        if(url.charAt(url.length - 1) === '/') {
+            url = url.slice(0, -1);
         }
-        return serviceList;
+        let name = url.substring(url.lastIndexOf('/')+1);
+        // Failing last part of URL working as a name, use the record ID
+        if(name==='') {
+            name = 'Remote_Dataset_' + cswRecord.id;
+        }
+        let description = cswRecord.name;
+        let location = './' + name;
+        const modalRef = this.modalService.open(RemoteDatasetsModalContent);
+        modalRef.componentInstance.remoteUrl = onlineResource.url;
+        modalRef.componentInstance.remoteName = name;
+        modalRef.componentInstance.remoteDescription = description;
+        modalRef.componentInstance.remoteLocation = location;
+        modalRef.result.then(jobDownload => {
+            jobDownload.cswRecord = cswRecord;
+            jobDownload.onlineResource = onlineResource;
+            this.userStateService.addJobDownload(jobDownload);
+            // Show success dialog
+            this.modalService.open(this.selectedDatasetsOkModal).result.then((result) => {
+                if(result==='New click') {
+                    this.router.navigate(['/wizard']);
+                    this.activeModal.close();
+                }
+            }, () => {});
+        }, () => {});
+    }
+
+    /*
+     * Convenience methods to template to access CSWSearch Service
+     */
+    public getSupportedOnlineResourceTypes(): string[] {
+        return this.cswSearchService.getSupportedOnlineResourceTypes();
+    }
+
+    public getOnlineResourcesByType(cswRecord: CSWRecordModel, type: string): OnlineResourceModel[] {
+        return this.cswSearchService.getOnlineResourcesByType(cswRecord, type);
     }
 
 }

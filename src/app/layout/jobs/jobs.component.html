@@ -7,23 +7,20 @@
         <!-- Job tree -->
         <split direction='horizontal'>
             <split-area size="30">
-                <div class="col" style="padding: 0px; width: 100%;">
-                    <div class="card" style="padding: 0px; width: 100%; height: 100%; border-radius: 0px;">
-                        <div class="card-header">Your Jobs</div>
-                        <div class="card-body" style="overflow-y:auto;padding:0px;">
-                            <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
-                        </div>
-                        <div class="card-footer">
-                            <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
-                                <i class="fa fa-refresh">&nbsp;Refresh</i>
-                            </button>
-                            <button class="btn btn-sm pull-right" (click)="showAddFolderModal(addFolderModal)">
-                                <i class="fa fa-folder">&nbsp;Add Folder</i>
-                            </button>
-                        </div>
+                <div class="card" style="padding: 0px; width: 100%; height: 100%; border-radius: 0px;">
+                    <div class="card-header">Your Jobs</div>
+                    <div class="card-body" style="overflow-y:auto;padding:0px;">
+                        <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
+                            <i class="fa fa-refresh">&nbsp;Refresh</i>
+                        </button>
+                        <button class="btn btn-sm pull-right" (click)="showAddFolderModal(addFolderModal)">
+                            <i class="fa fa-folder">&nbsp;Add Folder</i>
+                        </button>
                     </div>
                 </div>
-
             </split-area>
             <split-area size="70">
                 <!-- Selected job -->

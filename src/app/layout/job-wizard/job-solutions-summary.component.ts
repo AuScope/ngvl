@@ -65,8 +65,19 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   ngOnInit() {
     this.solutionsSubscription = this.userStateService.selectedSolutions
       .subscribe(solutions => {
+        // Update our solutions array
         this.solutions = solutions;
+
+        // Merge bindings for any new solutions with existing bindings, which
+        // will also update the template.
         this.mergeBindings(solutions);
+
+        // If the user hasn't selected a solution that is in the new list then
+        // select the first one by default.
+        if (!this.activeSolution ||
+            !this.solutions.find(s => s.id === this.activeSolution)) {
+          this.activeSolution = this.solutions[0].id;
+        }
       });
 
     this.bindingsSubscription = this.vbs.templateBindings

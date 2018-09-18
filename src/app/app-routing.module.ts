@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
-import { AuthGuard } from './shared';
 import { LandingpageComponent } from './landingpage/landingpage.component';
 
 const routes: Routes = [

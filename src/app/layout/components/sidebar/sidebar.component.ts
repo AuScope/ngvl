@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { UserStateService, ViewType } from '../../../shared';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 
 
 
@@ -24,7 +25,7 @@ export class SidebarComponent implements OnInit {
     @Input() isSidebarExpanded: boolean;
 
 
-    constructor(private userStateService: UserStateService) {
+    constructor(private userStateService: UserStateService, private olMapService: OlMapService) {
     }
 
 
@@ -48,6 +49,10 @@ export class SidebarComponent implements OnInit {
      */
     public setExpanded(expanded: boolean): void {
         this.sidebarExpansionEvent.emit(expanded);
+        // Update map size after, skip a tick to ensure it happens after Sidebar UI update
+        setTimeout(() => {
+            this.olMapService.updateSize();
+        });
     }
 
 

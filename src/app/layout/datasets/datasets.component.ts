@@ -50,9 +50,11 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     availableKeywords: string[] = [];   // List of available keywords
     selectedKeywords: string[] = [""];  // Chosen keywords for filtering
     availableServices: any = [];
-    dateTo: any = null;
-    dateFrom: any = null;
+    dateTo: Date = null;
+    dateFrom: Date = null;
     availableRegistries: Registry[] = [];
+
+    currentYear: number = 2018;
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     click$ = new Subject<string>();
@@ -75,6 +77,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     ngOnInit() {
         this.userStateService.setView(DATA_VIEW);
+        this.currentYear = (new Date()).getFullYear();
         // Load available registries
         this.cswSearchService.updateRegistries().subscribe(data => {
             this.availableRegistries = data;
@@ -95,9 +98,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
         });
-
-
-
 
         // Define available services
         this.availableServices = [
@@ -190,10 +190,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         if (this.dateFrom != null && this.dateTo != null) {
             fields.push('datefrom');
             fields.push('dateto');
-            let fromDate = Date.parse(this.dateFrom.year + '-' + this.dateFrom.month + '-' + this.dateFrom.day);
-            let toDate = Date.parse(this.dateTo.year + '-' + this.dateTo.month + '-' + this.dateTo.day);
-            values.push(fromDate.toString());
-            values.push(toDate.toString());
+            // For some reason getMilliseconds doesn't work on these Date objects,
+            // so parse from string
+            let fromDate = Date.parse(this.dateFrom.toString());
+	        let toDate = Date.parse(this.dateTo.toString());
+	        values.push(fromDate.toString());
+	        values.push(toDate.toString());            
             types.push('date');
             types.push('date');
             comparisons.push('gt');
@@ -325,10 +327,11 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
 
     /**
-     * Re-run faceted search whenpublication dates change
+     * Re-run faceted search when publication dates change
      */
     public publicationDateChanged(): void {
         if (this.isValidDate(this.dateFrom) && this.isValidDate(this.dateTo)) {
+            console.log("Valid dates, searching...");
             this.resetFacetedSearch();
         }
     }
@@ -429,7 +432,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * @param date
      */
     private isValidDate(date): boolean {
-        if (date && date.year && date.month)
+        if (date && date.getYear() && date.getMonth())
             return true;
         return false;
     }

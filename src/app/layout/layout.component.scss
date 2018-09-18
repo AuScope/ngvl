@@ -12,6 +12,7 @@
 }
 @media screen and (max-width: 992px) {
     .main-container {
+        // Todo: this plays havoc with Sidebar on small screens
         margin-left: 0px !important;
     }
 }

@@ -1,8 +1,8 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
-    <div class="row" style="margin-left:0px;overflow-y:auto;overflow-x:hidden;padding:0px;height:calc(100vh - 200px);">
-        <split (dragProgress)="onDrag($event)">
-            <split-area size="30">
+    <div class="row" style="margin-left:0px;overflow-y:auto;padding:0px;height:calc(100vh - 200px);">
+        <split class="datasets-split" (dragProgress)="onDrag($event)" style="border: 1px solid #ddd;">
+            <split-area size="30" class="split-area-search">
                 <!-- Datasets -->
                 <div class="card">
                     <ngb-tabset>
@@ -22,7 +22,7 @@
                                                     <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
                                                         [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">
                                                     <div class="input-group-btn input-group-apppend">
-                                                        <button class="btn btn-secondary" type="button" (click)="resetFacetedSearch()">
+                                                        <button class="btn btn-primary" type="button" (click)="resetFacetedSearch()">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     </div>
@@ -42,10 +42,10 @@
                                                 <div class="input-group input-group-sm">
                                                     <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
                                                     <div class="input-group-btn input-group-apppend">
-                                                        <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
+                                                        <button class="btn btn-primary" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
                                                             <i class="fa fa-eye"></i>
                                                         </button>
-                                                        <button class="btn btn-secondary" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
+                                                        <button class="btn btn-primary" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </div>
@@ -145,30 +145,20 @@
                                     </div>
                                     <!-- Publication date -->
                                     <div class="row">
-                                        <div class="col publication-date-panel">
+                                        <div class="col">
                                             <div class="submenu-header" (click)="pubDateIsCollapsed = !pubDateIsCollapsed">
                                                 <span>Publication Date</span>
                                                 <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
                                                 <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="pubDateIsCollapsed">
-                                                <div class="input-group input-group-sm">
-                                                    <label class="control-label col-sm-4 small" for="date-from">From</label>
-                                                    <!-- TODO: Validation -->
-                                                    <input class="form-control" placeholder="yyyy-mm-dd" name="dp-from" [(ngModel)]="dateFrom" ngbDatepicker #df="ngbDatepicker"
-                                                        (ngModelChange)="publicationDateChanged()">
-                                                    <div class="input-group-addon" (click)="df.toggle()">
-                                                        <span class="fa fa-calendar"></span>
-                                                    </div>
+                                                <div class="input-group input-group-sm" style="margin-top:4px;">
+                                                    <label class="control-label small" style="margin-left: 20px; width:40px;" for="date-from">From</label>
+                                                    <p-calendar [(ngModel)]="dateFrom" [baseZIndex]="9999" [style]="{'left': '0px'}" appendTo="body" placeholder="yyyy-mm-dd" (ngModelChange)="publicationDateChanged()" dateFormat="yy-mm-dd" [yearNavigator]="true" yearRange="1900:{{currentYear}}" [monthNavigator]="true" showIcon="true"></p-calendar>
                                                 </div>
-                                                <div class="input-group input-group-sm" style="position: relative;">
-                                                    <label class="control-label col-sm-4 small" for="date-to">To</label>
-                                                    <!-- TODO: Validation -->
-                                                    <input class="form-control" placeholder="yyyy-mm-dd" name="dp-to" [(ngModel)]="dateTo" ngbDatepicker #dt="ngbDatepicker"
-                                                        (ngModelChange)="publicationDateChanged()">
-                                                    <div class="input-group-addon" (click)="dt.toggle()">
-                                                        <span class="fa fa-calendar"></span>
-                                                    </div>
+                                                <div class="input-group input-group-sm" style="margin-top:4px;">
+                                                    <label class="control-label small" style="margin-left: 20px; width:40px;" for="date-to">To</label>
+                                                    <p-calendar [(ngModel)]="dateTo" [baseZIndex]="9999" [style]="{'left': '0px'}" appendTo="body" placeholder="yyyy-mm-dd" (ngModelChange)="publicationDateChanged()" dateFormat="yy-mm-dd" [yearNavigator]="true" [monthNavigator]="true" showIcon="true"></p-calendar>
                                                 </div>
                                             </div>
                                         </div>
@@ -246,21 +236,17 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </ng-template>
                         </ngb-tab>
+                        <!-- TODO: Should probably be paginated -->
                         <ngb-tab *ngIf="isValidUser() && bookMarkCSWRecords.length>0" class="card-header" title="Bookmarks">
                             <ng-template ngbTabContent>
-                                <div class="card-body">
+                                <div class="card-body bookmarks" style="padding-left:15px;padding-right:15px;">
                                     <!-- bookmarks -->
-                                    <div class="row">
-                                        <div class="col">
-                                            <div *ngIf="bookMarkCSWRecords.length>0">
-                                                <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries"
-                                                    [bookMarkList]="bookMarks" (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
-                                            </div>
-                                        </div>
+                                    <div *ngIf="bookMarkCSWRecords.length>0">
+                                        <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries"
+                                            [bookMarkList]="bookMarks" (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
                                     </div>
                                 </div>
                             </ng-template>
@@ -268,7 +254,7 @@
                     </ngb-tabset>
                 </div>
             </split-area>
-            <split-area size="70">
+            <split-area size="70" class="split-area-map">
                 <!-- Map -->
                 <!-- TODO: style in CSS -->
                 <div class="btn-group" style="position:absolute;z-index:1;margin-top:4px;margin-left:4px;">
@@ -279,7 +265,7 @@
                     <!-- Select Data button -->
                     <app-ol-map-select-data></app-ol-map-select-data>
                 </div>
-                <div style="position:absolute;z-index:1;margin-top:4px;width:400px;right:18px;">
+                <div style="position:absolute;z-index:1;margin-top:4px;width:400px;right:10px;">
                     <!-- Active Layers drop down menu -->
                     <app-ol-map-layers></app-ol-map-layers>
                 </div>

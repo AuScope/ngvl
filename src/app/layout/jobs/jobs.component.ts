@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ComponentFactoryResolver, ChangeDetectionStrategy, ChangeDetectorRef, ComponentRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver,ComponentRef, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { routerTransition } from '../../router.animations';
 import { Job, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
@@ -56,8 +56,6 @@ export class JobsComponent implements OnInit {
 
     componentRef: ComponentRef<PreviewComponent>;
 
-    @ViewChild('scroll') private myScrollContainer: ElementRef;
-
     // Will be JobDownload or CloudFileInformation, needed for preview Refresh
     currentPreviewObject: any = null;
     currentPreviewItem: PreviewItem = null;
@@ -69,38 +67,12 @@ export class JobsComponent implements OnInit {
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
         private jobsService: JobsService,
         private modalService: NgbModal,
-        private userStateService: UserStateService,
-        private cdr: ChangeDetectorRef) { }
+        private userStateService: UserStateService) { }
 
 
     ngOnInit() {
         this.userStateService.setView(JOBS_VIEW);
-    }
-
-    ngAfterViewChecked() {
-        this.scrollToBottom();
-    }
-
-    onScroll() {
-        console.log("scroll on div");
-      /*  let element = this.myScrollContainer.nativeElement
-        let atBottom = element.scrollHeight - element.scrollTop === element.clientHeight
-        if (this.disableScrollDown && atBottom) {
-            this.disableScrollDown = false
-        } else {
-            this.disableScrollDown = true
-        } */
-
-    }
-    scrollToBottom(): void {
-      /* // if (this.previewHost && this.componentRef && this.componentRef.instance.atBottom) {        
-            console.log("scroll bottom");
-          //  this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
-            //this.previewHost.viewContainerRef.element.nativeElement.scrollTop = this.previewHost.viewContainerRef.element.nativeElement.scrollHeight;            
-        if (this.myScrollContainer)         
-            this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
-        //} */
-    }
+    }   
 
     /**
      * Cancel the current HttpClient request, if any.
@@ -171,17 +143,17 @@ export class JobsComponent implements OnInit {
         if (this.currentPreviewItem) {
             if (this.currentPreviewItem && this.currentPreviewItem.type === 'image') {
                 this.currentPreviewObject = cloudFile;
-                const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
-                //this.previewFile(this.currentPreviewItem, imageUrl);
+                const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();                
                 this.componentRef.instance.data = imageUrl;
+                if(this.componentRef.instance.atBottom)
+                    this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
             }
             // Log files currently displayed as plain text, but this class will
             // allow us to make imporvements to display later (e.g. display
             // sectioned logs in tabs per section)
             else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'log')) {
                 this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
-                    logData => {
-                        //this.previewFile(this.currentPreviewItem, logData);
+                    logData => {                        
                         this.componentRef.instance.data = logData;                            
                         if(this.componentRef.instance.atBottom)
                             this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
@@ -203,15 +175,13 @@ export class JobsComponent implements OnInit {
                 const options = {
                     theme: 'vs-light',
                     language: language
-                }
-
-                // this.filePreviewLoading = true;
+                }                
                 // TODO: Max file size to config
                 this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
-                    previewData => {
-                        //this.previewFile(this.currentPreviewItem, previewData, options);
+                    previewData => {                        
                         this.componentRef.instance.data = previewData;
-                        //  this.componentRef.instance.cd.detectChanges();
+                        if(this.componentRef.instance.atBottom)
+                            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
                         this.currentPreviewObject = cloudFile;
                     },
                     error => {
@@ -241,12 +211,11 @@ export class JobsComponent implements OnInit {
         }
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        //   let componentRef = viewContainerRef.createComponent(componentFactory);
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);        
         this.componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
         (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
-        this.componentRef.changeDetectorRef.detectChanges();
+        //this.componentRef.changeDetectorRef.detectChanges();
     }
 
 

@@ -182,7 +182,9 @@ export class JobsComponent implements OnInit {
                 this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
                     logData => {
                         //this.previewFile(this.currentPreviewItem, logData);
-                        this.componentRef.instance.data = logData;
+                        this.componentRef.instance.data = logData;                            
+                        if(this.componentRef.instance.atBottom)
+                            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
                         this.currentPreviewObject = cloudFile;
                         this.filePreviewLoading = false;
                     },

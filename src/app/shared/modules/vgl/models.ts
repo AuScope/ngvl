@@ -1,6 +1,6 @@
 import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
 import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
-
+import { ElementRef } from "@angular/core";
 /*
  * User Models
  */
@@ -279,6 +279,7 @@ export interface PreviewComponent {
     data: any;
     options?: any;
     atBottom: boolean;
+    scrollElement?: any;
 }
 
 /*

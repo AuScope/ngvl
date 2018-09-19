@@ -1,4 +1,4 @@
-import { Component,HostListener,Inject } from "@angular/core";
+import { Component,HostListener,IterableDiffers,ViewChild,ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 import { DOCUMENT } from "@angular/platform-browser";
 
@@ -24,28 +24,35 @@ export class LogPreview implements PreviewComponent {
 
     atBottom: boolean = false;
 
-    constructor(@Inject(DOCUMENT) private document: Document) { }
+    @ViewChild('textarea') scrollElement: ElementRef;
 
-    ngAfterViewChecked() {     
-        if(this.atBottom) {
+    constructor(private _iterableDiffers: IterableDiffers) {
+
+       // this.iterableDiffer = this._iterableDiffers.find([]).create(null);
+     }
+
+    /*ngAfterViewChecked() {     
+      //  if(this.atBottom) {
            // this.el.nativeElement.scrollTop  = this.el.nativeElement.scrollHeight;
            // this.el.nativeElement.scrollTo({left: 0 , top: this.el.nativeElement.scrollHeight, behavior: 'smooth'});
-           document.documentElement.scrollTop = document.documentElement.scrollHeight;
-           document.documentElement.scrollIntoView();
+       //   this.textarea.nativeElement.scrollTop =    this.textarea.nativeElement.scrollHeight -   this.textarea.nativeElement.clientHeight;
+
         }        
-    }
+    } */
    
 
    @HostListener('wheel', ['$event'])       
-   onWheel($event):void {        
-    if($event.srcElement.scrollHeight - $event.srcElement.scrollTop === $event.srcElement.clientHeight) {        
-        this.atBottom = true;
-        event.preventDefault();
+   onWheel($event):void {            
+    //if($event.srcElement.scrollHeight - $event.srcElement.scrollTop === $event.srcElement.clientHeight) {        
+    if( ($event.srcElement.scrollTop + $event.srcElement.clientHeight) >  $event.srcElement.scrollHeight - 100) {        
+        this.atBottom = true;      
     }
     else
-        this.atBottom = false;
-        
-    console.log("onWheel Bottom "+this.atBottom);
+        this.atBottom = false;         
+        console.log("onWheel bottom "+this.atBottom);
+    /*    //$event.preventDefault();
+       // $event.srcElement.scrollTop =    $event.srcElement.scrollHeight -    $event.srcElement.clientHeight;
+    console.log("onWheel Bottom "+this.atBottom); */
   };  
 
 
@@ -69,9 +76,19 @@ export class LogPreview implements PreviewComponent {
     console.log("focus onFocus !!!");
   };
 
-  @HostListener('scroll', ['$event'])       
-   onScroll($event):void {  
-    console.log("scroll onScroll !!!");
+  @HostListener('arrow', ['$event'])       
+   onScrollll($event):void {  
+    console.log("arrow  onScroll !!!");
+  };
+
+  @HostListener('window:scroll', [])       
+   onwindowScroll($event):void {  
+    console.log("scroll window onScroll !!!");
+  };
+
+  @HostListener('document:scroll', ['$event'])       
+   ondocumentScroll($event):void {  
+    console.log("scroll document onScroll !!!");
   };
 
   @HostListener('loadend', ['$event'])       
@@ -93,4 +110,30 @@ onValueChange($event):void {
 onWaiting($event):void {  
  console.log("onWaiting onWaiting !!!");
 };
+
+@HostListener('resize', ['$event'])       
+onResize($event):void {  
+ console.log("onResize onResize !!!");
+};
+
+@HostListener('change', ['$event'])       
+onChange($event):void {  
+ console.log("onChange onChange !!!");
+};
+
+/*ngOnChanges(changes: SimpleChanges){    
+    if(changes.input){
+      console.log('input changed');
+    }
+  } */
+
+  onScroll(event) {      
+   //   if(event.srcElement.scrollHeight - event.srcElement.scrollTop === event.srcElement.clientHeight) {        
+    if( (event.srcElement.scrollTop + event.srcElement.clientHeight) >  event.srcElement.scrollHeight - 100) {        
+        this.atBottom = true;      
+    }
+    else
+        this.atBottom = false; 
+        console.log("onScroll bottom "+this.atBottom);
+  }
 }

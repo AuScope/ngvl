@@ -1,4 +1,4 @@
-import { Component,HostListener } from "@angular/core";
+import { Component,HostListener,ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -17,6 +17,8 @@ export class PlainTextPreview implements PreviewComponent {
         theme: 'vs-light'
     };
     atBottom: boolean = false;
+
+    @ViewChild('scrollarea') scrollElement: ElementRef;
 
     constructor() { }
 
@@ -42,8 +44,20 @@ export class PlainTextPreview implements PreviewComponent {
         return language;
     }
 
-    @HostListener('click', ['$event.target'])
-    onClick(btn) {
-        console.log('Host Element Clicked Plaintext');
-   }
+    @HostListener('wheel', ['$event'])
+    onWheel($event): void {
+        if (($event.srcElement.scrollTop + $event.srcElement.clientHeight) > $event.srcElement.scrollHeight - 100) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    };
+
+    onScroll(event) {
+        if ((event.srcElement.scrollTop + event.srcElement.clientHeight) > event.srcElement.scrollHeight - 100) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    }
 }

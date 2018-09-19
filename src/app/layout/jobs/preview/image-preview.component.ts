@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -18,6 +18,8 @@ export class ImagePreview implements PreviewComponent {
     showingImageModal: boolean = false;
 
     atBottom: boolean = false;
+
+    @ViewChild('imageModal') scrollElement: ElementRef;
 
     constructor() {
     }
@@ -49,4 +51,20 @@ export class ImagePreview implements PreviewComponent {
         return styles;
     }
 
+    @HostListener('wheel', ['$event'])
+    onWheel($event): void {
+        if (($event.srcElement.scrollTop + $event.srcElement.clientHeight) > $event.srcElement.scrollHeight - 100) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    };
+
+    onScroll(event) {
+        if ((event.srcElement.scrollTop + event.srcElement.clientHeight) > event.srcElement.scrollHeight - 100) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    }
 }

@@ -214,8 +214,7 @@ export class JobsComponent implements OnInit {
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);        
         this.componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
-        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
-        //this.componentRef.changeDetectorRef.detectChanges();
+        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;        
     }
 
 

@@ -51,9 +51,13 @@ export class JobsService {
         return this.vgl.cancelJob(jobId);
     }
 
-  public submitJob(job: Job): Observable<any> {
-    return this.vgl.submitJob(job);
-  }
+    public submitJob(job: Job): Observable<any> {
+        return this.vgl.submitJob(job);
+    }
+
+    public duplicateJob(jobId: number): Observable<Job[]> {
+        return this.vgl.duplicateJob(jobId);
+    }
 
     public getAuditLogs(jobId: number): Observable<any> {
         return this.vgl.getAuditLogs(jobId);

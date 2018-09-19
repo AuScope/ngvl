@@ -98,9 +98,7 @@ export class JobsComponent implements OnInit {
     /**
      * Job selection event from job browser
      * 
-     * TODO: Do we still need job? Using jobBrowser.selectedJob works
-     * 
-     * @param job 
+     * @param job selected Job
      */
     public jobSelected(job: Job) {
         if (job) {

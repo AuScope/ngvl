@@ -5,9 +5,11 @@
         <div class="bounce3"></div>
     </div>
     <div *ngIf="treeJobsData.length > 0 && !jobsLoading" class="job-browser-table">
-        <p-treeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,30]" selectionMode="{{ selectionMode }}"
-            [(selection)]="selectedJobNodes" [(contextMenuSelection)]="selectedContextNode" metaKeySelection="true" (onNodeSelect)="jobSelected($event)"
-            (onContextMenuSelect)="contextMenuSelected($event)" [contextMenu]="jobContextMenu">
+        <p-treeTable #jobTreeTable [value]="treeJobsData" [columns]="treeCols" [resizableColumns]="true" [paginator]="true" [rows]="10" 
+                [rowsPerPageOptions]="[10,20,30]" selectionMode="{{ selectionMode }}" [(selection)]="selectedJobNodes" 
+                [(contextMenuSelection)]="selectedContextNode" metaKeySelection="true" (onNodeSelect)="jobSelected($event)" 
+                (onContextMenuSelect)="contextMenuSelected($event)" [contextMenu]="jobContextMenu"
+                sortMode="multiple" [multiSortMeta]="multiSortMeta" (sortFunction)="customSort($event)" [customSort]="true">
             <ng-template pTemplate="header" let-columns>
                 <tr>
                     <th *ngFor="let col of columns" [(ngStyle)]="col.colStyle" ttResizableColumn [ttSortableColumn]="col.field">{{col.header}}

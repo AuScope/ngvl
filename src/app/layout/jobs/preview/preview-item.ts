@@ -1,4 +1,4 @@
-import { Type } from '@angular/core';
+import { Type,HostListener } from '@angular/core';
 
 
 export class PreviewItem {
@@ -18,5 +18,4 @@ export class PreviewItem {
             this.options = options;
         }
     }
-
 }

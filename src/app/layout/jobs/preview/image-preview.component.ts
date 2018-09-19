@@ -17,6 +17,7 @@ export class ImagePreview implements PreviewComponent {
     // Image modal is hidden by default
     showingImageModal: boolean = false;
 
+    atBottom: boolean = false;
 
     constructor() {
     }

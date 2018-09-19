@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component,HostListener } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -16,10 +16,9 @@ export class PlainTextPreview implements PreviewComponent {
     options: any = {
         theme: 'vs-light'
     };
-
+    atBottom: boolean = false;
 
     constructor() { }
-
 
     /**
      * Language will most often be the same as the extension, check for the
@@ -43,4 +42,8 @@ export class PlainTextPreview implements PreviewComponent {
         return language;
     }
 
+    @HostListener('click', ['$event.target'])
+    onClick(btn) {
+        console.log('Host Element Clicked Plaintext');
+   }
 }

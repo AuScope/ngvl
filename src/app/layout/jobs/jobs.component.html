@@ -91,7 +91,8 @@
                                         <split-area size="30">
                                             <div class="card" style="border-radius: 0px; height: 100%;">
                                                 <div class="card-body" style="overflow:hidden;padding:0px;">
-                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
+                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs> 
+                                                     <!-- <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>  -->
                                                 </div>
                                             </div>
                                         </split-area>
@@ -107,8 +108,8 @@
                                                 <div class="bounce2"></div>
                                                 <div class="bounce3"></div>
                                             </div>
-                                            <div style="height: 100%;min-height: 100px;">
-                                                <ng-template preview-host></ng-template>
+                                            <div #scroll style="overflow:auto;height: 100%;min-height: 100px;" (scroll)="onScroll()">
+                                                <ng-template preview-host ></ng-template>
                                             </div>
                                         </split-area>
                                     </split>

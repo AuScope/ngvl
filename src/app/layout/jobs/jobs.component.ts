@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver, ChangeDetectionStrategy, ChangeDetectorRef, ComponentRef, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { routerTransition } from '../../router.animations';
 import { Job, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
@@ -23,7 +23,8 @@ import { point, featureCollection, polygon } from '@turf/helpers';
     selector: 'app-jobs',
     templateUrl: './jobs.component.html',
     styleUrls: ['./jobs.component.scss'],
-    animations: [routerTransition()]
+    animations: [routerTransition()],
+    //   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 
@@ -52,8 +53,14 @@ export class JobsComponent implements OnInit {
         new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
+
+    componentRef: ComponentRef<PreviewComponent>;
+
+    @ViewChild('scroll') private myScrollContainer: ElementRef;
+
     // Will be JobDownload or CloudFileInformation, needed for preview Refresh
     currentPreviewObject: any = null;
+    currentPreviewItem: PreviewItem = null;
 
     // Current HttpClient GET request (for cancellation purposes)
     httpSubscription: Subscription;
@@ -62,13 +69,38 @@ export class JobsComponent implements OnInit {
     constructor(private componentFactoryResolver: ComponentFactoryResolver,
         private jobsService: JobsService,
         private modalService: NgbModal,
-        private userStateService: UserStateService) { }
+        private userStateService: UserStateService,
+        private cdr: ChangeDetectorRef) { }
 
 
     ngOnInit() {
         this.userStateService.setView(JOBS_VIEW);
     }
 
+    ngAfterViewChecked() {
+        this.scrollToBottom();
+    }
+
+    onScroll() {
+        console.log("scroll on div");
+      /*  let element = this.myScrollContainer.nativeElement
+        let atBottom = element.scrollHeight - element.scrollTop === element.clientHeight
+        if (this.disableScrollDown && atBottom) {
+            this.disableScrollDown = false
+        } else {
+            this.disableScrollDown = true
+        } */
+
+    }
+    scrollToBottom(): void {
+      /* // if (this.previewHost && this.componentRef && this.componentRef.instance.atBottom) {        
+            console.log("scroll bottom");
+          //  this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+            //this.previewHost.viewContainerRef.element.nativeElement.scrollTop = this.previewHost.viewContainerRef.element.nativeElement.scrollHeight;            
+        if (this.myScrollContainer)         
+            this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+        //} */
+    }
 
     /**
      * Cancel the current HttpClient request, if any.
@@ -133,6 +165,66 @@ export class JobsComponent implements OnInit {
         }
     }
 
+    public inputSizeUpdate(cloudFile) {
+        // Get the filename extension to determine type of preview required
+        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
+        if (this.currentPreviewItem) {
+            if (this.currentPreviewItem && this.currentPreviewItem.type === 'image') {
+                this.currentPreviewObject = cloudFile;
+                const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
+                //this.previewFile(this.currentPreviewItem, imageUrl);
+                this.componentRef.instance.data = imageUrl;
+            }
+            // Log files currently displayed as plain text, but this class will
+            // allow us to make imporvements to display later (e.g. display
+            // sectioned logs in tabs per section)
+            else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'log')) {
+                this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
+                    logData => {
+                        //this.previewFile(this.currentPreviewItem, logData);
+                        this.componentRef.instance.data = logData;
+                        this.currentPreviewObject = cloudFile;
+                        this.filePreviewLoading = false;
+                    },
+                    error => {
+                        //TODO: Proper error reporting
+                        this.currentPreviewItem = null;
+                        this.currentPreviewObject = null;
+                        console.log(error.message);
+                    }
+                );
+            }
+            // Preview text (default option if type can't be determined by extension)
+            else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'plaintext' || this.currentPreviewItem.type === 'ttl')) {
+
+                const language = PlainTextPreview.selectLanguageByExtension(extension);
+                const options = {
+                    theme: 'vs-light',
+                    language: language
+                }
+
+                // this.filePreviewLoading = true;
+                // TODO: Max file size to config
+                this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
+                    previewData => {
+                        //this.previewFile(this.currentPreviewItem, previewData, options);
+                        this.componentRef.instance.data = previewData;
+                        //  this.componentRef.instance.cd.detectChanges();
+                        this.currentPreviewObject = cloudFile;
+                    },
+                    error => {
+                        //TODO: Proper error reporting   
+                        this.currentPreviewItem = null;
+                        this.currentPreviewObject = null;
+                        console.log(error.message);
+                    }
+                );
+            }
+        }
+
+    }
+
+
 
     /**
      * Add the specified PreviewItem to the container
@@ -142,15 +234,17 @@ export class JobsComponent implements OnInit {
      */
     private previewFile(previewItem: PreviewItem, data: any, options?: any) {
         previewItem.data = data;
-        if(options) {
+        if (options) {
             previewItem.options = options;
         }
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        let componentRef = viewContainerRef.createComponent(componentFactory);
-        (<PreviewComponent>componentRef.instance).data = previewItem.data;
-        (<PreviewComponent>componentRef.instance).options = previewItem.options;
+        //   let componentRef = viewContainerRef.createComponent(componentFactory);
+        this.componentRef = viewContainerRef.createComponent(componentFactory);
+        (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
+        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
+        this.componentRef.changeDetectorRef.detectChanges();
     }
 
 
@@ -215,16 +309,18 @@ export class JobsComponent implements OnInit {
         const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
 
         // Job log file is a special case, look for this first
-        if(cloudFile.name === "vl.sh.log") {
+        if (cloudFile.name === "vl.sh.log") {
             previewItem = this.previewItems.find(item => item.type === 'log');
         } else {
             previewItem = this.previewItems.find(item => item.extensions.indexOf(extension) > -1);
         }
         // If the type can't be found, we'll try plain text
         // TODO: What if it's binary, check this out
-        if(previewItem === undefined) {
+        if (previewItem === undefined) {
             previewItem = this.previewItems.find(item => item.type === 'plaintext');
         }
+        //saving previewItem for refresh
+        this.currentPreviewItem = previewItem;
         // Preview image
         if (previewItem && previewItem.type === 'image') {
             this.currentPreviewObject = cloudFile;
@@ -300,8 +396,8 @@ export class JobsComponent implements OnInit {
      */
     public addFolder(folderName: string): void {
         this.jobsService.addFolder(folderName).subscribe(
-            series => {                
-                this.jobBrowser.refreshJobs();   
+            series => {
+                this.jobBrowser.refreshJobs();
             },
             // TODO: Proper error reporting
             error => {
@@ -322,7 +418,7 @@ export class JobsComponent implements OnInit {
             if (result === 'OK click' && this.newFolderName !== '') {
                 this.addFolder(this.newFolderName);
             }
-        }, () => {});
+        }, () => { });
     }
 
 }

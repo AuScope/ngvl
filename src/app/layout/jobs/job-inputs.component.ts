@@ -22,6 +22,8 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     @Input() public showCheckboxes: boolean = false;
     // Input change event
     @Output() inputSelectionChanged = new EventEmitter();
+    //file size change event
+    @Output() inputSizeChanged = new EventEmitter();
 
     // HttpCLient request (for cancelling)
     httpSubscription: Subscription;
@@ -56,11 +58,43 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     constructor(private jobsService: JobsService) { }
 
 
-    ngOnInit() {        
+    ngOnInit() {
         let timer = TimerObservable.create(0, 60000);
         this.fileUpdateSubscription = timer.subscribe(timer => {
-            this.resetInputsForSelectedJob();
-            console.log("Refreshing ........!");
+            if (this.selectedJob) {
+                this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
+                    // TODO: VGL seems to filter some files
+                    newFileDetails => {
+                        if (newFileDetails) {
+                            //check for new files or updates to existing files
+                            newFileDetails.forEach(newFile => {
+                                var existingFile: CloudFileInformation = this.cloudFiles.find(oldFile => oldFile.name === newFile.name);
+                                if (!existingFile)
+                                    this.cloudFiles.push(newFile); //not found so add as a new element
+                                else {
+                                    //found , so update by comparing existing details
+                                    if ((existingFile.name === newFile.name) && (existingFile.size !== newFile.size)) {
+                                        //update the size
+                                        existingFile.size = newFile.size;                                                                                
+                                        if(this.selectedCloudFiles.find(selectedFile => selectedFile.name === existingFile.name))                                        
+                                            this.inputSizeChanged.emit(existingFile);
+                                    }
+                                }
+                            });
+                            //check for deleted files
+                            this.cloudFiles.forEach((oldFile, index, cloudFilesArray) => {
+                                var fileIndex: number = newFileDetails.findIndex(file => file.name === oldFile.name);
+                                if (fileIndex === -1)
+                                    cloudFilesArray.splice(index, 1);
+                            });
+                        }
+                    },
+                    // TODO: Proper error reporting
+                    error => {
+                        console.log(error.message);
+                    }
+                );
+            }
         })
     }
 
@@ -114,8 +148,8 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         this.cloudFiles = [];
 
         this.cancelCurrentSubscription();
-        
-        if(this.selectedJob) {
+
+        if (this.selectedJob) {
             this.cloudFilesLoading = true;
             this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
                 // TODO: VGL seems to filter some files
@@ -124,7 +158,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
                     if (!fileDetails) {
                         this.cloudFiles = [];
                     } else {
-                        this.cloudFiles = fileDetails
+                        this.cloudFiles = fileDetails;
                     }
                     this.cloudFilesLoading = false;
                 },
@@ -148,7 +182,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelCurrentSubscription();
         // Clear any selections from the cloud file table if meta key was not
         // used
-        if(!this.showCheckboxes && !event.originalEvent.ctrlKey) {
+        if (!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedCloudFiles = [];
         }
         const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
@@ -167,7 +201,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         this.cancelCurrentSubscription();
         // Clear any selections from the download table if meta key was not
         // used
-        if(!this.showCheckboxes && !event.originalEvent.ctrlKey) {
+        if (!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedJobDownloads = [];
         }
         let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];

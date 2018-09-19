@@ -278,6 +278,7 @@ export interface TreeJobNode {
 export interface PreviewComponent {
     data: any;
     options?: any;
+    atBottom: boolean;
 }
 
 /*

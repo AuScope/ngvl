@@ -14,6 +14,7 @@ export class TtlPreview implements PreviewComponent {
     // Data will be the TTL data as a plaintext string
     data: any;
 
+    atBottom: boolean = false;
 
     constructor() { }
 

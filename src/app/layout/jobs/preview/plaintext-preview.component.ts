@@ -1,4 +1,4 @@
-import { Component,HostListener,ViewChild, ElementRef } from "@angular/core";
+import { Component,ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -44,17 +44,9 @@ export class PlainTextPreview implements PreviewComponent {
         return language;
     }
 
-    @HostListener('wheel', ['$event'])
-    onWheel($event): void {
-        if (($event.srcElement.scrollTop + $event.srcElement.clientHeight) > $event.srcElement.scrollHeight - 100) {
-            this.atBottom = true;
-        }
-        else
-            this.atBottom = false;
-    };
-
     onScroll(event) {
-        if ((event.srcElement.scrollTop + event.srcElement.clientHeight) > event.srcElement.scrollHeight - 100) {
+        var target = event.target || event.srcElement;
+        if ((target.scrollTop + target.clientHeight) > target.scrollHeight - 100) {
             this.atBottom = true;
         }
         else

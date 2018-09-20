@@ -2,7 +2,7 @@
 <img id="previewImage" src="{{ data }}" (click)="isShowingImageModal(true)">
 
 <!-- Modal to view image full screen, hidden by default -->
-<div #imageModal id="imageModal" class="image-modal" [ngStyle]="setModalStyle()">
+<div #imageModal id="imageModal" class="image-modal" [ngStyle]="setModalStyle()" (scroll)="onScroll($event)">
     <span class="close-button" (click)="isShowingImageModal(false)" >&times;</span>
     <img class="image-modal-content" src="{{ data }}">
     <div id="imageCaption"></div>

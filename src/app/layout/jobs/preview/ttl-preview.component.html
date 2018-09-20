@@ -8,4 +8,4 @@
     </div>
 </div>
 -->
-<textarea #scrollarea [value]="data" readonly style="resize:none;width:100%;height:100%;"></textarea>
+<textarea #scrollarea [value]="data" readonly style="overflow:auto;resize:none;width:100%;height:100%;" (scroll)="onScroll($event)"></textarea>

@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild, ElementRef } from "@angular/core";
+import { Component, ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 import { DOCUMENT } from "@angular/platform-browser";
 
@@ -28,21 +28,13 @@ export class LogPreview implements PreviewComponent {
 
     constructor() { }
 
-    @HostListener('wheel', ['$event'])
-    onWheel($event): void {
-        if (($event.srcElement.scrollTop + $event.srcElement.clientHeight) > $event.srcElement.scrollHeight - 100) {
+   onScroll(event) {
+        var target = event.target || event.srcElement;
+        if ((target.scrollTop + target.clientHeight) > target.scrollHeight - 100) {
             this.atBottom = true;
         }
         else
-            this.atBottom = false;
-    };
-
-    onScroll(event) {
-        if ((event.srcElement.scrollTop + event.srcElement.clientHeight) > event.srcElement.scrollHeight - 100) {
-            this.atBottom = true;
-        }
-        else
-            this.atBottom = false;
+            this.atBottom = false;                  
     }
 
 }

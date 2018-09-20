@@ -8,6 +8,7 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { forkJoin } from 'rxjs/observable/forkJoin';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -34,7 +35,8 @@ export class ConfirmDatasetsModalContent {
     // Selections saved dialog
     @ViewChild('selectedDatasetsOkModal') public selectedDatasetsOkModal;
 
-    constructor(public activeModal: NgbActiveModal,
+    constructor(public router: Router,
+        public activeModal: NgbActiveModal,
         private modalService: NgbModal,
         private vglService: VglService,
         private userStateService: UserStateService,
@@ -184,8 +186,12 @@ export class ConfirmDatasetsModalContent {
                         this.userStateService.addJobDownload(<JobDownload>result);
                     }
                     // Display selection OK modal
-                    this.modalService.open(this.selectedDatasetsOkModal);
-                    this.activeModal.close();
+                    this.modalService.open(this.selectedDatasetsOkModal).result.then((result) => {
+                        if(result==='New click') {
+                            this.router.navigate(['/wizard/new']);
+                        }
+                        this.activeModal.close();
+                    });
                 }, error => {
                     // TODO: Better error reporting
                     console.log(error.message);

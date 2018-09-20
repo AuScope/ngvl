@@ -29,7 +29,7 @@
                         </span>
                         <!-- Online resource check prevents copied jobs from being edited, as these currently have no associated online resource -->
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote' && rowData.input.onlineResource">
-                            <button class="btn pull-right" title="Edit the download options" (click)="editDownload($event, rowData.input)">
+                            <button class="btn btn-sm btn-primary pull-right" title="Edit the download options" (click)="editDownload($event, rowData.input)">
                                 <i class="fa fa-edit"></i>
                             </button>
                         </span>

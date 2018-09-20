@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, Renderer, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
-
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
@@ -294,15 +293,9 @@ export class JobBrowserComponent implements OnInit {
 
         // Fix to deselect context selection (if one was made) when user left-clicks
         if(!contextSelection && this.selectedContextNode) {
-
             this.selectedContextNode = undefined;
-
-            console.log("***");
-            
             let jobsData = this.sortTreeJobs(this.treeJobsData);
             this.treeJobsData = [...jobsData];
-
-            //this.treeJobsData = [...this.treeJobsData];
         }
 
         // Job selection has changed
@@ -319,29 +312,24 @@ export class JobBrowserComponent implements OnInit {
 
 
     /**
+     * Compare function for the TreeTable sort methods.
      * 
-     * @param jobs 
+     * @param node1 the first TreeNode to be compared
+     * @param node2 the second TreeNode to be compared
+     * @param multiSortMeta the multiSortMeta (from SortEvent or TreeTable)
+     * used to determine sort criteria
+     * @return -1 if the first result takes precedence, 0 if euqal, 1 if the
+     * second result takes precendence
      */
-    sortTreeJobs(jobs: TreeNode[]): TreeNode[] {
-        
-        for(let m of this.jobTreeTable.multiSortMeta) {
-            console.log("sortTreeJobs Sort Meta: " + m.field + ", " + m.order);
-        }
-        
-        jobs.sort((node1: TreeNode, node2: TreeNode) => {
-            let sortField = 'submitDate';
-            let sortOrder = -1;
-
+    compareJobs(node1: TreeNode, node2: TreeNode, multiSortMeta: any[]): number {
+        let result = null;
+        for(let i = 0; i < multiSortMeta.length; i++) {
+            let sortField = multiSortMeta[i].field;
+            let sortOrder = multiSortMeta[i].order;
             let value1 = node1['data'][sortField];
             let value2 = node2['data'][sortField];
-            let result = null;
-
-           if (value1 == null && value2 == null) {
-                value1 = node1['data']['name'];
-                value2 = node2['data']['name'];
-                result = value1.localeCompare(value2);
-            }
-            else if (value1 == null && value2 != null)
+            result = 0;
+            if (value1 == null && value2 != null)
                 result = -1;
             else if (value1 != null && value2 == null)
                 result = 1;
@@ -349,8 +337,32 @@ export class JobBrowserComponent implements OnInit {
                 result = value1.localeCompare(value2);
             else
                 result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+            result = result * sortOrder;
+            // If results aren't equal, we're done
+            if(result !== 0) {
+                break;
+            }
+            // If results are equal and this was the final comparison, use Job
+            // ID for consistent ordering
+            if(i === multiSortMeta.length -1 && result === 0) {
+                value1 = node1['data'].id;
+                value2 = node2['data'].id;
+                result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+            }
+        }
+        return result;
+    }
 
-            return (result * sortOrder);
+    /**
+     * Call tree sort manually, required for context menu bug where using the
+     * spread operator to clear the highlighted context selection reorders the
+     * TreeTable
+     * 
+     * @param jobs TreeNodes to reorder
+     */
+    sortTreeJobs(jobs: TreeNode[]): TreeNode[] {
+        jobs.sort((node1: TreeNode, node2: TreeNode) => {
+           return this.compareJobs(node1, node2, this.jobTreeTable.multiSortMeta);
         });
         return jobs;
     }
@@ -360,41 +372,14 @@ export class JobBrowserComponent implements OnInit {
      * Sort Tree based on multiSortMeta from the SortEvent
      * 
      * TODO: Currently ignores multiple column sorting, but this is needed
-     * as single column breakjs pagination when the spread operator is used
+     * as single column breaks pagination when the spread operator is used
      * to update the table
      * 
      * @param event SortEvent
      */
     customSort(event: SortEvent) {
-        
-        for(let m of event.multiSortMeta) {
-            console.log("CustomSort Meta: field="+m.field+", order="+m.order);
-        }
-        
-        let sortField = event.multiSortMeta[0].field;
-        let sortOrder = event.multiSortMeta[0].order;
-
         event.data.sort((data1, data2) => {
-            let value1 = data1['data'][sortField];
-            let value2 = data2['data'][sortField];
-            let result = null;
-
-            // If both values are null, order by name
-           if (value1 == null && value2 == null) {
-                value1 = data1['data']['name'];
-                value2 = data2['data']['name'];
-                result = value1.localeCompare(value2);
-            }
-            else if (value1 == null && value2 != null)
-                result = -1;
-            else if (value1 != null && value2 == null)
-                result = 1;
-            else if (typeof value1 === 'string' && typeof value2 === 'string')
-                result = value1.localeCompare(value2);
-            else
-                result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
-
-            return (sortOrder * result);
+            return this.compareJobs(data1, data2, event.multiSortMeta);
         });
     }
 

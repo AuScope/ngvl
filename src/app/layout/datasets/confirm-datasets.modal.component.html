@@ -32,10 +32,10 @@
                     <a title="{{rowData.url}}" href="{{rowData.url}}" target="_blank">{{rowData.url}}</a>
                 </td>
                 <td>
-                    <button pButton *ngIf="rowData.leaf" (click)="downloadDataset(rowData.onlineResource, rowData.downloadOptions)">
+                    <button class="btn btn-sm btn-primary" *ngIf="rowData.leaf" (click)="downloadDataset(rowData.onlineResource, rowData.downloadOptions)">
                         <i class="fa fa-download" title="Download this data to your local machine"></i>
                     </button>
-                    <button pButton *ngIf="rowData.leaf" (click)="editDownload($event,rowData,rowData.onlineResource,rowData.cswRecord,rowData.defaultOptions,rowData.downloadOptions)" title="Edit the download options">                       
+                    <button class="btn btn-sm btn-primary" style="margin-left:4px;" *ngIf="rowData.leaf" (click)="editDownload($event, rowData, rowData.onlineResource, rowData.cswRecord,rowData.defaultOptions,rowData.downloadOptions)" title="Edit the download options">
                         <i class="fa fa-edit"></i>
                     </button>
                 </td>
@@ -44,7 +44,7 @@
     </p-treeTable>
 </div>
 <div class="modal-footer" style="background: #EEE">
-    <button type="button" class="btn btn-secondary" (click)="captureData()" [disabled]="selectedDatasetNodes.length==0">Capture Data</button>
+    <button type="button" class="btn btn-primary" (click)="captureData()" [disabled]="selectedDatasetNodes.length==0">Capture Data</button>
 </div>
 
 <!-- Capture data success modal -->
@@ -60,6 +60,7 @@
         to process your existing selections.
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn" (click)="c('OK click')">OK</button>
+        <button type="button" class="btn btn-primary" (click)="c('New click')">New Job</button>
+        <button type="button" class="btn btn-primary" (click)="c('OK click')">Close</button>
     </div>
 </ng-template>

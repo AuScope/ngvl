@@ -8,10 +8,6 @@
         <i class="fa fa-bars text-muted" aria-hidden="true"></i>
     </button>
     <div class="collapse navbar-collapse">
-        <form class="form-inline my-2 my-lg-0">
-          <!-- <input class="form-control mr-sm-2" type="text" placeholder="{{ 'Search' | translate }}" > -->
-          <a [routerLink]="['/wizard']" class="btn btn-secondary">New job</a>
-        </form>
         <ul class="navbar-nav ml-auto">
             <!--
             <li class="nav-item">
@@ -111,12 +107,6 @@
                 <div *ngIf="isLoggedIn" class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" routerLink="/user" routerLinkActive="active">
                         <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
-                    </a>
-                    <a class="dropdown-item" href="javascript:void(0)">
-                        <i class="fa fa-fw fa-envelope"></i> {{ 'Inbox' | translate }}
-                    </a>
-                    <a class="dropdown-item" href="javascript:void(0)">
-                        <i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}
                     </a>
                     <button class="dropdown-item" (click)="onLoggedOut()">
                         <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}

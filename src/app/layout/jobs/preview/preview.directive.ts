@@ -1,4 +1,4 @@
-import { Directive, ViewContainerRef,HostListener } from '@angular/core';
+import { Directive, ViewContainerRef } from '@angular/core';
 
 
 @Directive({
@@ -7,10 +7,4 @@ import { Directive, ViewContainerRef,HostListener } from '@angular/core';
 
 export class PreviewDirective {
     constructor(public viewContainerRef: ViewContainerRef) { }
-
-    @HostListener('click', ['$event.target'])
-    onClick(btn) {
-        console.log('Host Element Clicked');
-   }
-
 }

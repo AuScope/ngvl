@@ -173,8 +173,11 @@ export class JobBrowserComponent implements OnInit {
         this.jobsService.getJobStatuses().subscribe(statusUpdates => {
             for (var key in statusUpdates) {
                 var jobNode = this.findJobNode(statusUpdates[key].jobId);
-                if (jobNode)
+                if (jobNode) {
                     jobNode.data.status = statusUpdates[key].status;
+                    if(this.selectedJob && (this.selectedJob.id === jobNode.data.id))
+                        this.selectedJob.status = jobNode.data.status;
+                }
             }
         });
     }

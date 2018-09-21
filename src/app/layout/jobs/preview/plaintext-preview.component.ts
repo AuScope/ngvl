@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component,ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -16,10 +16,11 @@ export class PlainTextPreview implements PreviewComponent {
     options: any = {
         theme: 'vs-light'
     };
+    atBottom: boolean = false;
 
+    @ViewChild('scrollarea') scrollElement: ElementRef;
 
     constructor() { }
-
 
     /**
      * Language will most often be the same as the extension, check for the
@@ -43,4 +44,12 @@ export class PlainTextPreview implements PreviewComponent {
         return language;
     }
 
+    onScroll(event) {
+        var target = event.target || event.srcElement;
+        if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    }
 }

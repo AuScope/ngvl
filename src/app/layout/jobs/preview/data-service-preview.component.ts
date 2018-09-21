@@ -15,6 +15,8 @@ export class DataServicePreview implements PreviewComponent, AfterViewInit {
     // Data will be array containing map center point [0] and the bbox geometries [1]
     data: any;
 
+    atBottom: boolean = false;
+    
     // Have a reference to the OlMapPreview Component so we can set the data
     @ViewChild(OlMapPreviewComponent) olMapPreview: OlMapPreviewComponent;
 

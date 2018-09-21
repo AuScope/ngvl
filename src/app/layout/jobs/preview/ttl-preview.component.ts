@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component,ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -14,7 +14,19 @@ export class TtlPreview implements PreviewComponent {
     // Data will be the TTL data as a plaintext string
     data: any;
 
+    atBottom: boolean = false;
+
+    @ViewChild('scrollarea') scrollElement: ElementRef;
 
     constructor() { }
 
+    onScroll(event) {
+        var target = event.target || event.srcElement;
+        if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
+            this.atBottom = true;
+        }
+        else
+            this.atBottom = false;
+    }
+    
 }

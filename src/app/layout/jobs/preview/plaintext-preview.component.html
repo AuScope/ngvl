@@ -1,1 +1,1 @@
-<ngx-monaco-editor class="template-code-editor" [options]="options" [(ngModel)]="data" style="width:100%;height:100%;border:1px solid lightgray;"></ngx-monaco-editor>
+<ngx-monaco-editor #scrollarea class="template-code-editor" [options]="options" [(ngModel)]="data" style="overflow:auto;width:100%;height:100%;border:1px solid lightgray;" (scroll)="onScroll($event)"></ngx-monaco-editor>

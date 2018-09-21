@@ -91,7 +91,7 @@
                                         <split-area size="30">
                                             <div class="card" style="border-radius: 0px; height: 100%;">
                                                 <div class="card-body" style="overflow:hidden;padding:0px;">
-                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
+                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>                                                      
                                                 </div>
                                             </div>
                                         </split-area>
@@ -106,38 +106,12 @@
                                                 <div class="bounce1"></div>
                                                 <div class="bounce2"></div>
                                                 <div class="bounce3"></div>
-                                            </div>
-                                            <div style="height: 100%;min-height: 100px;">
-                                                <!-- <div style="height: 100%;align-items: stretch;min-height: 100px"> -->
-                                                <ng-template preview-host></ng-template>
+                                            </div>    
+                                            <div style="height: 100%;min-height: 100px;">                                                                                           
+                                                <ng-template preview-host ></ng-template>                                            
                                             </div>
                                         </split-area>
                                     </split>
-
-                                    <div class="row">
-                                        <!-- File panel -->
-                                        <div class="col">
-                                            <div class="card" style="height: calc(100vh - 304px);">
-                                                <div class="card-body" style="overflow-y:auto;overflow-x:hidden;padding:0px;">
-                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Preview panel (no longer a card, match card style) -->
-                                        <div class="col" style="height: calc(100vh - 304px);border: 1px solid #ddd;border-radius: 0.25rem;padding: 0px;margin-right: 10px;">
-                                            <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
-                                                <div style="text-align: center;vertical-align: middle;display:table-cell;">
-                                                    Select a file to the left to preview it here.
-                                                </div>
-                                            </div>
-                                            <div *ngIf="filePreviewLoading" class="spinner">
-                                                <div class="bounce1"></div>
-                                                <div class="bounce2"></div>
-                                                <div class="bounce3"></div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>

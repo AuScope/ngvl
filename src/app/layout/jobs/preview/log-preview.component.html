@@ -1,5 +1,5 @@
 <p-tabView id="logViewTab">
     <p-tabPanel *ngFor="let key of logKeys(data[0]); let i = index" [header]="key" [selected]="i == 0">
-        <textarea #scrollarea [value]="data[0][key]" readonly style="overflow:scroll;resize:none;width:100%;height:100%;" (scroll)="onScroll($event)"></textarea>
+        <textarea #scrollarea [value]="data[0][key]" readonly style="overflow:auto;resize:none;width:100%;height:100%;" (scroll)="onScroll($event)" ></textarea>
     </p-tabPanel>
 </p-tabView>

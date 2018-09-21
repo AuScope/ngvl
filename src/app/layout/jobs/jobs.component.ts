@@ -145,8 +145,7 @@ export class JobsComponent implements OnInit {
                 this.currentPreviewObject = cloudFile;
                 const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();                
                 this.componentRef.instance.data = imageUrl;
-                if(this.componentRef.instance.atBottom)
-                    this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
+                this.scrollToBottom();
             }
             // Log files currently displayed as plain text, but this class will
             // allow us to make imporvements to display later (e.g. display
@@ -154,11 +153,9 @@ export class JobsComponent implements OnInit {
             else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'log')) {
                 this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
                     logData => {                        
-                        this.componentRef.instance.data = logData;                          
-                        if(this.componentRef.instance.atBottom)
-                            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                                                                          
-                        this.currentPreviewObject = cloudFile;
-                        this.filePreviewLoading = false;
+                        this.componentRef.instance.data = logData;                                                  
+                        this.scrollToBottom();
+                       this.currentPreviewObject = cloudFile;                        
                     },
                     error => {
                         //TODO: Proper error reporting
@@ -180,8 +177,7 @@ export class JobsComponent implements OnInit {
                 this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
                     previewData => {                        
                         this.componentRef.instance.data = previewData;
-                        if(this.componentRef.instance.atBottom)
-                            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
+                        this.scrollToBottom();
                         this.currentPreviewObject = cloudFile;
                     },
                     error => {
@@ -196,7 +192,12 @@ export class JobsComponent implements OnInit {
 
     }
 
-
+    scrollToBottom() {
+        if(this.componentRef.instance.atBottom) {
+            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
+            this.componentRef.instance.scrollElement.nativeElement.scrollIntoView(false);
+        }
+    }
 
     /**
      * Add the specified PreviewItem to the container

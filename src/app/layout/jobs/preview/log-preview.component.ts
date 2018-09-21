@@ -28,13 +28,13 @@ export class LogPreview implements PreviewComponent {
 
     constructor() { }
 
-   onScroll(event) {
+    onScroll(event) {
         var target = event.target || event.srcElement;
-        if ((target.scrollTop + target.clientHeight) > target.scrollHeight - 100) {
+        if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
             this.atBottom = true;
         }
         else
-            this.atBottom = false;                  
-    }
+            this.atBottom = false;
+    }    
 
 }

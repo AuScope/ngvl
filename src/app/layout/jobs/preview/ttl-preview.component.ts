@@ -22,7 +22,7 @@ export class TtlPreview implements PreviewComponent {
 
     onScroll(event) {
         var target = event.target || event.srcElement;
-        if ((target.scrollTop + target.clientHeight) > target.scrollHeight - 100) {
+        if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
             this.atBottom = true;
         }
         else

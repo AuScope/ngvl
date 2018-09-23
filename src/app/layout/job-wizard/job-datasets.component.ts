@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { DownloadOptions, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
 import { UserStateService } from '../../shared';
 import { CopyJobInputsModalContent } from '../jobs/copy-job-inputs.modal.component';
@@ -20,7 +20,7 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 })
 
 
-export class JobDatasetsComponent implements OnInit {
+export class JobDatasetsComponent {
 
     // Job input file tree (input type root nodes added to this)
     jobInputNodes: TreeNode[];
@@ -84,11 +84,6 @@ export class JobDatasetsComponent implements OnInit {
 
     constructor(private jobsService: JobsService, private userStateService: UserStateService,
         private vglService: VglService, private modalService: NgbModal, private cswSearchService: CSWSearchService) {}
-
-
-    ngOnInit() {
-        //this.loadJobInputs();
-    }
 
 
     /**

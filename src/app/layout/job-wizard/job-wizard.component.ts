@@ -1,17 +1,18 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute, Router, ParamMap, UrlSegment } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { routerTransition } from '../../router.animations';
 
 import { Observable, combineLatest } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
-import { Job, Solution, JobDownload } from '../../shared/modules/vgl/models';
+import { Job, Solution } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
+import { JobDatasetsComponent } from './job-datasets.component';
 
 @Component({
   selector: 'app-job-wizard',
@@ -19,7 +20,7 @@ import { JobSolutionsSummaryComponent } from './job-solutions-summary.component'
   styleUrls: ['./job-wizard.component.scss'],
   animations: [routerTransition()]
 })
-export class JobWizardComponent implements OnInit {
+export class JobWizardComponent implements OnInit, OnDestroy {
 
   jobIncomplete: boolean = false;
   cancelled: boolean = false;
@@ -34,6 +35,9 @@ export class JobWizardComponent implements OnInit {
 
   @ViewChild(JobSolutionsSummaryComponent)
   private solutionsComponent: JobSolutionsSummaryComponent;
+
+  @ViewChild(JobDatasetsComponent)
+  private jobDatasetsComponent: JobDatasetsComponent;
 
   constructor(private userStateService: UserStateService,
               private vglService: VglService,
@@ -56,7 +60,10 @@ export class JobWizardComponent implements OnInit {
           return this.userStateService.loadJob(id);
         }
       })
-    ).subscribe();
+    ).subscribe(() => {
+        // Only load job downloads after job has loaded
+        this.jobDatasetsComponent.loadJobInputs();
+    });
 
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions

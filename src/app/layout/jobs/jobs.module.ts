@@ -12,7 +12,6 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
 
 import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
-import { JobSubmissionDatasetsComponent } from './submission/job-submission-datasets.component';
 import { PageHeaderModule } from '../../shared';
 import { JobsService } from './jobs.service';
 import { NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -27,7 +26,7 @@ import { OlMapModule } from '../datasets/openlayermap/olmap.module';
 import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
 import { JobStatusModalContent } from './job-status.modal.component';
-import { JobInputsBrowserModalContent } from './submission/job-inputs-browser.modal.component';
+import { CopyJobInputsModalContent } from './copy-job-inputs.modal.component';
 import { AngularSplitModule } from 'angular-split';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/components/common/messageservice';
@@ -51,13 +50,11 @@ import { MessageService } from 'primeng/components/common/messageservice';
         ToastModule
     ],
     declarations: [
-        JobsComponent, JobBrowserComponent, JobInputsComponent,
-        JobSubmissionDatasetsComponent, JobInputsBrowserModalContent,       
+        JobsComponent, JobBrowserComponent, JobInputsComponent, CopyJobInputsModalContent,       
         PreviewDirective, DataServicePreview, ImagePreview,
         PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent
     ],
-    entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent, JobInputsBrowserModalContent ],
-    providers: [ JobsService, ConfirmationService, MessageService ],
-    exports: [ JobSubmissionDatasetsComponent ]
+    entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent, CopyJobInputsModalContent ],
+    providers: [ JobsService, ConfirmationService, MessageService ]
 })
 export class JobsModule { }

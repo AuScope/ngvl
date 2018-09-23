@@ -1,26 +1,26 @@
-import { Component } from '@angular/core';
-import { DownloadOptions, JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
-import { UserStateService } from '../../../shared';
-import { JobInputsBrowserModalContent } from './job-inputs-browser.modal.component';
-import { DownloadOptionsModalContent } from './../../datasets/download-options.modal.component';
+import { Component, OnInit } from '@angular/core';
+import { DownloadOptions, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
+import { UserStateService } from '../../shared';
+import { CopyJobInputsModalContent } from '../jobs/copy-job-inputs.modal.component';
+import { DownloadOptionsModalContent } from '../datasets/download-options.modal.component';
 import { TreeNode } from 'primeng/api';
-import { JobsService } from '../jobs.service';
+import { JobsService } from '../jobs/jobs.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
-import { VglService } from '../../../shared/modules/vgl/vgl.service';
-import { CSWSearchService } from '../../../shared/services/csw-search.service';
-import { RemoteDatasetsModalContent } from '../../datasets/remote-datasets.modal.component';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { RemoteDatasetsModalContent } from '../datasets/remote-datasets.modal.component';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 @Component({
-    selector: 'job-submission-datasets',
-    templateUrl: './job-submission-datasets.component.html',
-    styleUrls: ['./job-submission-datasets.component.scss'],
+    selector: 'app-job-datasets',
+    templateUrl: './job-datasets.component.html',
+    styleUrls: ['./job-datasets.component.scss'],
 })
 
 
-export class JobSubmissionDatasetsComponent {
+export class JobDatasetsComponent implements OnInit {
 
     // Job input file tree (input type root nodes added to this)
     jobInputNodes: TreeNode[];
@@ -83,8 +83,11 @@ export class JobSubmissionDatasetsComponent {
 
 
     constructor(private jobsService: JobsService, private userStateService: UserStateService,
-        private vglService: VglService, private modalService: NgbModal, private cswSearchService: CSWSearchService) {
-        this.loadJobInputs();
+        private vglService: VglService, private modalService: NgbModal, private cswSearchService: CSWSearchService) {}
+
+
+    ngOnInit() {
+        //this.loadJobInputs();
     }
 
 
@@ -172,7 +175,7 @@ export class JobSubmissionDatasetsComponent {
     /**
      * Load all Job inputs to the Tree
      */
-    private loadJobInputs(): void {
+    public loadJobInputs(): void {
         this.jobInputNodes = [];
         this.rootFileDownloads.children = [];
         this.rootRemoteWebServiceDownloads.children = [];
@@ -287,7 +290,7 @@ export class JobSubmissionDatasetsComponent {
     public copyFromJob(): void {
         this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
-                const modalRef = this.modalService.open(JobInputsBrowserModalContent, { size: 'lg' });
+                const modalRef = this.modalService.open(CopyJobInputsModalContent, { size: 'lg' });
                 modalRef.result.then((result) => {
                     for (let download of result.jobDownloads) {
                         this.userStateService.addJobDownload(download);

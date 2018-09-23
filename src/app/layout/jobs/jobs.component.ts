@@ -16,7 +16,7 @@ import { DataServicePreview } from './preview/data-service-preview.component';
 import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import olProj from 'ol/proj';
-import { point, featureCollection, polygon } from '@turf/helpers';
+import { featureCollection, polygon } from '@turf/helpers';
 
 
 @Component({
@@ -230,14 +230,8 @@ export class JobsComponent implements OnInit {
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
         let previewItem: PreviewItem = this.previewItems.find(item => item.type === 'data-service');
-        this.filePreviewLoading = true;
-
-        // TODO: Will there ever be more than 1 bbox? Confirm...
-        let featureArr: any = [];
-        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]));
-        featureArr.push(point([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]));
-        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]));
-        featureArr.push(point([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]));
+        this.filePreviewLoading = true;        
+        // TODO: Will there ever be more than 1 bbox? Confirm...       
 
         const key = "preview-key";
         let bboxPolygonArr = {};
@@ -256,8 +250,7 @@ export class JobsComponent implements OnInit {
         };
 
         let reCentrePt: any = {};
-        // Calculate the envelope, if not too big then re-centred map can be calculated
-        const featureColl = featureCollection(featureArr);
+        // Calculate the envelope, if not too big then re-centred map can be calculated        
         const bboxData = [olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr];
         this.previewFile(previewItem, bboxData);
         this.filePreviewLoading = false;

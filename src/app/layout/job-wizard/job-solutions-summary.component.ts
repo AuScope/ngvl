@@ -74,8 +74,8 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
         // If the user hasn't selected a solution that is in the new list then
         // select the first one by default.
-        if ((!this.activeSolution && this.solutions.length > 0) ||
-            (this.solutions.length > 0 && !this.solutions.find(s => s.id === this.activeSolution)) {
+        if (this.solutions.length > 0 && (!this.activeSolution  ||
+            !this.solutions.find(s => s.id === this.activeSolution))) {
           this.activeSolution = this.solutions[0].id;
         }
       });

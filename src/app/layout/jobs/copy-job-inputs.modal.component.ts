@@ -1,19 +1,19 @@
-import { Component, Input, ViewChild, Output } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Job, JobDownload, CloudFileInformation } from '../../../shared/modules/vgl/models';
-import { JobBrowserComponent } from '../job-browser.component';
-import { JobInputsComponent } from '../job-inputs.component';
+import { Job, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
+import { JobBrowserComponent } from './job-browser.component';
+import { JobInputsComponent } from './job-inputs.component';
 import { TreeNode } from 'primeng/api';
 
 
 @Component({
-    selector: 'jobs-inputs-browser-modal-content',
-    templateUrl: './job-inputs-browser.modal.component.html',
-    styleUrls: ['./job-inputs-browser.modal.component.scss']
+    selector: 'copy-jobs-inputs-modal-content',
+    templateUrl: './copy-job-inputs.modal.component.html',
+    styleUrls: ['./copy-job-inputs.modal.component.scss']
 })
 
 
-export class JobInputsBrowserModalContent {
+export class CopyJobInputsModalContent {
 
     @ViewChild('jobBrowser')
     public jobBrowser: JobBrowserComponent;

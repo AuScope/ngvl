@@ -1,9 +1,6 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
-    <!-- TODO: Translations -->
-    <!-- TODO: Move styles to CSS -->
     <div class="col" style="height: calc(100vh - 200px);padding: 0px; width: 100%;">
-        <!-- <div class="row" style="height: calc(100vh - 200px);"> -->
         <!-- Job tree -->
         <split direction='horizontal'>
             <split-area size="30">
@@ -13,10 +10,10 @@
                         <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-sm pull-right" (click)="refreshJobs()" style="margin-left:4px;">
+                        <button class="btn btn-sm btn-primary pull-right" (click)="refreshJobs()" style="margin-left:4px;">
                             <i class="fa fa-refresh">&nbsp;Refresh</i>
                         </button>
-                        <button class="btn btn-sm pull-right" (click)="showAddFolderModal(addFolderModal)">
+                        <button class="btn btn-sm btn-primary pull-right" (click)="showAddFolderModal(addFolderModal)">
                             <i class="fa fa-folder">&nbsp;Add Folder</i>
                         </button>
                     </div>

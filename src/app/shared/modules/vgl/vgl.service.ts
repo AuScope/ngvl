@@ -256,11 +256,11 @@ export class VglService {
         return this.vglRequest('secure/killJob.do', options);
     }
 
-    public duplicateJob(jobId: number, files: string[]): Observable<any> {
+    public duplicateJob(jobId: number/*, files: string[]*/): Observable<Job[]> {
         const options = {
             params: {
-                jobId: jobId.toString(),
-                files: files.join(',')
+                jobId: jobId.toString()//,
+                //files: files.join(',')
             }
         };
 

@@ -1,14 +1,14 @@
-import { Component, OnInit, Input, Output, EventEmitter, Renderer } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, Renderer, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
-
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { JobStatusModalContent } from "./job-status.modal.component";
-import { ConfirmationService, TreeNode } from "primeng/api";
+import { ConfirmationService, TreeNode, SortEvent } from "primeng/api";
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
 import { MessageService } from 'primeng/components/common/messageservice';
+import { TreeTable } from "primeng/treetable";
 
 
 @Component({
@@ -27,6 +27,9 @@ export class JobBrowserComponent implements OnInit {
 
     // Job selection change event
     @Output() jobSelectionChanged = new EventEmitter();
+
+    @ViewChild('jobTreeTable')
+    jobTreeTable: TreeTable;
 
     // HttpClient request (for cancelling)
     httpSubscription: Subscription;
@@ -50,7 +53,6 @@ export class JobBrowserComponent implements OnInit {
     // Flag for job loading in progress
     jobsLoading: boolean = false;
 
-
     // Job context menu actions
     cancelJobAction = { label: 'Cancel', icon: 'fa-times', command: (event) => this.cancelSelectedJob() };
     duplicateJobAction = { label: 'Duplicate', icon: 'fa-edit', command: (event) => this.duplicateSelectedJob() };
@@ -59,8 +61,13 @@ export class JobBrowserComponent implements OnInit {
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: (event) => this.editSelectedJob() };
     moveJobAction = { label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() };
 
+    // Initial multiple sort meta, order by reverse submitDate
+    multiSortMeta = [
+        { field: 'submitDate', order: -1 }
+    ];
 
-  constructor(private jobsService: JobsService,
+
+    constructor(private jobsService: JobsService,
               private confirmationService: ConfirmationService,
               private modalService: NgbModal,
               public renderer: Renderer,
@@ -85,6 +92,16 @@ export class JobBrowserComponent implements OnInit {
      */
     public getSelectedJob(): Job {
         return this.selectedJob;
+    }
+
+
+    /**
+     * TreeTable has UI issues, ensure updates are displayed using the spread
+     * operator (per documentation) after applying the sort function
+     */
+    updateJobTree() {
+        let jobsData = this.sortTreeJobs(this.treeJobsData);
+        this.treeJobsData = [...jobsData];
     }
 
 
@@ -116,9 +133,6 @@ export class JobBrowserComponent implements OnInit {
     /**
      * Transform the TreeJobs data that VGL returns into the TreeNode data
      * that p-treetable requires
-     *
-     * TODO: Sort. No column sorting available, but ng-treetable alternative
-     * to p-table may be able to do this
      *
      * @param treeJobs the TreeJobs data returned from VGL
      */
@@ -161,7 +175,7 @@ export class JobBrowserComponent implements OnInit {
             // TODO: Proper error reporting
             error => {
                 this.jobsLoading = false;
-                console.log("Error: " + error.message);
+                this.messageService.add({ severity: 'error', summary: 'Error retrieving job status', detail: error.message, sticky: true });
             }
         );
     }
@@ -238,7 +252,7 @@ export class JobBrowserComponent implements OnInit {
             const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
             if (selectedJob.status.toLowerCase() === 'active') {
                 items.push({ label: 'Cancel', icon: 'fa fa-cross', command: (event) => this.cancelSelectedJob() });
-                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                //items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
                 // TODO: Confirm on active jobs
                 items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'saved') {
@@ -248,11 +262,11 @@ export class JobBrowserComponent implements OnInit {
                 items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'done' || selectedJob.status.toLowerCase() === 'error') {
                 items.push({ label: 'Delete', icon: 'fa fa-trash', command: (event) => this.deleteSelectedJobsAndFolders() });
-                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                //items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
                 items.push({ label: 'Status', icon: 'fa fa-info-circle', command: (event) => this.showSelectedJobStatus() });
             } else {
                 items.push({ label: 'Cancel', icon: 'fa fa-cross', command: (event) => this.cancelSelectedJob() });
-                items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                //items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
             }
         }
         return items;
@@ -275,28 +289,107 @@ export class JobBrowserComponent implements OnInit {
                 this.selectedJobNodes = [event.node];
             }
         }
-        this.jobSelected(event);
+        this.jobSelected(event, true);
     }
 
 
     /**
      * Job has been selected, fire selection event
-     * @param event
+     * 
+     * @param event the selection event
+     * @param contextSelection if true, the selection was made as part of a
+     * context menu press (right-click), whilst false (or not present)
+     * indicates a standard left-click selection
      */
-    public jobSelected(event) {
+    public jobSelected(event, contextSelection?) {
         this.cancelCurrentSubscription();
+
+        // Job selection has changed
         if (event.node && event.node.leaf) {
             this.selectedJob = this.jobs.find(j => j.id === event.node.data.id);
             this.jobSelectionChanged.emit(event);
         }
-        // Folder selected
-        else if (event.node && !event.node.leaf) {
-            // TODO: Do we need ot do anything with folders?
-            //console.log("Folder selected");
-        }
+       
+        // Display context menu if the option has been set
         if (this.showContextMenu) {
             this.jobContextMenuItems = this.createJobContextMenu(event.node);
         }
+
+        // Fix to deselect context selection (if one was made) when user left-clicks
+        if(!contextSelection && this.selectedContextNode) {
+            this.selectedContextNode = undefined;
+            this.updateJobTree();
+        }
+    }
+
+
+    /**
+     * Compare function for the TreeTable sort methods.
+     * 
+     * @param node1 the first TreeNode to be compared
+     * @param node2 the second TreeNode to be compared
+     * @param multiSortMeta the multiSortMeta (from SortEvent or TreeTable)
+     * used to determine sort criteria
+     * @return -1 if the first result takes precedence, 0 if euqal, 1 if the
+     * second result takes precendence
+     */
+    compareJobs(node1: TreeNode, node2: TreeNode, multiSortMeta: any[]): number {
+        let result = null;
+        for(let i = 0; i < multiSortMeta.length; i++) {
+            let sortField = multiSortMeta[i].field;
+            let sortOrder = multiSortMeta[i].order;
+            let value1 = node1['data'][sortField];
+            let value2 = node2['data'][sortField];
+            result = 0;
+            if (value1 == null && value2 != null)
+                result = -1;
+            else if (value1 != null && value2 == null)
+                result = 1;
+            else if (typeof value1 === 'string' && typeof value2 === 'string')
+                result = value1.localeCompare(value2);
+            else
+                result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+            result = result * sortOrder;
+            // If results aren't equal, we're done
+            if(result !== 0) {
+                break;
+            }
+            // If results are equal and this was the final comparison, use Job
+            // or series ID for consistent ordering
+            if(i === multiSortMeta.length -1 && result === 0) {
+                value1 = node1['data'].hasOwnProperty('id') && node1['data'].id ? node1['data'].id : node1['data'].seriesId;
+                value2 = node2['data'].hasOwnProperty('id') && node2['data'].id ? node2['data'].id : node2['data'].seriesId;
+                result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Call tree sort manually, required for context menu bug where using the
+     * spread operator to clear the highlighted context selection reorders the
+     * TreeTable
+     * 
+     * @param jobs TreeNodes to reorder
+     */
+    sortTreeJobs(jobs: TreeNode[]): TreeNode[] {
+        jobs.sort((node1: TreeNode, node2: TreeNode) => {
+           return this.compareJobs(node1, node2, this.jobTreeTable.multiSortMeta);
+        });
+        return jobs;
+    }
+
+
+    /**
+     * Sort Tree based on multiSortMeta from the SortEvent when user clicks
+     * table headers
+     * 
+     * @param event SortEvent
+     */
+    customSort(event: SortEvent) {
+        event.data.sort((data1, data2) => {
+            return this.compareJobs(data1, data2, event.multiSortMeta);
+        });
     }
 
 
@@ -330,26 +423,31 @@ export class JobBrowserComponent implements OnInit {
             message: confirmMessage,
             icon: 'fa fa-trash',
             accept: () => {
+                //this.cancelCurrentSubscription();
                 for (let node of this.selectedJobNodes) {
                     if (node.leaf) {
-                        this.cancelCurrentSubscription();
                         this.jobsService.deleteJob(node.data.id).subscribe(
-                            response => {
-                                //delete from the tree
-                                let index;
+                            () => {
+                                // Root Job, no Series
                                 if (!node.parent) {
-                                    index = this.treeJobsData.findIndex(row => row.data.id === node.data.id);
-                                    this.deleteNode(index, this.treeJobsData);
-                                } else {
-                                    index = node.parent.children.findIndex(row => row.data.id === node.data.id);
-                                    this.deleteNode(index, node.parent.children);
+                                    this.treeJobsData = this.treeJobsData.filter(
+                                        job => job.data.id !== node.data.id
+                                    );
                                 }
-                                // TODO: Success message
+                                // Job part of series
+                                else {
+                                    node.parent.children = node.parent.children.filter(
+                                        job => job.data.id !== node.data.id
+                                    );
+                                }
+
+                                // Remove from Jobs list
+                                this.jobs = this.jobs.filter(
+                                    job => job.id !== node.data.id
+                                );
                             },
                             error => {
-                                // TODO: Proper error reporting
-                                console.log(error.message);
-                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting this job', detail: error.message });
+                                this.messageService.add({ severity: 'error', summary: 'Error deleting job(s)', detail: error.message, sticky: true });
                             }
                         )
                     }
@@ -358,18 +456,21 @@ export class JobBrowserComponent implements OnInit {
                         this.cancelCurrentSubscription();
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
                             response => {
-                                let index = this.treeJobsData.findIndex(row => row.data.seriesId === node.data.seriesId);
-                                //delete from the tree
-                                this.deleteNode(index, this.treeJobsData);
+                                this.treeJobsData = this.treeJobsData.filter(
+                                    series => series.data.seriesId !== node.data.seriesId
+                                );
                             },
                             error => {
-                                // TODO: Proper error reporting
-                                console.log(error.message);
-                                this.messageService.add({ severity: 'error', summary: 'There was an error deleting the jobs for the selected series', detail: error.message });
+                                this.messageService.add({ severity: 'error', summary: 'Error deleting series', detail: error.message, sticky: true });
                             }
                         )
                     }
                 }
+                // Clear selections, update tree
+                this.selectedContextNode = undefined;
+                this.selectedJobNodes = undefined;
+                this.selectedJob = undefined;
+                this.updateJobTree();
             }
         });
     }
@@ -381,7 +482,7 @@ export class JobBrowserComponent implements OnInit {
     deleteNode(index: number, nodes: TreeNode[]) {
         if (index > -1) {
             nodes.splice(index, 1);
-            this.treeJobsData = [...this.treeJobsData];
+            this.updateJobTree();
         }
     }
 
@@ -399,11 +500,10 @@ export class JobBrowserComponent implements OnInit {
                     this.jobsService.cancelJob(this.selectedJob.id).subscribe(
                         response => {
                             this.refreshJobs();
-                            // TODO: Success message
+                            this.messageService.add({ severity: 'success', summary: 'Cancel Job', detail: "Job(s) successfully cancelled" });
                         },
                         error => {
-                            // TODO: Proper error reporting
-                            console.log(error.message);
+                            this.messageService.add({ severity: 'error', summary: 'Error cancelling job', detail: error.message, sticky: true });
                         }
                     )
                 }
@@ -414,11 +514,32 @@ export class JobBrowserComponent implements OnInit {
 
     /**
      * Duplicate selected job (job context menu)
-     *
-     * TODO: Do. This will replicate a lot of submission functionality, so delaying
+     * 
+     * TODO: Re-implement, make sure files are copied
      */
     public duplicateSelectedJob(): void {
-
+        if(this.selectedJob) {
+            this.jobsService.duplicateJob(this.selectedJob.id).subscribe(
+                result => {
+                    if(result.length > 0) {
+                        let job: Job = result[0];
+                        let node: TreeNode = {};
+                        node.leaf = true;
+                        node.data = {
+                            id: job.id,
+                            name: job.name,
+                            status: job.status
+                        };
+                        this.jobs.push(job);
+                        this.treeJobsData.push(node);
+                        this.updateJobTree();
+                    }
+                    this.messageService.add({ severity: 'success', summary: 'Duplicate Job', detail: "Job successfully duplicated" });
+                }, error => {
+                    this.messageService.add({ severity: 'error', summary: 'Error duplicating job', detail: error.message, sticky: true });
+                }
+            )
+        }
     }
 
 
@@ -432,9 +553,8 @@ export class JobBrowserComponent implements OnInit {
                 modelRef.componentInstance.job = this.selectedJob;
                 modelRef.componentInstance.logs = auditLogs;
             },
-            // TODO: Proper error reporting
             error => {
-                console.log("Error: " + error.message);
+                this.messageService.add({ severity: 'error', summary: 'Error retrieving job status', detail: error.message, sticky: true });
             }
         );
     }
@@ -454,11 +574,10 @@ export class JobBrowserComponent implements OnInit {
             this.jobsService.submitJob(this.selectedJob).subscribe(
               response => {
                 this.refreshJobs();
-                // TODO: Success message
+                this.messageService.add({ severity: 'success', summary: 'Job Submitted', detail: 'The job has been submitted' });
               },
               error => {
-                // TODO: Proper error reporting
-                console.log(error.message);
+                this.messageService.add({ severity: 'error', summary: 'Error submitting job', detail: error.message, sticky: true });
               }
             )
           }
@@ -536,9 +655,8 @@ export class JobBrowserComponent implements OnInit {
                             parentNode.expanded = false;
                     });
                 },
-                // TODO: Proper error reporting
                 error => {
-                    console.log(error.message);
+                    this.messageService.add({ severity: 'error', summary: 'Error moving job', detail: error.message, sticky: true });
                 }
 
             );

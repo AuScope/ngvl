@@ -1,15 +1,22 @@
 <div class="card">
   <div class="card-header">Cart</div>
-  <div class="btn-group" role="group" *ngFor="let solution of cart$ | async">
-    <button type="button" [class.active]="solution.id === selected" (click)="selectSolution(solution)" class="list-group-item list-group-item-action d-flex justify-content-between"
-      style="display:block;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis">
-      <span class="text-truncate" title="{{ solution.name }}">{{ solution.name }}</span>
-    </button>
-    <button class="cart-icons" class="btn btn-light" (click)="removeSolution(solution)">
-      <i class="fa fa-times"></i>
-    </button>
+  <div class="list-group">
+    <div *ngFor="let solution of cart$ | async"
+      class="list-group-item list-group-item-action d-flex justify-content-between"
+      [class.active]="solution.id === selected">
+
+      <a role="button"
+        class="w-100"
+        (click)="selectSolution(solution)">
+        <span class="text-truncate" title="{{ solution.name }}">{{ solution.name }}</span>
+      </a>
+
+      <a role="button"
+        (click)="removeSolution(solution)">
+        <i class="fa fa-times"></i>
+      </a>
+
+    </div>
+
   </div>
 </div>

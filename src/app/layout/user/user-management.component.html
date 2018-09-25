@@ -12,15 +12,21 @@
                     <div class="row" style="width:100%;margin-top:10px;">
                         <!-- Initialising AWS -->
                         <div class="col-lg-5" style="overflow-y:auto;height:calc(100vh - 250px);">
-                            <div class="card" style="min-height:100%">
-                                <div class="card-header">Step 1: Initialising Your AWS</div>
-                                <div class="card-body">
-                                    <h5>Tutorial Video</h5>
-                                    <!-- TODO: Put in actual video -->
-                                    <img src="http://placekitten.com/450/250" style="max-width:100%;">
-                                    <!-- TODO: Sort out actual link, can't get this to work from dev machine -->
-                                    <p>You can also follow instructions at our
-                                        <a href="https://confluence.csiro.au/display/DEVL/Setting+up+a+Dev+environment" target="_blank">wiki</a>
+                            <div class="card" style="height:100%">
+                                <div class="card-header">AWS Cross Account Authorization Setup Insturctions</div>
+                                <div class="card-body" style="overflow-y:auto;">
+                                    <h5>Step by step instructions to set up AWS cross account authorization</h5>
+                                    <ol>
+                                        <li>Press "Download Cloud Formation Policy" below to download the Cloud Formation file.</li>
+                                        <li>Log into your AWS account and go to the Cloud Formation Service.</li>
+                                        <li>In Cloud Formation, create a new stack with the file you downloaded previously.</li>
+                                        <li>After the stack creation has finished, go to the Output tab.</li>
+                                        <li>Copy the 2 ARN values from the Output tab to the corresponding fields on the right.</li>
+                                        <li>Optional: Create a public / private keypair in AWS and enter the name of the key pair in the field "AWS Key Name" on the right.</li>
+                                    </ol>
+
+                                    <p>You can also find more detailed instructions at our 
+                                        <a href="https://confluence.csiro.au/display/DEVL/Configuring+Amazon+AWS+access" target="_blank">wiki</a>
                                     </p>
                                 </div>
                                 <div class="card-footer">
@@ -31,9 +37,9 @@
                         <!-- Configuring AWS -->
                         <div class="col-lg-7" style="overflow-y:auto;height:calc(100vh - 250px);">
                             <form #awsForm="ngForm" style="height:100%;">
-                                <div class="card" style="min-height:100%;">
-                                    <div class="card-header">Step 2: Configuring NGVL</div>
-                                    <div class="card-body">
+                                <div class="card" style="height:100%;">
+                                    <div class="card-header">AWS Cross Account Authorization Settings</div>
+                                    <div class="card-body" style="overflow-y:auto;">
                                         <div class="form-group">
                                             <label for="accessArn" class="required">VGL Instance ARN</label>
                                             <input type="text" class="form-control" id="accessArn" name="accessArn" [(ngModel)]="user.arnExecution" required>

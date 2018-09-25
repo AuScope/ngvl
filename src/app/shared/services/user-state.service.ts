@@ -1,13 +1,24 @@
 import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
-import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { BehaviorSubject, EMPTY, Observable, of, forkJoin } from 'rxjs';
+import { catchError, map, switchMap, defaultIfEmpty } from 'rxjs/operators';
 
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
+import { isSolution, Variable } from '../modules/vgl/models';
 import { saveAs } from 'file-saver/FileSaver';
+import {
+  SolutionVarBindings,
+  VarBinding,
+  VarBindingOptions,
+  StringEntryBinding,
+  NumberEntryBinding,
+  OptionsBinding,
+  BooleanBinding
+} from '../modules/solutions/models';
 
 export const DASHBOARD_VIEW = 'dashboard-view';
 export const DATA_VIEW = 'data-view';
@@ -20,7 +31,9 @@ export type ViewType = 'dashboard-view' | 'data-view' | 'solutions-view' | 'jobs
 export class UserStateService {
   private datePipe = new DatePipe('en-AU');
 
-  constructor(private vgl: VglService) {}
+  private _solutionVarPrefixMap: { [key: string]: number } = {};
+
+  constructor(private vgl: VglService, private http: HttpClient) {}
 
     private _currentView: BehaviorSubject<ViewType> = new BehaviorSubject(null);
     public readonly currentView: Observable<ViewType> = this._currentView.asObservable();
@@ -37,8 +50,14 @@ export class UserStateService {
     private _selectedSolutions: BehaviorSubject<Solution[]> = new BehaviorSubject([]);
     public readonly selectedSolutions: Observable<Solution[]> = this._selectedSolutions.asObservable();
 
+    private _solutionBindings: BehaviorSubject<SolutionVarBindings> = new BehaviorSubject({});
+    public readonly solutionBindings: Observable<SolutionVarBindings> = this._solutionBindings.asObservable();
+
     private _jobTemplate: BehaviorSubject<string> = new BehaviorSubject('');
     public readonly jobTemplate: Observable<string> = this._jobTemplate.asObservable();
+    public readonly jobTemplateWithVars: Observable<string> = this.jobTemplate.pipe(
+      map(template => this._subBindingsIntoTemplate(template))
+    );
 
     private _uploadedFiles: BehaviorSubject<any[]> = new BehaviorSubject([]);
     public readonly uploadedFiles: Observable<any[]> = this._uploadedFiles.asObservable();
@@ -174,10 +193,13 @@ export class UserStateService {
   public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
     // Call the passed function to update the current selection.
     const solutions = f(this._selectedSolutions.getValue());
+
     // If we got a sensible value back (i.e. defined, empty is valid) then
-    // update the current cart with the new value.
+    // update the current cart with the new value, merge any new bindings
+    // into the current set and regenerate the solution template.
     if (solutions) {
       this._selectedSolutions.next(solutions);
+      this._mergeSolutions(solutions);
     }
 
     // Return the new value so the caller can check that it worked.
@@ -197,12 +219,59 @@ export class UserStateService {
    * @param solutions Array of Solution objects to use as the current selection.
    */
   public setSolutionsCart(solutions: Solution[]) {
-    const newCart = solutions ? solutions : [];
-    this._selectedSolutions.next(newCart);
+    // Delegate to the update method, ignoring any existing cart.
+    this.updateSolutionsCart(ignored => solutions || []);
   }
 
+  /**
+   * Set the current template
+   *
+   * @param template New job template string.
+   */
   public updateJobTemplate(template: string) {
     this._jobTemplate.next(template);
+  }
+
+  /**
+   * Reset the job template based on the current solutions.
+   *
+   */
+  public resetJobTemplate() {
+    // Regenerate the template for the new solutions, and update any variable
+    // placeholders using the prefix-variable mapping to avoid name clashes.
+    const requests = this._selectedSolutions.getValue()
+      .map(solution => this._makeTemplateRequest(solution));
+    forkJoin(requests)
+      .pipe(defaultIfEmpty([]))
+      .subscribe(templates => this.updateJobTemplate(templates.join('\n\n')));
+
+  }
+
+  public setSolutionBindings(bindings: SolutionVarBindings) {
+    // Update the bindings
+    this._solutionBindings.next(bindings);
+  }
+
+  public updateSolutionBindings(solution: Solution, bindings: VarBinding<any>[]);
+  public updateSolutionBindings(varBindings: SolutionVarBindings);
+  public updateSolutionBindings(s, bindings?) {
+    let newBindings: SolutionVarBindings;
+
+    if (isSolution(s)) {
+      // Copy the current value rather than modifying the stored value.
+      newBindings = {...this._solutionBindings.getValue()};
+      newBindings[s.id] = bindings;
+    }
+    else {
+      newBindings = s;
+    }
+
+    // Replace the current set of bindings
+    this.setSolutionBindings(newBindings);
+  }
+
+  public getSolutionBindings(): SolutionVarBindings {
+    return this._solutionBindings.getValue();
   }
 
   /**
@@ -210,6 +279,13 @@ export class UserStateService {
    */
   public getJobTemplate(): string {
     return this._jobTemplate.getValue();
+  }
+
+  /**
+   * Return the current job template after substituting in all variable values.
+   */
+  public getJobTemplateWithVars(): string {
+    return this._subBindingsIntoTemplate(this._jobTemplate.getValue());
   }
 
   // Files User has uploaded for a Job
@@ -394,4 +470,138 @@ export class UserStateService {
 
     return of(this.updateJob(job));
   }
+
+  private _subBindingsIntoTemplate(template) {
+    const bindings = [].concat(...Object.values(this._solutionBindings.getValue()));
+    return this._replaceInTemplate(template, key => {
+      const b = bindings.find(it => it.key === key);
+      if (b && b.value !== undefined) {
+        return b.value;
+      }
+    });
+  }
+
+  private _replaceVarPlaceholders(template: string, prefix: any) {
+    return this._replaceInTemplate(template, key => {
+      return `\${${prefix}-${key}}`;
+    });
+  }
+
+  private _replaceInTemplate(template: string, lookup: (key: string) => any) {
+    return template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g,
+                            (match, p1, offset, string) => {
+                              const value = lookup(p1);
+                              return (value !== undefined) ? value : match;
+                            });
+  }
+
+  private _makeTemplateRequest(solution: Solution): Observable<string> {
+    return this.http.get(solution.template, { responseType: 'text' }).pipe(
+      // Update variable placeholders using prefix-variable mapping.
+      map(template => {
+        const prefix = this._solutionVarPrefixMap[solution.id];
+        return this._replaceVarPlaceholders(template, prefix);
+      }),
+
+      // Catch http errors
+      catchError(err => {
+        console.log('Request error in UserStateService.makeTemplateRequest: ' + err.message);
+        return Observable.of<string>('');
+      })
+    );
+  }
+
+  /**
+   * Reset the solution variable bindings based on the new solutions, merging in
+   * any existing bindings the user has set for the given solutions.
+   *
+   * Also update the solution variable prefix mapping for resolving variable
+   * name clashes across templates.
+   */
+  private _mergeSolutions(solutions: Solution[]) {
+    // Start with any existing bindings
+    let varBindings = {...this._solutionBindings.getValue()};
+
+    // Create and merge bindings for new solutions
+    solutions.forEach(solution => {
+      // Create default bindings for solution if none already exist
+      const id = solution.id;
+      if (!(id in varBindings)) {
+        const prefix = this._getVarPrefix(solution);
+        varBindings[id] = solution.variables
+          .map(v => {
+            const name = `${prefix}-${v.name}`;
+            return {...v, name: name};
+          })
+          .map(this._createBinding);
+      }
+    });
+
+    this.updateSolutionBindings(varBindings);
+    this.resetJobTemplate();
+  }
+
+  private _getVarPrefix(solution: Solution): number {
+    if (!(solution.id in this._solutionVarPrefixMap)) {
+      let prefix = 0;
+      while (prefix in Object.values(this._solutionVarPrefixMap)) {
+        prefix = prefix + 1;
+      }
+      this._solutionVarPrefixMap[solution.id] = prefix;
+    }
+    return this._solutionVarPrefixMap[solution.id];
+  }
+
+  private _createBinding(v: Variable): VarBinding<any> {
+    let b: VarBinding<any>;
+    const options: VarBindingOptions<any> = {
+      key: v.name,
+      label: v.label,
+      description: v.description,
+      required: !v.optional
+    };
+
+    if (v.default !== undefined) {
+      options.value = v.default;
+    }
+
+    if (v.values) {
+      options.options = v.values;
+    }
+
+    if (v.type == "file") {
+      // File inputs are always dropdowns, with options populated from the
+      // current set of selected downloads.
+      b = new OptionsBinding<string>(options);
+    }
+    else if (v.type == "int") {
+      options.step = v.step || 1;
+      if (v.min != null) {
+        options.min = v.min;
+      }
+      if (v.max != null)  {
+        options.max = v.max;
+      }
+      b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
+    }
+    else if (v.type == "double") {
+      options.step = v.step || 0.01;
+      if (v.min != null) {
+        options.min = v.min;
+      }
+      if (v.max != null)  {
+        options.max = v.max;
+      }
+      b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
+    }
+    else if (v.type == "string") {
+      b = options.options ? new OptionsBinding<number>(options) : new StringEntryBinding(options);
+    }
+    else if (v.type == "boolean") {
+      b = new BooleanBinding(options);
+    }
+
+    return b;
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Solution, VarBindingType, Variable, VariableType } from '../../shared/modules/vgl/models';
+import { Solution, VarBindingType, Variable, VariableType } from '../vgl/models';
 
 export interface SolutionVarBindingTypes {
   solution: Solution;
@@ -41,7 +41,7 @@ export class VarBinding<T> {
 
 export type SolutionVarBindings = { [key: string]: VarBinding<any>[] };
 
-export class TextboxBinding extends VarBinding<string> {
+export class StringEntryBinding extends VarBinding<string> {
   controlType = 'textbox';
   formType: string;
 
@@ -51,7 +51,7 @@ export class TextboxBinding extends VarBinding<string> {
   }
 }
 
-export class NumberboxBinding extends VarBinding<number> {
+export class NumberEntryBinding extends VarBinding<number> {
   controlType = 'textbox';
   formType: string;
 
@@ -61,9 +61,7 @@ export class NumberboxBinding extends VarBinding<number> {
   }
 }
 
-type SelectableVarType = string | number;
-
-export class DropdownBinding<T extends string|number> extends VarBinding<T> {
+export class OptionsBinding<T extends string|number> extends VarBinding<T> {
   controlType = 'dropdown';
   options: {key: string, value: T}[] = [];
 
@@ -73,6 +71,6 @@ export class DropdownBinding<T extends string|number> extends VarBinding<T> {
   }
 }
 
-export class CheckboxBinding extends VarBinding<boolean> {
+export class BooleanBinding extends VarBinding<boolean> {
   controlType = 'checkbox';
 }

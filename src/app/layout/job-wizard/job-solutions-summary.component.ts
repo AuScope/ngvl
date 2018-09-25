@@ -1,4 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Observable, BehaviorSubject, forkJoin } from 'rxjs';
 import { map, catchError, defaultIfEmpty } from 'rxjs/operators';
@@ -16,17 +18,12 @@ import { Solution,
          BooleanVariable
        } from '../../shared/modules/vgl/models';
 
-import {
-  VarBinding,
-  VarBindingOptions,
-  DropdownBinding,
-  TextboxBinding,
-  NumberboxBinding,
-  CheckboxBinding,
-  SolutionVarBindings
-} from './models';
+import { VarBinding,
+         VarBindingOptions,
+         SolutionVarBindings
+       } from '../../shared/modules/solutions/models';
+
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-job-solutions-summary',
@@ -38,7 +35,8 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   solutions: Solution[];
   activeSolution: string;
 
-  template: string = '';
+  template$: Observable<string>;
+
   varBindings: SolutionVarBindings = {};
 
   isTemplateEditorCollapsed = true;
@@ -60,17 +58,13 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
   constructor(private userStateService: UserStateService,
               private vbs: SolutionVarBindingsService,
-              private http: HttpClient) {}
+              private modalService: NgbModal) {}
 
   ngOnInit() {
     this.solutionsSubscription = this.userStateService.selectedSolutions
       .subscribe(solutions => {
         // Update our solutions array
         this.solutions = solutions;
-
-        // Merge bindings for any new solutions with existing bindings, which
-        // will also update the template.
-        this.mergeBindings(solutions);
 
         // If the user hasn't selected a solution that is in the new list then
         // select the first one by default.
@@ -82,11 +76,12 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
         }
       });
 
-    this.bindingsSubscription = this.vbs.templateBindings
+    this.bindingsSubscription = this.userStateService.solutionBindings
       .subscribe(bindings => {
         this.varBindings = bindings;
-        this.updateTemplate();
       });
+
+    this.template$ = this.userStateService.jobTemplate;
   }
 
   ngOnDestroy() {
@@ -99,115 +94,49 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   }
 
   updateBindings(solution: Solution, bindings: VarBinding<any>[]) {
-    this.vbs.updateTemplateBindings(solution, bindings);
+    this.userStateService.updateSolutionBindings(solution, bindings);
   }
 
-  updateTemplate() {
-    // Update the current job template based on the current solutions and bindings.
-    const requests = this.solutions.map(solution => this.makeRequest(solution));
-    forkJoin(requests).pipe(defaultIfEmpty([])).subscribe(templates => {
-      this.template = templates.join('\n\n');
-    });
+  updateTemplate(template: string) {
+    this.userStateService.updateJobTemplate(template);
   }
 
-  private subIntoTemplate(solution) {
-    const bindings: VarBinding<any>[] = this.varBindings[solution.id] || [];
-
-    return template => {
-      return template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g,
-                              (match, p1, offset, string) => {
-                                const b = bindings.find(it => it.key === p1);
-                                if (b && b.value !== undefined) {
-                                  return b.value;
-                                }
-                                return match;
-                              });
-    }
+  resetTemplate() {
+    this.userStateService.resetJobTemplate();
   }
 
-  private makeRequest(solution: Solution): Observable<string> {
-    const subf = this.subIntoTemplate(solution);
-
-    return this.http.get(solution.template, { responseType: 'text' }).pipe(
-      // Substitute current bindings for solution into template.
-      map(subf),
-
-      // Catch http errors
-      catchError(err => {
-        console.log('Request error in job-template-component: ' + err.message);
-        return Observable.of<string>('');
-      })
-    );
+  open() {
+    const modalRef = this.modalService.open(FinalTemplateModal);
+    modalRef.componentInstance.template = this.userStateService.getJobTemplateWithVars();
   }
 
-  /**
-   * Reset the solution variable bindings based on the new solutions, merging in
-   * any existing bindings the user has set for the given solutions.
-   */
-  mergeBindings(solutions: Solution[]) {
-    let varBindings = {...this.varBindings};
+}
 
-    solutions.forEach(solution => {
-      // Create default bindings for solution if none already exist
-      const id = solution.id;
-      if (!(id in varBindings)) {
-        varBindings[id] = solution.variables.map(this.createBinding);
-      }
-    });
+@Component({
+  selector: 'final-template-modal',
+  template: `
+    <div class="modal-header">
+      <h4 class="modal-title">Final template</h4>
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ngx-monaco-editor [options]="editorOptions" [ngModel]="template"></ngx-monaco-editor>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close()">Close</button>
+    </div>
+  `
+})
+export class FinalTemplateModal {
+  @Input() template: string;
 
-    this.vbs.updateTemplateBindings(varBindings);
-  }
+  editorOptions = {
+    theme: 'vs-light',
+    language: 'python',
+    readOnly: true
+  };
 
-  createBinding(v: Variable): VarBinding<any> {
-    let b: VarBinding<any>;
-    const options: VarBindingOptions<any> = {
-      key: v.name,
-      label: v.label,
-      description: v.description,
-      required: !v.optional
-    };
-
-    if (v.default !== undefined) {
-      options.value = v.default;
-    }
-
-    if (v.values) {
-      options.options = v.values;
-    }
-
-    if (v.type == "file") {
-      // File inputs are always dropdowns, with options populated from the
-      // current set of selected downloads.
-      b = new DropdownBinding<string>(options);
-    }
-    else if (v.type == "int") {
-      options.step = v.step || 1;
-      if (v.min != null) {
-        options.min = v.min;
-      }
-      if (v.max != null)  {
-        options.max = v.max;
-      }
-      b = options.options ? new DropdownBinding<number>(options) : new NumberboxBinding(options);
-    }
-    else if (v.type == "double") {
-      options.step = v.step || 0.01;
-      if (v.min != null) {
-        options.min = v.min;
-      }
-      if (v.max != null)  {
-        options.max = v.max;
-      }
-      b = options.options ? new DropdownBinding<number>(options) : new NumberboxBinding(options);
-    }
-    else if (v.type == "string") {
-      b = options.options ? new DropdownBinding<number>(options) : new TextboxBinding(options);
-    }
-    else if (v.type == "boolean") {
-      b = new CheckboxBinding(options);
-    }
-
-    return b;
-  }
-
+  constructor(public activeModal: NgbActiveModal) {}
 }

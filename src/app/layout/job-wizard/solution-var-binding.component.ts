@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { VarBinding } from './models';
+import { VarBinding } from '../../shared/modules/solutions/models';
 
 @Component({
   selector: 'app-solution-var-binding',

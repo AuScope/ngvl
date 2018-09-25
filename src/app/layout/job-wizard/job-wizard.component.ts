@@ -71,11 +71,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Store the current job object in the userStateService unless cancelled. Might not work with a viewchild?
-    if (!this.cancelled) {
-      this.stashUserState();
-    }
-
     // Clean up subs
     this._solutionsSub.unsubscribe();
     this.routeSub.unsubscribe();
@@ -102,36 +97,19 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   private doSave(): Observable<Job> {
-    // Store the current user state.
-    this.stashUserState();
-
     // Save the job to the backend
-    return this.vglService.saveJob(this.userStateService.getJob(),
+    return this.vglService.saveJob(this.getJobObject(),
                                    this.userStateService.getJobDownloads(),
                                    this.userStateService.getJobTemplate(),
                                    this.userStateService.getSolutionsCart());
   }
 
   cancel() {
-    this.cancelled = true;
-    this.stashUserState();
     this.location.back();
   }
 
   getJobObject(): Job {
     return this.jobObject.getJobObject();
-  }
-
-  getTemplate(): string {
-    return this.solutionsComponent.template;
-  }
-
-  private stashUserState() {
-    // Store the current state of the job object in the user state.
-    this.userStateService.updateJob(this.getJobObject());
-
-    // Update the current template
-    this.userStateService.updateJobTemplate(this.getTemplate());
   }
 
 }

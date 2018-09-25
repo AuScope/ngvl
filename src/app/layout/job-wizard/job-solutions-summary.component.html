@@ -11,6 +11,12 @@
         <span *ngIf="!isTemplateEditorCollapsed" aria-hidden="true" title="Edit template">&times;</span>
         <i *ngIf="isTemplateEditorCollapsed" class="fa fa-fw fa-angle-down" title="Hide template"></i>
       </button>
+      <button type="button"
+        class="btn btn-primary btn-sm"
+        (click)="resetTemplate()">Reset template</button>
+      <button type="button"
+        class="btn btn-primary btn-sm"
+        (click)="open()">View template</button>
     </div>
     <div class="col-md-8">
       <app-job-solution-vars
@@ -26,7 +32,11 @@
     <div class="col-md-12">
       <!-- Don't use ngbCollapse here becuase the ngx-monaco-editor doesn't size correctly unless we use the automaticLayout option. -->
       <div *ngIf="!isTemplateEditorCollapsed" id="collapseTemplateEditor">
-        <ngx-monaco-editor class="template-code-editor" [options]="editorOptions" [(ngModel)]="template"></ngx-monaco-editor>
+        <ngx-monaco-editor
+          class="template-code-editor"
+          [options]="editorOptions"
+          [ngModel]="template$ | async"
+          (ngModelChange)="updateTemplate($event)"></ngx-monaco-editor>
       </div>
     </div>
   </div>

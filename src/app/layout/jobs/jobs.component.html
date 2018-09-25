@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
-    <div class="col" style="height: calc(100vh - 200px);padding: 0px; width: 100%;">
+    <div class="col" style="height: calc(100vh - 200px);padding: 0px; width: 100%; border: 1px solid #ddd;">
         <!-- Job tree -->
         <split direction='horizontal'>
             <split-area size="30">
@@ -82,18 +82,14 @@
 
                             <div class="row" style="margin-right: -10px; margin-left: -2px; margin-top:-1px;">
                                 <!-- File panel -->
-                                <!-- Issue with padding changing after navigating to Datasets -->
                                 <div class="col" style="height: calc(100vh - 297px);border: 1px solid #ddd;padding: 0px;margin-right: 10px;">
                                     <split direction='horizontal'>
                                         <split-area size="30">
-                                            <div class="card" style="border-radius: 0px; height: 100%;">
-                                                <div class="card-body" style="overflow:hidden;padding:0px;">
-                                                    <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>                                                      
-                                                </div>
+                                            <div style="position: relative; height:100%; width: 100%; overflow-y:auto; overflow-x:hidden;">
+                                                <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
                                             </div>
                                         </split-area>
                                         <split-area id="preview-panel" size="70">
-                                            <!-- Preview panel (no longer a card, match card style)-->
                                             <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
                                                 <div style="height:100%;width:100%;text-align: center;vertical-align: middle;display:table-cell;">
                                                     Select a file to the left to preview it here.

@@ -1,4 +1,4 @@
-<div *ngIf="cloudFilesLoading" class="spinner" style="display:relative;">
+<div *ngIf="cloudFilesLoading" class="spinner">
     <div class="bounce1"></div>
     <div class="bounce2"></div>
     <div class="bounce3"></div>
@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col">
             <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
-                <button class="btn btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
+                <button class="btn btn-primary btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
                     ngbDropdownToggle>
                     <i class="fa fa-folder">&nbsp;Actions</i>
                 </button>
@@ -21,7 +21,6 @@
         </div>
     </div>
     <!-- Files table -->
-    <!-- TODO: Deselect file selection when preview loading, or interrupt file loading if selection changed -->
     <div class="row">
         <div class="col">
             <div *ngIf="selectedJob && selectedJob.jobDownloads.length > 0">

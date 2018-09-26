@@ -275,7 +275,8 @@ export class VglService {
   public saveJob(job: Job,
                  downloads: JobDownload[],
                  template: string,
-                 solutions: Solution[]): Observable<Job> {
+                 solutions: Solution[],
+                 files: any[]): Observable<Job> {
     // Ensure the job object is created/updated first, which also ensures we
     // have a job id for the subsequent requests.
     return this.updateJob(job).pipe(
@@ -285,6 +286,7 @@ export class VglService {
       // Next associate the template with the job, and if we succeed then return
       // the updated job object.
       switchMap(job => this.saveScript(template, job, solutions).pipe(map(x => job))),
+      switchMap(job => this.uploadFiles(job, files).pipe(map(x => job))),
     );
   }
 
@@ -329,6 +331,20 @@ export class VglService {
     return this.vglPost('secure/saveScript.do', params);
   }
 
+  public uploadFiles(job: Job, files: any[]): Observable<any> {
+
+      let headers = new Headers();
+      headers.append('enctype', 'multipart/form-data');
+      headers.append('Accept', 'application/json');
+      let options = { headers };
+
+      const requests = files.map(file => {
+          const params = { file: file, jobId: job.id };
+          return this.vglPost('secure/uploadFile.do', params, options);
+      });
+      return forkJoin(requests);
+  }
+
   public updateJob(job: Job): Observable<Job> {
     // Copy the properties of the job for the request parameters.
     const params = {...job};
@@ -349,6 +365,9 @@ export class VglService {
     if (params.hasOwnProperty('id') && params.id == -1) {
       delete params.id;
     }
+
+    if(!params.computeServiceId)
+        delete params.computeServiceId;
 
     return this.vglGet('secure/updateOrCreateJob.do', params)
       .pipe(

@@ -12,10 +12,10 @@
         <div class="card-body">
           <h3 class="card-title">{{ solution.name }}</h3>
           <p class="card-text">{{ solution.description }}</p>
-          <button class="btn btn-secondary" (click)="selectSolution(solution)">Select</button>
+          <button class="btn btn-primary" (click)="selectSolution(solution)">Select</button>
           <a
             [routerLink]="['/solutions/detail', solution['@id']]"
-            class="btn btn-secondary">
+            class="btn btn-primary" style="margin-left:8px;">
             Details...
           </a>
         </div>

@@ -1,7 +1,7 @@
 label.required:after { 
     color: #d00;
     content: "*";
-    position: absolute;
+    position: relative;
     margin-left: 5px;
 }
 
@@ -14,6 +14,6 @@ input.ng-invalid.ng-touched {
 	height: 0.1px;
 	opacity: 0;
 	overflow: hidden;
-	position: absolute;
+	position: relative;
 	z-index: -1;
 }

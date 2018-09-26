@@ -156,9 +156,9 @@
                     <p-dropdown #dropDown [options]="dropDownItems" [(ngModel)]="selectedOptions" editable="true" placeholder="Select from saved options " [ngModelOptions]="{standalone: true}" (onChange)="selectBookMarkOptions()"  >                                           
                     </p-dropdown>                 
                     &nbsp;
-                    <button #addButton type="button" class="btn btn-secondary" (click)="addBookMarkOptions()">Add</button> 
+                    <button #addButton type="button" class="btn btn-primary" (click)="addBookMarkOptions()">Add</button> 
                     &nbsp;                    
-                    <button #deleteButton type="button" class="btn btn-secondary" (click)="deleteBookMarkOptions()" disabled="disabled">Remove</button>
+                    <button #deleteButton type="button" class="btn btn-primary" (click)="deleteBookMarkOptions()" disabled="disabled">Remove</button>
                     <br>    
                     <small>Select default or saved options. Alternatively,enter a new name to save options for future requests.</small>
             </div>
@@ -166,8 +166,8 @@
     </div>
     <div class="modal-footer" style="background: #EEE">      
             
-        <button *ngIf="!isBMarked" type="button" class="btn btn-secondary" (click)="revertChanges()">Restore defaults</button>
-        <button type="button" type="submit" [disabled]="!downloadOptionsForm.valid" class="btn btn-secondary">
+        <button *ngIf="!isBMarked" type="button" class="btn btn-primary" (click)="revertChanges()">Restore defaults</button>
+        <button type="button" type="submit" [disabled]="!downloadOptionsForm.valid" class="btn btn-primary">
             <i class="fa fa-plus-circle"></i>&nbsp;Confirm Changes
         </button>
     </div>

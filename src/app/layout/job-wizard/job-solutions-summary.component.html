@@ -6,7 +6,8 @@
       <button type="button" class="btn btn-primary btn-sm"
               (click)="isTemplateEditorCollapsed = !isTemplateEditorCollapsed"
               [attr.aria-expanded]="!isTemplateEditorCollapsed"
-              aria-controls="collapseTemplateEditor">
+              aria-controls="collapseTemplateEditor"
+              style="margin-left:8px;">
         {{ isTemplateEditorCollapsed ? 'Edit' : 'Hide' }} template
         <span *ngIf="!isTemplateEditorCollapsed" aria-hidden="true" title="Edit template">&times;</span>
         <i *ngIf="isTemplateEditorCollapsed" class="fa fa-fw fa-angle-down" title="Hide template"></i>

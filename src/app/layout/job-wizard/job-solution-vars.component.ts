@@ -62,7 +62,7 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {
     const options = [
-      ...downs.map(d => { return {key: d.name, value: d.name}; }),
+      ...downs.map(d => { return {key: d.localPath, value: d.name}; }),
       ...clouds.map(c => { return {key: c.name, value: c.name}; }),
       ...ups.map(u => { return {key: u.name, value: u.name}; })
     ];

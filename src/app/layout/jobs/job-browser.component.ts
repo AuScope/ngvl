@@ -220,27 +220,12 @@ export class JobBrowserComponent implements OnInit {
     }
 
     /**
-     * Test if a specified TreeNode has a parent
-     * 
-     * @param node the TreeNode to test
-     * @return true if TreeNode has a parent, false otherwise
-     */
-    private nodeHasParent(node: TreeNode): boolean {
-        for(let treeJob of this.treeJobsData) {
-            if(treeJob.children && treeJob.children.findIndex(n => n === node)>-1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Build the job context menu based on job status
      */
     public createJobContextMenu(node): any[] {
         let items: any[] = [];
         //one or more job nodes are selected to move to top level
-        if (this.selectedJobNodes.length === 1 && (this.nodeHasParent(node))) {
+        if (this.selectedJobNodes.length === 1 && node.parent) {
             items.push({ label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: (event) => this.moveSelectedJob() });
         }
         // If more than 1 item is selected, or only a series is selected, delete is only action
@@ -334,6 +319,16 @@ export class JobBrowserComponent implements OnInit {
      * second result takes precendence
      */
     compareJobs(node1: TreeNode, node2: TreeNode, multiSortMeta: any[]): number {
+        if(node1.children && node1.children.length > 0) {
+            node1.children.sort((child1: TreeNode, child2: TreeNode) => {
+                return this.compareJobs(child1, child2, multiSortMeta);
+            });
+        }
+        if(node2.children && node2.children.length > 0) {
+            node2.children.sort((child1: TreeNode, child2: TreeNode) => {
+                return this.compareJobs(child1, child2, multiSortMeta);
+            });
+        }
         let result = null;
         for(let i = 0; i < multiSortMeta.length; i++) {
             let sortField = multiSortMeta[i].field;
@@ -423,7 +418,8 @@ export class JobBrowserComponent implements OnInit {
             message: confirmMessage,
             icon: 'fa fa-trash',
             accept: () => {
-                //this.cancelCurrentSubscription();
+                // Job may still be loading from selection, cancel it
+                this.cancelCurrentSubscription();
                 for (let node of this.selectedJobNodes) {
                     if (node.leaf) {
                         this.jobsService.deleteJob(node.data.id).subscribe(
@@ -440,11 +436,15 @@ export class JobBrowserComponent implements OnInit {
                                         job => job.data.id !== node.data.id
                                     );
                                 }
-
                                 // Remove from Jobs list
                                 this.jobs = this.jobs.filter(
                                     job => job.id !== node.data.id
                                 );
+                                // Remove from selection list
+                                this.selectedJobNodes = this.selectedJobNodes.filter(
+                                    job => job.data.id !== node.data.id
+                                );
+                                this.updateJobTree();
                             },
                             error => {
                                 this.messageService.add({ severity: 'error', summary: 'Error deleting job(s)', detail: error.message, sticky: true });
@@ -453,12 +453,22 @@ export class JobBrowserComponent implements OnInit {
                     }
                     // Series
                     else if (!node.leaf) {
-                        this.cancelCurrentSubscription();
                         this.jobsService.deleteSeries(node.data.seriesId).subscribe(
-                            response => {
+                            () => {
                                 this.treeJobsData = this.treeJobsData.filter(
                                     series => series.data.seriesId !== node.data.seriesId
                                 );
+                                if(node.children) {
+                                    for(let jobNode of node.children) {
+                                        this.jobs.filter(
+                                            job => job.id !== jobNode.data.id
+                                        );
+                                        this.selectedJobNodes.filter(
+                                            job => job.data.id !== jobNode.data.id
+                                        );
+                                    }
+                                }
+                                this.updateJobTree();
                             },
                             error => {
                                 this.messageService.add({ severity: 'error', summary: 'Error deleting series', detail: error.message, sticky: true });
@@ -466,11 +476,7 @@ export class JobBrowserComponent implements OnInit {
                         )
                     }
                 }
-                // Clear selections, update tree
                 this.selectedContextNode = undefined;
-                this.selectedJobNodes = undefined;
-                this.selectedJob = undefined;
-                this.updateJobTree();
             }
         });
     }
@@ -675,7 +681,6 @@ export class JobBrowserComponent implements OnInit {
                 //delete from old folder
                 if (shiftingNodeIndex > -1) {
                     oldFolder.children.splice(shiftingNodeIndex, 1);
-                    //add to the new folder
                     this.addToNewFolder(newFolder, jobNode);
                 }
             }
@@ -686,7 +691,6 @@ export class JobBrowserComponent implements OnInit {
             //delete from the main tree and and add to new folder
             if (shiftingNodeIndex > -1) {
                 this.treeJobsData.splice(shiftingNodeIndex, 1);
-                //add to the new folder
                 this.addToNewFolder(newFolder, jobNode);
             }
         }

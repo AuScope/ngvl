@@ -109,7 +109,8 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     return this.vglService.saveJob(this.userStateService.getJob(),
                                    this.userStateService.getJobDownloads(),
                                    this.userStateService.getJobTemplate(),
-                                   this.userStateService.getSolutionsCart());
+                                   this.userStateService.getSolutionsCart(),
+                                   this.userStateService.getUploadedFiles());
   }
 
   cancel() {

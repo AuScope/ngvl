@@ -14,12 +14,11 @@
             class="d-flex flex-column"
             [(ngModel)]="selectedProblemId">
 
-            <label ngbButtonLabel
-              *ngFor="let problem of problems; let i = index">
-              <input ngbButton
-                type="radio"
-                [value]="problem['@id']">
-              {{ problem.name }}
+            <label ngbButtonLabel style="display:block;
+                        white-space:nowrap;
+                        overflow:hidden;
+                        text-overflow:ellipsis" *ngFor="let problem of problems; let i = index">
+              <input ngbButton type="radio" [value]="problem['@id']" title="{{ problem.name }}"> {{ problem.name }}
             </label>
 
           </div>

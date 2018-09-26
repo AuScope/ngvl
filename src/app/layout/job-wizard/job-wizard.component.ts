@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, ParamMap, UrlSegment } from '@angular/router';
+import { MessageService } from 'primeng/api';
 
 import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
@@ -24,6 +25,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
 
   jobIncomplete: boolean = false;
   cancelled: boolean = false;
+  noSave: boolean = false;
 
   solutions: Solution[];
   private _solutionsSub;
@@ -43,7 +45,8 @@ export class JobWizardComponent implements OnInit, OnDestroy {
               private vglService: VglService,
               private location: Location,
               private router: Router,
-              private route: ActivatedRoute) {}
+              private route: ActivatedRoute,
+              private messageService: MessageService) {}
 
   ngOnInit() {
     // Check the URL and parameters to determine whether we're creating a new
@@ -57,7 +60,18 @@ export class JobWizardComponent implements OnInit, OnDestroy {
         else if (parts[0].path == 'job' && params.has('id')) {
           // Load the specified job from the server
           const id = parseInt(params.get('id'));
-          return this.userStateService.loadJob(id);
+          return this.userStateService.loadJob(id).pipe(
+            // Notify the user of job load status as a side-effect, then pass on
+            // the job object unchanged.
+            map(job => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Load success',
+                detail: `Job ${job.id} loaded successfully.`
+              });
+              return job;
+            })
+          );
         }
       })
     ).subscribe(() => {
@@ -77,12 +91,21 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    this.doSave().subscribe(resp => {
-      console.log('Saved: ' + resp);
+    this.noSave = true;
+    this.messageService.clear();
+    this.messageService.add({severity: 'info', summary: 'Saving job...', detail: '', sticky: true});
+
+    this.doSave().subscribe((resp: Job) => {
+      this.router.navigate(['/wizard/job', resp.id]);
     });
+
   }
 
   submit() {
+    this.noSave = true;
+    this.messageService.clear();
+    this.messageService.add({severity: 'info', summary: 'Submitting job...', detail: '', sticky: true});
+
     // Save the job first, then submit it an navigate away.
     this.doSave().subscribe(savedJob => {
       this.vglService.submitJob(savedJob).subscribe(
@@ -100,7 +123,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     // Save the job to the backend
     return this.vglService.saveJob(this.getJobObject(),
                                    this.userStateService.getJobDownloads(),
-                                   this.userStateService.getJobTemplate(),
+                                   this.userStateService.getJobTemplateWithVars(),
                                    this.userStateService.getSolutionsCart());
   }
 

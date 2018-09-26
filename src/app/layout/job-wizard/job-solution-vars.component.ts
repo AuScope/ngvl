@@ -51,7 +51,6 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   }
 
   formBindings(values): VarBinding<any>[] {
-    console.log('formBindings(' + this.solution.id + ', ' + JSON.stringify(values) + ')');
     const bindings = [...this.bindings];
 
     for (const b of bindings) {

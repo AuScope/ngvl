@@ -6,6 +6,7 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
+import { ToastModule } from 'primeng/toast';
 
 import { JobWizardRoutingModule } from './job-wizard-routing.module';
 import { JobWizardComponent } from './job-wizard.component';
@@ -31,7 +32,8 @@ import { JobDatasetsComponent } from './job-datasets.component';
     TreeTableModule,
     JobWizardRoutingModule,
     JobsModule,
-    SolutionsModule
+    SolutionsModule,
+    ToastModule
   ],
   declarations: [
     JobWizardComponent,

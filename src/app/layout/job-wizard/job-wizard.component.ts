@@ -110,6 +110,12 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this.doSave().subscribe(savedJob => {
       this.vglService.submitJob(savedJob).subscribe(
         submitted => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Submitted',
+            detail: `Job ${savedJob.id} submitted successfully.`,
+            life: 10000
+          });
           this.router.navigate(['/jobs']);
         },
         error => {

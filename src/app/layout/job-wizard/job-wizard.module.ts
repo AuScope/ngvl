@@ -30,10 +30,10 @@ import { JobDatasetsComponent } from './job-datasets.component';
     ContextMenuModule,
     TableModule,
     TreeTableModule,
+    ToastModule,
     JobWizardRoutingModule,
     JobsModule,
-    SolutionsModule,
-    ToastModule
+    SolutionsModule
   ],
   declarations: [
     JobWizardComponent,

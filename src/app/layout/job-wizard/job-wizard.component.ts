@@ -7,8 +7,8 @@ import { UserStateService } from '../../shared';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { routerTransition } from '../../router.animations';
 
-import { Observable, combineLatest } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, combineLatest, EMPTY } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
 
 import { Job, Solution } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';
@@ -94,10 +94,25 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this.noSave = true;
     this.messageService.clear();
     this.messageService.add({severity: 'info', summary: 'Saving job...', detail: '', sticky: true});
+    const oldId = this.getJobObject().id;
 
-    this.doSave().subscribe((resp: Job) => {
-      this.router.navigate(['/wizard/job', resp.id]);
-    });
+    this.doSave()
+      .pipe(catchError((err, obs) => {
+        this.messageService.clear();
+        this.messageService.add({severity: 'error', summary: 'Save failed!', detail: JSON.stringify(err), sticky: true});
+        return EMPTY;
+      }))
+      .subscribe(
+        (resp: Job) => {
+          if (resp) {
+            const id = resp.id;
+            this.messageService.clear();
+            this.messageService.add({severity: 'success', summary: 'Saved', detail: `Job ${id} saved successfully.`});
+            this.noSave = false;
+            this.router.navigate(['/wizard/job', id]);
+          }
+        }
+      );
 
   }
 

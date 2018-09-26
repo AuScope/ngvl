@@ -8,7 +8,7 @@ import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { routerTransition } from '../../router.animations';
 
 import { Observable, combineLatest } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import { Job, Solution } from '../../shared/modules/vgl/models';
 import { JobObjectComponent } from './job-object.component';

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable, of, throwError, combineLatest, forkJoin, EMPTY } from 'rxjs';
-import { catchError, mergeMap, switchMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
 import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType, Entry } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
@@ -333,16 +333,17 @@ export class VglService {
 
   public uploadFiles(job: Job, files: any[]): Observable<any> {
 
-      let headers = new Headers();
-      headers.append('enctype', 'multipart/form-data');
-      headers.append('Accept', 'application/json');
-      let options = { headers };
+    let headers = new Headers();
+    headers.append('enctype', 'multipart/form-data');
+    headers.append('Accept', 'application/json');
+    let options = { headers };
 
-      const requests = files.map(file => {
-          const params = { file: file, jobId: job.id };
-          return this.vglPost('secure/uploadFile.do', params, options);
-      });
-      return forkJoin(requests);
+    const requests = files.map(file => {
+      const params = { file: file, jobId: job.id };
+      return this.vglPost('secure/uploadFile.do', params, options);
+    });
+
+    return forkJoin(requests).pipe(defaultIfEmpty([]));
   }
 
   public updateJob(job: Job): Observable<Job> {

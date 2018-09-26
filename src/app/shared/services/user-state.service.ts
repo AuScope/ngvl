@@ -212,6 +212,10 @@ export class UserStateService {
     return this._jobTemplate.getValue();
   }
 
+  public getUploadedFiles(): any[] {
+    return this._uploadedFiles.getValue();
+  }
+
   // Files User has uploaded for a Job
   public setUploadedFiles(files: any[]): void {
       this._uploadedFiles.next(files);
@@ -316,7 +320,7 @@ export class UserStateService {
         computeInstanceId: null,
         computeInstanceType: "",
         computeInstanceKey: "",
-        computeServiceId: "",
+        computeServiceId: null,
         computeTypeId: "",
         storageBaseKey: "",
         storageServiceId: "",

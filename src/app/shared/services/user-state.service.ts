@@ -60,9 +60,8 @@ export class UserStateService {
         return this.currentView;
     }
 
-    public updateUser() {
-        this.vgl.user.subscribe(
-            user => {
+    public updateUser(): Observable<any> {
+        return this.vgl.user.map(user => {
                 // If full name is empty (as with AAF login), use email address as name
                 if (user.fullName === undefined || user.fullName === "") {
                     user.fullName = user.email;

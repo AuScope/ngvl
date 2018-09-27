@@ -57,40 +57,40 @@ export class AuthService {
    * the server, but the front end doesn't know it yet
    */
   checkServerLogin(): void {
-    this.userStateService.updateUser();
-    this.userStateService.updateBookMarks();
-    this.userStateService.user.subscribe(
-      user => {
-          if(user === ANONYMOUS_USER) {
-            localStorage.removeItem('isLoggedIn');
-          } else {
-            localStorage.setItem('isLoggedIn', 'true');
-          }
-      }
-    )
+    this.userStateService.updateUser().subscribe(() => {
+        this.userStateService.updateBookMarks();
+        this.userStateService.user.subscribe(user => {
+            if(user === ANONYMOUS_USER) {
+                localStorage.removeItem('isLoggedIn');
+            } else {
+                localStorage.setItem('isLoggedIn', 'true');
+            }
+        })
+    });
   }
 
   onLoggedIn() {
     localStorage.setItem('isLoggedIn', 'true');
     // Trigger an update in the user state service to get the new username
-    this.userStateService.updateUser();
-    // Check is User has accpeted T&C's
-    this.userStateService.user.subscribe(
-        user => {
-            // Navigate to the saved url. Reset the saved url so it isn't retained for
-            // later logins.
-            if(user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
-                this.userStateService.updateBookMarks();
-                const savedUrl = this.resetRedirectUrl();
-                const redirect = savedUrl ? savedUrl : '/dashboard';
-                this.router.navigate([redirect]);
+    this.userStateService.updateUser().subscribe(() => {
+        // Check is User has accpeted T&C's
+        this.userStateService.user.subscribe(
+            user => {
+                // Navigate to the saved url. Reset the saved url so it isn't retained for
+                // later logins.
+                if(user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
+                    this.userStateService.updateBookMarks();
+                    const savedUrl = this.resetRedirectUrl();
+                    const redirect = savedUrl ? savedUrl : '/dashboard';
+                    this.router.navigate([redirect]);
+                }
+                // Redirect User to Profile to accept T&C's if they haven't already
+                else {
+                    this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
+                }
             }
-            // Redirect User to Profile to accept T&C's if they haven't already
-            else {
-                this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
-            }
-        }
-    );
+        );
+    });
   }
 
   public get isLoggedIn(): boolean {

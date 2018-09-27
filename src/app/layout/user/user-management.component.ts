@@ -115,11 +115,9 @@ export class UserManagementComponent implements OnInit {
      * User has accepted T&C's. Leverage existing AWS function to write this back to DB
      */
     private acceptTermsAndConditions(): void {
-      this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe(
-        result => {
-          this.userStateService.updateUser();
-        }
-      );
+      this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe(() => {
+          this.userStateService.updateUser().subscribe();
+      });
     }
 
     

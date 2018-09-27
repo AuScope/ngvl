@@ -310,6 +310,7 @@ export class VglService {
 
     const params = {
       id: job.id,
+      append: false, // Replace job downloads with new set
       name: names,
       description: descriptions,
       url: urls,

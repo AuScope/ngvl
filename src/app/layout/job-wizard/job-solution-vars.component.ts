@@ -2,10 +2,11 @@ import { Component, OnDestroy, OnInit, EventEmitter, Input, Output } from '@angu
 import { FormGroup } from '@angular/forms';
 
 import { Subscription, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Solution, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
+import { SolutionVarBindings, VarBinding, OptionsBinding } from '../../shared/modules/solutions/models';
 
-import { SolutionVarBindings, VarBinding, DropdownBinding } from './models';
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
 
 import { UserStateService } from '../../shared';
@@ -22,7 +23,6 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   @Output() bindingsChange = new EventEmitter<VarBinding<any>[]>();
 
   form: FormGroup;
-  payLoad = '';
 
   private subscription: Subscription;
 
@@ -32,7 +32,12 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
+    // Create the form for our bindings, and subscribe to values changes so we
+    // can update the parent bindings.
     this.form = this.vbs.toFormGroup(this.bindings);
+    this.form.valueChanges.pipe(
+      map(values => this.formBindings(values))
+    ).subscribe(bindings => this.bindingsChange.emit(bindings));
 
     this.subscription = combineLatest(
       this.uss.jobDownloads,
@@ -45,15 +50,11 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
     this.subscription.unsubscribe();
   }
 
-  onSubmit() {
-    this.bindingsChange.emit(this.formBindings());
-  }
-
-  formBindings(): VarBinding<any>[] {
+  formBindings(values): VarBinding<any>[] {
     const bindings = [...this.bindings];
 
     for (const b of bindings) {
-      b.value = this.form.value[b.key];
+      b.value = values[b.key];
     }
 
     return bindings;
@@ -61,14 +62,14 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {
     const options = [
-      ...downs.map(d => { return {key: d.name, value: d.name}; }),
+      ...downs.map(d => { return {key: d.localPath, value: d.name}; }),
       ...clouds.map(c => { return {key: c.name, value: c.name}; }),
       ...ups.map(u => { return {key: u.name, value: u.name}; })
     ];
 
     this.bindings.forEach(b => {
       if (this.isInputFileBinding(b)) {
-        (b as DropdownBinding<any>).options = options;
+        (b as OptionsBinding<any>).options = options;
 
         // If the current value is in options then retain it, otherwise reset to no selection
         const stillAnOption = options.find(o => o.key == b.value);

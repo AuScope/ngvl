@@ -6,13 +6,14 @@ import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
+import { ToastModule } from 'primeng/toast';
 
 import { JobWizardRoutingModule } from './job-wizard-routing.module';
 import { JobWizardComponent } from './job-wizard.component';
 
 import { JobsModule } from '../jobs/jobs.module';
 import { SolutionsModule } from '../../shared/modules';
-import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
+import { JobSolutionsSummaryComponent, FinalTemplateModal } from './job-solutions-summary.component';
 import { JobSolutionVarsComponent } from './job-solution-vars.component';
 import { SolutionVarBindingComponent } from './solution-var-binding.component';
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
@@ -29,6 +30,7 @@ import { JobDatasetsComponent } from './job-datasets.component';
     ContextMenuModule,
     TableModule,
     TreeTableModule,
+    ToastModule,
     JobWizardRoutingModule,
     JobsModule,
     SolutionsModule
@@ -39,9 +41,11 @@ import { JobDatasetsComponent } from './job-datasets.component';
     JobSolutionsSummaryComponent,
     JobSolutionVarsComponent,
     JobObjectComponent,
-    SolutionVarBindingComponent
+    SolutionVarBindingComponent,
+    FinalTemplateModal
   ],
   exports: [JobWizardComponent],
-  providers: [SolutionVarBindingsService]
+  providers: [SolutionVarBindingsService],
+  entryComponents: [FinalTemplateModal]
 })
 export class JobWizardModule { }

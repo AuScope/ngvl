@@ -21,12 +21,12 @@ export class SolutionsCartComponent implements OnInit {
     this.cart$ = this.userStateService.selectedSolutions;
   }
 
-  selectSolution(solution: Solution) {   
+  selectSolution(solution: Solution) {
     this.selected = solution.id;
     this.selectedChange.emit(this.selected);
   }
 
-  removeSolution(solution: Solution) {   
+  removeSolution(solution: Solution) {
     this.userStateService.removeSolutionFromCart(solution);
   }
 }

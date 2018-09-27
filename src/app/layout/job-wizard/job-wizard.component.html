@@ -29,9 +29,11 @@
     <hr>
   </div>
   <p>
-    <button class="btn btn-primary" style="margin-right:8px;" (click)="save()">Save</button>
+    <button class="btn btn-primary" [disabled]="noSave" style="margin-right:8px;" (click)="save()">Save</button>
     <button class="btn btn-primary" style="margin-right:8px;" (click)="cancel()">Cancel</button>
-    <button class="btn btn-primary" [disabled]="jobIncomplete" (click)="submit()">Submit</button>
+    <button class="btn btn-primary" [disabled]="jobIncomplete || noSave" (click)="submit()">Submit</button>
   </p>
 
 </div>
+
+<p-toast position="center"></p-toast>

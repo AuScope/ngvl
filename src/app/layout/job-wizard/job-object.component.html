@@ -1,144 +1,148 @@
-<div class="card">
-    <div class="card-header">
-        Enter job details...
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <!-- Job Name -->
-            <div class="col-lg-2">
-                <label>Job Name:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <input type="text" style="width:100%;" [(ngModel)]="job.name">
-                </div>
-                <small>Enter a useful name for your job here.</small>
-            </div>
+<form #jobObjectForm=ngForm>
+    <div class="card">
+        <div class="card-header">
+            Enter job details...
         </div>
-        <!-- Job Description -->
-        <div class="row">
-            <div class="col-lg-2">
-                <label>Job Description:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <input type="text" style="width:100%;" [(ngModel)]="job.description">
+        <div class="card-body">
+            <div class="row">
+                <!-- Job Name -->
+                <div class="col-lg-2">
+                    <label>Job Name:</label>
                 </div>
-                <small>Enter an optional description for your job here.</small>
-            </div>
-        </div>
-        <!-- Compute provider (Job.computeServiceId) -->
-        <div class="row">
-            <div class="col-lg-2">
-                <label class="required">Compute Provider:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <select #computeProvider style="width:100%;" [(ngModel)]="job.computeServiceId" (change)="computeProviderChanged(computeProvider.value)">
-                        <option *ngFor="let provider of computeProviders" [value]="provider.id">{{ provider.name }}</option>
-                    </select>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input type="text" style="width:100%;" [(ngModel)]="job.name" name="jobName">
+                    </div>
+                    <small>Enter a useful name for your job here.</small>
                 </div>
-                <small>Select a location where your data will be processed. Different locations will have different toolboxes.</small>
             </div>
-        </div>
-        <!-- Toolbox (Job.computeVmId) -->
-        <div class="row">
-            <div class="col-lg-2">
-                <label class="required">Toolbox:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <select #toolbox style="width:100%;" [(ngModel)]="job.computeVmId" (change)="toolboxChanged(toolbox.value)">
-                        <option *ngFor="let toolbox of toolboxes" [value]="toolbox.imageId">{{ toolbox.name }}</option>
-                    </select>
+            <!-- Job Description -->
+            <div class="row">
+                <div class="col-lg-2">
+                    <label>Job Description:</label>
                 </div>
-                <small>Select a toolbox that contains software that you would like to use to process your data.</small>
-            </div>
-        </div>
-        <!-- Resources (Job.computeTypeId) -->
-        <div class="row" *ngIf="isCloudProvider(job.computeServiceId)">
-            <div class="col-lg-2">
-                <label class="required">Cloud resources:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <select style="width:100%;" [(ngModel)]="job.computeTypeId">
-                        <option *ngFor="let resource of resources" [value]="resource.id">{{ resource.description }}</option>
-                    </select>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input type="text" style="width:100%;" [(ngModel)]="job.description" name="jobDescription">
+                    </div>
+                    <small>Enter an optional description for your job here.</small>
                 </div>
-                <small>Select a compute resource configuration that is sufficient for your needs.</small>
             </div>
-        </div>
+            <!-- Compute provider (Job.computeServiceId) -->
+            <div class="row">
+                <div class="col-lg-2">
+                    <label class="required">Compute Provider:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <select #computeProvider style="width:100%;" [(ngModel)]="job.computeServiceId" (change)="computeProviderChanged(computeProvider.value)"
+                            name="computeProvider" required>
+                            <option *ngFor="let provider of computeProviders" [value]="provider.id">{{ provider.name }}</option>
+                        </select>
+                    </div>
+                    <small>Select a location where your data will be processed. Different locations will have different toolboxes.</small>
+                </div>
+            </div>
+            <!-- Toolbox (Job.computeVmId) -->
+            <div class="row">
+                <div class="col-lg-2">
+                    <label class="required">Toolbox:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <select #toolbox style="width:100%;" [(ngModel)]="job.computeVmId" (change)="toolboxChanged(toolbox.value)" name="computeVmId"
+                            required>
+                            <option *ngFor="let toolbox of toolboxes" [value]="toolbox.imageId">{{ toolbox.name }}</option>
+                        </select>
+                    </div>
+                    <small>Select a toolbox that contains software that you would like to use to process your data.</small>
+                </div>
+            </div>
+            <!-- Resources (Job.computeTypeId) -->
+            <div class="row" *ngIf="isCloudProvider(job.computeServiceId)">
+                <div class="col-lg-2">
+                    <label class="required">Cloud resources:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <select style="width:100%;" [(ngModel)]="job.computeTypeId" name="computeType" required>
+                            <option *ngFor="let resource of resources" [value]="resource.id">{{ resource.description }}</option>
+                        </select>
+                    </div>
+                    <small>Select a compute resource configuration that is sufficient for your needs.</small>
+                </div>
+            </div>
 
-        <ng-container *ngIf="isHPCProvider(job.computeServiceId)">
-          <div class="row">
-            <div class="col-lg-2">
-              <label class="required">Number of CPUs:</label>
-            </div>
-            <div class="col-lg-10">
-              <div class="input-group">
-                <input type="number" [(ngModel)]="job.ncpus">
-              </div>
-              <small>This will be the number of CPUs that the job scripts will request from the HPC.</small>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-2">
-              <label class="required">Memory (GB):</label>
-            </div>
-            <div class="col-lg-10">
-              <div class="input-group">
-                <input type="number" [(ngModel)]="job.mem">
-              </div>
-              <small>How much memory (in GB) should be requested for the running job.</small>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-2">
-              <label class="required">Disk Space (GB):</label>
-            </div>
-            <div class="col-lg-10">
-              <div class="input-group">
-                <input type="number" [(ngModel)]="job.jobfs">
-              </div>
-              <small>How much working disk space (in GB) should be requested for the running jobs.</small>
-            </div>
-          </div>
-        </ng-container>
-        <!-- Email notification -->
-        <div class="row">
-            <div class="col-lg-2">
-                <label>Email Notification:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <input type="checkbox" [(ngModel)]="job.emailNotification">
+            <ng-container *ngIf="isHPCProvider(job.computeServiceId)">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <label class="required">Number of CPUs:</label>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="input-group">
+                            <input type="number" [(ngModel)]="job.ncpus" name="ncpus" required>
+                        </div>
+                        <small>This will be the number of CPUs that the job scripts will request from the HPC.</small>
+                    </div>
                 </div>
-                <small>Tick to receive email notification upon job processing.</small>
-            </div>
-        </div>
-        <!-- Job Walltime -->
-        <div class="row">
-            <div class="col-lg-2">
-                <label>Set Job Walltime:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <input type="checkbox" [(ngModel)]="useWalltime">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <label class="required">Memory (GB):</label>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="input-group">
+                            <input type="number" [(ngModel)]="job.mem" name="mem" required>
+                        </div>
+                        <small>How much memory (in GB) should be requested for the running job.</small>
+                    </div>
                 </div>
-                <small>Select to add an optional walltime (minutes) for your job.</small>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-2">
-                <label>Walltime:</label>
-            </div>
-            <div class="col-lg-10">
-                <div class="input-group">
-                    <input type="text" style="width:100%;" [(ngModel)]="job.walltime" [disabled]="!useWalltime">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <label class="required">Disk Space (GB):</label>
+                    </div>
+                    <div class="col-lg-10">
+                        <div class="input-group">
+                            <input type="number" [(ngModel)]="job.jobfs" name="diskspace" required>
+                        </div>
+                        <small>How much working disk space (in GB) should be requested for the running jobs.</small>
+                    </div>
                 </div>
-                <small>The walltime (minutes) for your job.</small>
+            </ng-container>
+            <!-- Email notification -->
+            <div class="row">
+                <div class="col-lg-2">
+                    <label>Email Notification:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input type="checkbox" [(ngModel)]="job.emailNotification" name="emailNfn">
+                    </div>
+                    <small>Tick to receive email notification upon job processing.</small>
+                </div>
+            </div>
+            <!-- Job Walltime -->
+            <div class="row">
+                <div class="col-lg-2">
+                    <label>Set Job Walltime:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input type="checkbox" [(ngModel)]="useWalltime" name="wallTimeOption">
+                    </div>
+                    <small>Select to add an optional walltime (minutes) for your job.</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <label>Walltime:</label>
+                </div>
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <input type="text" style="width:100%;" [(ngModel)]="job.walltime" [disabled]="!useWalltime" name="wallTime">
+                    </div>
+                    <small>The walltime (minutes) for your job.</small>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>

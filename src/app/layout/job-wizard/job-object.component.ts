@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 import { UserStateService } from '../../shared';
 import { JobsService } from '../jobs/jobs.service';
@@ -25,6 +26,9 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   resources: ComputeType[] = [];
 
   private _jobSub;
+
+  @ViewChild('jobObjectForm')
+  form: NgForm;
 
   constructor(private userStateService: UserStateService,
               private jobsService: JobsService,

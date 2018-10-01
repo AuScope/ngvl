@@ -2,22 +2,22 @@
   <div class="row">
     <div class="col-md-4">
       <app-solutions-cart *ngIf="solutions.length > 0; else noSolutions" [(selected)]="activeSolution"></app-solutions-cart>
-      <a [routerLink]="['/solutions']" role="button" class="btn btn-primary btn-sm">Add a solution</a>
+      <a [routerLink]="['/solutions']" role="button" class="btn btn-primary btn-sm" style="margin-top:8px;">Add a solution</a>
       <button type="button" class="btn btn-primary btn-sm"
               (click)="isTemplateEditorCollapsed = !isTemplateEditorCollapsed"
               [attr.aria-expanded]="!isTemplateEditorCollapsed"
               aria-controls="collapseTemplateEditor"
-              style="margin-left:8px;">
+              style="margin-left:8px;margin-top:8px;">
         {{ isTemplateEditorCollapsed ? 'Edit' : 'Hide' }} template
         <span *ngIf="!isTemplateEditorCollapsed" aria-hidden="true" title="Edit template">&times;</span>
         <i *ngIf="isTemplateEditorCollapsed" class="fa fa-fw fa-angle-down" title="Hide template"></i>
       </button>
       <button type="button"
         class="btn btn-primary btn-sm"
-        (click)="resetTemplate()">Reset template</button>
+        (click)="resetTemplate()" style="margin-left:8px;margin-top:8px;">Reset template</button>
       <button type="button"
         class="btn btn-primary btn-sm"
-        (click)="open()">View template</button>
+        (click)="open()" style="margin-left:8px;margin-top:8px;">View template</button>
     </div>
     <div class="col-md-8">
       <app-job-solution-vars

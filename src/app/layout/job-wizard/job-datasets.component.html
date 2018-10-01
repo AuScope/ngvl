@@ -2,13 +2,13 @@
     <div class="card-header">Manage Job Input Files</div>
     <!-- TODO: Unsure where this will sit, if it's a full pager style body to fill vertically using calc -->
     <div class="card-body datasetsTablePanel">
-        <div style="margin:10px;" *ngIf="jobInputNodes.length === 0">
+        <div style="margin:10px;" *ngIf="jobInputNodes && jobInputNodes.length === 0">
             This job doesn't have any input files or service downloads configured. You can add some by using the add button below or by selecting
             a dataset from the
             <a [routerLink]="['/data']">datasets page</a>.
         </div>
         <!-- TODO: Actions currently via context menu, do we need an action column to match some other tables? -->
-        <p-treeTable *ngIf="jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single"
+        <p-treeTable *ngIf="jobInputNodes && jobInputNodes.length > 0" [value]="jobInputNodes" [columns]="treeCols" [resizableColumns]="true" selectionMode="single"
             [(selection)]="selectedJobInputNode" (onNodeSelect)="jobInputSelected($event)" [contextMenu]="jobInputContextMenu"
             [(contextMenuSelection)]="selectedContextNode" (onContextMenuSelect)="contextMenuSelected($event)">
             <ng-template pTemplate="header" let-columns>

@@ -11,6 +11,7 @@ import { Observable, combineLatest, EMPTY } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 
 import { Job, Solution } from '../../shared/modules/vgl/models';
+import { SolutionVarBindings } from '../../shared/modules/solutions/models';
 import { JobObjectComponent } from './job-object.component';
 import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 import { JobDatasetsComponent } from './job-datasets.component';
@@ -157,4 +158,22 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     return this.jobObject.getJobObject();
   }
 
+  isJobComplete(): boolean {
+    if (this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid)
+      this.jobIncomplete = false;
+    else
+      this.jobIncomplete = true;    
+    return this.jobIncomplete;
+  }
+
+  validSolutionBindings(): boolean {
+    const solutionvarBindings: SolutionVarBindings = this.userStateService.getSolutionBindings();
+    for (var solution of this.solutions) {
+      for (const bindings of solutionvarBindings[solution.id]) {
+        if (bindings.required && !bindings.value)           
+          return false;        
+      }
+    }
+    return true;
+  } 
 }

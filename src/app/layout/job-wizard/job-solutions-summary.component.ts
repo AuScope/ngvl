@@ -1,35 +1,49 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
-import { Observable, BehaviorSubject, forkJoin } from 'rxjs';
-import { map, catchError, defaultIfEmpty } from 'rxjs/operators';
-
+import { Observable } from 'rxjs';
 import { UserStateService } from '../../shared';
-import { Solution,
-         Problem,
-         Dependency,
-         VarBindingType,
-         Variable,
-         FileVariable,
-         IntegerVariable,
-         DoubleVariable,
-         StringVariable,
-         BooleanVariable
-       } from '../../shared/modules/vgl/models';
+import { Solution } from '../../shared/modules/vgl/models';
+import { VarBinding, SolutionVarBindings } from '../../shared/modules/solutions/models';
 
-import { VarBinding,
-         VarBindingOptions,
-         SolutionVarBindings
-       } from '../../shared/modules/solutions/models';
 
-import { SolutionVarBindingsService } from './solution-var-bindings.service';
+@Component({
+  selector: 'app-final-template-modal',
+  template: `
+    <div class="modal-header">
+      <h4 class="modal-title">Final template</h4>
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <ngx-monaco-editor [options]="editorOptions" [ngModel]="template"></ngx-monaco-editor>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close()">Close</button>
+    </div>
+  `
+})
+export class FinalTemplateModalComponent {
+  @Input() template: string;
+
+  editorOptions = {
+    theme: 'vs-light',
+    language: 'python',
+    readOnly: true
+  };
+
+  constructor(public activeModal: NgbActiveModal) {}
+}
+
+
+
 
 @Component({
   selector: 'app-job-solutions-summary',
   templateUrl: './job-solutions-summary.component.html',
   styleUrls: ['./job-solutions-summary.component.scss']
 })
+
 export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
 
   solutions: Solution[];
@@ -57,7 +71,7 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   private bindingsSubscription;
 
   constructor(private userStateService: UserStateService,
-              private vbs: SolutionVarBindingsService,
+            //  private vbs: SolutionVarBindingsService,
               private modalService: NgbModal) {}
 
   ngOnInit() {
@@ -106,37 +120,9 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   }
 
   open() {
-    const modalRef = this.modalService.open(FinalTemplateModal);
+    const modalRef = this.modalService.open(FinalTemplateModalComponent);
     modalRef.componentInstance.template = this.userStateService.getJobTemplateWithVars();
   }
 
 }
 
-@Component({
-  selector: 'final-template-modal',
-  template: `
-    <div class="modal-header">
-      <h4 class="modal-title">Final template</h4>
-      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <ngx-monaco-editor [options]="editorOptions" [ngModel]="template"></ngx-monaco-editor>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close()">Close</button>
-    </div>
-  `
-})
-export class FinalTemplateModal {
-  @Input() template: string;
-
-  editorOptions = {
-    theme: 'vs-light',
-    language: 'python',
-    readOnly: true
-  };
-
-  constructor(public activeModal: NgbActiveModal) {}
-}

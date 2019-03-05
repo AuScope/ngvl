@@ -2,7 +2,7 @@ import { Directive, ViewContainerRef } from '@angular/core';
 
 
 @Directive({
-    selector: '[preview-host]',
+    selector: '[appPreviewHost]'
 })
 
 export class PreviewDirective {

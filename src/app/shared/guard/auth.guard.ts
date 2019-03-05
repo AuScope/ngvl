@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
         // Check T&C's have been accepted
         return this.userStateService.user.map(
             user => {
-                if(user.acceptedTermsConditions !== undefined && user.acceptedTermsConditions > 0) {
+                if (user.acceptedTermsConditions !== undefined && user.acceptedTermsConditions > 0) {
                     return true;
                 } else {
                     this.router.navigate(['/user'], { queryParams: { notacs: 1 } });

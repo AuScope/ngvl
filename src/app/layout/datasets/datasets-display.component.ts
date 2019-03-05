@@ -1,12 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark } from '../../shared/modules/vgl/models';
-import { RecordModalContent } from './record.modal.component';
+import { RecordModalComponent } from './record.modal.component';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import olProj from 'ol/proj';
-import olExtent from 'ol/extent';
+import Proj from 'ol/proj';
 
 
 // List of valid online resource types that can be added to the map
@@ -15,20 +14,20 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 @Component({
     selector: 'app-datasets-display',
     templateUrl: './datasets-display.component.html',
-    styleUrls: ['./datasets-display.component.scss']    
+    styleUrls: ['./datasets-display.component.scss']
 })
 export class DatasetsDisplayComponent {
 
     @Input() registries: any = [];
-    @Input() cswRecordList: CSWRecordModel[] = [];    
-    @Input() bookMarkList: BookMark[] = []; 
+    @Input() cswRecordList: CSWRecordModel[] = [];
+    @Input() bookMarkList: BookMark[] = [];
     @Input() validUser = false;
-    
-    @Output() bookMarkChoice = new EventEmitter();   
 
-    constructor(private olMapService: OlMapService,
-        private cswSearchService: CSWSearchService,        
-        private modalService: NgbModal) { }
+    @Output() bookMarkChoice = new EventEmitter();
+
+    constructor(public olMapService: OlMapService,
+        public cswSearchService: CSWSearchService,
+        public modalService: NgbModal) { }
 
     /**
      *
@@ -39,7 +38,7 @@ export class DatasetsDisplayComponent {
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
-            alert(error.message);            
+            alert(error.message);
         }
     }
 
@@ -59,7 +58,7 @@ export class DatasetsDisplayComponent {
      */
     public displayRecordInformation(cswRecord) {
         if (cswRecord) {
-            const modelRef = this.modalService.open(RecordModalContent, { size: 'lg' });
+            const modelRef = this.modalService.open(RecordModalComponent, { size: 'lg' });
             modelRef.componentInstance.record = cswRecord;
         }
     }
@@ -74,7 +73,7 @@ export class DatasetsDisplayComponent {
             let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
             const bbox: [number, number, number, number] =
                 [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
-            const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+            const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
             this.olMapService.displayExtent(extent, 3000);
         }
     }
@@ -89,54 +88,54 @@ export class DatasetsDisplayComponent {
             let bounds = cswRecord.geographicElements.find(i => i.type === 'bbox');
             const bbox: [number, number, number, number] =
                 [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
-            const extent: olExtent = olProj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+            const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
             this.olMapService.fitView(extent);
         }
     }
-   
+
     /**
      * Bookmark a dataset as favourite and emit the event "add" to be processed by datasets.component
-     * @param cswRecord 
+     * @param cswRecord
      */
     public addBookMark(cswRecord: CSWRecordModel) {
         let serviceId: string = this.cswSearchService.getServiceId(cswRecord);
-        let fileIdentifier: string = cswRecord.id;       
-        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(id => {            
-            this.bookMarkChoice.emit({ choice: "add", bookmark: {id: id, fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });                       
-        }, error => {         
+        let fileIdentifier: string = cswRecord.id;
+        this.cswSearchService.addBookMark(fileIdentifier, serviceId).subscribe(id => {
+            this.bookMarkChoice.emit({ choice: "add", bookmark: {id: id, fileIdentifier: fileIdentifier, serviceId : serviceId}, cswRecord: cswRecord });
+        }, error => {
             console.log(error.message);
         });
     }
 
     /**
      * checks if a csw record has been bookmarked by the user
-     * @param cswRecord 
+     * @param cswRecord
      */
-    public isBookMark(cswRecord: CSWRecordModel) {        
+    public isBookMark(cswRecord: CSWRecordModel) {
         return this.cswSearchService.isBookMark(cswRecord);
-    } 
+    }
 
     /**
      * remove dataset as favourite and emit the event "remove" to be processed by datasets.component
-     * @param cswRecord 
+     * @param cswRecord
      */
-    public removeBookMark(cswRecord: CSWRecordModel) {       
+    public removeBookMark(cswRecord: CSWRecordModel) {
        let bookmarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
-        this.cswSearchService.removeBookMark(bookmarkId).subscribe(data => {            
-            this.bookMarkChoice.emit({ choice: "remove", bookmark: {id : bookmarkId }, cswRecord: cswRecord });                       
-        }, error => {            
+        this.cswSearchService.removeBookMark(bookmarkId).subscribe(data => {
+            this.bookMarkChoice.emit({ choice: "remove", bookmark: {id : bookmarkId }, cswRecord: cswRecord });
+        }, error => {
             console.log(error.message);
         });
     }
 
     /**
      * Determine if a CSWRecord meets the criteria to be added to the map:
-     * 
+     *
      *   1. Has online resource.
      *   2. Has at least one defined geographicElement.
      *   3. Layer does not already exist on map.
      *   4. One online resource is of type WMS, WFS, CSW or WWW.
-     * 
+     *
      * @param cswRecord the CSWRecord to verify
      * @return true is CSWRecord can be added, false otherwise
      */

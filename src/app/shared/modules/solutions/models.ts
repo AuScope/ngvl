@@ -1,23 +1,23 @@
-import { Solution, VarBindingType, Variable, VariableType } from '../vgl/models';
+import { Solution, VarBindingType } from '../vgl/models';
 
 export interface SolutionVarBindingTypes {
   solution: Solution;
-  bindings: { [varName: string]: VarBindingType }
+  bindings: { [varName: string]: VarBindingType };
 }
 
-export type VarBindingOptions<T> = {
-  value?: T,
-  key?: string,
-  label?: string,
-  description?: string,
-  required?: boolean,
-  order?: number,
-  controlType?: string,
-  min?: number,
-  max?: number,
-  step?: number,
-  options?: T[]
-};
+export interface VarBindingOptions<T> {
+  value?: T;
+  key?: string;
+  label?: string;
+  description?: string;
+  required?: boolean;
+  order?: number;
+  controlType?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  options?: T[];
+}
 
 export class VarBinding<T> {
   value: T;
@@ -39,7 +39,9 @@ export class VarBinding<T> {
   }
 }
 
-export type SolutionVarBindings = { [key: string]: VarBinding<any>[] };
+export interface SolutionVarBindings {
+    [key: string]: VarBinding<any>[];
+}
 
 export class StringEntryBinding extends VarBinding<string> {
   controlType = 'textbox';

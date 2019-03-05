@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Job, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
 import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
@@ -7,13 +7,13 @@ import { TreeNode } from 'primeng/api';
 
 
 @Component({
-    selector: 'copy-jobs-inputs-modal-content',
+    selector: 'app-copy-jobs-inputs-modal-content',
     templateUrl: './copy-job-inputs.modal.component.html',
     styleUrls: ['./copy-job-inputs.modal.component.scss']
 })
 
 
-export class CopyJobInputsModalContent {
+export class CopyJobInputsModalComponent {
 
     @ViewChild('jobBrowser')
     public jobBrowser: JobBrowserComponent;
@@ -24,9 +24,7 @@ export class CopyJobInputsModalContent {
     selectedJobNode: TreeNode = null;
     selectedJob: Job = null;
 
-
-    constructor(public activeModal: NgbActiveModal, private modalService: NgbModal) { }
-
+    constructor(public activeModal: NgbActiveModal) { }
 
     /**
      * Make selected job ID and selected inputs available to caller when modal closed

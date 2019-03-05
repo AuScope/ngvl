@@ -8,12 +8,12 @@
     <div class="row">
         <!-- Job panel -->
         <div class="col">
-            <job-browser #jobBrowser [selectionMode]="'single'" [showContextMenu]="false"></job-browser>
+            <app-job-browser #jobBrowser [selectionMode]="'single'" [showContextMenu]="false"></app-job-browser>
         </div>
         <!-- Input panel -->
         <div class="col">
-            <job-inputs #jobInputs [selectionMode]="'checkbox'" [selectedJob]="jobBrowser.selectedJob" [showCheckboxes]="true">
-            </job-inputs>
+            <app-job-inputs #jobInputs [selectionMode]="'checkbox'" [selectedJob]="jobBrowser.selectedJob" [showCheckboxes]="true">
+            </app-job-inputs>
         </div>
     </div>
 </div>

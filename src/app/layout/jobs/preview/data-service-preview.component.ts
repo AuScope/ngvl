@@ -10,13 +10,13 @@ import { OlMapPreviewComponent } from "../../datasets/openlayermap/olmap.preview
 })
 
 
-export class DataServicePreview implements PreviewComponent, AfterViewInit {
+export class DataServicePreviewComponent implements PreviewComponent, AfterViewInit {
 
     // Data will be array containing map center point [0] and the bbox geometries [1]
     data: any;
 
     atBottom: boolean = false;
-    
+
     // Have a reference to the OlMapPreview Component so we can set the data
     @ViewChild(OlMapPreviewComponent) olMapPreview: OlMapPreviewComponent;
 
@@ -31,10 +31,10 @@ export class DataServicePreview implements PreviewComponent, AfterViewInit {
 
 
     public updateBbox(): void {
-        if(this.data != null && this.data.length==2) {
+        if (this.data != null && this.data.length === 2) {
             this.olMapPreview.setupBBoxes(this.data[0], this.data[1]);
             this.olMapPreview.fitViewToAllLayers();
         }
-    };
+    }
 
 }

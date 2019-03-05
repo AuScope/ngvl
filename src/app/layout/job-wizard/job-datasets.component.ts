@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { DownloadOptions, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
 import { UserStateService } from '../../shared';
-import { CopyJobInputsModalContent } from '../jobs/copy-job-inputs.modal.component';
-import { DownloadOptionsModalContent } from '../datasets/download-options.modal.component';
+import { CopyJobInputsModalComponent } from '../jobs/copy-job-inputs.modal.component';
+import { DownloadOptionsModalComponent } from '../datasets/download-options.modal.component';
 import { TreeNode } from 'primeng/api';
 import { JobsService } from '../jobs/jobs.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { saveAs } from 'file-saver';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
-import { RemoteDatasetsModalContent } from '../datasets/remote-datasets.modal.component';
+import { RemoteDatasetsModalComponent } from '../datasets/remote-datasets.modal.component';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
@@ -47,7 +47,7 @@ export class JobDatasetsComponent {
             leaf: false
         },
         children: []
-    }
+    };
 
     // Root files node (copied CloudFileInformation and user uploaded files)
     rootFileDownloads: TreeNode = {
@@ -58,7 +58,7 @@ export class JobDatasetsComponent {
             leaf: false
         },
         children: []
-    }
+    };
 
     // Job download context menu and actions
     jobInputContextMenuItems = [];
@@ -67,13 +67,13 @@ export class JobDatasetsComponent {
         label: 'Download to your machine',
         icon: 'fa fa-download',
         command: (event) => this.downloadSelectedInput()
-    }
+    };
 
     deleteContextMenuAction = {
         label: 'Delete this input',
         icon: 'fa fa-times',
         command: (event) => this.deleteSelectedInput()
-    }
+    };
 
     // Add remote download modal fields
     remoteUrl: string = "";
@@ -88,7 +88,7 @@ export class JobDatasetsComponent {
 
     /**
      * Add a JobDownload (dataset) or copied Job input to the Tree
-     * 
+     *
      * @param jobDownload the JobDownload object
      */
     private addJobDownloadToTree(jobDownload: JobDownload) {
@@ -101,7 +101,7 @@ export class JobDatasetsComponent {
                 input: jobDownload,
                 leaf: true
             }
-        }
+        };
         this.rootRemoteWebServiceDownloads.children.push(jobDownloadTreeNode);
         this.rootRemoteWebServiceDownloads.expanded = true;
 
@@ -115,7 +115,7 @@ export class JobDatasetsComponent {
 
     /**
      * Add a CloudFileInformation object (copied from existing job) to the Tree
-     * 
+     *
      * @param cloudFile CloudFileInformation file to add to tree
      */
     private addJobCloudFileToTree(cloudFile: CloudFileInformation) {
@@ -128,7 +128,7 @@ export class JobDatasetsComponent {
                 input: cloudFile,
                 leaf: true
             }
-        }
+        };
         this.rootFileDownloads.children.push(jobFileNode);
         this.rootFileDownloads.expanded = true;
 
@@ -142,7 +142,7 @@ export class JobDatasetsComponent {
 
     /**
      * Add a Job file upload to the Tree
-     * 
+     *
      * @param file the file object to be added to the Tree
      */
     private addJobFileUploadToTree(file: any) {
@@ -155,7 +155,7 @@ export class JobDatasetsComponent {
                 input: file,
                 leaf: true
             }
-        }
+        };
         this.rootFileDownloads.children.push(jobFileNode);
         this.rootFileDownloads.expanded = true;
 
@@ -209,7 +209,7 @@ export class JobDatasetsComponent {
 
     /**
      * Input node selected in Tree, builds context menu based on selection
-     * 
+     *
      * @param event the selection event, intended to clear the existing
      *              context selection but not working
      */
@@ -221,7 +221,7 @@ export class JobDatasetsComponent {
     /**
      * Context menu event fired. Select the node the event was fired from and
      * build context menu based on input
-     * 
+     *
      * @param event the context menu event used to get the appropriate node
      */
     public contextMenuSelected(event) {
@@ -250,7 +250,7 @@ export class JobDatasetsComponent {
                 response => {
                     saveAs(response, this.selectedJobInputNode.data.input.name);
                 }, error => {
-                    //TODO: Proper error reporting
+                    // TODO: Proper error reporting
                     console.log(error.message);
                 }
             );
@@ -285,7 +285,7 @@ export class JobDatasetsComponent {
     public copyFromJob(): void {
         this.jobsService.getTreeJobs().subscribe(
             treeJobs => {
-                const modalRef = this.modalService.open(CopyJobInputsModalContent, { size: 'lg' });
+                const modalRef = this.modalService.open(CopyJobInputsModalComponent, { size: 'lg' });
                 modalRef.result.then((result) => {
                     for (let download of result.jobDownloads) {
                         this.userStateService.addJobDownload(download);
@@ -303,18 +303,18 @@ export class JobDatasetsComponent {
                 // TODO: Proper error reporting
                 console.log(error.message);
             }
-        )
+        );
     }
 
 
     /**
      * Add remote download. Displays dialog, "OK" will create and add a
      * remote download to the data selection service (local storage)
-     * 
+     *
      * @param content the add remote download modal, defined in HTML
      */
     public showAddRemoteDownloadDialog(): void {
-        this.modalService.open(RemoteDatasetsModalContent).result.then((jobDownload) => {
+        this.modalService.open(RemoteDatasetsModalComponent).result.then((jobDownload) => {
             // Create an online resource object fro the download
             const onlineResource: OnlineResourceModel = {
                 url: jobDownload.url,
@@ -324,8 +324,7 @@ export class JobDatasetsComponent {
                 version: "",
                 applicationProfile: "",
                 geographicElements: []
-
-            }
+            };
             jobDownload.onlineResource = onlineResource;
             this.addJobDownloadToTree(jobDownload);
             this.userStateService.addJobDownload(jobDownload);
@@ -337,7 +336,7 @@ export class JobDatasetsComponent {
     /**
      * Upload a file. Will be stored locally and persisted in UserStateService
      * for actual upload to server when Job is created
-     * 
+     *
      * @param event the upload event, will contain the file
      */
     public uploadFile(event): void {
@@ -356,22 +355,23 @@ export class JobDatasetsComponent {
 
     /**
      * Edit Download options and update the jobdownload object.
-     * 
-     * @param jobDownload 
+     *
+     * @param jobDownload
      */
     public editDownload(event: any, jobDownload: JobDownload): void {
         event.stopPropagation();
-        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        const modelRef = this.modalService.open(DownloadOptionsModalComponent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = jobDownload.cswRecord;
         modelRef.componentInstance.onlineResource = jobDownload.onlineResource;
-        let defaultBbox: any = { eastBoundLongitude: jobDownload.eastBoundLongitude, northBoundLatitude: jobDownload.northBoundLatitude, southBoundLatitude: jobDownload.southBoundLatitude, westBoundLongitude: jobDownload.westBoundLongitude };
+        let defaultBbox: any = { eastBoundLongitude: jobDownload.eastBoundLongitude, northBoundLatitude: jobDownload.northBoundLatitude,
+            southBoundLatitude: jobDownload.southBoundLatitude, westBoundLongitude: jobDownload.westBoundLongitude };
 
-        //checks if a csw record belongs to a bookmarked dataset
+        // checks if a csw record belongs to a bookmarked dataset
         let isBookMarkRecord: boolean = jobDownload.cswRecord !== undefined ? this.cswSearchService.isBookMark(jobDownload.cswRecord) : false;
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
         let defaultDownloadOptions: DownloadOptions = this.cswSearchService.createDownloadOptionsForResource(jobDownload.onlineResource, jobDownload.cswRecord, defaultBbox);
         modelRef.componentInstance.defaultDownloadOptions = JSON.parse(JSON.stringify(defaultDownloadOptions));
-        
+
         defaultDownloadOptions.name = jobDownload.name;
         defaultDownloadOptions.description = jobDownload.description;
         defaultDownloadOptions.localPath = jobDownload.localPath;
@@ -384,19 +384,19 @@ export class JobDatasetsComponent {
         modelRef.componentInstance.defaultDownloadOptions.bookmarkOptionName = 'Default Options';
         modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: modelRef.componentInstance.defaultDownloadOptions });
         if (isBookMarkRecord) {
-            //gets id of the bookmark using csw record information
+            // gets id of the bookmark using csw record information
             let bookMarkId: number = this.cswSearchService.getBookMarkId(jobDownload.cswRecord);
-            //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
+            // gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
             this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {
                 if (data.length > 0) {
-                    //updates dropdown component with download options data that were bookmarked in the format(label, value)
+                    // updates dropdown component with download options data that were bookmarked in the format(label, value)
                     data.forEach(option => {
                         modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
                     });
                 }
             });
         }
-        //after the user conforim changes update the job download object 
+        // after the user conforim changes update the job download object
         modelRef.result.then((userResponse) => {
             this.userStateService.removeJobDownload(jobDownload);
             if (jobDownload.onlineResource && defaultDownloadOptions) {
@@ -406,6 +406,6 @@ export class JobDatasetsComponent {
                     this.loadJobInputs();
                 });
             }
-        },() => {});
+        }, () => {});
     }
 }

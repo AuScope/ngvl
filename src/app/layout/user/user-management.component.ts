@@ -26,7 +26,7 @@ export class UserManagementComponent implements OnInit {
     @ViewChild('termsAndConditionsModal')
     private notacsDialog;
     // T&C's HTML content (retrieved from server)
-    private tacsHTML: string = "";
+    public tacsHTML: string = "";
 
     // Compute services not configured dialog
     @ViewChild('computeServicesNotConfiguredModal')
@@ -47,22 +47,21 @@ export class UserManagementComponent implements OnInit {
             this.route.queryParams
                 .subscribe(params => {
                     // T&C's have not been agreed to, show dialog
-                    if(params.hasOwnProperty('notacs') && params['notacs']==='1') {
+                    if (params.hasOwnProperty('notacs') && params['notacs'] === '1') {
                         this.userStateService.getTermsAndConditions().subscribe(
                             tacsResponse => {
-                                this.tacsHTML = tacsResponse.data.html;                                
-                                this.modalService.open(this.notacsDialog, { backdrop: 'static', keyboard:false }).result.then((result) => {
+                                this.tacsHTML = tacsResponse.data.html;
+                                this.modalService.open(this.notacsDialog, { backdrop: 'static', keyboard: false }).result.then((result) => {
                                     if (result === 'accept') {
                                         this.acceptTermsAndConditions();
-                                    } else if(result==='reject') {
+                                    } else if (result === 'reject') {
                                         this.authService.logout();
                                     }
                                 });
                             }
-                        )
-                    }
+                        );
                     // Compute services required dialog
-                    else if(params.hasOwnProperty('noconfig') && params['noconfig']==='1') {
+                    } else if (params.hasOwnProperty('noconfig') && params['noconfig'] === '1') {
                         this.modalService.open(this.noconfigDialog);
                     }
             });
@@ -100,7 +99,7 @@ export class UserManagementComponent implements OnInit {
 
 
     /**
-     * 
+     *
      */
     private createEmptyNciDetailsObject(): NCIDetails {
         return {
@@ -120,7 +119,6 @@ export class UserManagementComponent implements OnInit {
       });
     }
 
-    
     /**
      * Download the Cloud Formation Policy (AWS)
      */
@@ -135,18 +133,18 @@ export class UserManagementComponent implements OnInit {
     public saveAwsChanges(): void {
         // TODO: Assumes already accepted T&Cs, need a screen for this
         this.userStateService.setUserAwsDetails(this.user.arnExecution, this.user.arnStorage, 1, this.user.awsKeyName).subscribe(
-            response => {
+            () => {
                 this.messageService.add({ severity: 'success', summary: 'Changes Saved', detail: 'Your AWS details have been updated' });
             }, error => {
                 this.messageService.add({ severity: 'error', summary: 'Error Saving Changes', detail: error.message });
             }
-        )
+        );
     }
 
 
     /**
      * New NCI key file selected, update text input and file object
-     * 
+     *
      * @param event file selected event
      */
     public nciKeyFileChanged(event): void {
@@ -159,14 +157,14 @@ export class UserManagementComponent implements OnInit {
      * Save User NCI changes
      */
     public saveNciChanges(): void {
-        if(this.nciDetails) {
+        if (this.nciDetails) {
             this.userStateService.setUserNciDetails(this.nciDetails.nciUsername, this.nciDetails.nciProject, this.nciKeyfile).subscribe(
-                response => {
+                () => {
                     this.messageService.add({ severity: 'success', summary: 'Changes Saved', detail: 'Your NCI details have been updated' });
                 }, error => {
                     this.messageService.add({ severity: 'error', summary: 'Error Saving Changes', detail: error.message });
                 }
-            )
+            );
         }
     }
 }

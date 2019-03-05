@@ -7,7 +7,7 @@ import { JobDownload } from '../../shared/modules/vgl/models';
     templateUrl: './remote-datasets.modal.component.html',
     styleUrls: ['./remote-datasets.modal.component.scss']
 })
-export class RemoteDatasetsModalContent {
+export class RemoteDatasetsModalComponent {
 
     // Mandatory fields for remote dataset (will become JobDownload)
     remoteName: string = "";
@@ -16,7 +16,6 @@ export class RemoteDatasetsModalContent {
     remoteLocation: string = "";
 
     constructor(public activeModal: NgbActiveModal) { }
-
 
     createRemoteDownload(): void {
         const jobDownload: JobDownload = {
@@ -32,7 +31,7 @@ export class RemoteDatasetsModalContent {
             parentUrl: '',
             parentName: '',
             parent: undefined          // No Job associated with this download at this stage
-        }
+        };
         this.activeModal.close(jobDownload);
     }
 

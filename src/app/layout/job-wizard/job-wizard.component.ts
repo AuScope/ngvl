@@ -54,13 +54,13 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     // job or loading an existing one.
     this.routeSub = combineLatest(this.route.url, this.route.paramMap).pipe(
       switchMap(([parts, params]) => {
-        if (parts[0].path == 'new') {
+        if (parts[0].path === 'new') {
           // Load a new, empty job object for the user to manage.
           return this.userStateService.newJob();
-        }
-        else if (parts[0].path == 'job' && params.has('id')) {
+
+        } else if (parts[0].path === 'job' && params.has('id')) {
           // Load the specified job from the server
-          const id = parseInt(params.get('id'));
+          const id = parseInt(params.get('id'), 10);
           return this.userStateService.loadJob(id).pipe(
             // Notify the user of job load status as a side-effect, then pass on
             // the job object unchanged.
@@ -125,15 +125,15 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     // Save the job first, then submit it an navigate away.
     this.doSave().subscribe(savedJob => {
       this.vglService.submitJob(savedJob).subscribe(
-        submitted => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Submitted',
-            detail: `Job ${savedJob.id} submitted successfully.`,
-            life: 10000
-          });
-          this.router.navigate(['/jobs']);
-        },
+        () => {
+              this.messageService.add({
+                  severity: 'success',
+                  summary: 'Submitted',
+                  detail: `Job ${savedJob.id} submitted successfully.`,
+                  life: 10000
+              });
+              this.router.navigate(['/jobs']);
+          },
         error => {
           console.log('Failed to submit job: ' + error);
         }
@@ -159,21 +159,23 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   isJobComplete(): boolean {
-    if (this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid)
+    if (this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid) {
       this.jobIncomplete = false;
-    else
-      this.jobIncomplete = true;    
+    } else {
+      this.jobIncomplete = true;
+    }
     return this.jobIncomplete;
   }
 
   validSolutionBindings(): boolean {
     const solutionvarBindings: SolutionVarBindings = this.userStateService.getSolutionBindings();
-    for (var solution of this.solutions) {
+    for (let solution of this.solutions) {
       for (const bindings of solutionvarBindings[solution.id]) {
-        if (bindings.required && !bindings.value)           
-          return false;        
+        if (bindings.required && !bindings.value) {
+          return false;
+        }
       }
     }
     return true;
-  } 
+  }
 }

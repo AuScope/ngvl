@@ -13,7 +13,7 @@ import { JobWizardComponent } from './job-wizard.component';
 
 import { JobsModule } from '../jobs/jobs.module';
 import { SolutionsModule } from '../../shared/modules';
-import { JobSolutionsSummaryComponent, FinalTemplateModal } from './job-solutions-summary.component';
+import { JobSolutionsSummaryComponent, FinalTemplateModalComponent } from './job-solutions-summary.component';
 import { JobSolutionVarsComponent } from './job-solution-vars.component';
 import { SolutionVarBindingComponent } from './solution-var-binding.component';
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
@@ -41,11 +41,11 @@ import { JobDatasetsComponent } from './job-datasets.component';
     JobSolutionsSummaryComponent,
     JobSolutionVarsComponent,
     JobObjectComponent,
-    SolutionVarBindingComponent,
-    FinalTemplateModal
+    FinalTemplateModalComponent,
+    SolutionVarBindingComponent
   ],
   exports: [JobWizardComponent],
   providers: [SolutionVarBindingsService],
-  entryComponents: [FinalTemplateModal]
+  entryComponents: [FinalTemplateModalComponent]
 })
 export class JobWizardModule { }

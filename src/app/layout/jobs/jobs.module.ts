@@ -16,24 +16,24 @@ import { PageHeaderModule } from '../../shared';
 import { JobsService } from './jobs.service';
 import { NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
-import { DataServicePreview } from './preview/data-service-preview.component';
-import { PlainTextPreview } from './preview/plaintext-preview.component';
-import { ImagePreview } from './preview/image-preview.component';
+import { DataServicePreviewComponent } from './preview/data-service-preview.component';
+import { PlainTextPreviewComponent } from './preview/plaintext-preview.component';
+import { ImagePreviewComponent } from './preview/image-preview.component';
 import { PreviewDirective } from './preview/preview.directive';
-import { TtlPreview } from './preview/ttl-preview.component';
-import { LogPreview } from './preview/log-preview.component';
+import { TtlPreviewComponent } from './preview/ttl-preview.component';
+import { LogPreviewComponent } from './preview/log-preview.component';
 import { OlMapModule } from '../datasets/openlayermap/olmap.module';
 import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
-import { JobStatusModalContent } from './job-status.modal.component';
-import { CopyJobInputsModalContent } from './copy-job-inputs.modal.component';
+import { JobStatusModalComponent} from './job-status.modal.component';
+import { CopyJobInputsModalComponent } from './copy-job-inputs.modal.component';
 import { AngularSplitModule } from 'angular-split';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/components/common/messageservice';
 
 @NgModule({
     imports: [
-        AngularSplitModule,
+        AngularSplitModule.forRoot(),
         CommonModule,
         FormsModule,
         JobsRoutingModule,
@@ -50,11 +50,13 @@ import { MessageService } from 'primeng/components/common/messageservice';
         ToastModule
     ],
     declarations: [
-        JobsComponent, JobBrowserComponent, JobInputsComponent, CopyJobInputsModalContent,       
-        PreviewDirective, DataServicePreview, ImagePreview,
-        PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent
+        JobsComponent, JobBrowserComponent, JobInputsComponent, CopyJobInputsModalComponent,
+        PreviewDirective, DataServicePreviewComponent, ImagePreviewComponent,
+        PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent, JobStatusModalComponent
     ],
-    entryComponents: [ DataServicePreview, ImagePreview, PlainTextPreview, TtlPreview, LogPreview, JobStatusModalContent, CopyJobInputsModalContent ],
+    entryComponents: [ DataServicePreviewComponent, ImagePreviewComponent, PlainTextPreviewComponent,
+        TtlPreviewComponent, LogPreviewComponent, JobStatusModalComponent, CopyJobInputsModalComponent
+    ],
     providers: [ JobsService, ConfirmationService, MessageService ]
 })
 export class JobsModule { }

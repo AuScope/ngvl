@@ -1,8 +1,8 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
-    <div class="row" style="margin-left:0px;overflow-y:auto;padding:0px;height:calc(100vh - 200px);">
-        <split class="datasets-split" (dragProgress)="onDrag($event)" style="border: 1px solid #ddd;">
-            <split-area size="30" class="split-area-search">
+    <div class="row" style="margin-left:0px;overflow-y:auto;padding:0px;height:calc(100vh - 198px);width:100%;">
+        <as-split class="datasets-split" (dragProgress)="onDrag()" style="border: 1px solid #ddd;">
+            <as-split-area size="30" class="split-area-search">
                 <!-- Datasets -->
                 <div class="card">
                     <ngb-tabset>
@@ -65,7 +65,7 @@
                                                 <li *ngFor="let keyword of selectedKeywords; index as i">
                                                     <div class="input-group input-group-sm">
                                                         <!-- TODO: Catch update change event, update model -->
-                                                        <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]=selectedKeywords[i] (click)="click$.next($event.target.value)"
+                                                        <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]="selectedKeywords[i]" (click)="click$.next($event.target.value)"
                                                             #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"
                                                         />
                                                         <div class="input-group-btn input-group-apppend">
@@ -253,13 +253,14 @@
                         </ngb-tab>
                     </ngb-tabset>
                 </div>
-            </split-area>
-            <split-area size="70" class="split-area-map">
+            </as-split-area>
+            <as-split-area size="70" class="split-area-map">
                 <!-- Map -->
                 <!-- TODO: style in CSS -->
                 <div class="btn-group" style="position:absolute;z-index:1;margin-top:4px;margin-left:4px;">
-                    <!-- Zoom button -->
+                    <!-- Zoom buttons -->
                     <app-ol-map-zoom></app-ol-map-zoom>
+                    <app-ol-boundary-select></app-ol-boundary-select>
                 </div>
                 <div class="btn-group" style="position:absolute;z-index:1;margin-top:40px;margin-left:4px;">
                     <!-- Select Data button -->
@@ -270,8 +271,8 @@
                     <app-ol-map-layers></app-ol-map-layers>
                 </div>
                 <!-- The map -->
-                <app-ol-map class="height-full width-full"></app-ol-map>
-            </split-area>
-        </split>
+                <app-ol-map class="height-full width-full"></app-ol-map> 
+            </as-split-area>
+        </as-split>
     </div>
 </div>

@@ -31,7 +31,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   form: NgForm;
 
   constructor(private userStateService: UserStateService,
-              private jobsService: JobsService,
+             // private jobsService: JobsService,
               private vgl: VglService) {
     // Initialise the job object so we can bind to it and copy parameters as
     // required.
@@ -71,7 +71,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
    */
   public getJobObject(): Job {
     // Disregard walltime value present in UI if User has chosen not to use it
-    if(!this.useWalltime) {
+    if (!this.useWalltime) {
       this.job.walltime = undefined;
     }
 
@@ -110,7 +110,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
    * @param event the toolbox select change event
    */
   public toolboxChanged(imageId): void {
-    const toolbox = this.toolboxes.find(it => it.imageId == imageId);
+    const toolbox = this.toolboxes.find(it => it.imageId === imageId);
 
     if (toolbox) {
       // Set the computeVmRunCommand on the job to match the new toolbox.
@@ -119,7 +119,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
       // When toolbox is changed and we're using a cloud compute provider, reload
       // the available cloud resources.
       if (this.isCloudProvider(this.job.computeServiceId)) {
-        if(imageId && imageId !== "") {
+        if (imageId && imageId !== "") {
           this.vgl.getComputeTypes(this.job.computeServiceId, imageId)
             .subscribe(computeTypes => {
               this.resources = computeTypes;

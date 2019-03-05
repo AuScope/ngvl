@@ -8,7 +8,7 @@ const routes: Routes = [
   {
     path: '',
     component: LayoutComponent,
-    children: [      
+    children: [
       { path: 'dashboard', loadChildren: './dashboard/dashboard.module#DashboardModule' },
       { path: 'data', loadChildren: './datasets/datasets.module#DatasetsModule' },
       { path: 'solutions', loadChildren: './solutions/solutions.module#SolutionsModule', canActivate: [AuthGuard] },

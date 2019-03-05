@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ComponentFactoryResolver,ComponentRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver, ComponentRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { routerTransition } from '../../router.animations';
 import { Job, CloudFileInformation, JobDownload, PreviewComponent } from '../../shared/modules/vgl/models';
@@ -7,15 +7,15 @@ import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
 import { JobsService } from './jobs.service';
 import { PreviewDirective } from './preview/preview.directive';
-import { PlainTextPreview } from './preview/plaintext-preview.component';
-import { ImagePreview } from './preview/image-preview.component';
+import { PlainTextPreviewComponent } from './preview/plaintext-preview.component';
+import { ImagePreviewComponent } from './preview/image-preview.component';
 import { PreviewItem } from './preview/preview-item';
-import { TtlPreview } from './preview/ttl-preview.component';
-import { LogPreview } from './preview/log-preview.component';
-import { DataServicePreview } from './preview/data-service-preview.component';
+import { TtlPreviewComponent } from './preview/ttl-preview.component';
+import { LogPreviewComponent } from './preview/log-preview.component';
+import { DataServicePreviewComponent } from './preview/data-service-preview.component';
 import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import olProj from 'ol/proj';
+import Proj from 'ol/proj';
 import { featureCollection, polygon } from '@turf/helpers';
 
 
@@ -46,11 +46,11 @@ export class JobsComponent implements OnInit {
     // TODO: A code preview would be nice
     // TODO: TIFF/BMP support untested, may vary on browser
     previewItems: PreviewItem[] = [
-        new PreviewItem("data-service", DataServicePreview, {}, []),
-        new PreviewItem("plaintext", PlainTextPreview, {}, ['txt', 'sh', 'log']),
-        new PreviewItem("log", LogPreview, {}, ['.sh.log']),
-        new PreviewItem("ttl", TtlPreview, {}, ['ttl']),
-        new PreviewItem("image", ImagePreview, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
+        new PreviewItem("data-service", DataServicePreviewComponent, {}, []),
+        new PreviewItem("plaintext", PlainTextPreviewComponent, {}, ['txt', 'sh', 'log']),
+        new PreviewItem("log", LogPreviewComponent, {}, ['.sh.log']),
+        new PreviewItem("ttl", TtlPreviewComponent, {}, ['ttl']),
+        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
@@ -72,7 +72,7 @@ export class JobsComponent implements OnInit {
 
     ngOnInit() {
         this.userStateService.setView(JOBS_VIEW);
-    }   
+    }
 
     /**
      * Cancel the current HttpClient request, if any.
@@ -101,7 +101,7 @@ export class JobsComponent implements OnInit {
 
     /**
      * Job selection event from job browser
-     * 
+     *
      * @param job selected Job
      */
     public jobSelected(job: Job) {
@@ -119,8 +119,8 @@ export class JobsComponent implements OnInit {
 
     /**
      * Event fired when an input (JobDownload or CloudFileInformation) is selected
-     * 
-     * @param event 
+     *
+     * @param event
      */
     public inputSelected(event) {
         this.cancelCurrentSubscription();
@@ -128,58 +128,54 @@ export class JobsComponent implements OnInit {
         // Cloud file selected
         if (event.hasOwnProperty('cloudKey')) {
             this.previewCloudFile(event);
-        }
         // Download selected
-        else {
+        } else {
             this.previewJobDownload(event);
         }
     }
 
     public inputSizeUpdate(cloudFile) {
-        // Get the filename extension to determine type of preview required
-        const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
+
         if (this.currentPreviewItem) {
             if (this.currentPreviewItem && this.currentPreviewItem.type === 'image') {
                 this.currentPreviewObject = cloudFile;
-                const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();                
+                const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
                 this.componentRef.instance.data = imageUrl;
                 this.scrollToBottom();
-            }
             // Log files currently displayed as plain text, but this class will
             // allow us to make imporvements to display later (e.g. display
             // sectioned logs in tabs per section)
-            else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'log')) {
+            } else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'log')) {
                 this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
-                    logData => {                        
-                        this.componentRef.instance.data = logData;                                                  
+                    logData => {
+                        this.componentRef.instance.data = logData;
                         this.scrollToBottom();
-                       this.currentPreviewObject = cloudFile;                        
+                       this.currentPreviewObject = cloudFile;
                     },
                     error => {
-                        //TODO: Proper error reporting
+                        // TODO: Proper error reporting
                         this.currentPreviewItem = null;
                         this.currentPreviewObject = null;
                         console.log(error.message);
                     }
                 );
-            }
             // Preview text (default option if type can't be determined by extension)
-            else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'plaintext' || this.currentPreviewItem.type === 'ttl')) {
+            } else if (this.currentPreviewItem && (this.currentPreviewItem.type === 'plaintext' || this.currentPreviewItem.type === 'ttl')) {
 
-                const language = PlainTextPreview.selectLanguageByExtension(extension);
-                const options = {
-                    theme: 'vs-light',
-                    language: language
-                }                
+                // const language = PlainTextPreviewComponent.selectLanguageByExtension(extension);
+                // const options = {
+                //     theme: 'vs-light',
+                //     language: language
+                // };
                 // TODO: Max file size to config
                 this.httpSubscription = this.jobsService.getPlaintextPreview(this.jobBrowser.selectedJob.id, cloudFile.name, 20 * 1024).subscribe(
-                    previewData => {                        
+                    previewData => {
                         this.componentRef.instance.data = previewData;
                         this.scrollToBottom();
                         this.currentPreviewObject = cloudFile;
                     },
                     error => {
-                        //TODO: Proper error reporting   
+                        // TODO: Proper error reporting
                         this.currentPreviewItem = null;
                         this.currentPreviewObject = null;
                         console.log(error.message);
@@ -191,17 +187,18 @@ export class JobsComponent implements OnInit {
     }
 
     scrollToBottom() {
-        if(this.componentRef.instance.atBottom) {
-            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight -   this.componentRef.instance.scrollElement.nativeElement.clientHeight;                   
+        if (this.componentRef.instance.atBottom) {
+            this.componentRef.instance.scrollElement.nativeElement.scrollTop = this.componentRef.instance.scrollElement.nativeElement.scrollHeight
+                - this.componentRef.instance.scrollElement.nativeElement.clientHeight;
             this.componentRef.instance.scrollElement.nativeElement.scrollIntoView(false);
         }
     }
 
     /**
      * Add the specified PreviewItem to the container
-     * 
-     * @param previewItem 
-     * @param data 
+     *
+     * @param previewItem
+     * @param data
      */
     private previewFile(previewItem: PreviewItem, data: any, options?: any) {
         previewItem.data = data;
@@ -210,35 +207,35 @@ export class JobsComponent implements OnInit {
         }
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);        
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
         this.componentRef = viewContainerRef.createComponent(componentFactory);
         (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
-        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;        
+        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
     }
 
 
     /**
      * Preview a JobDownload object
-     * 
+     *
      * TODO: Are there other types of Data Service Downloads?
-     * 
-     * @param jobDownload 
+     *
+     * @param jobDownload
      */
     previewJobDownload(jobDownload: JobDownload): void {
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
         let previewItem: PreviewItem = this.previewItems.find(item => item.type === 'data-service');
-        this.filePreviewLoading = true;        
-        // TODO: Will there ever be more than 1 bbox? Confirm...       
+        this.filePreviewLoading = true;
+        // TODO: Will there ever be more than 1 bbox? Confirm...
 
         const key = "preview-key";
         let bboxPolygonArr = {};
         bboxPolygonArr[key] = featureCollection([polygon([[
-            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]),
-            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]),
-            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]),
-            olProj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]),
-            olProj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude])
+            Proj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude]),
+            Proj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.southBoundLatitude]),
+            Proj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.southBoundLatitude]),
+            Proj.fromLonLat([jobDownload.eastBoundLongitude, jobDownload.northBoundLatitude]),
+            Proj.fromLonLat([jobDownload.westBoundLongitude, jobDownload.northBoundLatitude])
         ]])]);
         bboxPolygonArr[key].crs = {
             'type': 'name',
@@ -248,8 +245,8 @@ export class JobsComponent implements OnInit {
         };
 
         let reCentrePt: any = {};
-        // Calculate the envelope, if not too big then re-centred map can be calculated        
-        const bboxData = [olProj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr];
+        // Calculate the envelope, if not too big then re-centred map can be calculated
+        const bboxData = [Proj.fromLonLat([reCentrePt.longitude, reCentrePt.latitude]), bboxPolygonArr];
         this.previewFile(previewItem, bboxData);
         this.filePreviewLoading = false;
         this.currentPreviewObject = jobDownload;
@@ -258,15 +255,15 @@ export class JobsComponent implements OnInit {
 
     /**
      * Preview a CloudFileInformation object
-     * 
-     * @param cloudFile 
+     *
+     * @param cloudFile
      */
     public previewCloudFile(cloudFile: CloudFileInformation): void {
         this.cancelCurrentSubscription();
         let viewContainerRef = this.previewHost.viewContainerRef;
         viewContainerRef.clear();
 
-        let previewItem: PreviewItem = undefined;
+        let previewItem: PreviewItem;
         // Get the filename extension to determine type of preview required
         const extension = cloudFile.name.substr(cloudFile.name.lastIndexOf('.') + 1).toLowerCase();
 
@@ -281,18 +278,18 @@ export class JobsComponent implements OnInit {
         if (previewItem === undefined) {
             previewItem = this.previewItems.find(item => item.type === 'plaintext');
         }
-        //saving previewItem for refresh
+        // saving previewItem for refresh
         this.currentPreviewItem = previewItem;
         // Preview image
         if (previewItem && previewItem.type === 'image') {
             this.currentPreviewObject = cloudFile;
             const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
             this.previewFile(previewItem, imageUrl);
-        }
+
         // Log files currently displayed as plain text, but this class will
         // allow us to make imporvements to display later (e.g. display
         // sectioned logs in tabs per section)
-        else if (previewItem && (previewItem.type === 'log')) {
+        } else if (previewItem && (previewItem.type === 'log')) {
             this.filePreviewLoading = true;
             this.httpSubscription = this.jobsService.getSectionedLogs(this.jobBrowser.selectedJob.id).subscribe(
                 logData => {
@@ -301,21 +298,21 @@ export class JobsComponent implements OnInit {
                     this.filePreviewLoading = false;
                 },
                 error => {
-                    //TODO: Proper error reporting
+                    // TODO: Proper error reporting
                     this.filePreviewLoading = false;
                     this.currentPreviewObject = null;
                     console.log(error.message);
                 }
             );
-        }
-        // Preview text (default option if type can't be determined by extension)
-        else if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
 
-            const language = PlainTextPreview.selectLanguageByExtension(extension);
+        // Preview text (default option if type can't be determined by extension)
+        } else if (previewItem && (previewItem.type === 'plaintext' || previewItem.type === 'ttl')) {
+
+            const language = PlainTextPreviewComponent.selectLanguageByExtension(extension);
             const options = {
                 theme: 'vs-light',
                 language: language
-            }
+            };
 
             this.filePreviewLoading = true;
             // TODO: Max file size to config
@@ -326,7 +323,7 @@ export class JobsComponent implements OnInit {
                     this.filePreviewLoading = false;
                 },
                 error => {
-                    //TODO: Proper error reporting
+                    // TODO: Proper error reporting
                     this.filePreviewLoading = false;
                     this.currentPreviewObject = null;
                     console.log(error.message);
@@ -353,12 +350,12 @@ export class JobsComponent implements OnInit {
 
     /**
      * Add a folder to the Job tree new Jobs can be added to
-     * 
+     *
      * @param folderName the name of the folder to be added
      */
     public addFolder(folderName: string): void {
         this.jobsService.addFolder(folderName).subscribe(
-            series => {
+            () => {
                 this.jobBrowser.refreshJobs();
             },
             // TODO: Proper error reporting
@@ -371,7 +368,7 @@ export class JobsComponent implements OnInit {
 
     /**
      * Show a dialog for adding a folder to the Job tree
-     * 
+     *
      * @param content the add folder modal content
      */
     public showAddFolderModal(content): void {

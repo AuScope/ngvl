@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewChecked } from '@angular/core';
 import { routerTransition } from '../../router.animations';
-import { Observable } from 'rxjs/Observable';
 
 import { UserStateService, SOLUTIONS_VIEW } from '../../shared';
 import { Problem, Solution } from '../../shared/modules/vgl/models';
@@ -19,7 +18,7 @@ export class SolutionsComponent implements OnInit, AfterViewChecked {
 
   ngOnInit() {
     // Notify user state that we're using the solutions view
-    //this.userStateService.setView(SOLUTIONS_VIEW);
+    // this.userStateService.setView(SOLUTIONS_VIEW);
 
     // Subscribe to the current solution query to display relevant
     // results/selections.

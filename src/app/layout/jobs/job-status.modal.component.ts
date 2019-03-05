@@ -15,11 +15,11 @@ export const statusDescriptions = {
     "DELETED" : "The job has been deleted by the user.",
     "Provisioning" : "The job is currently trying to allocate computing resources.",
     "WALLTIME EXCEEDED" : "The job exceeded the walltime specified and has terminated."
-}
+};
 
 
 @Component({
-    selector: 'job-status-modal-content',
+    selector: 'app-job-status-modal-content',
     templateUrl: './job-status.modal.component.html'
 })
 
@@ -27,7 +27,7 @@ export const statusDescriptions = {
 /*
  * Modal to display job status logs
  */
-export class JobStatusModalContent {
+export class JobStatusModalComponent {
 
     @Input() job: any;  // Selected job
     @Input() logs: any; // The status logs of the selected job
@@ -38,7 +38,7 @@ export class JobStatusModalContent {
 
     /**
      * Return a string description of the specified status
-     * 
+     *
      * @param status Get the description of the supplied status
      */
     public getStatusDescription(status: string): string {

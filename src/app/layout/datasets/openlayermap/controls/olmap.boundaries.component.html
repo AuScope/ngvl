@@ -1,0 +1,29 @@
+<div *ngIf="boundaryLayers.length > 0" id="app-ol-boundary-select" class="form-inline" role="form" autocomplete="off">
+    <div class="form-group" style="align-items: flex-start">
+        <select class="btn btn-sm btn-primary" id="boundary-select" style="margin-left: 4px; vertical-align: top;"
+            (change)="onChange($event)">
+            <option value="NONE" selected>No Boundaries</option>
+            <option *ngFor="let layer of boundaryLayers" value="{{layer.name}}">{{layer.description}}</option>
+        </select>
+
+        <div class="filter-wrapper" style="margin-left: 4px">
+            <div class="keyword-wrapper">
+                <input [formControl]="searchRegionField" class="form-control input-sm keyword-input" type="text"  placeholder="search region name..." />
+            </div>
+            <ul class="filter-select-list" id="search-results-select">
+                <li *ngFor="let result of searchResults" class="filter-select-item" (click)="onClick($event)" id="{{result.id}}">
+                    <p class="region-name" id="{{result.id}}">{{result.name}}</p>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<div #popupElement id="popup" class="ol-popup">
+    <a #popupCloser href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div #popupContent id="popup-content">
+    </div>
+    <div #popupFooter id="popup-footer" class="ol-popup-footer" (click)="selectData()">Select Data
+    </div>
+</div>

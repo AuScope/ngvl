@@ -6,7 +6,7 @@ import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
 
 @Component({
-    selector: 'job-inputs',
+    selector: 'app-job-inputs',
     templateUrl: './job-inputs.component.html',
     styleUrls: ['./job-inputs.component.scss']
 })
@@ -22,7 +22,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     @Input() public showCheckboxes: boolean = false;
     // Input change event
     @Output() inputSelectionChanged = new EventEmitter();
-    //file size change event
+    // file size change event
     @Output() inputSizeChanged = new EventEmitter();
 
     // HttpCLient request (for cancelling)
@@ -46,12 +46,12 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     downloadTableColumns = [
         { field: 'name', header: 'Name' },
         { field: 'url', header: 'Details' }
-    ]
+    ];
 
     cloudFileTableColumns = [
         { field: 'name', header: 'Name' },
         { field: 'size', header: 'Details' }
-    ]
+    ];
 
     private fileUpdateSubscription: Subscription;
 
@@ -66,26 +66,28 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
                     // TODO: VGL seems to filter some files
                     newFileDetails => {
                         if (newFileDetails) {
-                            //check for new files or updates to existing files
+                            // check for new files or updates to existing files
                             newFileDetails.forEach(newFile => {
-                                var existingFile: CloudFileInformation = this.cloudFiles.find(oldFile => oldFile.name === newFile.name);
-                                if (!existingFile)
-                                    this.cloudFiles.push(newFile); //not found so add as a new element
-                                else {
-                                    //found , so update by comparing existing details
+                                let existingFile: CloudFileInformation = this.cloudFiles.find(oldFile => oldFile.name === newFile.name);
+                                if (!existingFile) {
+                                    this.cloudFiles.push(newFile); // not found so add as a new element
+                                } else {
+                                    // found, so update by comparing existing details
                                     if ((existingFile.name === newFile.name) && (existingFile.size !== newFile.size)) {
-                                        //update the size
-                                        existingFile.size = newFile.size;                                                                                
-                                        if(this.selectedCloudFiles.find(selectedFile => selectedFile.name === existingFile.name))                                        
+                                        // update the size
+                                        existingFile.size = newFile.size;
+                                        if (this.selectedCloudFiles.find(selectedFile => selectedFile.name === existingFile.name)) {
                                             this.inputSizeChanged.emit(existingFile);
+                                        }
                                     }
                                 }
                             });
-                            //check for deleted files
+                            // check for deleted files
                             this.cloudFiles.forEach((oldFile, index, cloudFilesArray) => {
-                                var fileIndex: number = newFileDetails.findIndex(file => file.name === oldFile.name);
-                                if (fileIndex === -1)
+                                let fileIndex: number = newFileDetails.findIndex(file => file.name === oldFile.name);
+                                if (fileIndex === -1) {
                                     cloudFilesArray.splice(index, 1);
+                                }
                             });
                         }
                     },
@@ -95,7 +97,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
                     }
                 );
             }
-        })
+        });
     }
 
     ngOnDestroy() {
@@ -175,8 +177,8 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     /**
      * TODO: Cache selected jobs so we don't need to re-download?
      * TODO: Deselect anything in cloud file table if meta key wasn't used
-     * 
-     * @param event 
+     *
+     * @param event
      */
     public jobDownloadSelected(event): void {
         this.cancelCurrentSubscription();
@@ -194,7 +196,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
      * TODO: Cache selected jobs so we don't need to re-download?
      * TODO: Deselect anything in job download table if meta key wasn't used
      * TODO: Remove (or change) preview on item de-selection?
-     * 
+     *
      * @param event event triggered by node selection, unused
      */
     public jobCloudFileSelected(event): void {
@@ -211,7 +213,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
 
     /**
      * XXX This is specific to cloud files, may need to make general
-     * 
+     *
      * TODO: Cache selected jobs so we don't need to re-download?
      */
     public downloadSingleFile(): void {
@@ -220,10 +222,10 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
                 saveAs(response, this.selectedCloudFiles[0].name);
             },
             error => {
-                //TODO: Proper error reporting
+                // TODO: Proper error reporting
                 console.log(error.message);
             }
-        )
+        );
     }
 
 
@@ -240,10 +242,10 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
                 saveAs(response, 'Job_' + this.selectedJob.id.toString() + '.zip');
             },
             error => {
-                //TODO: Proper error reporting
+                // TODO: Proper error reporting
                 console.log(error.message);
             }
-        )
+        );
     }
 
 
@@ -251,7 +253,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
      * Download selected job files (downloads and cloud files). Individual
      * files are downloaded in their native format, multiple files will be
      * zipped
-     * 
+     *
      * TODO: Figure out how to do data service downloads XXX
      * TODO: Report any errors
      */
@@ -269,7 +271,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
             } else if (this.selectedCloudFiles.length === 1) {
                 this.downloadSingleFile();
             } else if (this.selectedCloudFiles.length > 1) {
-                this.downloadFilesAsZip()
+                this.downloadFilesAsZip();
             }
         }
     }

@@ -2,12 +2,12 @@
     <app-page-header [heading]="'Jobs'" [icon]="'fa-magic'"></app-page-header>
     <div class="col" style="height: calc(100vh - 200px);padding: 0px; width: 100%; border: 1px solid #ddd;">
         <!-- Job tree -->
-        <split direction='horizontal'>
-            <split-area size="30">
+        <as-split direction="horizontal">
+            <as-split-area size="30">
                 <div class="card" style="padding: 0px; width: 100%; height: 100%; border-radius: 0px;">
                     <div class="card-header">Your Jobs</div>
                     <div class="card-body" style="overflow-y:auto;padding:0px;">
-                        <job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></job-browser>
+                        <app-job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></app-job-browser>
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-sm btn-primary pull-right" (click)="refreshJobs()" style="margin-left:4px;">
@@ -18,8 +18,8 @@
                         </button>
                     </div>
                 </div>
-            </split-area>
-            <split-area size="70">
+            </as-split-area>
+            <as-split-area size="70">
                 <!-- Selected job -->
                 <div class="col" style="padding:0px;">
                     <div class="card" style="height: 100%; border-radius: 0px;">
@@ -83,13 +83,13 @@
                             <div class="row" style="margin-right: -10px; margin-left: -2px; margin-top:-1px;">
                                 <!-- File panel -->
                                 <div class="col" style="height: calc(100vh - 297px);border: 1px solid #ddd;padding: 0px;margin-right: 10px;">
-                                    <split direction='horizontal'>
-                                        <split-area size="30">
+                                    <as-split direction="horizontal">
+                                        <as-split-area size="30">
                                             <div style="position: relative; height:100%; width: 100%; overflow-y:auto; overflow-x:hidden;">
-                                                <job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></job-inputs>
+                                                <app-job-inputs #jobInputs [selectionMode]="'multiple'" (inputSelectionChanged)="inputSelected($event)" (inputSizeChanged)="inputSizeUpdate($event)" [selectedJob]="jobBrowser.selectedJob"></app-job-inputs>
                                             </div>
-                                        </split-area>
-                                        <split-area id="preview-panel" size="70">
+                                        </as-split-area>
+                                        <as-split-area id="preview-panel" size="70">
                                             <div *ngIf="!currentPreviewObject && !filePreviewLoading" style="display:table;height:100%;width:100%;">
                                                 <div style="height:100%;width:100%;text-align: center;vertical-align: middle;display:table-cell;">
                                                     Select a file to the left to preview it here.
@@ -101,17 +101,17 @@
                                                 <div class="bounce3"></div>
                                             </div>    
                                             <div style="height: 100%;min-height: 100px;">                                                                                           
-                                                <ng-template preview-host ></ng-template>                                            
+                                                <ng-template appPreviewHost ></ng-template>                                            
                                             </div>
-                                        </split-area>
-                                    </split>
+                                        </as-split-area>
+                                    </as-split>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </split-area>
-        </split>
+            </as-split-area>
+        </as-split>
     </div>
 
 

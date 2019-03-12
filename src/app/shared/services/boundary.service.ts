@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import GeoJSON from 'ol/format/geojson';
-import Feature from 'ol/Feature';
+import Feature from 'ol';
 
 import { environment } from '../../../environments/environment';
 

@@ -9,7 +9,7 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 })
 
 
-export class ImagePreview implements PreviewComponent {
+export class ImagePreviewComponent implements PreviewComponent {
 
     // Data will be a URL to the server's getImagePreview endpoint
     data: any;
@@ -39,24 +39,24 @@ export class ImagePreview implements PreviewComponent {
      */
     public setModalStyle(): any {
         let styles = {};
-        if(this.showingImageModal) {
+        if (this.showingImageModal) {
             styles = {
                 'display': 'block'
-            }
+            };
         } else {
             styles = {
                 'display': 'none'
-            }
+            };
         }
         return styles;
     }
-    
+
     onScroll(event) {
-        var target = event.target || event.srcElement;
+        let target = event.target || event.srcElement;
         if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
             this.atBottom = true;
-        }
-        else
+        } else {
             this.atBottom = false;
+        }
     }
 }

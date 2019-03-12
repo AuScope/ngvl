@@ -1,4 +1,4 @@
-import { Component,ViewChild, ElementRef } from "@angular/core";
+import { Component, ViewChild, ElementRef } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
 
@@ -9,7 +9,7 @@ import { PreviewComponent } from '../../../shared/modules/vgl/models';
 })
 
 
-export class PlainTextPreview implements PreviewComponent {
+export class PlainTextPreviewComponent implements PreviewComponent {
 
     // Data will be the plaintext string
     data: any;
@@ -25,12 +25,12 @@ export class PlainTextPreview implements PreviewComponent {
     /**
      * Language will most often be the same as the extension, check for the
      * few instances where it is not
-     * 
+     *
      * @param extension file name extension
      */
     public static selectLanguageByExtension(extension: string): string {
         let language = extension;
-        switch(extension.toLocaleLowerCase()) {
+        switch (extension.toLocaleLowerCase()) {
             case 'py':
                 language = 'python';
             break;
@@ -45,11 +45,11 @@ export class PlainTextPreview implements PreviewComponent {
     }
 
     onScroll(event) {
-        var target = event.target || event.srcElement;
+        let target = event.target || event.srcElement;
         if ((target.scrollHeight - target.scrollTop) === target.clientHeight) {
             this.atBottom = true;
-        }
-        else
+        } else {
             this.atBottom = false;
+        }
     }
 }

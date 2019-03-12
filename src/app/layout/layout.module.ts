@@ -1,7 +1,3 @@
-import { environment } from '../../environments/environment';
-import { DatePickerComponent } from './bs-component/components/date-picker/date-picker.component';
-import { PortalCoreModule } from 'portal-core-ui/portal-core.module';
-import { KeysPipe } from 'portal-core-ui/uiutilities/pipes';
 import { PortalCorePipesModule } from 'portal-core-ui/uiutilities/portal-core.pipes.module';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -13,13 +9,14 @@ import { LayoutComponent } from './layout.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { CSWSearchService } from '../shared/services/csw-search.service';
-import { RecordModalContent } from './datasets/record.modal.component';
+import { RecordModalComponent } from './datasets/record.modal.component';
 import { SolutionsModule } from './solutions/solutions.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { JobsModule } from './jobs/jobs.module';
 import { UserModule } from './user/user.module';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { JobWizardModule } from './job-wizard/job-wizard.module';
+import { AngularSplitModule } from 'angular-split';
 
 
 @NgModule({
@@ -30,6 +27,7 @@ import { JobWizardModule } from './job-wizard/job-wizard.module';
     LayoutRoutingModule,
     TranslateModule,
     NgbModule.forRoot(),
+    AngularSplitModule.forRoot(),
     SolutionsModule,
     DatasetsModule,
     JobsModule,
@@ -41,8 +39,8 @@ import { JobWizardModule } from './job-wizard/job-wizard.module';
     LayoutComponent,
     SidebarComponent,
     HeaderComponent,
-    RecordModalContent ],
+    RecordModalComponent ],
   providers: [ CSWSearchService ],
-  entryComponents: [ RecordModalContent ]
+  entryComponents: [ RecordModalComponent ]
 })
 export class LayoutModule {}

@@ -12,11 +12,13 @@ import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
 
 
-@Injectable()
+@Injectable({
+    providedIn: 'root'
+})
 export class CSWSearchService {
 
     constructor(private httpClient: HttpClient, @Inject('env') private env,
-                private vgl: VglService, private userStateService: UserStateService) { }
+        private vgl: VglService, private userStateService: UserStateService) { }
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();
@@ -63,49 +65,48 @@ export class CSWSearchService {
 
 
     /**
-     * 
-     * @param start 
-     * @param limit 
-     * @param serviceId 
-     * @param field 
-     * @param value 
-     * @param type 
-     * @param comparison 
+     * @param start
+     * @param limit
+     * @param serviceId
+     * @param field
+     * @param value
+     * @param type
+     * @param comparison
      */
     public getFacetedSearch(start: number[], limit: number, serviceId: string[],
         field: string[], value: string[],
         type: string[], comparison: string[]): Observable<any> {
 
         let httpParams = new HttpParams();
-        if(limit) {
+        if (limit) {
             httpParams = httpParams.append('limit', limit.toString());
         }
-        if(start) {
+        if (start) {
             start.forEach(s => {
                 httpParams = httpParams.append('start', s.toString());
             });
         }
-        if(serviceId) {
+        if (serviceId) {
             serviceId.forEach(id => {
                 httpParams = httpParams.append('serviceId', id);
             });
         }
-        if(field) {
+        if (field) {
             field.forEach(f => {
                 httpParams = httpParams.append('field', f);
             });
         }
-        if(value) {
+        if (value) {
             value.forEach(v => {
                 httpParams = httpParams.append('value', v);
             });
         }
-        if(type) {
+        if (type) {
             type.forEach(t => {
                 httpParams = httpParams.append('type', t);
             });
         }
-        if(comparison) {
+        if (comparison) {
             comparison.forEach(c => {
                 httpParams = httpParams.append('comparison', c);
             });
@@ -114,18 +115,18 @@ export class CSWSearchService {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).map(response => {
-            //return response['data'].records;
+            // return response['data'].records;
             return response['data'];
         });
-    } 
-       
+    }
+
     /**
-     * executes getFacetedCSWServices.do in vgl service 
+     * executes getFacetedCSWServices.do in vgl service
      */
-    public updateRegistries() : Observable<Registry[]> {  
-       let obs = this.vgl.getAvailableRegistries();
-       obs.subscribe(registryList => this._registries.next(registryList));
-       return obs;
+    public updateRegistries(): Observable<Registry[]> {
+        let obs = this.vgl.getAvailableRegistries();
+        obs.subscribe(registryList => this._registries.next(registryList));
+        return obs;
     }
 
     /**
@@ -134,68 +135,69 @@ export class CSWSearchService {
 
     public getServiceId(cswRecord: CSWRecordModel): string {
         let availableRegistries: Registry[] = [];
-        let serviceId: string = "";             
+        let serviceId: string = "";
         this.registries.subscribe(data => {
             availableRegistries = data;
             for (let registry of availableRegistries) {
-                var matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
-                if (cswRecord.recordInfoUrl.indexOf(matchingUrl) != -1) {
+                let matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
+                if (cswRecord.recordInfoUrl.indexOf(matchingUrl) !== -1) {
                     serviceId = registry.id;
                     break;
                 }
             }
         });
-        return serviceId; 
+        return serviceId;
     }
 
-    public getFilteredCSWRecord(fileIdentifier : string, serviceId : string): Observable<CSWRecordModel[]> {         
-        return this.vgl.getFilteredCSWRecord(fileIdentifier,serviceId);
+    public getFilteredCSWRecord(fileIdentifier: string, serviceId: string): Observable<CSWRecordModel[]> {
+        return this.vgl.getFilteredCSWRecord(fileIdentifier, serviceId);
     }
 
-    public getBookMarks(): Observable <BookMark[]> {       
+    public getBookMarks(): Observable<BookMark[]> {
         return this.vgl.getBookMarks();
     }
 
-    public addBookMark(fileIdentifier : string, serviceId : string ) : Observable<number> {           
-        return this.vgl.addBookMark(fileIdentifier,serviceId);
+    public addBookMark(fileIdentifier: string, serviceId: string): Observable<number> {
+        return this.vgl.addBookMark(fileIdentifier, serviceId);
     }
 
-    public removeBookMark(id : number ) {           
+    public removeBookMark(id: number) {
         return this.vgl.removeBookMark(id);
     }
 
     /**
      * checks if a csw record has been bookmarked by the user
-     * @param cswRecord 
+     * @param cswRecord
      */
-    public isBookMark(cswRecord: CSWRecordModel) : boolean {
+    public isBookMark(cswRecord: CSWRecordModel): boolean {
         let bookMarkList: BookMark[] = [];
-        let match: boolean = false;        
+        let match: boolean = false;
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
         this.userStateService.bookmarks.subscribe(data => {
             bookMarkList = data;
             bookMarkList.some(bookMark => {
-                match = ((fileIdentifier.indexOf(bookMark.fileIdentifier) >= 0) && (serviceId.indexOf(bookMark.serviceId) >= 0));                
+                match = ((fileIdentifier.indexOf(bookMark.fileIdentifier) >= 0) && (serviceId.indexOf(bookMark.serviceId) >= 0));
                 return match;
-            }); 
-        });        
+            });
+        });
         return match;
-    }   
+    }
 
     /**
-     * Gets the book mark id information for a csw record.  
+     * Gets the book mark id information for a csw record.
      * This is made use of while storing multiple sets of download options as bookmarks for a particular dataset that has been bookmarked
-     * @param cswRecord 
+     * @param cswRecord
      */
-    public getBookMarkId(cswRecord: CSWRecordModel) : number {
+    public getBookMarkId(cswRecord: CSWRecordModel): number {
         let serviceId: string = this.getServiceId(cswRecord);
         let fileIdentifier: string = cswRecord.id;
         let bookMarkId: number;
         this.userStateService.bookmarks.subscribe(data => {
             data.forEach(bookMark => {
-                if ((bookMark.fileIdentifier.indexOf(fileIdentifier) === 0) && (bookMark.serviceId.indexOf(serviceId) === 0))
+                if ((bookMark.fileIdentifier.indexOf(fileIdentifier) === 0) && (bookMark.serviceId.indexOf(serviceId) === 0)) {
                     bookMarkId = bookMark.id;
+                }
             });
         }, error => {
             console.log(error.message);
@@ -206,16 +208,16 @@ export class CSWSearchService {
 
     /**
      * Create default download options for a given online resource
-     * 
-     * @param or 
-     * @param cswRecord 
-     * @param defaultBbox 
+     *
+     * @param or
+     * @param cswRecord
+     * @param defaultBbox
      */
     public createDownloadOptionsForResource(or, cswRecord, defaultBbox): any {
         // Note that remote downloads may not have an associated CSW record
-        const dsBounds = (cswRecord && cswRecord.geographicElements.length>0) ? cswRecord.geographicElements[0] : null;
+        const dsBounds = (cswRecord && cswRecord.geographicElements.length > 0) ? cswRecord.geographicElements[0] : null;
 
-        //Set the defaults of our new item
+        // Set the defaults of our new item
         let downloadOptions: DownloadOptions = {
             name: 'Subset of ' + or.name,
             description: or.description,
@@ -239,7 +241,7 @@ export class CSWSearchService {
             featureType: undefined
         };
 
-        //Add/subtract info based on resource type
+        // Add/subtract info based on resource type
         switch (or.type) {
             case 'WCS':
                 delete downloadOptions.url;
@@ -273,24 +275,24 @@ export class CSWSearchService {
                 delete downloadOptions.format;
                 delete downloadOptions.srsName;
                 break;
-            //We don't support EVERY type
+            // We don't support EVERY type
             default:
                 break;
         }
 
         return downloadOptions;
-    };
+    }
 
     /**
-     * 
-     * @param onlineResource 
-     * @param dlOptions 
+     *
+     * @param onlineResource
+     * @param dlOptions
      */
     public makeJobDownload(onlineResource: any, cswRecord: CSWRecordModel, dlOptions: DownloadOptions): Observable<JobDownload> {
         switch (onlineResource.type) {
             case 'WCS':
-                //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
-                //will fail. To workaround this, we need to crop our selection to the dataset bounds
+                // Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
+                // will fail. To workaround this, we need to crop our selection to the dataset bounds
                 if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
                     dlOptions.eastBoundLongitude = dlOptions.dsEastBoundLongitude;
                 }
@@ -332,7 +334,7 @@ export class CSWSearchService {
 
     /**
      * Get a list of online resource types for iteration
-     * 
+     *
      * TODO: Repeated, better off elsewhere?
      */
     public getSupportedOnlineResourceTypes(): string[] {
@@ -342,8 +344,8 @@ export class CSWSearchService {
 
     /**
      * Is the online resource of a supported type
-     * 
-     * @param onlineResource 
+     *
+     * @param onlineResource
      */
     public isResourceSupported(onlineResource): boolean {
         switch (onlineResource.type) {
@@ -355,13 +357,13 @@ export class CSWSearchService {
             default:
                 return false;
         }
-    };
+    }
 
 
     /**
      * Get all online resources of a particular resource type for a given
      * CSW record
-     * 
+     *
      * @param cswRecord the CSW Record
      * @param resourceType  the resource type
      */
@@ -379,7 +381,7 @@ export class CSWSearchService {
 
     /**
      * Return the first supported OnlineResourceModel for a given CSW Record
-     * 
+     *
      * @param cswRecord the CSW Record containing the online resource types
      * @return the OnlineResourceModel of the first supported resource type,
      *         or undefined if no such type could be found

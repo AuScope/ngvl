@@ -1,10 +1,9 @@
-import olLayer from 'ol/layer/layer';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 import { Component } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { RecordModalContent } from '../../record.modal.component';
+import { RecordModalComponent } from '../../record.modal.component';
 
 
 @Component({
@@ -33,17 +32,18 @@ export class OlMapLayersComponent {
      * Get active layers
      */
     public getActiveLayers(): LayerModel[] {
-        let layers: LayerModel[] = [];
-        for(let key of Object.keys(this.olMapService.getLayerModelList())) {
-            layers.push(this.olMapService.getLayerModelList()[key]);
+        const layers: LayerModel[] = [];
+        const keys = Object.keys(this.olMapService.getLayerModelList());
+        for (let i = 0; i < keys.length; i++) {
+            layers.push(this.olMapService.getLayerModelList()[keys[i]]);
         }
         return layers;
     }
 
 
     /**
-     * 
-     * @param layer 
+     *
+     * @param layer
      */
     public toggleLayerVisibility(layer: LayerModel): void {
         this.olMapService.setLayerVisibility(layer.id, layer.hidden);
@@ -51,12 +51,12 @@ export class OlMapLayersComponent {
 
 
     /**
-     * 
-     * @param layer 
+     *
+     * @param layer
      */
     public displayRecordInformation(layer: LayerModel) {
-        if(layer.cswRecords.length > 0) {
-            const modelRef = this.modalService.open(RecordModalContent, {size: 'lg'});
+        if (layer.cswRecords.length > 0) {
+            const modelRef = this.modalService.open(RecordModalComponent, {size: 'lg'});
             // TODO: DO we ever need to worry about other records?
             modelRef.componentInstance.record = layer.cswRecords[0];
         }
@@ -64,8 +64,8 @@ export class OlMapLayersComponent {
 
 
     /**
-     * 
-     * @param recordId 
+     *
+     * @param recordId
      */
     public removeRecord(recordId: string): void {
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));

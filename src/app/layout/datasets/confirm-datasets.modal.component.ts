@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
-import { DownloadOptionsModalContent } from './download-options.modal.component';
+import { DownloadOptionsModalComponent } from './download-options.modal.component';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { UserStateService } from '../../shared';
@@ -12,13 +12,13 @@ import { Router } from '@angular/router';
 
 
 @Component({
-    selector: 'confirm-datasets-modal-content',
+    selector: 'app-confirm-datasets-modal-content',
     templateUrl: './confirm-datasets.modal.component.html',
     styleUrls: ['./confirm-datasets.modal.component.scss']
 })
 
 
-export class ConfirmDatasetsModalContent {
+export class ConfirmDatasetsModalComponent {
 
     // TreeData, columns and selection
     @Input() public cswRecordTreeData: TreeNode[] = [];
@@ -46,15 +46,15 @@ export class ConfirmDatasetsModalContent {
     /**
      * TODO: This lazily opens the download URL in a new window, so this won't
      * work on mobile devices
-     * 
-     * @param onlineResource 
-     * @param dlOptions 
+     *
+     * @param onlineResource
+     * @param dlOptions
      */
-    private downloadDataset(onlineResource: any, dlOptions: DownloadOptions): void {
+    public downloadDataset(onlineResource: any, dlOptions: DownloadOptions): void {
         switch (onlineResource.type) {
             case 'WCS':
-                //Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
-                //will fail. To workaround this, we need to crop our selection to the dataset bounds
+                // Unfortunately ERDDAP requests that extend beyond the spatial bounds of the dataset
+                // will fail. To workaround this, we need to crop our selection to the dataset bounds
                 if (dlOptions.dsEastBoundLongitude != null && (dlOptions.dsEastBoundLongitude < dlOptions.eastBoundLongitude)) {
                     dlOptions.eastBoundLongitude = dlOptions.dsEastBoundLongitude;
                 }
@@ -116,18 +116,18 @@ export class ConfirmDatasetsModalContent {
 
     /**
      * Edit the download options for the resource.
-     * Several input parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.  
-     * If the record is book marked and has saved options, loads the downloadoptions from DB, 
-     * and sets the drop down items for DownloadOptionsModal in the format (label, value)     
+     * Several input parameters for DownloadOptionsModal are set such as default options, book mark status, csw record etc.
+     * If the record is book marked and has saved options, loads the downloadoptions from DB,
+     * and sets the drop down items for DownloadOptionsModal in the format (label, value)
      */
     public editDownload(event: any, rowData: any, onlineResource: any,
                         cswRecord: CSWRecordModel, defaultOptions: DownloadOptions,
                         downloadOptions: DownloadOptions): void {
         event.stopPropagation();
-        const modelRef = this.modalService.open(DownloadOptionsModalContent, { size: 'lg' });
+        const modelRef = this.modalService.open(DownloadOptionsModalComponent, { size: 'lg' });
         modelRef.componentInstance.cswRecord = cswRecord;
         modelRef.componentInstance.onlineResource = onlineResource;
-        //checks if a csw record belongs to a bookmarked dataset
+        // checks if a csw record belongs to a bookmarked dataset
         let isBookMarkRecord: boolean = this.cswSearchService.isBookMark(cswRecord);
         modelRef.componentInstance.isBMarked = isBookMarkRecord;
         modelRef.componentInstance.defaultDownloadOptions = defaultOptions;
@@ -135,19 +135,19 @@ export class ConfirmDatasetsModalContent {
         defaultOptions.bookmarkOptionName = 'Default Options';
         modelRef.componentInstance.dropDownItems.push({ label: 'Default Options', value: defaultOptions });
         if (isBookMarkRecord) {
-            //gets id of the bookmark using csw record information
+            // gets id of the bookmark using csw record information
             let bookMarkId: number = this.cswSearchService.getBookMarkId(cswRecord);
-            //gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
+            // gets any download options that were bookmarked previously by the user for a particular bookmarked dataset
             this.vglService.getDownloadOptions(bookMarkId).subscribe(data => {
                 if (data.length > 0) {
-                    //updates dropdown component with download options data that were bookmarked in the format(label, value)
+                    // updates dropdown component with download options data that were bookmarked in the format(label, value)
                     data.forEach(option => {
                         modelRef.componentInstance.dropDownItems.push({ label: option.bookmarkOptionName, value: option });
                     });
                 }
             });
         }
-        //After the user confirm changes, updated name and url are reflected in the page.
+        // After the user confirm changes, updated name and url are reflected in the page.
         modelRef.result.then((userResponse) => {
             this.cswRecordTreeData.forEach((node) => {
                 node.children.forEach((item) => {
@@ -157,13 +157,13 @@ export class ConfirmDatasetsModalContent {
                     }
                 });
             });
-        },() => {});
+        }, () => {});
     }
 
 
     /**
      * User has selected to save the selected datasets
-     * 
+     *
      * TODO: Don't reset selections every time, just add new selections
      */
     public captureData(): void {
@@ -187,7 +187,7 @@ export class ConfirmDatasetsModalContent {
                     }
                     // Display selection OK modal
                     this.modalService.open(this.selectedDatasetsOkModal).result.then((result) => {
-                        if(result==='New click') {
+                        if (result === 'New click') {
                             this.router.navigate(['/wizard/new']);
                         }
                         this.activeModal.close();

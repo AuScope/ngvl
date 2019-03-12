@@ -1,6 +1,6 @@
 import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
 import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
-import { ElementRef } from "@angular/core";
+
 /*
  * User Models
  */
@@ -135,11 +135,11 @@ export class JobParameter {
     name: string;
     value: string;
     type: string;
-    //parent: Job;
+    // parent: Job;
 }
 
 export class JobDownload {
-    //id: number;
+    // id: number;
     name: string;
     description: string;
     url: string;
@@ -169,7 +169,7 @@ export interface Job {
     processDate: Date;
     status: string;
     computeVmId: string;
-    computeInstanceId: null,
+    computeInstanceId: null;
     computeInstanceType: string;
     computeInstanceKey: string;
     computeServiceId: string;
@@ -260,7 +260,7 @@ export interface TreeJobs {
 }
 
 export interface TreeJobNode {
-    id: number,         // Not present on root
+    id: number;         // Not present on root
     name: string;
     expanded: boolean;
     expandable: boolean;
@@ -268,7 +268,7 @@ export interface TreeJobNode {
     root: boolean;      // Not present on children
     seriesId: number;
     children: TreeJobNode[];
-    submitDate: Date,   // Only present on job leaves
+    submitDate: Date;   // Only present on job leaves
     status: string;     // Only present on job leaves
 }
 
@@ -286,28 +286,28 @@ export interface PreviewComponent {
  * Dataset options
  */
 export interface DownloadOptions {
-    name: string,
-    description: string,
-    url: string,
-    method?: string,
-    localPath: string,
-    crs?: string,
-    eastBoundLongitude?: number,
-    northBoundLatitude?: number,
-    southBoundLatitude?: number,
-    westBoundLongitude?: number,
-    dsEastBoundLongitude?: number,
-    dsNorthBoundLatitude?: number,
-    dsSouthBoundLatitude?: number,
-    dsWestBoundLongitude?: number,
-    format?: string,
-    layerName?: string,
-    coverageName?: string,
-    serviceUrl?: string,
-    srsName?: string,
-    featureType?: string,
-    id?: number,
-    bookmarkId?: number,
+    name: string;
+    description: string;
+    url: string;
+    method?: string;
+    localPath: string;
+    crs?: string;
+    eastBoundLongitude?: number;
+    northBoundLatitude?: number;
+    southBoundLatitude?: number;
+    westBoundLongitude?: number;
+    dsEastBoundLongitude?: number;
+    dsNorthBoundLatitude?: number;
+    dsSouthBoundLatitude?: number;
+    dsWestBoundLongitude?: number;
+    format?: string;
+    layerName?: string;
+    coverageName?: string;
+    serviceUrl?: string;
+    srsName?: string;
+    featureType?: string;
+    id?: number;
+    bookmarkId?: number;
     bookmarkOptionName?: string;
 }
 
@@ -326,11 +326,11 @@ export interface Registry {
     url: string;
     checked?: boolean;
     startIndex?: number;
-    prevIndices?: number[]
+    prevIndices?: number[];
 }
 
 export function isSolution(x) {
-  if (x && x.problem != undefined) {
+  if (x && x.problem !== undefined) {
     return true;
   }
 

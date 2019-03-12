@@ -25,7 +25,7 @@ export class LayoutComponent implements OnInit {
         let styles = {
             'margin-left': this.isSidebarExpanded ? '280px' : '60px',
             'margin-right': '12px'
-        }
+        };
         return styles;
     }
 
@@ -33,7 +33,7 @@ export class LayoutComponent implements OnInit {
     /**
      * Catch the sidebar expansion/contraction event fired in the sidebar
      * component
-     * 
+     *
      * @param event will be true or false depending on whether the sidebar is
      * expanded (true) or contracted (false)
      */

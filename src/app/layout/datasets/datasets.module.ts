@@ -5,8 +5,8 @@ import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
 import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
-import { ConfirmDatasetsModalContent } from './confirm-datasets.modal.component';
-import { DownloadOptionsModalContent } from './download-options.modal.component';
+import { ConfirmDatasetsModalComponent } from './confirm-datasets.modal.component';
+import { DownloadOptionsModalComponent } from './download-options.modal.component';
 import { NgbCollapseModule, NgbModalModule, NgbTypeaheadModule, NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarModule } from 'primeng/calendar';
 import { TableModule } from 'primeng/table';
@@ -14,12 +14,12 @@ import { TreeTableModule } from 'primeng/treetable';
 import { DropdownModule } from 'primeng/dropdown';
 import { DatasetsDisplayComponent } from './datasets-display.component';
 import { AngularSplitModule } from 'angular-split';
-import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component';
 
 
 @NgModule({
   imports: [
-    AngularSplitModule,
+    AngularSplitModule.forRoot(),
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -35,7 +35,7 @@ import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
     NgbTypeaheadModule.forRoot(),
     NgbTabsetModule.forRoot()
   ],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalContent, DownloadOptionsModalContent, DatasetsDisplayComponent, RemoteDatasetsModalContent],
-  entryComponents: [ ConfirmDatasetsModalContent, DownloadOptionsModalContent, RemoteDatasetsModalContent ]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, DatasetsDisplayComponent, RemoteDatasetsModalComponent],
+  entryComponents: [ ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ]
 })
 export class DatasetsModule { }

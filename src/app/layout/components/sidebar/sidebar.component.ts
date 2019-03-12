@@ -2,14 +2,11 @@ import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { UserStateService, ViewType } from '../../../shared';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 
-
-
 @Component({
     selector: 'app-sidebar',
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.scss']
 })
-
 
 export class SidebarComponent implements OnInit {
 
@@ -28,23 +25,21 @@ export class SidebarComponent implements OnInit {
     constructor(private userStateService: UserStateService, private olMapService: OlMapService) {
     }
 
-
     /**
      * Set the sidebar style based on whether it is expanded or not
      */
     public setSidebarStyle(): any {
-        let styles= {
+        let styles = {
             'left': this.isSidebarExpanded ? '280px' : '60px',
             'width': this.isSidebarExpanded ? '280px' : '60px',
             'margin-left': this.isSidebarExpanded ? '-280px' : '-60px'
-        }
+        };
         return styles;
     }
-    
 
     /**
      * Set whether the sidebar should be expanded or not
-     * 
+     *
      * @param expanded true if sidebar expanded, false if not
      */
     public setExpanded(expanded: boolean): void {
@@ -55,7 +50,6 @@ export class SidebarComponent implements OnInit {
         });
     }
 
-
     ngOnInit(): void {
         // Listen for the current user view, and display the appropriate
         // view-specific components.
@@ -63,22 +57,18 @@ export class SidebarComponent implements OnInit {
             .subscribe(viewType => this.showComponentForView(viewType));
     }
 
-
     showComponentForView(viewType: ViewType) {
         this.currentView = viewType;
     }
-
 
     getCurrentView(): string {
         return this.currentView;
     }
 
-
     eventCalled() {
         this.isActive = !this.isActive;
     }
 
-    
     addExpandClass(element: any) {
         if (element === this.showMenu) {
             this.showMenu = '0';

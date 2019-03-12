@@ -29,13 +29,11 @@ export class AuthService {
         if (err.error instanceof Error) {
           // A client-side network error, so it's a genuine problem.
           console.error('An error occurred:', err.error.message);
-        }
-        else {
+        } else {
           // Otherwise, check the response code.
-          if (err.status == 404) {
+          if (err.status === 404) {
             console.log('Ignoring old redirect/not-found from VGL spring logout.');
-          }
-          else {
+          } else {
             console.error(`VGL backend returned error code ${err.status}, body was ${err.error}`);
           }
         }
@@ -43,13 +41,13 @@ export class AuthService {
         // Return an empty observable so the app can continue.
         return Observable.of<any>({});
       })
-      .subscribe(resp => {
-        // Trigger an update in the user state service to get the new username, then
-        // navigate to the dashboard.
-        this.userStateService.updateAnonymousUser();
-        this.userStateService.updateBookMarks();
-        this.router.navigate(['/dashboard']);
-      });
+      .subscribe(() => {
+              // Trigger an update in the user state service to get the new username, then
+              // navigate to the dashboard.
+              this.userStateService.updateAnonymousUser();
+              this.userStateService.updateBookMarks();
+              this.router.navigate(['/dashboard']);
+          });
   }
 
   /**
@@ -60,12 +58,12 @@ export class AuthService {
     this.userStateService.updateUser().subscribe(() => {
         this.userStateService.updateBookMarks();
         this.userStateService.user.subscribe(user => {
-            if(user === ANONYMOUS_USER) {
+            if (user === ANONYMOUS_USER) {
                 localStorage.removeItem('isLoggedIn');
             } else {
                 localStorage.setItem('isLoggedIn', 'true');
             }
-        })
+        });
     });
   }
 
@@ -78,14 +76,13 @@ export class AuthService {
             user => {
                 // Navigate to the saved url. Reset the saved url so it isn't retained for
                 // later logins.
-                if(user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
+                if (user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
                     this.userStateService.updateBookMarks();
                     const savedUrl = this.resetRedirectUrl();
                     const redirect = savedUrl ? savedUrl : '/dashboard';
                     this.router.navigate([redirect]);
-                }
-                // Redirect User to Profile to accept T&C's if they haven't already
-                else {
+                } else {
+                    // Redirect User to Profile to accept T&C's if they haven't already
                     this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
                 }
             }

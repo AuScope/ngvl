@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
         );
  */
     }
-    
+
     ngOnInit() {
         this.userStateService.setView(DASHBOARD_VIEW);
     }

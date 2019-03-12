@@ -3,23 +3,22 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserStateService } from '../../shared';
-import { DownloadOptions, BookMark } from '../../shared/modules/vgl/models';
+import { DownloadOptions } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { Dropdown } from "primeng/components/dropdown/dropdown";
 import { SelectItem } from 'primeng/api';
-import { ButtonsComponent } from '../bs-component/components';
 
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'download-options-modal-content',
+    selector: 'app-download-options-modal-content',
     templateUrl: './download-options.modal.component.html',
     styleUrls: ['./download-options.modal.component.scss']
 })
 
 
-export class DownloadOptionsModalContent implements OnInit {
+export class DownloadOptionsModalComponent implements OnInit {
 
     // Validator patterns
     LATITUDE_PATTERN = '^(\\+|-)?(?:90(?:(?:\\.0{1,20})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,20})?))$';
@@ -62,7 +61,7 @@ export class DownloadOptionsModalContent implements OnInit {
 
     /**
      * Retrieve the output formats for WFS online resource type.
-     * 
+     *
      * TODO: Find a working WFS example to test this against
      */
     getFeatureRequestOutputFormats(serviceUrl: string): any[] {
@@ -71,13 +70,13 @@ export class DownloadOptionsModalContent implements OnInit {
             response => {
                 outputFormats = response;
             }
-        )
+        );
         return outputFormats;
     }
 
 
     /**
-     * 
+     *
      * @param type the type of the online resource, will be 'WCS' or 'WFS'
      */
     private populateDataTypes() {
@@ -191,18 +190,18 @@ export class DownloadOptionsModalContent implements OnInit {
 
     /**
      * Checks if a object is of type interface Downloadoptions.
-     * This was necessary as primeng editable dropdown component was 
+     * This was necessary as primeng editable dropdown component was
      * returning select item as a string when the drop down is edited to enter a new value.
-     * 
-     * @param obj 
+     *
+     * @param obj
      */
     private isDownloadOptions(obj: any): obj is DownloadOptions {
         return obj && obj.bookmarkOptionName !== undefined;
     }
 
     /**
-     * Checks if item selected is of default download options 
-     * @param obj 
+     * Checks if item selected is of default download options
+     * @param obj
      */
     private isDefaultDownloadOptions(obj: DownloadOptions) {
         return obj && (obj.bookmarkOptionName.indexOf('Default Options') === 0);
@@ -211,7 +210,7 @@ export class DownloadOptionsModalContent implements OnInit {
     /**
      * Checks if download options are bookmarked and returns the index.
      * Used when adding and removing bookmarks for download options
-     * @param bookmarkOptionName 
+     * @param bookmarkOptionName
      */
     private bookmarkExists(bookmarkOptionName: string) {
         let index = this.dropDownItems.findIndex(item => {
@@ -225,16 +224,16 @@ export class DownloadOptionsModalContent implements OnInit {
      * This is executed on onChange event of the dropdown. Changes the form fields based on the
      * selection in the dropdown. Also enables and disables add/ remove buttons based on user input
      * like enetering a new book mark or selection of existing book marks for the download options.
-     * 
      */
     public selectBookMarkOptions() {
         if (this.isDownloadOptions(this.selectedOptions)) {
             this.downloadOptionsForm.reset(this.selectedOptions, { onlySelf: true, emitEvent: true });
             this.addButton.nativeElement.disabled = true;
-            if (this.isDefaultDownloadOptions(this.selectedOptions))
+            if (this.isDefaultDownloadOptions(this.selectedOptions)) {
                 this.deleteButton.nativeElement.disabled = true;
-            else
+            } else {
                 this.deleteButton.nativeElement.disabled = false;
+            }
         }
         if (!this.isDownloadOptions(this.selectedOptions)) {
             this.addButton.nativeElement.disabled = false;
@@ -247,20 +246,20 @@ export class DownloadOptionsModalContent implements OnInit {
      * Adds a bookmark for the download options in the drop down.
      */
     public addBookMarkOptions() {
-        //primeng component returns selectedOptions as a string object when user edits the dropdown to enter a new value.
-        //Hence it was necessary to check the type of the object
+        // primeng component returns selectedOptions as a string object when user edits the dropdown to enter a new value.
+        // Hence it was necessary to check the type of the object
         if ((typeof this.selectedOptions === "string") && (this.bookmarkExists(this.selectedOptions) === -1)) {
             let savedOptionsName: string = this.selectedOptions;
-            //Get updated options from the form fields
+            // Get updated options from the form fields
             for (let option in this.downloadOptions) {
                 if (this.downloadOptionsForm.controls.hasOwnProperty(option)) {
                     this.downloadOptions[option] = this.downloadOptionsForm.controls[option].value;
                 }
             }
             this.downloadOptions.bookmarkOptionName = savedOptionsName;
-            //saves the download options as a bookmark under the user entered bookmark name. 
+            // saves the download options as a bookmark under the user entered bookmark name.
             this.vglService.bookMarkDownloadOptions(this.cswSearchService.getBookMarkId(this.cswRecord), this.downloadOptions).subscribe(id => {
-                //updates downloadload options object with id and includes it in the drop down items
+                // updates downloadload options object with id and includes it in the drop down items
                 this.downloadOptions.id = id;
                 this.dropDownItems.push({ label: savedOptionsName, value: JSON.parse(JSON.stringify(this.downloadOptions)) });
             }, error => {
@@ -273,16 +272,17 @@ export class DownloadOptionsModalContent implements OnInit {
      * removes bookmarked options from the bookmarks in the drop down.
      */
     public deleteBookMarkOptions() {
-        //Gets the index of item to be removed from the dropdown items
+        // Gets the index of item to be removed from the dropdown items
         let index: number;
-        if ((typeof this.selectedOptions === "string"))
+        if ((typeof this.selectedOptions === "string")) {
             index = this.bookmarkExists(this.selectedOptions);
-        else
+        } else {
             index = this.bookmarkExists(this.selectedOptions.bookmarkOptionName);
-        //proceed to remove if item is present both from DB and dropdown SelctItems[]
+        }
+        // proceed to remove if item is present both from DB and dropdown SelctItems[]
         if (index > -1) {
             let optionsId = this.dropDownItems[index].value.id;
-            this.vglService.deleteDownloadOptions(optionsId).subscribe(data => {
+            this.vglService.deleteDownloadOptions(optionsId).subscribe(() => {
                 this.dropDownItems.splice(index, 1);
                 this.downloadOptionsForm.reset(this.defaultDownloadOptions, { onlySelf: true, emitEvent: true });
                 this.dropDown.clear(event);

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient} from '@angular/common/http';
 
-import { Observable, of, throwError, combineLatest, forkJoin, EMPTY } from 'rxjs';
-import { catchError, mergeMap, switchMap, map, defaultIfEmpty } from 'rxjs/operators';
+import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
+import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
-import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, Registry, ComputeService, MachineImage, ComputeType, Entry } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -46,9 +46,8 @@ export class VglService {
     for (const key in params) {
       const val = params[key];
       if (Array.isArray(val)) {
-        val.forEach(v => body.append(key, v))
-      }
-      else {
+        val.forEach(v => body.append(key, v));
+      } else {
         body.append(key, val);
       }
     }
@@ -102,16 +101,16 @@ export class VglService {
         return this.vglRequest('secure/createFolder.do', options);
     }
 
-    public setJobFolder(jobId: number[],seriesId: number): Observable<any> {
+    public setJobFolder(jobId: number[], seriesId: number): Observable<any> {
 
         const options = {
             params: {
                 jobIds: jobId.join(','),
             }
         };
-        if(seriesId)
+        if (seriesId) {
             options.params['seriesId'] = seriesId;
-
+        }
         return this.vglRequest('secure/setJobFolder.do', options);
     }
 
@@ -136,7 +135,7 @@ export class VglService {
                 acceptedTermsConditions: acceptedTermsConditions.toString(),
                 awsKeyName: awsKeyName
             }
-        }
+        };
         return this.vglRequest('secure/setUser.do', options);
     }
 
@@ -150,7 +149,7 @@ export class VglService {
                 nciUsername: nciUsername,
                 nciProject: nciProjectCode
             }
-        }
+        };
         return this.http.post(environment.portalBaseUrl + 'secure/setNCIDetails.do', formData, options);
     }
 
@@ -259,8 +258,8 @@ export class VglService {
     public duplicateJob(jobId: number/*, files: string[]*/): Observable<Job[]> {
         const options = {
             params: {
-                jobId: jobId.toString()//,
-                //files: files.join(',')
+                jobId: jobId.toString() // ,
+                // files: files.join(',')
             }
         };
 
@@ -281,12 +280,12 @@ export class VglService {
     // have a job id for the subsequent requests.
     return this.updateJob(job).pipe(
       // Update downloads for the job, and pass along the updated job object.
-      switchMap(job => this.updateJobDownloads(job, downloads).pipe(map(x => job))),
+      switchMap(job => this.updateJobDownloads(job, downloads).pipe(map(() => job))),
 
       // Next associate the template with the job, and if we succeed then return
       // the updated job object.
-      switchMap(job => this.saveScript(template, job, solutions).pipe(map(x => job))),
-      switchMap(job => this.uploadFiles(job, files).pipe(map(x => job))),
+      switchMap(job => this.saveScript(template, job, solutions).pipe(map(() => job))),
+      switchMap(job => this.uploadFiles(job, files).pipe(map(() => job))),
     );
   }
 
@@ -356,7 +355,7 @@ export class VglService {
     for (const p of Object.getOwnPropertyNames(job)) {
       // Remove any properties that are undefined, so they do not get included in
       // the request parameters.
-      if (params[p] == undefined) {
+      if (params[p] === undefined) {
         delete params[p];
       }
     }
@@ -364,12 +363,13 @@ export class VglService {
     // If no job id is supplied then updateOrCreateJob.do will create a new job
     // with the supplied parameters. So remove the id from job if it's not a
     // valid job id.
-    if (params.hasOwnProperty('id') && params.id == -1) {
+    if (params.hasOwnProperty('id') && params.id === -1) {
       delete params.id;
     }
 
-    if(!params.computeServiceId)
+    if (!params.computeServiceId) {
         delete params.computeServiceId;
+    }
 
     return this.vglGet('secure/updateOrCreateJob.do', params)
       .pipe(
@@ -398,11 +398,10 @@ export class VglService {
 
         // Values should all be numbers, after stripping off any units
         // designator ('gb').
-        const num = parseInt(value.endsWith('gb') ? value.slice(0, -2) : value);
+        const num = parseInt(value.endsWith('gb') ? value.slice(0, -2) : value, 10);
         if (isNaN(num)) {
           console.log('Bad HPC instance type parameter: ' + key + ' = ' + value);
-        }
-        else {
+        } else {
           job[key] = num;
         }
       }
@@ -498,35 +497,35 @@ export class VglService {
     public makeErddapUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
-        }
+        };
         return this.vglRequest('makeErddapUrl.do', options);
     }
 
     public makeWfsUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
-        }
+        };
         return this.vglRequest('makeWfsUrl.do', options);
     }
 
     public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
-        }
+        };
         return this.vglRequest('makeNetcdfsubseserviceUrl.do', options);
     }
 
     public makeDownloadUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
-        }
+        };
         return this.vglRequest('makeDownloadUrl.do', options);
     }
 
     public getRequestedOutputFormats(serviceUrl: string): Observable<any> {
         const options = {
             params: { serviceUrl: serviceUrl }
-        }
+        };
         return this.vglRequest('getFeatureRequestOutputFormats.do', options);
     }
 
@@ -554,7 +553,7 @@ export class VglService {
   }
 
     // Add to database dataset information that is bookmarked
-    public addBookMark(fileIdentifier: string, serviceId: string) : Observable<number> {
+    public addBookMark(fileIdentifier: string, serviceId: string): Observable<number> {
         const options = {
             params: {
                 fileIdentifier: fileIdentifier,
@@ -564,8 +563,8 @@ export class VglService {
         return this.vglRequest('addBookMark.do', options);
     }
 
-    //remove book mark information from database
-    public removeBookMark(id : number) {
+    // remove book mark information from database
+    public removeBookMark(id: number) {
         const options = {
             params: {
                 id: id.toString()
@@ -574,7 +573,7 @@ export class VglService {
         return this.vglRequest('deleteBookMark.do', options);
     }
 
-    //get list of bookmarks for a user
+    // get list of bookmarks for a user
     public getBookMarks(): Observable<BookMark[]> {
         return this.vglRequest('getBookMarks.do');
     }
@@ -587,7 +586,7 @@ export class VglService {
             params: {
                 bookmarkId: bookmarkId.toString()
             }
-        }
+        };
         return this.vglRequest('getDownloadOptions.do', options);
     }
 
@@ -620,7 +619,7 @@ export class VglService {
         return this.vglRequest('deleteDownloadOptions.do', options);
     }
 
-    //gets csw record information based on fileter parameters such as file identifier and service id
+    // gets csw record information based on fileter parameters such as file identifier and service id
     public getFilteredCSWRecord(fileIdentifier: string, serviceId: string): Observable<CSWRecordModel[]> {
         const options = {
             params: {
@@ -631,7 +630,7 @@ export class VglService {
         return this.vglRequest('getCSWRecord.do', options);
     }
 
-    //gets registry information to be used in faceted search and bookmarking of a dataset
+    // gets registry information to be used in faceted search and bookmarking of a dataset
     public getAvailableRegistries(): Observable<any> {
         return this.vglRequest('getFacetedCSWServices.do');
     }

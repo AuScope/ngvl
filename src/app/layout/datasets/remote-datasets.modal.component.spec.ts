@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RemoteDatasetsModalContent } from './remote-datasets.modal.component';
+import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component';
 
 describe('RemoteDatasetsContent', () => {
-  let component: RemoteDatasetsModalContent;
-  let fixture: ComponentFixture<RemoteDatasetsModalContent>;
+  let component: RemoteDatasetsModalComponent;
+  let fixture: ComponentFixture<RemoteDatasetsModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RemoteDatasetsModalContent ]
+      declarations: [ RemoteDatasetsModalComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RemoteDatasetsModalContent);
+    fixture = TestBed.createComponent(RemoteDatasetsModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

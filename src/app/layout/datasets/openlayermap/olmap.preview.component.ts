@@ -3,21 +3,21 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { Constants } from 'portal-core-ui/utility/constants.service';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { point, featureCollection, Geoms, polygon, feature } from '@turf/helpers';
+import { point, Geoms, polygon } from '@turf/helpers';
 import * as inside from '@turf/inside';
 import * as bbox from '@turf/bbox';
-import olStyle from 'ol/style/style';
-import olSource from 'ol/source/source';
-import olFormat from 'ol/';
-import olLayer from 'ol/layer/layer';
-import olView from 'ol/view';
-import olStroke from 'ol/style/stroke';
-import olFill from 'ol/style/fill';
-import olGeoJSON from 'ol/format/geojson';
-import olSourceVector from 'ol/source/vector';
-import olLayerVector from 'ol/layer/vector';
-import olExtent from 'ol/extent';
-import olLayerGroup from 'ol/layer/group';
+
+import View from 'ol/view';
+import Stroke from 'ol/style/stroke';
+import Fill from 'ol/style/fill';
+import Style from 'ol/style/style';
+import GeoJSON from 'ol/format/geojson';
+import SourceVector from 'ol/source/vector';
+import LayerVector from 'ol/layer/vector';
+import LayerGroup from 'ol/layer/group';
+import Extent from 'ol/extent';
+
+import { MapBrowserEvent } from 'openlayers';
 
 
 @Component({
@@ -35,7 +35,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     BBOX_HIGH_STROKE_COLOUR = '#ff33cc';
     BBOX_LOW_FILL_COLOUR = 'rgba(128,128,128,0.25)';
     BBOX_HIGH_FILL_COLOUR = 'rgba(255,179,236,0.4)';
-    layerVectorArr: { [key: string]: olLayerVector } = {};
+    layerVectorArr: { [key: string]: LayerVector } = {};
 
 
     constructor(private olMapService: OlMapService) {
@@ -44,7 +44,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
         const me = this;
 
         // When the user clicks on a rectangle in the preview, the main map zooms to the same area
-        map.on('singleclick', function (event) {
+        map.on('singleclick', function (event: MapBrowserEvent) {
             for (const featureColl of me.bboxGeojsonObjectArr) {
                 for (const feat of featureColl.features) {
                     const poly = polygon([[feat.geometry.coordinates[0][0],
@@ -52,7 +52,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                     feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
                     if (inside(point(event.coordinate), poly)) {
                         const bboxX: [number, number, number, number] = bbox(poly);
-                        olMapService.fitView(bboxX);
+                        me.olMapService.fitView(bboxX);
                     }
                 }
             }
@@ -82,7 +82,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
 
     /**
     * Adds bounding boxes to the preview map, recentres the map to the middle of the bounding boxes
-    * 
+    *
     * @param reCentrePt  Point to re-centre map
     * @param bboxGeojsonObj  Bounding boxes in GeoJSON format
     */
@@ -92,19 +92,19 @@ export class OlMapPreviewComponent implements AfterViewInit {
             this.bboxGeojsonObjectArr.push(bboxGeojsonObj[key]);
 
             // Set up bounding box style
-            const rectStyle = new olStyle({
-                stroke: new olStroke({
+            const rectStyle = new Style({
+                stroke: new Stroke({
                     color: this.BBOX_LOW_STROKE_COLOUR,
                     width: 2
                 }),
-                fill: new olFill({
+                fill: new Fill({
                     color: this.BBOX_LOW_FILL_COLOUR
                 })
             });
-            const source = new olSourceVector({
-                features: (new olGeoJSON()).readFeatures(bboxGeojsonObj[key])
+            const source = new SourceVector({
+                features: (new GeoJSON()).readFeatures(bboxGeojsonObj[key])
             });
-            const layerVector = new olLayerVector({
+            const layerVector = new LayerVector({
                 source: source,
                 style: [rectStyle]
             });
@@ -119,16 +119,16 @@ export class OlMapPreviewComponent implements AfterViewInit {
         // Only re-centre and zoom using valid coordinates, otherwise just recentre to middle of Australia
         let newView;
         if (isNaN(reCentrePt[0]) || isNaN(reCentrePt[1])) {
-            newView = new olView({ center: Constants.CENTRE_COORD, zoom: 3 });
+            newView = new View({ center: Constants.CENTRE_COORD, zoom: 3 });
         } else {
-            newView = new olView({ center: reCentrePt, zoom: 3 });
+            newView = new View({ center: reCentrePt, zoom: 3 });
         }
         this.olMapObject.getMap().setView(newView);
     }
 
     /**
      * Highlights or unhighlights a bounding box in the preview map
-     * 
+     *
      * @param state if true will highlight bounding box, else will unhighlight it
      * @param key used for selecting which bounding box to (un)highlight
      */
@@ -146,17 +146,17 @@ export class OlMapPreviewComponent implements AfterViewInit {
             if (layer === this.layerVectorArr[key]) {
                 // Renew the layer but with a new colour
                 map.removeLayer(layer);
-                const rectStyle = new olStyle({
-                    stroke: new olStroke({
+                const rectStyle = new Style({
+                    stroke: new Stroke({
                         color: strokeColour,
                         width: 2
                     }),
-                    fill: new olFill({
+                    fill: new Fill({
                         color: fillColour
                     })
                 });
-                layer.setStyle(rectStyle);
-                map.addLayer(layer)
+                layer.set('style', rectStyle);
+                map.addLayer(layer);
                 break;
             }
         }
@@ -166,21 +166,20 @@ export class OlMapPreviewComponent implements AfterViewInit {
      * Fit the map's view to the extent of all layers
      */
     public fitViewToAllLayers(): void {
-        let extent: olExtent = olExtent.createEmpty();
+        let extent = Extent.createEmpty();
         let map = this.olMapObject.getMap();
         map.getLayers().forEach(function (layer) {
-            if (layer instanceof olLayerGroup) {
-
+            if (layer instanceof LayerGroup) {
                 layer.getLayers().forEach(function(groupLayer) {
-                    if (layer instanceof olLayerVector) {
-                        olExtent.extend(extent, groupLayer.getSource().getExtent());
+                    if (layer instanceof LayerVector) {
+                        Extent.extend(extent, groupLayer.getExtent());
                     }
                 });
-            } else if (layer instanceof olLayerVector) {
-                olExtent.extend(extent, layer.getSource().getExtent());
+            } else if (layer instanceof LayerVector) {
+                Extent.extend(extent, layer.getSource().getExtent());
             }
         });
-        map.getView().fit(extent, map.getSize());
+        map.getView().fit(extent);
         map.getView().setZoom(map.getView().getZoom() - 2);
     }
 }

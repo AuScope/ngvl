@@ -3,13 +3,14 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, EMPTY, Observable, of, forkJoin } from 'rxjs';
-import { catchError, map, switchMap, defaultIfEmpty } from 'rxjs/operators';
+import { catchError, map, defaultIfEmpty } from 'rxjs/operators';
 
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
 import { isSolution, Variable } from '../modules/vgl/models';
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'file-saver';
+
 import {
   SolutionVarBindings,
   VarBinding,
@@ -94,11 +95,11 @@ export class UserStateService {
                 this.vgl.nciDetails.subscribe(
                     nciDetails => {
                         this._nciDetails.next(nciDetails);
-                    }, error => {}
+                    }, () => { }
                 );
             },
             // Failure to retrieve User means no User logged in
-            error => {
+            () => {
                 this.updateAnonymousUser();
             }
         );
@@ -219,7 +220,7 @@ export class UserStateService {
    */
   public setSolutionsCart(solutions: Solution[]) {
     // Delegate to the update method, ignoring any existing cart.
-    this.updateSolutionsCart(ignored => solutions || []);
+    this.updateSolutionsCart(() => solutions || []);
   }
 
   /**
@@ -260,8 +261,7 @@ export class UserStateService {
       // Copy the current value rather than modifying the stored value.
       newBindings = {...this._solutionBindings.getValue()};
       newBindings[s.id] = bindings;
-    }
-    else {
+    } else {
       newBindings = s;
     }
 
@@ -305,7 +305,7 @@ export class UserStateService {
   public removeUploadedFile(file: any): void {
       let uploadedFiles: any[] = this._uploadedFiles.getValue();
       uploadedFiles.forEach((item, index) => {
-        if(item === file) {
+        if (item === file) {
             uploadedFiles.splice(index, 1);
         }
       });
@@ -328,7 +328,7 @@ export class UserStateService {
   public removeJobDownload(jobDownload: JobDownload): void {
     let jobDownloads: any[] = this._jobDownloads.getValue();
     jobDownloads.forEach((item, index) => {
-      if(item === jobDownload) {
+      if (item === jobDownload) {
           jobDownloads.splice(index, 1);
       }
     });
@@ -353,7 +353,7 @@ export class UserStateService {
   public removeJobCloudFile(cloudFile: CloudFileInformation): void {
     let cloudFiles: any[] = this._jobCloudFiles.getValue();
     cloudFiles.forEach((item, index) => {
-      if(item === cloudFile) {
+      if (item === cloudFile) {
           cloudFiles.splice(index, 1);
       }
     });
@@ -414,8 +414,7 @@ export class UserStateService {
         jobDownloads: [],
         jobFiles: [],
         jobSolutions: []
-    }
-
+    };
     return Object.assign(job, initialValues);
   }
 
@@ -468,7 +467,7 @@ export class UserStateService {
    */
   public newJob(): Observable<Job> {
     // Create a new job with a default name
-    const name = "VGL Job - " + this.datePipe.transform(new Date(), 'medium')
+    const name = "VGL Job - " + this.datePipe.transform(new Date(), 'medium');
     const job = this.createEmptyJob({name: name});
 
     return of(this.updateJob(job));
@@ -492,7 +491,7 @@ export class UserStateService {
 
   private _replaceInTemplate(template: string, lookup: (key: string) => any) {
     return template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g,
-                            (match, p1, offset, string) => {
+                            (match, p1) => {
                               const value = lookup(p1);
                               return (value !== undefined) ? value : match;
                             });
@@ -572,12 +571,12 @@ export class UserStateService {
       options.options = v.values;
     }
 
-    if (v.type == "file") {
+    if (v.type === "file") {
       // File inputs are always dropdowns, with options populated from the
       // current set of selected downloads.
       b = new OptionsBinding<string>(options);
-    }
-    else if (v.type == "int") {
+
+    } else if (v.type === "int") {
       options.step = v.step || 1;
       if (v.min != null) {
         options.min = v.min;
@@ -586,8 +585,8 @@ export class UserStateService {
         options.max = v.max;
       }
       b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
-    }
-    else if (v.type == "double") {
+
+    } else if (v.type === "double") {
       options.step = v.step || 0.01;
       if (v.min != null) {
         options.min = v.min;
@@ -596,11 +595,11 @@ export class UserStateService {
         options.max = v.max;
       }
       b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
-    }
-    else if (v.type == "string") {
+
+    } else if (v.type === "string") {
       b = options.options ? new OptionsBinding<number>(options) : new StringEntryBinding(options);
-    }
-    else if (v.type == "boolean") {
+
+    } else if (v.type === "boolean") {
       b = new BooleanBinding(options);
     }
 

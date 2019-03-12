@@ -5,7 +5,7 @@ import { Subscription, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Solution, JobDownload, CloudFileInformation } from '../../shared/modules/vgl/models';
-import { SolutionVarBindings, VarBinding, OptionsBinding } from '../../shared/modules/solutions/models';
+import { VarBinding, OptionsBinding } from '../../shared/modules/solutions/models';
 
 import { SolutionVarBindingsService } from './solution-var-bindings.service';
 
@@ -62,9 +62,9 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {
     const options = [
-      ...downs.map(d => { return {key: d.localPath, value: d.name}; }),
-      ...clouds.map(c => { return {key: c.name, value: c.name}; }),
-      ...ups.map(u => { return {key: u.name, value: u.name}; })
+      ...downs.map(d => ({key: d.localPath, value: d.name})),
+      ...clouds.map(c => ({key: c.name, value: c.name})),
+      ...ups.map(u => ({key: u.name, value: u.name}))
     ];
 
     this.bindings.forEach(b => {
@@ -72,7 +72,7 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
         (b as OptionsBinding<any>).options = options;
 
         // If the current value is in options then retain it, otherwise reset to no selection
-        const stillAnOption = options.find(o => o.key == b.value);
+        const stillAnOption = options.find(o => o.key === b.value);
         if (!stillAnOption) {
           b.value = null;
         }
@@ -81,6 +81,6 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   }
 
   isInputFileBinding(binding: VarBinding<any>): boolean {
-    return binding && binding.controlType == 'dropdown';
+    return binding && binding.controlType === 'dropdown';
   }
 }

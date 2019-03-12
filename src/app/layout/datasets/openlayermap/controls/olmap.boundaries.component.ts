@@ -169,7 +169,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         this.clearSearchResults();
     }
 
-    public handleClick(p: number[]) {
+    public handleClick(p: [number, number]) {
 
         console.log("handleClick(" + p + ")");
 

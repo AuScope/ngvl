@@ -108,12 +108,12 @@
                     <a class="dropdown-item" routerLink="/user" routerLinkActive="active">
                         <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
                     </a>
-                    <button class="dropdown-item" (click)="onLoggedOut()">
+                    <button class="dropdown-item" (click)="onLogOut()">
                         <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
                     </button>
                 </div>
                 <div *ngIf="!isLoggedIn" class="dropdown-menu dropdown-menu-right">
-                  <button class="dropdown-item" (click)="onLoggedIn()">
+                  <button class="dropdown-item" (click)="onLogIn()">
                     <i class="fa fa-fw fa-power-on"></i> {{ 'Log In' | translate }}
                   </button>
                 </div>

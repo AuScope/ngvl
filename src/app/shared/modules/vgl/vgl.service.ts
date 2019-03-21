@@ -115,7 +115,7 @@ export class VglService {
     }
 
     public getJobStatuses(): Observable<any> {
-        return this.vglRequest('/secure/jobsStatuses.do');
+        return this.vglRequest('secure/jobsStatuses.do');
     }
 
     public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {

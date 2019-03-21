@@ -1,20 +1,23 @@
-.card-body {
-  padding: 10px;
-  .row {
-    margin-bottom: 10px;
-  }
-  li {
-    list-style-type: none;
-  }
-  .submenu-header {
-    padding: 4px;
-    cursor: pointer;
-    background: #eee;
-  }
+.card {
+  margin-bottom: 10px;
+  .card-body {
+    padding: 10px;
+    .row {
+      margin-bottom: 10px;
+    }
+    li {
+      list-style-type: none;
+    }
+    .submenu-header {
+      padding: 4px;
+      cursor: pointer;
+      background: #eee;
+    }
 
-  .flex-column {
-    label {
-      text-align: left;
+    .flex-column {
+      label {
+        text-align: left;
+      }
     }
   }
 }

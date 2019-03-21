@@ -82,31 +82,35 @@ export class UserStateService {
 
     public updateUser(): Observable<any> {
         return this.vgl.user.map(user => {
-                // If full name is empty (as with AAF login), use email address as name
-                if (user.fullName === undefined || user.fullName === "") {
-                    user.fullName = user.email;
-                }
-                // For a new user AWS details may be null, set to empty string if so
-                user.arnExecution = user.arnExecution ? user.arnExecution : "";
-                user.arnStorage = user.arnStorage ? user.arnStorage : "";
-                user.awsKeyName = user.awsKeyName ? user.awsKeyName : "";
-                this._user.next(user);
-                // Update NCI details (if they exist)
-                this.vgl.nciDetails.subscribe(
-                    nciDetails => {
-                        this._nciDetails.next(nciDetails);
-                    }, () => { }
-                );
-            },
-            // Failure to retrieve User means no User logged in
-            () => {
-                this.updateAnonymousUser();
+            // If full name is empty (as with AAF login), use email address as name
+            if (user.fullName === undefined || user.fullName === "") {
+                user.fullName = user.email;
             }
-        );
+            // For a new user AWS details may be null, set to empty string if so
+            user.arnExecution = user.arnExecution ? user.arnExecution : "";
+            user.arnStorage = user.arnStorage ? user.arnStorage : "";
+            user.awsKeyName = user.awsKeyName ? user.awsKeyName : "";
+            this._user.next(user);
+
+            // Updsate bookmarks
+            this.updateBookMarks();
+
+            // Update NCI details (if they exist)
+            this.vgl.nciDetails.subscribe(
+                nciDetails => {
+                    this._nciDetails.next(nciDetails);
+                }, () => { }
+            );
+        },
+        // Failure to retrieve User means no User logged in
+        () => {
+            this.updateAnonymousUser();
+        });
     }
 
     public updateAnonymousUser() {
         this._user.next(ANONYMOUS_USER);
+        this._bookmarks.next([]);
     }
 
     public updateNciDetails() {

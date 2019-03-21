@@ -53,13 +53,13 @@ export class HeaderComponent implements OnInit {
         dom.classList.toggle('rtl');
     }
 
-  onLoggedIn() {
+  onLogIn() {
       // Store the current url then login.
       this.authService.redirectUrl = this.router.url;
       this.authService.login();
     }
 
-  onLoggedOut() {
+  onLogOut() {
       this.authService.logout();
     }
 

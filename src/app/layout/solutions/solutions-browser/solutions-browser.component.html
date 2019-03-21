@@ -1,5 +1,5 @@
 <div class="card">
-  <div class="card-body">
+  <div class="card-body" *ngIf="problems.length > 0">
     <!-- Search by problem -->
     <div class="row">
       <div class="col">
@@ -31,6 +31,9 @@
         </div>
       </div>
     </div>
+  </div>
+  <div *ngIf="problems.length === 0" style="padding:10px;">
+    No problems could be found.<br>Make sure you have at least one service configured in <a [routerLink]="['/user']">your profile</a>.
   </div>
 </div>
 

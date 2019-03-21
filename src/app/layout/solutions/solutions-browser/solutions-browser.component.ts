@@ -65,4 +65,8 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
     this.userStateService.setSolutionQuery({ problems: problems });
   }
 
+  get problemCount(): number {
+    return this.problems.length;
+  }
+
 }

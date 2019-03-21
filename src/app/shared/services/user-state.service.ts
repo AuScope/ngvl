@@ -80,7 +80,7 @@ export class UserStateService {
         return this.currentView;
     }
 
-    public updateUser(): Observable<any> {
+    public updateUser(): Observable<User> {
         return this.vgl.user.map(user => {
             // If full name is empty (as with AAF login), use email address as name
             if (user.fullName === undefined || user.fullName === "") {
@@ -92,7 +92,7 @@ export class UserStateService {
             user.awsKeyName = user.awsKeyName ? user.awsKeyName : "";
             this._user.next(user);
 
-            // Updsate bookmarks
+            // Update bookmarks
             this.updateBookMarks();
 
             // Update NCI details (if they exist)
@@ -101,10 +101,13 @@ export class UserStateService {
                     this._nciDetails.next(nciDetails);
                 }, () => { }
             );
+
+            return user;
         },
         // Failure to retrieve User means no User logged in
         () => {
             this.updateAnonymousUser();
+            return ANONYMOUS_USER;
         });
     }
 

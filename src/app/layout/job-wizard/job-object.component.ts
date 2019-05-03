@@ -1,8 +1,7 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { UserStateService } from '../../shared';
-import { JobsService } from '../jobs/jobs.service';
 import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 
@@ -31,7 +30,6 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   form: NgForm;
 
   constructor(private userStateService: UserStateService,
-             // private jobsService: JobsService,
               private vgl: VglService) {
     // Initialise the job object so we can bind to it and copy parameters as
     // required.
@@ -96,8 +94,12 @@ export class JobObjectComponent implements OnDestroy, OnInit {
 
           // Select the first image in the list by default, and update resources accordingly.
           if (this.toolboxes.length > 0) {
-            const toolbox = this.toolboxes[0];
-            this.job.computeVmId = toolbox.imageId;
+            // TODO: Check if existing job already has a toolbox selected
+            let toolbox: MachineImage = this.toolboxes.find(it => it.imageId === this.job.computeVmId);
+            if(toolbox === undefined) {
+              toolbox = this.toolboxes[0];
+              this.job.computeVmId = toolbox.imageId;
+            }
             this.toolboxChanged(toolbox.imageId);
           }
         });

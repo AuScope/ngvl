@@ -66,8 +66,7 @@
                                                     <div class="input-group input-group-sm">
                                                         <!-- TODO: Catch update change event, update model -->
                                                         <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]="selectedKeywords[i]" (click)="click$.next($event.target.value)"
-                                                            #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"
-                                                        />
+                                                            #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"/>
                                                         <div class="input-group-btn input-group-apppend">
                                                             <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary"
                                                                 type="button" (click)="addNewKeyword()" style="background-color:green;">
@@ -189,7 +188,8 @@
                                     <!-- TODO : Paging of results (use factedSearch start/limit) -->
                                     <div class="row" #searchResults>
                                         <div class="col">
-                                            <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">Search Results
+                                            <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
+                                                Search Results&nbsp;({{ cswSearchResults.length }} of {{ cswSearchResultsMatched }})
                                                 <span>
                                                     <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
                                                 </span>

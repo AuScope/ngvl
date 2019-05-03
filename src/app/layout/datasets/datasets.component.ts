@@ -10,7 +10,6 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark, Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import Proj from 'ol/proj';
-import Extent from 'ol/extent';
 
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 
@@ -28,6 +27,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     // Search results
     cswSearchResults: CSWRecordModel[] = [];
+    cswSearchResultsMatched: number = 0;
     recordsLoading = false;
 
     // BookMarks
@@ -209,6 +209,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     registry.startIndex = response.nextIndexes[registry.id];
                 }
                 this.cswSearchResults = response.records;
+                this.cswSearchResultsMatched = response.recordsMatched;
                 this.recordsLoading = false;
                 this.searchResultsIsCollapsed = false;
                 this.searchResultsElement.nativeElement.scrollIntoView(false);

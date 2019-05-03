@@ -69,7 +69,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
             .debounceTime(200)
             .distinctUntilChanged()
             .subscribe(queryField => {
-                console.log("query field value: " + queryField);
                 if (this.boundaryLayer.getVisible && queryField != null && queryField.length > 0) {
                     const layer = this.boundaryLayerMapping[this.boundaryLayer.get('name')];
                     this.boundaryService.findFeatures(queryField, layer.name, layer.nameAttribute)

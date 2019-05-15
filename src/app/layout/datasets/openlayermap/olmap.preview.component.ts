@@ -2,7 +2,7 @@ import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { Constants } from 'portal-core-ui/utility/constants.service';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { point, Geoms, polygon } from '@turf/helpers';
 import * as inside from '@turf/inside';
 import * as bbox from '@turf/bbox';
@@ -38,8 +38,8 @@ export class OlMapPreviewComponent implements AfterViewInit {
     layerVectorArr: { [key: string]: LayerVector } = {};
 
 
-    constructor(private olMapService: OlMapService) {
-        this.olMapObject = new OlMapObject(new RenderStatusService());
+    constructor(private olMapService: OlMapService, @Inject('env') private env) {
+        this.olMapObject = new OlMapObject(new RenderStatusService(), env);
         const map = this.olMapObject.getMap();
         const me = this;
 

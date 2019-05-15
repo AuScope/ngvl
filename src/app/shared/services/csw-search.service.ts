@@ -111,11 +111,11 @@ export class CSWSearchService {
                 httpParams = httpParams.append('comparison', c);
             });
         }
+
         return this.httpClient.post(this.env.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).map(response => {
-            // return response['data'].records;
             return response['data'];
         });
     }

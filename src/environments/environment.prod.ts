@@ -29,5 +29,6 @@ export const environment = {
         //{ value: 't', viewValue: 'Google Terrain', layerType: 'Google' },
         //{ value: 'p', viewValue: 'Google Terrain & Roads', layerType: 'Google' },
         //{ value: 'r', viewValue: 'Google Road without Building', layerType: 'Google' }
-    ]
+    ],
+    forceAddLayerViaProxy: []
 };

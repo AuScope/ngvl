@@ -355,7 +355,7 @@ export class VglService {
     for (const p of Object.getOwnPropertyNames(job)) {
       // Remove any properties that are undefined, so they do not get included in
       // the request parameters.
-      if (params[p] === undefined) {
+      if (params[p] === undefined || params[p] === null) {
         delete params[p];
       }
     }

@@ -2,7 +2,6 @@ export const environment = {
     production: true,
     getCSWRecordUrl: 'getKnownLayers.do',
     portalBaseUrl: '/VGL-Portal/',
-    // portalBaseUrl: 'http://gis-dev-or.it.csiro.au:8080/VGL-Portal/',
     boundariesUrl: 'http://localhost:8080/geoserver/boundaries',
     boundaryLayersEmpty: [],   // if no geoserver with ABS boundary layers is available, rename this to boundaryLayers and remove (or rename) the boundaryLayers definition below
     boundaryLayers: [{ 'name': 'boundaries:CED_2018_AUST', 'description': 'Federal Electorates', 'nameAttribute': 'CED_NAME_2018', 'areaAttribute': 'AREA_ALBERS_SQKM', 'colour': '#351c75' },

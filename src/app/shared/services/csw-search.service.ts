@@ -33,7 +33,7 @@ export class CSWSearchService {
             'expanded': true
         },
         'WFS': {
-            'nme': 'OGC Web Feature Service 1.1.0',
+            'name': 'OGC Web Feature Service 1.1.0',
             'expanded': true
         },
         'WMS': {

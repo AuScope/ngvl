@@ -175,7 +175,7 @@
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-prepend">
                                                             <div class="input-group-text">
-                                                                <input type="checkbox" [(ngModel)]="registry.value.checked" (change)="resetFacetedSearch()" id="check1">
+                                                                <input type="checkbox" [(ngModel)]="registry.value.checked" (change)="registryChanged(registry.value)" id="check1">
                                                             </div>
                                                         </div>
                                                         <label for="check1" class="small">&nbsp;{{ registry.value.title }}</label>

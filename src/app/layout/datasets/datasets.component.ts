@@ -146,8 +146,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * Search all registries using current facets.
      */
     public facetedSearchAllRegistries(): void {
-        // Limit
-        const limit = this.CSW_RECORD_PAGE_LENGTH;
 
         // Available registries and start
         let serviceIds: string[] = [];
@@ -321,8 +319,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         }
 
         registry.searching = true;
-        this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
-        .subscribe(response => {
+
+        this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons).subscribe(response => {
             registry.prevIndices.push(registry.startIndex);
             registry.startIndex = response.nextIndexes[registry.id];
             registry.recordsMatched = response.recordsMatched;
@@ -379,11 +377,22 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
-     * Fires when a registry is changed, resets keywords and re-runs facted search.
+     * Fires when a registry is changed, resets keywords and re-runs facted
+     * search if registry has been added, as well as resetting search indices.
      */
-    public registryChanged(): void {
+    public registryChanged(registry: Registry): void {
         this.getFacetedKeywords();
-        this.resetFacetedSearch();
+        if(registry.checked) {
+            this.facetedSearchSingleRegistry(registry);
+        } else {
+            registry.currentPage = 1;
+            registry.startIndex = 1;
+            registry.prevIndices = [];
+            registry.recordsMatched = 0;
+            if(this.cswSearchResults.has(registry.id)) {
+                this.cswSearchResults.delete(registry.id);
+            }
+        }
     }
 
     /**

@@ -65,14 +65,57 @@ export class CSWSearchService {
 
 
     /**
+     * @param serviceId
      * @param start
      * @param limit
-     * @param serviceId
      * @param field
      * @param value
      * @param type
      * @param comparison
      */
+    public getFacetedSearch(serviceId: string, start: number, limit: number,
+        field: string[], value: string[],
+        type: string[], comparison: string[]): Observable<any> {
+
+        let httpParams = new HttpParams();
+        if (limit) {
+            httpParams = httpParams.append('limit', limit.toString());
+        }
+        if (start) {
+            httpParams = httpParams.append('start', start.toString());
+        }
+        if (serviceId) {
+            httpParams = httpParams.append('serviceId', serviceId);
+        }
+        if (field) {
+            field.forEach(f => {
+                httpParams = httpParams.append('field', f);
+            });
+        }
+        if (value) {
+            value.forEach(v => {
+                httpParams = httpParams.append('value', v);
+            });
+        }
+        if (type) {
+            type.forEach(t => {
+                httpParams = httpParams.append('type', t);
+            });
+        }
+        if (comparison) {
+            comparison.forEach(c => {
+                httpParams = httpParams.append('comparison', c);
+            });
+        }
+
+        return this.httpClient.post(this.env.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
+            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
+            responseType: 'json'
+        }).map(response => {
+            return response['data'];
+        });
+    }
+    /*
     public getFacetedSearch(start: number[], limit: number, serviceId: string[],
         field: string[], value: string[],
         type: string[], comparison: string[]): Observable<any> {
@@ -119,6 +162,7 @@ export class CSWSearchService {
             return response['data'];
         });
     }
+    */
 
     /**
      * executes getFacetedCSWServices.do in vgl service
@@ -132,7 +176,6 @@ export class CSWSearchService {
     /**
      * Get the service id information of the cswrecord by matching the record info(cswrecord.recordInfoUrl) with available registries.
      */
-
     public getServiceId(cswRecord: CSWRecordModel): string {
         let availableRegistries: Registry[] = [];
         let serviceId: string = "";

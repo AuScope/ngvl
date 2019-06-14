@@ -171,25 +171,25 @@
                                                 <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="registriesIsCollapsed">
-                                                <li *ngFor="let registry of availableRegistries">
+                                                <li *ngFor="let registry of availableRegistries | keyvalue">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-prepend">
                                                             <div class="input-group-text">
-                                                                <input type="checkbox" [(ngModel)]="registry.checked" (change)="resetFacetedSearch()" id="check1">
+                                                                <input type="checkbox" [(ngModel)]="registry.value.checked" (change)="resetFacetedSearch()" id="check1">
                                                             </div>
                                                         </div>
-                                                        <label for="check1" class="small">&nbsp;{{ registry.title }}</label>
+                                                        <label for="check1" class="small">&nbsp;{{ registry.value.title }}</label>
                                                     </div>
                                                 </li>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Search results -->
-                                    <!-- TODO : Paging of results (use factedSearch start/limit) -->
                                     <div class="row" #searchResults>
                                         <div class="col">
                                             <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
-                                                Search Results&nbsp;({{ cswSearchResults.length }} of {{ cswSearchResultsMatched }})
+                                                <!--Search Results&nbsp;({{ cswDisplayResults.length }} of {{ cswSearchResultsMatched }})-->
+                                                Search Results ({{ getTotalSearchResultCount() }} Total)
                                                 <span>
                                                     <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
                                                 </span>
@@ -199,39 +199,44 @@
                                             </div>
                                             <div [ngbCollapse]="searchResultsIsCollapsed" style="position:relative;border-style:solid;border-color:#eee">
                                                 <div class="container-fluid">
-                                                    <!-- Records loading spinner -->
-                                                    <div class="row" *ngIf="recordsLoading" style="height:21px;">
-                                                        <div class="col">
-                                                            <div class="spinner">
-                                                                <div class="bounce1"></div>
-                                                                <div class="bounce2"></div>
-                                                                <div class="bounce3"></div>
+                                                    <ngb-tabset type="pills">
+                                                        <div *ngFor="let registry of availableRegistries | keyvalue">
+                                                            <div *ngIf="registry.value.checked">
+                                                                <ngb-tab [title]="getRegistryTabTitle(registry.key)">
+
+
+                                                                        <ng-template ngbTabContent>
+
+                                                                            <div *ngIf="!registry.value.searching && !cswSearchResults.get(registry.key)">
+                                                                                <label>There was a problem retrieving records from this registry</label>
+                                                                            </div>
+
+                                                                            <div *ngIf="!registry.value.searching && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
+                                                                                <label>No records match the current filter(s)</label>
+                                                                            </div>
+
+                                                                            <div *ngIf="cswSearchResults.get(registry.key)">
+                                                                                <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="cswSearchResults.get(registry.key)" [registries]="availableRegistries" [bookMarkList]="bookMarks"
+                                                                                    (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
+                                                                                <div class="row" *ngIf="!registry.value.searching" style="bottom:0;right:0px;">
+                                                                                    <div class="col">
+                                                                                        <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
+                                                                                            (click)="nextResultsPage(registry.key)">
+                                                                                            <i class="fa fa-arrow-circle-right"></i>
+                                                                                        </button>
+                                                                                        <button [disabled]="registry.value.currentPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
+                                                                                            title="Previous page" (click)="previousResultsPage(registry.key)">
+                                                                                            <i class="fa fa-arrow-circle-left"></i>
+                                                                                        </button>
+                                                                                        <label class="pull-right">Page {{ registry.value.currentPage }}&nbsp;</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </ng-template>      
+                                                                </ngb-tab>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <!-- Records -->
-                                                    <div *ngIf="cswSearchResults.length>0">
-                                                        <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="cswSearchResults" [registries]="availableRegistries" [bookMarkList]="bookMarks"
-                                                            (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
-                                                        <!-- Record pagination -->
-                                                        <div class="row" *ngIf="!recordsLoading" style="bottom:0;right:0px;">
-                                                            <div class="col">
-                                                                <button [disabled]="!hasNextResultsPage()" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
-                                                                    (click)="nextResultsPage()">
-                                                                    <i class="fa fa-arrow-circle-right"></i>
-                                                                </button>
-                                                                <button [disabled]="currentCSWRecordPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
-                                                                    title="Previous page" (click)="previousResultsPage()">
-                                                                    <i class="fa fa-arrow-circle-left"></i>
-                                                                </button>
-                                                                <label class="pull-right">Page {{ currentCSWRecordPage }}&nbsp;</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- No records -->
-                                                    <div *ngIf="cswSearchResults.length===0 && !recordsLoading">
-                                                        <label>No records match the current filter(s)</label>
-                                                    </div>
+                                                    </ngb-tabset>
                                                 </div>
                                             </div>
                                         </div>

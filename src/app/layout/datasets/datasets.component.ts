@@ -23,12 +23,9 @@ import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
-    currentCSWRecordPage: number = 1;
-
+    
     // Search results
-    cswSearchResults: CSWRecordModel[] = [];
-    cswSearchResultsMatched: number = 0;
-    recordsLoading = false;
+    cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
 
     // BookMarks
     bookMarks: BookMark[] = [];
@@ -52,7 +49,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     availableServices: any = [];
     dateTo: Date = null;
     dateFrom: Date = null;
-    availableRegistries: Registry[] = [];
+    availableRegistries: Map<String, Registry> = new Map<String, Registry>();
 
     currentYear: number = 2018;
 
@@ -77,18 +74,24 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.userStateService.setView(DATA_VIEW);
         this.currentYear = (new Date()).getFullYear();
         // Load available registries
-        this.cswSearchService.updateRegistries().subscribe(data => {
-            this.availableRegistries = data;
-            for (let registry of this.availableRegistries) {
+        this.cswSearchService.updateRegistries().subscribe((data: Registry[]) => {
+            // Update registries
+            for(let registry of data) {
                 registry.checked = true;
                 registry.startIndex = 1;
                 registry.prevIndices = [];
+                registry.recordsMatched = 0;
+                registry.searching = false;
+                registry.currentPage = 1;
+                this.availableRegistries.set(registry.id, registry);
             }
+
             // Populate initial results (if this isn't desired, add checks to
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
-            this.facetedSearch();
             this.getFacetedKeywords();
+            this.facetedSearch();
+            
             // get bookmark data only if the user is logged in
             if (this.isValidUser()) {
                 this.getBookMarkCSWRecords();
@@ -115,10 +118,35 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
+     * 
+     * @param serviceId 
+     */
+    public getRegistryTabTitle(serviceId: String) {
+        let title: String = this.availableRegistries.get(serviceId).title;
+        if(this.availableRegistries.get(serviceId).searching) {
+            title += " (Searching)";
+        } else if(this.availableRegistries.get(serviceId).recordsMatched) {
+            title += " (" + this.availableRegistries.get(serviceId).recordsMatched + ")";
+        }
+        return title;
+    }
+
+    /**
+     * 
+     */
+    public getTotalSearchResultCount(): number {
+        let count: number = 0;
+        this.availableRegistries.forEach((registry: Registry) => {
+            count += registry.recordsMatched;
+        });
+        return count;
+    }
+
+    /**
      * Search results based on the current faceted search panel values
      */
     public facetedSearch(): void {
-        this.cswSearchResults = [];
+        this.cswSearchResults = new Map<String, CSWRecordModel[]>();
 
         // Limit
         const limit = this.CSW_RECORD_PAGE_LENGTH;
@@ -127,13 +155,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         let serviceIds: string[] = [];
         let starts: number[] = [];
         let registrySelected: boolean = false;
-        this.availableRegistries.forEach(registry => {
+        this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             if (registry.checked) {
                 registrySelected = true;
                 serviceIds.push(registry.id);
                 starts.push(registry.startIndex);
             }
         });
+
         // If no registries are selected, there's nothing to search
         if (!registrySelected) {
             return;
@@ -201,23 +230,30 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             comparisons.push('lt');
         }
 
-        this.recordsLoading = true;
-        this.cswSearchService.getFacetedSearch(starts, limit, serviceIds, fields, values, types, comparisons)
-            .subscribe(response => {
-                for (let registry of this.availableRegistries) {
+        this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
+            if(registry.checked) {
+                registry.searching = true;
+                this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, limit, fields, values, types, comparisons)
+                .subscribe(response => {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
-                }
-                this.cswSearchResults = response.records;
-                this.cswSearchResultsMatched = response.recordsMatched;
-                this.recordsLoading = false;
-                this.searchResultsIsCollapsed = false;
-                this.searchResultsElement.nativeElement.scrollIntoView(false);
-            }, error => {
-                // TODO: proper error reporting
-                console.log("Faceted search error: " + error.message);
-                this.recordsLoading = false;
-            });
+                    registry.recordsMatched = response.recordsMatched;
+
+                    if((<CSWRecordModel[]>response.records).length > 0) {
+                        console.log("facetedSearch - found " + (<CSWRecordModel[]>response.records).length + " records in registry " + registry.id);
+                        this.cswSearchResults.set(registry.id, response.records);
+                    }
+                    registry.searching = false;
+                    this.searchResultsIsCollapsed = false;
+                    //this.searchResultsElement.nativeElement.scrollIntoView(false);
+                }, error => {
+                    // TODO: proper error reporting
+                    console.log("Faceted search error: " + error.message);
+                    this.cswSearchResults.set(serviceId, null);
+                    registry.searching = false;
+                });
+            }
+        });
     }
 
     /**
@@ -226,12 +262,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     public getFacetedKeywords(): void {
         let registrySelected: boolean = false;
         let serviceIds = [];
-        for (let registry of this.availableRegistries) {
+        this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             if (registry.checked) {
                 registrySelected = true;
                 serviceIds.push(registry.id);
             }
-        }
+        });
         // If no registries are selected, there's nothing to search
         if (!registrySelected) {
             return;
@@ -248,12 +284,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      *
      */
     public resetFacetedSearch(): void {
-        this.currentCSWRecordPage = 1;
         // Reset registry start and previous indices
-        for (let registry of this.availableRegistries) {
+        this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             registry.startIndex = 1;
             registry.prevIndices = [];
-        }
+            registry.currentPage = 1;
+        });
         this.facetedSearch();
     }
 
@@ -270,15 +306,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      */
     public drawBound(): void {
         this.olMapService.drawBound().subscribe((vector) => {
-
             const features = vector.getSource().getFeatures();
-
             // Go through this array and get coordinates of their geometry.
             features.forEach(function (feature) {
                 const bbox4326 = feature.getGeometry().transform('EPSG:3857', 'EPSG:4326');
                 alert('bounds:' + bbox4326.getExtent()[2] + ' ' + bbox4326.getExtent()[0] + ' ' + bbox4326.getExtent()[3] + ' ' + bbox4326.getExtent()[1]);
             });
-
         });
     }
 
@@ -301,7 +334,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.spatialBounds = Proj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
         this.updateSpatialBoundsText(this.spatialBounds);
         this.resetFacetedSearch();
-
     }
 
     /**
@@ -376,11 +408,10 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     * @returns true if at least one registry has (nextIndex > 0), false
     *          otherwise
     */
-    public hasNextResultsPage(): boolean {
-        for (let registry of this.availableRegistries) {
-            if (registry.startIndex !== 0) {
-                return true;
-            }
+    public hasNextResultsPage(serviceId: String): boolean {
+
+        if(this.availableRegistries.get(serviceId).startIndex != 0) {
+            return true;
         }
         return false;
     }
@@ -388,14 +419,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     /**
      *
      */
-    public previousResultsPage(): void {
-        if (this.currentCSWRecordPage !== 1) {
-            this.currentCSWRecordPage -= 1;
-            for (let registry of this.availableRegistries) {
-                if (registry.prevIndices.length >= 2) {
-                    registry.startIndex = registry.prevIndices[registry.prevIndices.length - 2];
-                    registry.prevIndices.splice(registry.prevIndices.length - 2, 2);
-                }
+    public previousResultsPage(serviceId: String): void {
+        if (this.availableRegistries.get(serviceId).currentPage !== 1) {
+            this.availableRegistries.get(serviceId).currentPage -= 1;
+            if (this.availableRegistries.get(serviceId).prevIndices.length >= 2) {
+                this.availableRegistries.get(serviceId).startIndex = this.availableRegistries.get(serviceId).prevIndices[this.availableRegistries.get(serviceId).prevIndices.length - 2];
+                this.availableRegistries.get(serviceId).prevIndices.splice(this.availableRegistries.get(serviceId).prevIndices.length - 2, 2);
             }
             this.facetedSearch();
         }
@@ -404,8 +433,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     /**
      *
      */
-    public nextResultsPage(): void {
-        this.currentCSWRecordPage += 1;
+    public nextResultsPage(serviceId: String): void {
+        this.availableRegistries.get(serviceId).currentPage += 1;
         this.facetedSearch();
     }
 

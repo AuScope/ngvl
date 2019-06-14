@@ -90,7 +90,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // facetedSearch to ensure at least 1 filter has been used or de-
             // selecting a registry will populate results)
             this.getFacetedKeywords();
-            this.facetedSearch();
+            this.facetedSearchAllRegistries();
             
             // get bookmark data only if the user is logged in
             if (this.isValidUser()) {
@@ -143,11 +143,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
-     * Search results based on the current faceted search panel values
+     * Search all registries using current facets.
      */
-    public facetedSearch(): void {
-        this.cswSearchResults = new Map<String, CSWRecordModel[]>();
-
+    public facetedSearchAllRegistries(): void {
         // Limit
         const limit = this.CSW_RECORD_PAGE_LENGTH;
 
@@ -233,14 +231,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             if(registry.checked) {
                 registry.searching = true;
-                this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, limit, fields, values, types, comparisons)
+                this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
                 .subscribe(response => {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-
                     if((<CSWRecordModel[]>response.records).length > 0) {
-                        console.log("facetedSearch - found " + (<CSWRecordModel[]>response.records).length + " records in registry " + registry.id);
                         this.cswSearchResults.set(registry.id, response.records);
                     }
                     registry.searching = false;
@@ -253,6 +249,94 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     registry.searching = false;
                 });
             }
+        });
+    }
+
+    /**
+     * Search a single registry using current facets.
+     * @param registry the single registry to search
+     */
+    public facetedSearchSingleRegistry(registry: Registry): void {
+
+        let fields: string[] = [];
+        let values: string[] = [];
+        let types: string[] = [];
+        let comparisons: string[] = [];
+
+        // Any text search
+        if (this.anyTextValue) {
+            fields.push('anytext');
+            values.push(this.anyTextValue);
+            types.push('string');
+            comparisons.push('eq');
+        }
+
+        // Spatial bounds
+        if (this.spatialBounds != null) {
+            fields.push('bbox');
+            let boundsStr = '{"northBoundLatitude":' + this.spatialBounds[3] +
+                ',"southBoundLatitude":' + this.spatialBounds[1] +
+                ',"eastBoundLongitude":' + this.spatialBounds[2] +
+                ',"westBoundLongitude":' + this.spatialBounds[0] +
+                ',"crs":"EPSG:4326"}';
+            values.push(boundsStr);
+            types.push('bbox');
+            comparisons.push('eq');
+        }
+
+        // Keywords
+        this.selectedKeywords.forEach(keyword => {
+            if (keyword !== '') {
+                fields.push('keyword');
+                values.push(keyword);
+                types.push('string');
+                comparisons.push('eq');
+            }
+        });
+
+        // Available services
+        for (let service of this.availableServices) {
+            if (service.checked) {
+                fields.push('servicetype');
+                values.push(service.name);
+                types.push('servicetype');
+                comparisons.push('eq');
+            }
+        }
+
+        // Publication dates
+        if (this.dateFrom != null && this.dateTo != null) {
+            fields.push('datefrom');
+            fields.push('dateto');
+            // For some reason getMilliseconds doesn't work on these Date objects,
+            // so parse from string
+            let fromDate = Date.parse(this.dateFrom.toString());
+            let toDate = Date.parse(this.dateTo.toString());
+            values.push(fromDate.toString());
+            values.push(toDate.toString());
+            types.push('date');
+            types.push('date');
+            comparisons.push('gt');
+            comparisons.push('lt');
+        }
+
+        registry.searching = true;
+        this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
+        .subscribe(response => {
+            registry.prevIndices.push(registry.startIndex);
+            registry.startIndex = response.nextIndexes[registry.id];
+            registry.recordsMatched = response.recordsMatched;
+            if((<CSWRecordModel[]>response.records).length > 0) {
+                this.cswSearchResults.set(registry.id, response.records);
+            }
+            registry.searching = false;
+            this.searchResultsIsCollapsed = false;
+            //this.searchResultsElement.nativeElement.scrollIntoView(false);
+        }, error => {
+            // TODO: proper error reporting
+            console.log("Faceted search error: " + error.message);
+            this.cswSearchResults.set(registry.id, null);
+            registry.searching = false;
         });
     }
 
@@ -284,13 +368,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      *
      */
     public resetFacetedSearch(): void {
-        // Reset registry start and previous indices
+        // Reset results and registry indices
+        this.cswSearchResults = new Map<String, CSWRecordModel[]>();
         this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             registry.startIndex = 1;
             registry.prevIndices = [];
             registry.currentPage = 1;
         });
-        this.facetedSearch();
+        this.facetedSearchAllRegistries();
     }
 
     /**
@@ -426,7 +511,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                 this.availableRegistries.get(serviceId).startIndex = this.availableRegistries.get(serviceId).prevIndices[this.availableRegistries.get(serviceId).prevIndices.length - 2];
                 this.availableRegistries.get(serviceId).prevIndices.splice(this.availableRegistries.get(serviceId).prevIndices.length - 2, 2);
             }
-            this.facetedSearch();
+            this.facetedSearchSingleRegistry(this.availableRegistries.get(serviceId));
         }
     }
 
@@ -435,7 +520,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      */
     public nextResultsPage(serviceId: String): void {
         this.availableRegistries.get(serviceId).currentPage += 1;
-        this.facetedSearch();
+        this.facetedSearchSingleRegistry(this.availableRegistries.get(serviceId));
     }
 
     /**

@@ -63,7 +63,6 @@ export class CSWSearchService {
         });
     }
 
-
     /**
      * @param serviceId
      * @param start
@@ -115,55 +114,7 @@ export class CSWSearchService {
             return response['data'];
         });
     }
-    /*
-    public getFacetedSearch(start: number[], limit: number, serviceId: string[],
-        field: string[], value: string[],
-        type: string[], comparison: string[]): Observable<any> {
-
-        let httpParams = new HttpParams();
-        if (limit) {
-            httpParams = httpParams.append('limit', limit.toString());
-        }
-        if (start) {
-            start.forEach(s => {
-                httpParams = httpParams.append('start', s.toString());
-            });
-        }
-        if (serviceId) {
-            serviceId.forEach(id => {
-                httpParams = httpParams.append('serviceId', id);
-            });
-        }
-        if (field) {
-            field.forEach(f => {
-                httpParams = httpParams.append('field', f);
-            });
-        }
-        if (value) {
-            value.forEach(v => {
-                httpParams = httpParams.append('value', v);
-            });
-        }
-        if (type) {
-            type.forEach(t => {
-                httpParams = httpParams.append('type', t);
-            });
-        }
-        if (comparison) {
-            comparison.forEach(c => {
-                httpParams = httpParams.append('comparison', c);
-            });
-        }
-
-        return this.httpClient.post(this.env.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
-            headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
-            responseType: 'json'
-        }).map(response => {
-            return response['data'];
-        });
-    }
-    */
-
+    
     /**
      * executes getFacetedCSWServices.do in vgl service
      */

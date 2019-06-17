@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col" style="padding: 0px;">
         <li *ngFor="let cswRecord of cswRecordList">
-            <div class="input-group input-group-sm" style="border:1px solid #ccc; padding: 0px;">
+            <div class="input-group input-group-sm" style="border: 1px solid #ccc; padding: 0px;">
                 <span class="input-group-prepend" style="display:flex">                        
                     <button *ngIf="!canRecordBeAdded(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
                         title="Layer has no associated online resources and as such, cannot be added">

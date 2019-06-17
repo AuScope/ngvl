@@ -202,19 +202,27 @@
                                                     <ngb-tabset type="pills">
                                                         <div *ngFor="let registry of availableRegistries | keyvalue">
                                                             <div *ngIf="registry.value.checked">
-                                                                <ngb-tab [title]="getRegistryTabTitle(registry.key)">
-
-
+                                                                <!--<ngb-tab [title]="getRegistryTabTitle(registry.key)">-->
+                                                                <ngb-tab>
+                                                                    <ng-template ngbTabTitle>
+                                                                        <div class="tab-text">{{ getRegistryTabTitle(registry.key) }}</div>
+                                                                    </ng-template>
                                                                         <ng-template ngbTabContent>
-
                                                                             <div *ngIf="!registry.value.searching && !cswSearchResults.get(registry.key)">
-                                                                                <label>There was a problem retrieving records from this registry</label>
+                                                                                <div class="row">
+                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;">
+                                                                                        <label>There was a problem retrieving records from this registry</label>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
-
+                                                                            <!-- TODO: This never appears -->
                                                                             <div *ngIf="!registry.value.searching && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
-                                                                                <label>No records match the current filter(s)</label>
+                                                                                <div class="row">
+                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;">
+                                                                                        <label>No records match the current filter(s)</label>
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
-
                                                                             <div *ngIf="cswSearchResults.get(registry.key)">
                                                                                 <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="cswSearchResults.get(registry.key)" [registries]="availableRegistries" [bookMarkList]="bookMarks"
                                                                                     (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>

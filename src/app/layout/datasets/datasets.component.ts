@@ -51,7 +51,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     dateFrom: Date = null;
     availableRegistries: Map<String, Registry> = new Map<String, Registry>();
 
-    currentYear: number = 2018;
+    currentYear: number;
 
     @ViewChild('instance') typeaheadInstance: NgbTypeahead;
     @ViewChild('searchResults') searchResultsElement: ElementRef;
@@ -234,9 +234,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-                    if((<CSWRecordModel[]>response.records).length > 0) {
+                    //if((<CSWRecordModel[]>response.records).length > 0) {
                         this.cswSearchResults.set(registry.id, response.records);
-                    }
+                    //}
                     registry.searching = false;
                     this.searchResultsIsCollapsed = false;
                     //this.searchResultsElement.nativeElement.scrollIntoView(false);
@@ -503,8 +503,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     *          otherwise
     */
     public hasNextResultsPage(serviceId: String): boolean {
-
-        if(this.availableRegistries.get(serviceId).startIndex != 0) {
+        if(this.availableRegistries.get(serviceId).startIndex != 0 && this.availableRegistries.get(serviceId).startIndex != 1) {
             return true;
         }
         return false;

@@ -8,7 +8,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
     selector: 'app-ol-map',
     styleUrls: ['./olmap.component.scss'],
     template: `
-    <div #mapElement id="map" class="height-full width-full" style="height:calc(100vh - 200px);"></div>
+    <div #mapElement id="map" class="height-full width-full" style="height:calc(100vh - 132px);"></div>
     `
     // The "#" (template reference variable) matters to access the map element with the ViewChild decorator!
 })

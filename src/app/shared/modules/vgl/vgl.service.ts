@@ -405,6 +405,8 @@ export class VglService {
           job[key] = num;
         }
       }
+    } else {
+      job.computeTypeId = job.computeInstanceType;
     }
 
     return job;

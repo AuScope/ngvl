@@ -173,7 +173,7 @@ export interface Job {
     computeInstanceType: string;
     computeInstanceKey: string;
     computeServiceId: string;
-    //computeTypeId: string;
+    computeTypeId: string;
     storageBaseKey: string;
     storageServiceId: string;
     registeredUrl: string;

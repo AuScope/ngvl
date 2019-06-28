@@ -21,7 +21,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('isLoggedIn');
     // Hit the VGL logout endpoint, then navigate to the dashboard.
-    this.http.get('/VGL-Portal/j_spring_security_logout')
+    this.http.get('/VGL-Portal/logout')
       // VGL redirects from the spring logout to the old portal page, which 404's,
       // so catch that error and continue.
       .catch((err: HttpErrorResponse) => {

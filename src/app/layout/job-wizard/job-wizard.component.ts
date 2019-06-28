@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute, Router, ParamMap, UrlSegment } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
 import { UserStateService } from '../../shared';
@@ -95,7 +95,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this.noSave = true;
     this.messageService.clear();
     this.messageService.add({severity: 'info', summary: 'Saving job...', detail: '', sticky: true});
-    const oldId = this.getJobObject().id;
+    //const oldId = this.getJobObject().id;
 
     this.doSave()
       .pipe(catchError((err, obs) => {

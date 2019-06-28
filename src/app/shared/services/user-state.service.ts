@@ -81,7 +81,8 @@ export class UserStateService {
     }
 
     public updateUser(): Observable<User> {
-        return this.vgl.user.map(user => {
+        return this.vgl.user.pipe(
+          map(user => {
             // If full name is empty (as with AAF login), use email address as name
             if (user.fullName === undefined || user.fullName === "") {
                 user.fullName = user.email;
@@ -108,7 +109,7 @@ export class UserStateService {
         () => {
             this.updateAnonymousUser();
             return ANONYMOUS_USER;
-        });
+        }));
     }
 
     public updateAnonymousUser() {

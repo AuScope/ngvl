@@ -33,7 +33,7 @@ export class CSWSearchService {
             'expanded': true
         },
         'WFS': {
-            'nme': 'OGC Web Feature Service 1.1.0',
+            'name': 'OGC Web Feature Service 1.1.0',
             'expanded': true
         },
         'WMS': {
@@ -63,17 +63,16 @@ export class CSWSearchService {
         });
     }
 
-
     /**
+     * @param serviceId
      * @param start
      * @param limit
-     * @param serviceId
      * @param field
      * @param value
      * @param type
      * @param comparison
      */
-    public getFacetedSearch(start: number[], limit: number, serviceId: string[],
+    public getFacetedSearch(serviceId: string, start: number, limit: number,
         field: string[], value: string[],
         type: string[], comparison: string[]): Observable<any> {
 
@@ -82,14 +81,10 @@ export class CSWSearchService {
             httpParams = httpParams.append('limit', limit.toString());
         }
         if (start) {
-            start.forEach(s => {
-                httpParams = httpParams.append('start', s.toString());
-            });
+            httpParams = httpParams.append('start', start.toString());
         }
         if (serviceId) {
-            serviceId.forEach(id => {
-                httpParams = httpParams.append('serviceId', id);
-            });
+            httpParams = httpParams.append('serviceId', serviceId);
         }
         if (field) {
             field.forEach(f => {
@@ -111,15 +106,15 @@ export class CSWSearchService {
                 httpParams = httpParams.append('comparison', c);
             });
         }
+
         return this.httpClient.post(this.env.portalBaseUrl + 'facetedCSWSearch.do', httpParams.toString(), {
             headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded'),
             responseType: 'json'
         }).map(response => {
-            // return response['data'].records;
             return response['data'];
         });
     }
-
+    
     /**
      * executes getFacetedCSWServices.do in vgl service
      */
@@ -132,7 +127,6 @@ export class CSWSearchService {
     /**
      * Get the service id information of the cswrecord by matching the record info(cswrecord.recordInfoUrl) with available registries.
      */
-
     public getServiceId(cswRecord: CSWRecordModel): string {
         let availableRegistries: Registry[] = [];
         let serviceId: string = "";

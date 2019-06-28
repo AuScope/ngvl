@@ -8,3 +8,27 @@ li {
 .btn {
     cursor: pointer;
 }
+
+// Shrink input components a little
+button {
+  height: 24px;
+  line-height: 14px;
+}
+
+.input-group-append {
+  height: 24px;
+  line-height: 14px;
+}
+
+.input-group-sm {
+  height: 24px;
+}
+
+label {
+  width: 100%;
+  margin-left: 4px;
+  margin-right:4px;
+  height: 24px;
+  //font-size: 14px;
+  line-height: 24px;
+}

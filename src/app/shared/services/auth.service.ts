@@ -5,12 +5,15 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { UserStateService } from './user-state.service';
-import { ANONYMOUS_USER } from '../modules/vgl/models';
+import { ANONYMOUS_USER, JobDownload } from '../modules/vgl/models';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 @Injectable()
 export class AuthService {
 
   constructor(private userStateService: UserStateService,
+              private olMapService: OlMapService,
               private router: Router,
               private http: HttpClient) {}
 
@@ -20,6 +23,9 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('solutions');
+    localStorage.removeItem('jobDownloads');
+    localStorage.removeItem('layers');
     // Hit the VGL logout endpoint, then navigate to the dashboard.
     this.http.get('/VGL-Portal/logout')
       // VGL redirects from the spring logout to the old portal page, which 404's,
@@ -69,14 +75,26 @@ export class AuthService {
     this.userStateService.updateUser().subscribe(user => {
         // Check is User has accpeted T&C's
         if (user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
-            // Navigate to the saved url. Reset the saved url so it isn't retained for
-            // later logins.
-            const savedUrl = this.resetRedirectUrl();
-            const redirect = savedUrl ? savedUrl : '/dashboard';
-            this.router.navigate([redirect]);
+          // Load any layers and job downloads that may have been added pre-log in
+          if(localStorage.getItem('layers') && localStorage.getItem('layers').length > 0) {
+            let layers: LayerModel[] = JSON.parse(localStorage.getItem('layers'));
+            layers.forEach(layer => {
+              this.olMapService.addLayer(layer, null);
+            });
+          }
+          if(localStorage.getItem('jobDownloads') && localStorage.getItem('jobDownloads').length > 0) {
+            let jobDownloads: JobDownload[] = JSON.parse(localStorage.getItem('jobDownloads'));
+            this.userStateService.setJobDownloads(jobDownloads);
+          }
+
+          // Navigate to the saved url. Reset the saved url so it isn't retained for
+          // later logins.
+          const savedUrl = this.resetRedirectUrl();
+          const redirect = savedUrl ? savedUrl : '/dashboard';
+          this.router.navigate([redirect]);
         } else {
-            // Redirect User to Profile to accept T&C's if they haven't already
-            this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
+          // Redirect User to Profile to accept T&C's if they haven't already
+          this.router.navigate(['/user'], { queryParams: { notacs: 1 } });
         }
     });
   }

@@ -4,12 +4,8 @@
             <img src="assets/images/logo.png" width="150px" class="user-avatar" />
             <h1>{{ 'app.title' | translate }}</h1>
             <p style="margin-top:50px;">Please log in using one of the options below</p>
-            <!--
-            <a style="margin-top:50px;" href="/VGL-Portal/oauth/google_login.html"><img src="/assets/images/btn_google_signin_dark_normal_web.png"></a>
-            <a href="/VGL-Portal/jwt/aaf_login.html"><img src="/assets/images/aaf_service_223x54.png" height="46px"></a>
-            -->
-            <a style="margin-top:50px;" href="/VGL-Portal/login/google"><img src="/assets/images/btn_google_signin_dark_normal_web.png"></a>
-            <a href="/VGL-Portal/login/aaf"><img src="/assets/images/aaf_service_223x54.png" height="46px"></a>
+            <a class="login-button" style="margin-top:50px;" (click)="loginGoogle()"><img src="/assets/images/btn_google_signin_dark_normal_web.png"></a>
+            <a class="login-button" (click)="loginAaf()"><img src="/assets/images/aaf_service_223x54.png" height="46px"></a>
         </div>
     </div>
 </div>

@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../router.animations';
 
 import { AuthService } from '../shared/services/auth.service';
+import { UserStateService } from '../shared';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
+import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 @Component({
     selector: 'app-login',
@@ -10,11 +14,30 @@ import { AuthService } from '../shared/services/auth.service';
     animations: [routerTransition()]
 })
 export class LoginComponent implements OnInit {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, public olMapService: OlMapService, private userStateService: UserStateService) {}
 
   ngOnInit() {}
 
-  doLogin() {
-    this.authService.login();
+  /**
+   * Persist selected layers and job downloads to local storage as we lose all
+   * information within services due to the log in site redirect
+   */
+  private selectedItemsToLocalStorage() {
+    let layers: LayerModel[] = Object.values(this.olMapService.getLayerModelList());
+    // Map layers
+    localStorage.setItem("layers", JSON.stringify(layers));
+    // Selected downloads
+    localStorage.setItem("jobDownloads", JSON.stringify(this.userStateService.getJobDownloads()));
   }
+
+  loginGoogle() {
+    this.selectedItemsToLocalStorage();
+    window.location.href = "/VGL-Portal/login/google";
+  }
+
+  loginAaf() {
+    this.selectedItemsToLocalStorage();
+    window.location.href = "/VGL-Portal/login/aaf";
+  }
+
 }

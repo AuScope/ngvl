@@ -40,7 +40,7 @@
                             <i class="fa fa-tint"></i>
                         </button>
                         <div ngbDropdownMenu>
-                            <p-slider [(ngModel)]="cswRecord.opacity" [min]="0" [max]="100" orientation="vertical" (onChange)="setLayerOpacity(cswRecord.id, $event)"></p-slider>
+                            <p-slider [ngModel]="layerOpacities.get(cswRecord.id)" [min]="0" [max]="100" orientation="vertical" (onChange)="setLayerOpacity(cswRecord.id, $event)"></p-slider>
                         </div>
                     </div>
                 </span>

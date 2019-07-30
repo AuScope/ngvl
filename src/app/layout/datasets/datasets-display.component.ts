@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark } from '../../shared/modules/vgl/models';
 import { RecordModalComponent } from './record.modal.component';
@@ -16,7 +16,7 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
     templateUrl: './datasets-display.component.html',
     styleUrls: ['./datasets-display.component.scss']
 })
-export class DatasetsDisplayComponent {
+export class DatasetsDisplayComponent implements OnInit {
 
     @Input() registries: any = [];
     @Input() cswRecordList: CSWRecordModel[] = [];
@@ -25,10 +25,21 @@ export class DatasetsDisplayComponent {
 
     @Output() bookMarkChoice = new EventEmitter();
 
+    // Store opacities so slider remembers position when paging
+    layerOpacities: Map<String, number> = new Map<String, number>();
+
 
     constructor(public olMapService: OlMapService,
         public cswSearchService: CSWSearchService,
         public modalService: NgbModal) { }
+
+
+    ngOnInit() {
+        this.cswRecordList.forEach(record => {
+            this.layerOpacities.set(record.id, 100);
+        });
+    }
+    
 
     /**
      *
@@ -36,7 +47,7 @@ export class DatasetsDisplayComponent {
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         try {
-            cswRecord.opacity = 100;
+            this.layerOpacities.set(cswRecord.id, 100);
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
@@ -49,6 +60,7 @@ export class DatasetsDisplayComponent {
      * @param recordId
      */
     public removeCSWRecord(recordId: string): void {
+        this.layerOpacities.set(recordId, 100);
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
     }
 
@@ -58,6 +70,7 @@ export class DatasetsDisplayComponent {
      * @param opacity 
      */
     public setLayerOpacity(layerId: string, e: any) {
+        this.layerOpacities.set(layerId, e.value);
         this.olMapService.setLayerOpacity(layerId, e.value/100);
     }
 

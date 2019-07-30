@@ -25,6 +25,7 @@ export class DatasetsDisplayComponent {
 
     @Output() bookMarkChoice = new EventEmitter();
 
+
     constructor(public olMapService: OlMapService,
         public cswSearchService: CSWSearchService,
         public modalService: NgbModal) { }
@@ -35,13 +36,13 @@ export class DatasetsDisplayComponent {
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         try {
+            cswRecord.opacity = 100;
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
             alert(error.message);
         }
     }
-
 
     /**
      *
@@ -51,6 +52,14 @@ export class DatasetsDisplayComponent {
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
     }
 
+    /**
+     * 
+     * @param layerId 
+     * @param opacity 
+     */
+    public setLayerOpacity(layerId: string, e: any) {
+        this.olMapService.setLayerOpacity(layerId, e.value/100);
+    }
 
     /**
      *
@@ -62,7 +71,6 @@ export class DatasetsDisplayComponent {
             modelRef.componentInstance.record = cswRecord;
         }
     }
-
 
     /**
      *
@@ -77,7 +85,6 @@ export class DatasetsDisplayComponent {
             this.olMapService.displayExtent(extent, 3000);
         }
     }
-
 
     /**
      *
@@ -145,5 +152,14 @@ export class DatasetsDisplayComponent {
                cswRecord.geographicElements.length > 0 &&
                !this.olMapService.layerExists(cswRecord.id) &&
                cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1);
+    }
+
+    /**
+     * Check if a record has already been added to the map
+     * 
+     * @param cswRecord the record to check
+     */
+    public isRecordAddedToMap(cswRecord: CSWRecordModel): boolean {
+        return this.olMapService.layerExists(cswRecord.id);
     }
 }

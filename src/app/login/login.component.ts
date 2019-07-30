@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../router.animations';
 
-import { AuthService } from '../shared/services/auth.service';
 import { UserStateService } from '../shared';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 @Component({
     selector: 'app-login',
@@ -14,7 +12,7 @@ import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
     animations: [routerTransition()]
 })
 export class LoginComponent implements OnInit {
-  constructor(private authService: AuthService, public olMapService: OlMapService, private userStateService: UserStateService) {}
+  constructor(public olMapService: OlMapService, private userStateService: UserStateService) {}
 
   ngOnInit() {}
 

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 import { OlMapComponent } from './olmap.component';
 import { OlMapPreviewComponent } from './olmap.preview.component';
@@ -9,16 +9,20 @@ import { OlMapDataSelectComponent } from './controls/olmap.select.data.component
 import { OlMapLayersComponent } from './controls/olmap.layers.component';
 import { OlMapBoundariesComponent } from './controls/olmap.boundaries.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { OlMapBasemapComponent } from './controls/ol-map-basemap.component';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 
 @NgModule({
   imports: [
     CommonModule,
     NgbModule.forRoot(),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule,
+    RadioButtonModule
   ],
-  declarations: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent ],
-  bootstrap: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent ],
-  exports: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent ]
+  declarations: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],
+  bootstrap: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],
+  exports: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ]
 })
 export class OlMapModule { }

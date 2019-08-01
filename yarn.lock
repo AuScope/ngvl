@@ -6629,7 +6629,7 @@ pkg-dir@^3.0.0:
 
 "portal-core-ui@github:AuScope/portal-core-ui#master":
   version "0.0.1"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/d419c71d47dcc0af4341c643757cfd3411d6c7f2"
+  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/c156790600208e2cc1e6c0787b4992c1e05600ce"
 
 portfinder@^1.0.9:
   version "1.0.20"

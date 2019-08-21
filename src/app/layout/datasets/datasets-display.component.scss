@@ -29,6 +29,19 @@ label {
   margin-left: 4px;
   margin-right:4px;
   height: 24px;
-  //font-size: 14px;
   line-height: 24px;
+}
+
+// Remove opacity Dropdown arrow
+.dropdown-toggle::after {
+  display:none;
+}
+
+.dropdown-menu {
+  min-width: 25px;
+}
+
+p-slider {
+  display: flex;
+  justify-content: center;
 }

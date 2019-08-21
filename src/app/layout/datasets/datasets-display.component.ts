@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark } from '../../shared/modules/vgl/models';
 import { RecordModalComponent } from './record.modal.component';
@@ -16,7 +16,7 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
     templateUrl: './datasets-display.component.html',
     styleUrls: ['./datasets-display.component.scss']
 })
-export class DatasetsDisplayComponent {
+export class DatasetsDisplayComponent implements OnInit {
 
     @Input() registries: any = [];
     @Input() cswRecordList: CSWRecordModel[] = [];
@@ -25,9 +25,21 @@ export class DatasetsDisplayComponent {
 
     @Output() bookMarkChoice = new EventEmitter();
 
+    // Store opacities so slider remembers position when paging
+    layerOpacities: Map<String, number> = new Map<String, number>();
+
+
     constructor(public olMapService: OlMapService,
         public cswSearchService: CSWSearchService,
         public modalService: NgbModal) { }
+
+
+    ngOnInit() {
+        this.cswRecordList.forEach(record => {
+            this.layerOpacities.set(record.id, 100);
+        });
+    }
+    
 
     /**
      *
@@ -35,6 +47,7 @@ export class DatasetsDisplayComponent {
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         try {
+            this.layerOpacities.set(cswRecord.id, 100);
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
@@ -42,15 +55,24 @@ export class DatasetsDisplayComponent {
         }
     }
 
-
     /**
      *
      * @param recordId
      */
     public removeCSWRecord(recordId: string): void {
+        this.layerOpacities.set(recordId, 100);
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
     }
 
+    /**
+     * 
+     * @param layerId 
+     * @param opacity 
+     */
+    public setLayerOpacity(layerId: string, e: any) {
+        this.layerOpacities.set(layerId, e.value);
+        this.olMapService.setLayerOpacity(layerId, e.value/100);
+    }
 
     /**
      *
@@ -62,7 +84,6 @@ export class DatasetsDisplayComponent {
             modelRef.componentInstance.record = cswRecord;
         }
     }
-
 
     /**
      *
@@ -77,7 +98,6 @@ export class DatasetsDisplayComponent {
             this.olMapService.displayExtent(extent, 3000);
         }
     }
-
 
     /**
      *
@@ -145,5 +165,14 @@ export class DatasetsDisplayComponent {
                cswRecord.geographicElements.length > 0 &&
                !this.olMapService.layerExists(cswRecord.id) &&
                cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1);
+    }
+
+    /**
+     * Check if a record has already been added to the map
+     * 
+     * @param cswRecord the record to check
+     */
+    public isRecordAddedToMap(cswRecord: CSWRecordModel): boolean {
+        return this.olMapService.layerExists(cswRecord.id);
     }
 }

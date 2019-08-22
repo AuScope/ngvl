@@ -5,6 +5,8 @@ import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RecordModalComponent } from '../../record.modal.component';
 
+import Proj from 'ol/proj';
+
 
 @Component({
     selector: 'app-ol-map-layers',
@@ -15,6 +17,9 @@ import { RecordModalComponent } from '../../record.modal.component';
 export class OlMapLayersComponent {
 
     activeLayersIsCollapsed = true;
+
+    // Store opacities so they can be re-set if anonymous user logs in
+    layerOpacities: Map<String, number> = new Map<String, number>();
 
 
     constructor(private olMapService: OlMapService, private modalService: NgbModal) {}
@@ -27,7 +32,6 @@ export class OlMapLayersComponent {
         return Object.keys(this.olMapService.getLayerModelList()).length;
     }
 
-
     /**
      * Get active layers
      */
@@ -35,11 +39,12 @@ export class OlMapLayersComponent {
         const layers: LayerModel[] = [];
         const keys = Object.keys(this.olMapService.getLayerModelList());
         for (let i = 0; i < keys.length; i++) {
-            layers.push(this.olMapService.getLayerModelList()[keys[i]]);
+            let currentLayer = this.olMapService.getLayerModelList()[keys[i]];
+            layers.push(currentLayer);
+            this.layerOpacities.set(currentLayer.id, 100);
         }
         return layers;
     }
-
 
     /**
      *
@@ -48,7 +53,6 @@ export class OlMapLayersComponent {
     public toggleLayerVisibility(layer: LayerModel): void {
         this.olMapService.setLayerVisibility(layer.id, layer.hidden);
     }
-
 
     /**
      *
@@ -62,6 +66,55 @@ export class OlMapLayersComponent {
         }
     }
 
+    /**
+     *
+     * @param layer
+     */
+    public showCSWRecordBounds(layer: any): void {
+        if (layer.cswRecords) {
+            for(let record of layer.cswRecords) {
+                if(record.geographicElements && record.geographicElements.length > 0) {
+                    let bounds = record.geographicElements.find(i => i.type === 'bbox');
+                    if(bounds) {
+                        const bbox: [number, number, number, number] =
+                            [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+                        const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+                        this.olMapService.displayExtent(extent, 3000);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param layer
+     */
+    public zoomToCSWRecordBounds(layer: any): void {
+        if (layer.cswRecords) {
+            for(let record of layer.cswRecords) {
+                if(record.geographicElements && record.geographicElements.length > 0) {
+                    let bounds = record.geographicElements.find(i => i.type === 'bbox');
+                    const bbox: [number, number, number, number] =
+                        [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
+                    const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
+                    this.olMapService.fitView(extent);
+                    return;
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param layerId 
+     * @param opacity 
+     */
+    public setLayerOpacity(layerId: string, e: any) {
+        this.layerOpacities.set(layerId, e.value);
+        this.olMapService.setLayerOpacity(layerId, e.value/100);
+    }
 
     /**
      *

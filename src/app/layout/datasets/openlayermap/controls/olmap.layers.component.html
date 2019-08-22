@@ -28,18 +28,28 @@
                             -->
                             <input class="input-group-text text-truncate" style="width:100%;" data-toggle="tooltip" title="{{ layer.name }}" value="{{ layer.name }}"
                                 readonly>
+
+                            <span class="input-group-append">
+                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(layer)"
+                                    (dblclick)="zoomToCSWRecordBounds(layer)">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+
                             <span class="input-group-append">
                                 <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
                                     <i class="fa fa-info-circle" style="color:blue;"></i>
                                 </button>
                             </span>
                             <span class="input-group-append">
-                                <button *ngIf="!layer.hidden" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to hide layer" (click)="toggleLayerVisibility(layer)">
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                                <button *ngIf="layer.hidden" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to make layer visibility" (click)="toggleLayerVisibility(layer)">
-                                    <i class="fa fa-eye-slash"></i>
-                                </button>
+                                <div ngbDropdown>
+                                    <button ngbDropdownToggle class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer opacity">
+                                        <i class="fa fa-tint" style="color:blue;"></i>
+                                    </button>
+                                    <div ngbDropdownMenu>
+                                        <p-slider [ngModel]="layerOpacities.get(layer.id)" [min]="0" [max]="100" orientation="vertical" (onChange)="setLayerOpacity(layer.id, $event)"></p-slider>
+                                    </div>
+                                </div>
                             </span>
                             <span class="input-group-append">
                                 <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeRecord(layer.id)">

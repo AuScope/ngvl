@@ -330,6 +330,7 @@ export interface Registry {
     recordsMatched?: number;  // Total number of records matched
     currentPage?: number;     // Current page of search records
     searching?: boolean;      // Is a faceted search in progress?
+    searchError?: string;     // Faceted search error result for registry
 }
 
 export function isSolution(x) {

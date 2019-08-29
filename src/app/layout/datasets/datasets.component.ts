@@ -229,20 +229,21 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             if(registry.checked) {
                 registry.searching = true;
+                registry.searchError = null;
                 this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
                 .subscribe(response => {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-                    //if((<CSWRecordModel[]>response.records).length > 0) {
-                        this.cswSearchResults.set(registry.id, response.records);
-                    //}
+                    if(response.searchErrors != null) {
+                        registry.searchError = response.searchErrors[registry.id];
+                    }
+                    this.cswSearchResults.set(registry.id, response.records);
                     registry.searching = false;
+
                     this.searchResultsIsCollapsed = false;
                     //this.searchResultsElement.nativeElement.scrollIntoView(false);
                 }, error => {
-                    // TODO: proper error reporting
-                    console.log("Faceted search error: " + error.message);
                     this.cswSearchResults.set(serviceId, null);
                     registry.searching = false;
                 });
@@ -319,6 +320,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         }
 
         registry.searching = true;
+        registry.searchError = null;
 
         this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons).subscribe(response => {
             registry.prevIndices.push(registry.startIndex);
@@ -327,13 +329,15 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             if((<CSWRecordModel[]>response.records).length > 0) {
                 this.cswSearchResults.set(registry.id, response.records);
             }
+            if(response.searchErrors != null) {
+                registry.searchError = response.searchErrors[registry.id];
+            }
             registry.searching = false;
             this.searchResultsIsCollapsed = false;
             //this.searchResultsElement.nativeElement.scrollIntoView(false);
         }, error => {
-            // TODO: proper error reporting
-            console.log("Faceted search error: " + error.message);
             this.cswSearchResults.set(registry.id, null);
+            registry.searchError = error.message;
             registry.searching = false;
         });
     }

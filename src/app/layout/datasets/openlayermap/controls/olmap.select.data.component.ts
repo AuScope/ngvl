@@ -98,7 +98,7 @@ export class OlMapDataSelectComponent {
                             break;
                         }
                     } else {
-                        // TODO: REMOVE, but may want to report if no valid resource at all
+                        // TODO: Report if no valid resource at all
                         console.log("No " + resourceType + " resources found for record ");
                     }
                 }

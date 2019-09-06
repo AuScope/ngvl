@@ -44,8 +44,7 @@ export class ConfirmDatasetsModalComponent {
 
 
     /**
-     * TODO: This lazily opens the download URL in a new window, so this won't
-     * work on mobile devices
+     * TODO: Opens the download URL in a new window, confirm working on mobile devices
      *
      * @param onlineResource
      * @param dlOptions

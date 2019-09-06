@@ -299,12 +299,20 @@ export class VglService {
     const descriptions: string[] = [];
     const urls: string[] = [];
     const localPaths: string[] = [];
+    const northBoundLatitudes: number[] = [];
+    const eastBoundLongitudes: number[] = [];
+    const southBoundLatitudes: number[] = [];
+    const westBoundLongitudes: number[] = [];
 
     for (const download of downloads) {
       names.push(download.name);
       descriptions.push(download.description);
       urls.push(download.url);
       localPaths.push(download.localPath);
+      northBoundLatitudes.push(download.northBoundLatitude);
+      eastBoundLongitudes.push(download.eastBoundLongitude);
+      southBoundLatitudes.push(download.southBoundLatitude);
+      westBoundLongitudes.push(download.westBoundLongitude);
     }
 
     const params = {
@@ -313,7 +321,11 @@ export class VglService {
       name: names,
       description: descriptions,
       url: urls,
-      localPath: localPaths
+      localPath: localPaths,
+      northBoundLatitude: northBoundLatitudes,
+      eastBoundLongitude: eastBoundLongitudes,
+      southBoundLatitude: southBoundLatitudes,
+      westBoundLongitude: westBoundLongitudes
     };
 
     // Use a POST request since the download descriptions could get very large.

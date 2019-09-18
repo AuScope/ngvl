@@ -6,6 +6,8 @@ import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component'
 import { UserStateService } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { WmsLayersModalComponent } from './wms-layers.modal.component';
+import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 
 
 @Component({
@@ -24,10 +26,11 @@ export class RecordModalComponent implements OnInit {
 
 
     constructor(private router: Router,
-                private userStateService: UserStateService,
-                private cswSearchService: CSWSearchService,
-                private modalService: NgbModal,
-                public activeModal: NgbActiveModal) { }
+        private userStateService: UserStateService,
+        private cswSearchService: CSWSearchService,
+        private olMapService: OlMapService,
+        private modalService: NgbModal,
+        public activeModal: NgbActiveModal) { }
 
 
     ngOnInit() {
@@ -69,8 +72,44 @@ export class RecordModalComponent implements OnInit {
                     this.router.navigate(['/wizard']);
                     this.activeModal.close();
                 }
-            }, () => {});
-        }, () => {});
+            }, () => { });
+        }, () => { });
+    }
+
+    /**
+     * TODO: Repeated in DatasetsDisplayComponent
+     * @param cswRecord 
+     * @param onlineResource 
+     */
+    showAddLayerDialog(cswRecord: CSWRecordModel, onlineResource: OnlineResourceModel) {
+        const modalRef = this.modalService.open(WmsLayersModalComponent);
+        modalRef.componentInstance.wmsUrl = onlineResource.url;
+        modalRef.result.then((layers) => {
+            if (layers && layers !== 'Cross click') {
+                for (let layer of layers) {
+                    this.olMapService.addCSWRecord(layer);
+                }
+            }
+            this.activeModal.close();
+        })
+    }
+
+    /**
+     * Parse the URL to see if it's a WMS GetCapabilities request
+     * TODO: Repeated in DatasetsDisplayComponent
+     * @param url endpoint
+     */
+    public isWmsGetCapabilitiesUrl(url: string): boolean {
+        if (url.toLowerCase().startsWith("http")) {
+            let paramIndex = url.indexOf("?");
+            if (paramIndex !== -1) {
+                if (url.toLowerCase().indexOf("request=getcapabilities", paramIndex) !== -1 &&
+                    url.toLowerCase().indexOf("service=wms", paramIndex) !== -1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /*

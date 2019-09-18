@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
@@ -10,6 +9,7 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 
 
 @Injectable({
@@ -18,7 +18,8 @@ import { UserStateService } from './user-state.service';
 export class CSWSearchService {
 
     constructor(private httpClient: HttpClient, @Inject('env') private env,
-        private vgl: VglService, private userStateService: UserStateService) { }
+        private vgl: VglService, private userStateService: UserStateService,
+        private layerHandlerService: LayerHandlerService) { }
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();
@@ -346,6 +347,7 @@ export class CSWSearchService {
             case 'WCS':
             case 'WFS':
             case 'WWW':
+            case 'WMS':
             case 'NCSS':
                 return true;
             default:

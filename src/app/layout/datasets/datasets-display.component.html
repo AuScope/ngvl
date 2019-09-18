@@ -28,11 +28,16 @@
                 <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" readonly style="width: 100%;margin-left:4px;margin-right:4px;">
                     {{ cswRecord.name }}
                 </label>
-                <span class="input-group-append" *ngIf="cswRecord.geographicElements != null && cswRecord.geographicElements.length>0">                        
-                        <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
-                            (dblclick)="zoomToCSWRecordBounds(cswRecord)">
-                            <i class="fa fa-search"></i>
-                        </button>
+                <span class="input-group-append" *ngIf="cswRecord.geographicElements != null && cswRecord.geographicElements.length>0 && getWmsGetCapabilitiesOnlineResource(cswRecord)!=null">
+                    <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display WMS Layer(s)" (click)="showAddLayerDialog(cswRecord)" style="background-color:transparent;float:right;">
+                        <i class="fa fa-list-alt" style="color:green;"></i>
+                    </button>
+                </span>
+                <span class="input-group-append" *ngIf="cswRecord.geographicElements != null && cswRecord.geographicElements.length>0">
+                    <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
+                        (dblclick)="zoomToCSWRecordBounds(cswRecord)">
+                        <i class="fa fa-search"></i>
+                    </button>
                 </span>
                 <span class="input-group-append">
                     <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">

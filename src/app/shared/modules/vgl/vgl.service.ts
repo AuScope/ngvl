@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
 import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
@@ -102,7 +102,6 @@ export class VglService {
     }
 
     public setJobFolder(jobId: number[], seriesId: number): Observable<any> {
-
         const options = {
             params: {
                 jobIds: jobId.join(','),
@@ -681,5 +680,10 @@ export class VglService {
         description: description
       };
     });
+  }
+
+  public getCustomLayerRecords(serviceUrl: string): Observable<any> {
+    const params = { serviceUrl: serviceUrl };
+    return this.vglGet<CSWRecordModel[]>('/getCustomLayers.do', params);
   }
 }

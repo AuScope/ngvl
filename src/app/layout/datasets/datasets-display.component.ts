@@ -4,8 +4,10 @@ import { BookMark } from '../../shared/modules/vgl/models';
 import { RecordModalComponent } from './record.modal.component';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Proj from 'ol/proj';
+import { WmsLayersModalComponent } from './wms-layers.modal.component';
+import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 // List of valid online resource types that can be added to the map
@@ -27,8 +29,9 @@ export class DatasetsDisplayComponent {
 
 
     constructor(public olMapService: OlMapService,
-        public cswSearchService: CSWSearchService,
-        public modalService: NgbModal) { }
+                public cswSearchService: CSWSearchService,
+                public modalService: NgbModal,
+                public activeModal: NgbActiveModal) { }
 
 
     /**
@@ -152,5 +155,60 @@ export class DatasetsDisplayComponent {
      */
     public isRecordAddedToMap(cswRecord: CSWRecordModel): boolean {
         return this.olMapService.layerExists(cswRecord.id);
+    }
+
+    /**
+     * 
+     * @param url 
+     */
+    isGetCapabilitiesUrl(url: string): boolean {
+        if (url.toLowerCase().startsWith("http")) {
+            let paramIndex = url.indexOf("?");
+            if (paramIndex !== -1) {
+                if (url.toLowerCase().indexOf("request=getcapabilities", paramIndex) !== -1 &&
+                    url.toLowerCase().indexOf("service=wms", paramIndex) !== -1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Parse the URL to see if it's a WMS GetCapabilities request
+     * @param url endpoint
+     */
+    public getWmsGetCapabilitiesOnlineResource(record: CSWRecordModel): OnlineResourceModel {
+        if(record.onlineResources) {
+            for(let resource of record.onlineResources) {
+                if(this.isGetCapabilitiesUrl(resource.url)) {
+                    return resource;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param cswRecord 
+     * @param onlineResource 
+     */
+    showAddLayerDialog(cswRecord: CSWRecordModel) {
+        if(cswRecord.onlineResources) {
+            const resource = this.getWmsGetCapabilitiesOnlineResource(cswRecord);
+            if(resource) {
+                const modalRef = this.modalService.open(WmsLayersModalComponent);
+                modalRef.componentInstance.wmsUrl = resource.url;
+                modalRef.result.then((layers) => {
+                    if (layers && layers !== 'Cross click') {
+                        for (let layer of layers) {
+                            this.olMapService.addCSWRecord(layer);
+                        }
+                    }
+                    this.activeModal.close();
+                });
+            }
+        }
     }
 }

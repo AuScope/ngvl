@@ -87,9 +87,14 @@
                                 </div>
                                 <div class="row">
                                     <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
-                                    <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
-                                        <i class="fa fa-plus-circle" style="color:green;"></i>
-                                    </button>
+                                    <div>
+                                        <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
+                                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                                        </button>
+                                        <button class="btn btn-sm" *ngIf="isWmsGetCapabilitiesUrl(resource.url)" data-toggle="tooltip" title="Add WMS Layer(s)" (click)="showAddLayerDialog(record, resource)" style="background-color:transparent;float:right;">
+                                            <i class="fa fa-list-alt" style="color:green;"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <!-- TODO: WCS Describe Coverage, link to XML -->
                                 <!-- TODO: WMS layer preview -->

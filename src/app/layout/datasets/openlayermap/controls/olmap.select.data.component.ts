@@ -29,8 +29,6 @@ export class OlMapDataSelectComponent {
         OlMapDataSelectComponent.cswSearchService = this.cswSearchService1;
     }
 
-
-
     /**
      * Builds TreeTable from supplied CSWRecords for display in the confirm
      * datasets modal
@@ -99,7 +97,7 @@ export class OlMapDataSelectComponent {
                         }
                     } else {
                         // TODO: Report if no valid resource at all
-                        console.log("No " + resourceType + " resources found for record ");
+                        //console.log("No " + resourceType + " resources found for record ");
                     }
                 }
             }
@@ -114,8 +112,6 @@ export class OlMapDataSelectComponent {
         }
         return cswRecordTreeNodes;
     }
-
-
 
     /**
      * toggle on zoom to zoom into bbox
@@ -139,7 +135,6 @@ export class OlMapDataSelectComponent {
         });
     }
 
-
     /**
      * Return a count of the active layers on the map
      *
@@ -148,7 +143,5 @@ export class OlMapDataSelectComponent {
     public getActiveLayerCount(): number {
         return Object.keys(this.olMapService.getLayerModelList()).length;
     }
-
-
 
 }

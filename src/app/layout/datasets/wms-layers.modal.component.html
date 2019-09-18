@@ -1,0 +1,38 @@
+<div class="modal-header">
+    <h4 class="modal-title">Add WMS Layers</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.close('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form #downloadForm="ngForm">
+    <div class="modal-body">
+        WMS: {{ wmsUrl }}
+        <div *ngIf="layersLoading" class="spinner" style="position:inherit;top:60px;">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+        <div *ngIf="!layersLoading && errorMessage == null">
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Layer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let layer of layerRecords">
+                        <td>
+                            <input type="checkbox" (change)="layerChangeEvent($event, layer)" name="{{ layer.id }}" style="margin-right:4px;">{{ layer.name }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="errorMessage" *ngIf="!layersLoading && errorMessage != null">
+            {{ errorMessage }}
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="addLayers()">Add Layers</button>
+    </div>
+</form>

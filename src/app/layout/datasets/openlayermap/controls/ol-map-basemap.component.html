@@ -1,21 +1,20 @@
 <div class="olMapBasemapPanel">
-  <ngb-accordion #acc="ngbAccordion">
-      <ngb-panel>
-          <ng-template ngbPanelTitle>
-              <span>&nbsp;Base Map</span>
-              <i *ngIf="basemapIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-              <i *ngIf="!basemapIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
-          </ng-template>
-          <ng-template ngbPanelContent>
-              <div *ngIf="baseMaps.length===0" style="padding:1.25rem;">
-                  No basemaps have been defined, using the default.
-              </div>
-              <div *ngIf="baseMaps.length>0">
-                  <div *ngFor="let baseMap of baseMaps" style="margin-bottom:2px;">
-                      <p-radioButton  (click)="onBaseMapSelection()"  name="baseMapGroup" label="{{ baseMap.viewValue }}" value="{{ baseMap.value }}" [(ngModel)]="selectedBaseMap"></p-radioButton>
-                  </div>
-              </div>
-          </ng-template>
-      </ngb-panel>
-  </ngb-accordion>
+    <button type="button" class="btn btn-sm btn-primary" title="Select base map" (click)="baseMapIsCollapsed=!baseMapIsCollapsed"
+        [attr.aria-expanded]="!baseMapIsCollapsed" aria-controls="baseMapCollapse">
+        <span class="fa fa-globe" aria-hidden="true"></span>
+    </button>
+    <div id="baseMapCollapse" [ngbCollapse]="baseMapIsCollapsed">
+        <div class="card" style="position:fixed;max-height:calc(100vh - 200px);overflow-y:auto;background-color:white;">
+            <div class="card-body">
+                <div *ngIf="baseMaps.length===0" style="padding:1.25rem;">
+                    No basemaps have been defined, using the default.
+                </div>
+                <div *ngIf="baseMaps.length>0">
+                    <div *ngFor="let baseMap of baseMaps" style="margin-bottom:2px;">
+                        <p-radioButton  (click)="onBaseMapSelection()"  name="baseMapGroup" label="{{ baseMap.viewValue }}" value="{{ baseMap.value }}" [(ngModel)]="selectedBaseMap"></p-radioButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

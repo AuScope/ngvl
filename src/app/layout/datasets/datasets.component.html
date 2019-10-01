@@ -274,19 +274,20 @@
                     <app-ol-map-zoom></app-ol-map-zoom>
                     <app-ol-boundary-select></app-ol-boundary-select>
                 </div>
+
                 <div class="btn-group" style="position:absolute;z-index:1;margin-top:40px;margin-left:4px;">
                     <!-- Select Data button -->
                     <app-ol-map-select-data></app-ol-map-select-data>
                 </div>
+
+                <div class="btn-group" style="position:absolute;z-index:1;margin-left:190px; margin-top:4px;width:250px;">
+                    <!-- Basemap drop down menu -->
+                    <app-ol-map-basemap></app-ol-map-basemap>
+                </div>
+
                 <div style="position:absolute;z-index:1;margin-top:4px;right:10px;">
-                    <div style="position:relative;z-index:2;width:400px;right:0px;">
-                        <!-- Active Layers drop down menu -->
-                        <app-ol-map-layers></app-ol-map-layers>
-                    </div>
-                    <div class="height-full" style="position:absolute;z-index:2;margin-top:4px;width:250px;right:0px;">
-                        <!-- Basemap drop down menu -->
-                        <app-ol-map-basemap></app-ol-map-basemap>
-                    </div>
+                    <!-- Active Layers drop down menu -->
+                    <app-ol-map-layers></app-ol-map-layers>
                 </div>
                 <!-- The map -->
                 <app-ol-map class="height-full width-full"></app-ol-map> 

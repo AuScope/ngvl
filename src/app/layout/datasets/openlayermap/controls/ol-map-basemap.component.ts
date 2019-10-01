@@ -26,6 +26,7 @@ export class OlMapBasemapComponent implements OnInit {
   onBaseMapSelection() {
     if(this.selectedBaseMap) {
       this.olMapService.switchBaseMap(this.selectedBaseMap);
+      this.baseMapIsCollapsed = true;
     }
   }
 

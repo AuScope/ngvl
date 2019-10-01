@@ -35,16 +35,6 @@
                         </button>
                 </span>
                 <span class="input-group-append">
-                    <div ngbDropdown>
-                        <button ngbDropdownToggle [disabled]="isRecordAddedToMap(cswRecord) ? null : true" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer opacity">
-                            <i class="fa fa-tint"></i>
-                        </button>
-                        <div ngbDropdownMenu>
-                            <p-slider [ngModel]="layerOpacities.get(cswRecord.id)" [min]="0" [max]="100" orientation="vertical" (onChange)="setLayerOpacity(cswRecord.id, $event)"></p-slider>
-                        </div>
-                    </div>
-                </span>
-                <span class="input-group-append">
                     <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
                         <i class="fa fa-info-circle" style="color:blue;"></i>
                     </button>

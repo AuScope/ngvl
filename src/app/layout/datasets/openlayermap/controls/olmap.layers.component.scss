@@ -25,4 +25,19 @@
             padding-bottom: 0px;
         }
     }
+
+    // Remove opacity Dropdown arrow
+    .dropdown-toggle::after {
+        display:none;
+    }
+  
+    .dropdown-menu {
+        min-width: 25px;
+    }
+  
+    p-slider {
+        display: flex;
+        justify-content: center;
+    }
+  
 }

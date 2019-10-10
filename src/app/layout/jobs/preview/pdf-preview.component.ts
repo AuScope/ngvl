@@ -1,5 +1,4 @@
 import { Component, ViewChild, ElementRef, Input } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
 
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 
@@ -20,27 +19,14 @@ export class PdfPreviewComponent implements PreviewComponent {
 
   @ViewChild('pdfInline') inlineViewer;
 
-  constructor(private http: HttpClient) {
-  }
+  constructor() {}
 
   @Input()
   set data(data: string) {
-    this._data = data;
-    this.downloadPdf();
+    this._data = encodeURIComponent(data);
   }
 
   get data(): string { return this._data; }
-
-  downloadPdf() {
-    const url = this._data;
-
-    if (url) {
-      return this.http.get(url, { responseType: 'blob' }).subscribe((res) => {
-        this.inlineViewer.pdfSrc = res;
-        this.inlineViewer.refresh();
-      });
-    }
-  }
 
   onScroll(event) {
     let target = event.target || event.srcElement;

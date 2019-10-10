@@ -9,6 +9,7 @@ import { JobsService } from './jobs.service';
 import { PreviewDirective } from './preview/preview.directive';
 import { PlainTextPreviewComponent } from './preview/plaintext-preview.component';
 import { ImagePreviewComponent } from './preview/image-preview.component';
+import { PdfPreviewComponent } from './preview/pdf-preview.component';
 import { PreviewItem } from './preview/preview-item';
 import { TtlPreviewComponent } from './preview/ttl-preview.component';
 import { LogPreviewComponent } from './preview/log-preview.component';
@@ -50,7 +51,8 @@ export class JobsComponent implements OnInit {
         new PreviewItem("plaintext", PlainTextPreviewComponent, {}, ['txt', 'sh', 'log']),
         new PreviewItem("log", LogPreviewComponent, {}, ['.sh.log']),
         new PreviewItem("ttl", TtlPreviewComponent, {}, ['ttl']),
-        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif'])
+        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif']),
+        new PreviewItem("pdf", PdfPreviewComponent, {}, ['pdf'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
@@ -281,7 +283,7 @@ export class JobsComponent implements OnInit {
         // saving previewItem for refresh
         this.currentPreviewItem = previewItem;
         // Preview image
-        if (previewItem && previewItem.type === 'image') {
+        if (previewItem && (previewItem.type === 'image' || previewItem.type === 'pdf')) {
             this.currentPreviewObject = cloudFile;
             const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
             this.previewFile(previewItem, imageUrl);

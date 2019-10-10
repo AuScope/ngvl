@@ -9,6 +9,7 @@ import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 
 import { MonacoEditorModule } from 'ngx-monaco-editor';
+import { PdfJsViewerModule } from 'ng2-pdfjs-viewer';
 
 import { JobsRoutingModule } from './jobs-routing.module';
 import { JobsComponent } from './jobs.component';
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { DataServicePreviewComponent } from './preview/data-service-preview.component';
 import { PlainTextPreviewComponent } from './preview/plaintext-preview.component';
 import { ImagePreviewComponent } from './preview/image-preview.component';
+import { PdfPreviewComponent } from './preview/pdf-preview.component';
 import { PreviewDirective } from './preview/preview.directive';
 import { TtlPreviewComponent } from './preview/ttl-preview.component';
 import { LogPreviewComponent } from './preview/log-preview.component';
@@ -47,15 +49,19 @@ import { MessageService } from 'primeng/components/common/messageservice';
         NgbDropdownModule.forRoot(),
         NgbCollapseModule.forRoot(),
         MonacoEditorModule.forRoot(),
+        PdfJsViewerModule,
         ToastModule
     ],
     declarations: [
         JobsComponent, JobBrowserComponent, JobInputsComponent, CopyJobInputsModalComponent,
-        PreviewDirective, DataServicePreviewComponent, ImagePreviewComponent,
+        PreviewDirective, DataServicePreviewComponent, ImagePreviewComponent, PdfPreviewComponent,
         PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent, JobStatusModalComponent
     ],
-    entryComponents: [ DataServicePreviewComponent, ImagePreviewComponent, PlainTextPreviewComponent,
-        TtlPreviewComponent, LogPreviewComponent, JobStatusModalComponent, CopyJobInputsModalComponent
+    entryComponents: [
+        DataServicePreviewComponent, ImagePreviewComponent,
+        PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent,
+        JobStatusModalComponent, CopyJobInputsModalComponent,
+        PdfPreviewComponent
     ],
     providers: [ JobsService, ConfirmationService, MessageService ]
 })

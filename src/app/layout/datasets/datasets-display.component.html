@@ -1,17 +1,32 @@
 <div class="row">
     <div class="col" style="padding: 0px;">
         <li *ngFor="let cswRecord of cswRecordList">
-            <div class="input-group input-group-sm" style="border: 1px solid #ccc; padding: 0px;">
-                <span class="input-group-prepend" style="display:flex">                        
+
+            <div class="input-group input-group-sm" style="padding: 0px;border-top: 1px solid gray;">
+                <span class="input-group-prepend" style="display:flex">
+                    <!-- Record can not be added -->
                     <button *ngIf="!canRecordBeAdded(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
                         title="Layer has no associated online resources and as such, cannot be added">
                         <i class="fa fa-times"></i>
                     </button>
-                    <button *ngIf="canRecordBeAdded(cswRecord)"
+                    <!-- Add layer to map, or load child layers (GSKY) -->
+                    <button *ngIf="canRecordBeAdded(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
                         class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map"
                         (click)="addCSWRecord(cswRecord)">
                         <i class="fa fa-plus-circle" style="color:green;"></i>
                     </button>
+                    <!-- Loading child layers (GSKY) -->
+                    <button *ngIf="areLayersLoading(cswRecord.id)"
+                        class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Loading layers...">
+                        <i class="fa fa-spinner fa-spin"></i>
+                    </button>
+                    <!-- Child layers (GSKY) are being displayed, button will collapse children -->
+                    <button *ngIf="hasChildRecords(cswRecord)"
+                        class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Collapse layers"
+                        (click)="removeChildRecords(cswRecord)">
+                        <i class="fa fa-minus-circle" style="color:red;"></i>
+                    </button>
+                    <!-- Layer (non-GSKY) displayed, button will remove from map -->
                     <button *ngIf="olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
                         (click)="removeCSWRecord(cswRecord.id)">
                         <i class="fa fa-trash" style="color:red;"></i>
@@ -28,11 +43,6 @@
                 <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ cswRecord.name }}" readonly style="width: 100%;margin-left:4px;margin-right:4px;">
                     {{ cswRecord.name }}
                 </label>
-                <span class="input-group-append" *ngIf="cswRecord.geographicElements != null && cswRecord.geographicElements.length>0 && getWmsGetCapabilitiesOnlineResource(cswRecord)!=null">
-                    <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display WMS Layer(s)" (click)="showAddLayerDialog(cswRecord)" style="background-color:transparent;float:right;">
-                        <i class="fa fa-list-alt" style="color:green;"></i>
-                    </button>
-                </span>
                 <span class="input-group-append" *ngIf="cswRecord.geographicElements != null && cswRecord.geographicElements.length>0">
                     <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
                         (dblclick)="zoomToCSWRecordBounds(cswRecord)">
@@ -45,6 +55,62 @@
                     </button>
                 </span>
             </div>
+            <!-- GSKY layers -->
+            <div *ngIf="hasChildRecords(cswRecord)">
+                <div *ngFor="let layer of cswRecord.childRecords">
+                    
+                    <!-- TODO: This was copy/pasted from above to get working, needs to be separate component -->
+                    <div class="input-group input-group-sm" style="padding: 0px;">
+                        <span class="input-group-prepend" style="display:flex">                        
+                            <span style="width:29px;"></span>
+
+                            <!-- TESTING XXX -->
+                            <button *ngIf="layer.id=='unique-id-blend_sentinel2_landsat_nbart_daily_false_colour'" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="TEST TIME"
+                                (click)="changeTime()">
+                                <i class="fa fa-check" style="color:red;"></i>
+                            </button>
+
+                            <button *ngIf="!canRecordBeAdded(layer) && !olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
+                                title="Layer has no associated online resources and as such, cannot be added">
+                                <i class="fa fa-times"></i>
+                            </button>
+                            <button *ngIf="canRecordBeAdded(layer)"
+                                class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map"
+                                (click)="addCSWRecord(layer)">
+                                <i class="fa fa-plus-circle" style="color:green;"></i>
+                            </button>
+                            <button *ngIf="olMapService.layerExists(layer.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
+                                (click)="removeCSWRecord(layer.id)">
+                                <i class="fa fa-trash" style="color:red;"></i>
+                            </button>
+                            <div>
+                                <button *ngIf="validUser && !isBookMark(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(layer)">
+                                    <i class="fa fa-heart-o" style="color:red;"></i>
+                                </button>
+                                <button *ngIf="validUser && isBookMark(layer)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove as favourite" (click)="removeBookMark(layer)">                                    
+                                        <i class="fa fa-heart" style="color:red;"></i>
+                                </button>
+                            </div>
+                        </span>
+                        <label class="input-group-label text-truncate" data-toggle="tooltip" title="{{ layer.name }}" readonly style="width: 100%;margin-left:0px;margin-right:0px;">
+                            &nbsp;{{ layer.name }}
+                        </label>
+                        <span class="input-group-append" *ngIf="layer.geographicElements != null && layer.geographicElements.length>0">
+                            <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(layer)"
+                                (dblclick)="zoomToCSWRecordBounds(layer)">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </span>
+                        <span class="input-group-append">
+                            <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
+                                <i class="fa fa-info-circle" style="color:blue;"></i>
+                            </button>
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
         </li> 
     </div>
 </div>

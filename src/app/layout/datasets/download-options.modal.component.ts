@@ -2,8 +2,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy, ViewChild, ElementRe
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UserStateService } from '../../shared';
-import { DownloadOptions } from '../../shared/modules/vgl/models';
+import { DownloadOptions, DescribeCoverage } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { Dropdown } from "primeng/components/dropdown/dropdown";
@@ -47,7 +46,6 @@ export class DownloadOptionsModalComponent implements OnInit {
     constructor(private formBuilder: FormBuilder,
         public activeModal: NgbActiveModal,
         private vglService: VglService,
-        private userStateService: UserStateService,
         private cswSearchService: CSWSearchService) {
     }
 
@@ -74,23 +72,54 @@ export class DownloadOptionsModalComponent implements OnInit {
         return outputFormats;
     }
 
+    /**
+     * Small hack to get the select format control to update at start
+     */
+    hasFocus(): boolean {
+        return true;
+    }
 
     /**
-     *
+     * TODO: Pass in valid types
+     * 
      * @param type the type of the online resource, will be 'WCS' or 'WFS'
      */
     private populateDataTypes() {
         if (this.onlineResource.type === 'WFS') {
             this.dataTypes = this.getFeatureRequestOutputFormats(this.onlineResource.serviceUrl);
         } else if (this.onlineResource.type === 'WCS') {
-            this.dataTypes = [
-                { label: 'CSV', urn: 'csv' },
-                { label: 'GeoTIFF', urn: 'geotif' },
-                { label: 'NetCDF', urn: 'nc' }
-            ];
+            this.dataTypes = [];
+            this.vglService.describeCoverage(this.onlineResource.url, this.onlineResource.name).subscribe((response: DescribeCoverage[]) => {
+                if(response.length > 0 && response[0].supportedFormats) {
+                    for(let format of response[0].supportedFormats) {
+                        switch(format.toLowerCase()) {
+                            case "csv":
+                                this.dataTypes.push({ label: 'CSV', urn: 'csv'});
+                            break;
+                            case "netcdf":
+                                this.dataTypes.push({ label: 'NetCDF', urn: 'nc'});
+                            break;
+                            case "geotiff":
+                                this.dataTypes.push({ label: 'GeoTIFF', urn: 'geotif'});
+                            break;
+                        }
+                    }
+                }
+            }, error => {
+                // TODO: Deal with error
+            }, () => {
+                if(this.dataTypes.length == 0) {
+                    this.dataTypes = [
+                        { label: 'CSV', urn: 'csv' },
+                        { label: 'GeoTIFF', urn: 'geotif' },
+                        { label: 'NetCDF', urn: 'nc' }
+                    ];
+                }
+                this.downloadOptionsForm.controls.format.updateValueAndValidity();
+            });
         }
-
     }
+    
     /**
      * Construct the DL options FormGroup based on the supplied DownloadOptions input
      */
@@ -157,6 +186,14 @@ export class DownloadOptionsModalComponent implements OnInit {
                 }
                 case "description": {
                     optionsGroup['description'] = [this.downloadOptions.description, Validators.required];
+                    break;
+                }
+                case "outputWidth": {
+                    optionsGroup['outputWidth'] = [this.downloadOptions.outputWidth, Validators.required];
+                    break;
+                }
+                case "outputHeight": {
+                    optionsGroup['outputHeight'] = [this.downloadOptions.outputHeight, Validators.required];
                     break;
                 }
             }

@@ -306,6 +306,13 @@ export interface DownloadOptions {
     serviceUrl?: string;
     srsName?: string;
     featureType?: string;
+
+    outputWidth?: number;
+    outputHeight?: number;
+    //outputResolutionX: number;
+    //outputResolutionY: number;
+    styles?: string;
+
     id?: number;
     bookmarkId?: number;
     bookmarkOptionName?: string;
@@ -331,6 +338,21 @@ export interface Registry {
     currentPage?: number;     // Current page of search records
     searching?: boolean;      // Is a faceted search in progress?
     searchError?: string;     // Faceted search error result for registry
+}
+
+export interface DescribeCoverage {
+  description: string;
+  name: string;
+  label: string;
+  supportedRequestCRSs: string[];
+  supportedResponseCRSs: string[];
+  supportedFormats: string[];
+  supportedInterpolations: string[];
+  nativeCRSs: string[];
+  // May need to define these as interfaces if needed
+  spatialDomain: any; //SpatialDomain --- define if needed
+  temporalDomain: any[]; //TemporalDomain[] --- define if needed
+  rangeSet: any; //RangeSet --- define if needed
 }
 
 export function isSolution(x) {

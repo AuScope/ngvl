@@ -66,6 +66,8 @@ export class ConfirmDatasetsModalComponent {
                 if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                     dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
                 }
+                // TODO: Find out if we still need ERDAP support
+                /*
                 this.vglService.makeErddapUrl(dlOptions).subscribe(
                     response => {
                         if (response.url) {
@@ -75,6 +77,15 @@ export class ConfirmDatasetsModalComponent {
                         console.log(error.message);
                     }
                 );
+                */
+               this.vglService.makeWcsUrl(dlOptions).subscribe(
+                   response => {
+                        if(response.url) {
+                            window.open(response.url);
+                        }
+                   }, error => {
+                    console.log(error.message);
+                   });
                 break;
             case 'WFS':
                 this.vglService.makeWfsUrl(dlOptions).subscribe(

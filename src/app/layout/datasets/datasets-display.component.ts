@@ -6,8 +6,8 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Proj from 'ol/proj';
-import { WmsLayersModalComponent } from './wms-layers.modal.component';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { VglService } from '../../shared/modules/vgl/vgl.service';
 
 
 // List of valid online resource types that can be added to the map
@@ -24,12 +24,15 @@ export class DatasetsDisplayComponent {
     @Input() cswRecordList: CSWRecordModel[] = [];
     @Input() bookMarkList: BookMark[] = [];
     @Input() validUser = false;
-
     @Output() bookMarkChoice = new EventEmitter();
+
+    // Keep track of GSKY (or other) layers that may currently be loading
+    private layersLoading: Map<string, boolean> = new Map<string, boolean>();
 
 
     constructor(public olMapService: OlMapService,
                 public cswSearchService: CSWSearchService,
+                public vglService: VglService,
                 public modalService: NgbModal,
                 public activeModal: NgbActiveModal) { }
 
@@ -39,7 +42,9 @@ export class DatasetsDisplayComponent {
      * @param cswRecord
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
-        try {
+        if(this.isGskyRecord(cswRecord)) {
+            this.loadGskyLayers(cswRecord);
+        } else try {
             this.olMapService.addCSWRecord(cswRecord);
         } catch (error) {
             // TODO: Proper error reporting
@@ -130,22 +135,51 @@ export class DatasetsDisplayComponent {
     }
 
     /**
-     * Determine if a CSWRecord meets the criteria to be added to the map:
+     * Determine if a CSWRecord meets the criteria to be added to the map.
+     * 
+     * For a standard layer:
      *
      *   1. Has online resource.
      *   2. Has at least one defined geographicElement.
      *   3. Layer does not already exist on map.
      *   4. One online resource is of type WMS, WFS, CSW or WWW.
+     * 
+     * TODO: further checks
+     * For GSKY server:
+     * 
+     *   1. WMS and WCS endpoints exist and both are GetCapability requests.
      *
      * @param cswRecord the CSWRecord to verify
      * @return true is CSWRecord can be added, false otherwise
      */
     public canRecordBeAdded(cswRecord: CSWRecordModel): boolean {
         return cswRecord.hasOwnProperty('onlineResources') &&
+               cswRecord.onlineResources != null &&
                cswRecord.onlineResources.length > 0 &&
                cswRecord.geographicElements.length > 0 &&
-               !this.olMapService.layerExists(cswRecord.id) &&
-               cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1);
+               // GSKY layer
+               (this.isGskyRecord(cswRecord) ||
+                // Standard layer
+               (!this.olMapService.layerExists(cswRecord.id) &&
+                 cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1)));
+    }
+
+    /**
+     * TODO: Not an ideal test
+     * 
+     * @param cswRecord 
+     */
+    public isGskyRecord(cswRecord: CSWRecordModel): boolean {
+        return this.getCapabilitiesOnlineResource(cswRecord, 'wms') != null &&
+               this.getCapabilitiesOnlineResource(cswRecord, 'wcs') != null;
+    }
+
+    /**
+     * 
+     * @param layerId 
+     */
+    public areLayersLoading(layerId: string): boolean {
+        return this.layersLoading.get(layerId) == true;
     }
 
     /**
@@ -159,14 +193,39 @@ export class DatasetsDisplayComponent {
 
     /**
      * 
-     * @param url 
+     * @param cswRecord 
      */
-    isGetCapabilitiesUrl(url: string): boolean {
+    public hasChildRecords(cswRecord: CSWRecordModel): boolean {
+        if(cswRecord.hasOwnProperty('childRecords') &&
+           cswRecord.childRecords != null &&
+           cswRecord.childRecords.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 
+     * @param cswRecord 
+     */
+    public removeChildRecords(cswRecord: CSWRecordModel) {
+        if(cswRecord.hasOwnProperty('childRecords')) {
+            cswRecord.childRecords = [];
+        }
+    }
+
+    /**
+     * 
+     * @param url URL to parse
+     * @param serviceType service type ('wms' or 'wcs')
+     */
+    isGetCapabilitiesUrl(url: string, serviceType: string): boolean {
         if (url.toLowerCase().startsWith("http")) {
+            // TODO: Given this is currently only used for GSKY, could search for "gsky" in URL
             let paramIndex = url.indexOf("?");
             if (paramIndex !== -1) {
                 if (url.toLowerCase().indexOf("request=getcapabilities", paramIndex) !== -1 &&
-                    url.toLowerCase().indexOf("service=wms", paramIndex) !== -1) {
+                    url.toLowerCase().indexOf("service=" + serviceType.toLowerCase(), paramIndex) !== -1) {
                     return true;
                 }
             }
@@ -175,13 +234,13 @@ export class DatasetsDisplayComponent {
     }
 
     /**
-     * Parse the URL to see if it's a WMS GetCapabilities request
+     * Parse the CSW record to see if it has a GetCapabilities request (WMS or WCS)
      * @param url endpoint
      */
-    public getWmsGetCapabilitiesOnlineResource(record: CSWRecordModel): OnlineResourceModel {
+    public getCapabilitiesOnlineResource(record: CSWRecordModel, serviceType: string): OnlineResourceModel {
         if(record.onlineResources) {
             for(let resource of record.onlineResources) {
-                if(this.isGetCapabilitiesUrl(resource.url)) {
+                if(this.isGetCapabilitiesUrl(resource.url, serviceType)) {
                     return resource;
                 }
             }
@@ -189,26 +248,40 @@ export class DatasetsDisplayComponent {
         return null;
     }
 
-    /**
-     * 
-     * @param cswRecord 
-     * @param onlineResource 
-     */
-    showAddLayerDialog(cswRecord: CSWRecordModel) {
-        if(cswRecord.onlineResources) {
-            const resource = this.getWmsGetCapabilitiesOnlineResource(cswRecord);
-            if(resource) {
-                const modalRef = this.modalService.open(WmsLayersModalComponent);
-                modalRef.componentInstance.wmsUrl = resource.url;
-                modalRef.result.then((layers) => {
-                    if (layers && layers !== 'Cross click') {
-                        for (let layer of layers) {
-                            this.olMapService.addCSWRecord(layer);
-                        }
+    loadGskyLayers(cswRecord: CSWRecordModel) {
+        this.layersLoading.set(cswRecord.id, true);
+        const wmsGetCapResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
+        const wcsGetCapResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wcs');
+
+        if(wmsGetCapResource != null && wcsGetCapResource != null) {
+            this.vglService.getCustomLayerRecords(wmsGetCapResource.url).subscribe((response: CSWRecordModel[]) => {
+                for(let layer of response) {
+                    let wcsOnlineResource: OnlineResourceModel = {
+                        applicationProfile: '',
+                        description: layer.onlineResources[0].description,
+                        geographicElements: layer.onlineResources[0].geographicElements,
+                        name: layer.onlineResources[0].name,
+                        type: 'WCS',
+                        url: wcsGetCapResource.url,
+                        // TODO: from GetCapabilities <WCS_Capabilities ... version="1.0.0"> OR DescribeCoverage <CoverageDescription ... version="1.0.0.">
+                        version: ''
                     }
-                    this.activeModal.close();
-                });
-            }
+                    layer.onlineResources.push(wcsOnlineResource);
+                    cswRecord.childRecords.push(layer);
+                }
+            }, error => {
+                // TODO: Do something
+            }, () => {
+                this.layersLoading.set(cswRecord.id, false);
+            });
         }
     }
+
+    /*
+    changeTime() {
+        console.log("Test change time...");
+        this.olMapService.setLayerSourceParam('unique-id-blend_sentinel2_landsat_nbart_daily_false_colour', 'TIME', '1991-03-20T00:00:00.000Z');
+    }
+    */
+
 }

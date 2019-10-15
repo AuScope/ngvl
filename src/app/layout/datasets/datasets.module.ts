@@ -16,7 +16,6 @@ import { SliderModule } from 'primeng/slider';
 import { DatasetsDisplayComponent } from './datasets-display.component';
 import { AngularSplitModule } from 'angular-split';
 import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component';
-import { WmsLayersModalComponent } from './wms-layers.modal.component';
 
 
 @NgModule({
@@ -39,7 +38,7 @@ import { WmsLayersModalComponent } from './wms-layers.modal.component';
     NgbTabsetModule.forRoot()
   ],
   providers: [NgbActiveModal],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, DatasetsDisplayComponent, RemoteDatasetsModalComponent, WmsLayersModalComponent],
-  entryComponents: [ ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent, WmsLayersModalComponent ]
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, DatasetsDisplayComponent, RemoteDatasetsModalComponent ],
+  entryComponents: [ ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ]
 })
 export class DatasetsModule { }

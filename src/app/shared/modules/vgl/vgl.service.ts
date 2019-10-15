@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
 import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
-import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry, DescribeCoverage } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -531,6 +531,13 @@ export class VglService {
         return this.vglRequest('makeWfsUrl.do', options);
     }
 
+    public makeWcsUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
+      const options = {
+        params: dlOptions
+      };
+      return this.vglRequest('makeWcsUrl.do', options);
+    }
+
     public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
@@ -682,8 +689,29 @@ export class VglService {
     });
   }
 
+  // GSKY methods
   public getCustomLayerRecords(serviceUrl: string): Observable<any> {
     const params = { serviceUrl: serviceUrl };
-    return this.vglGet<CSWRecordModel[]>('/getCustomLayers.do', params);
+    return this.vglGet<CSWRecordModel[]>('getCustomLayers.do', params);
+  }
+
+  public getCustomCoverageOfferingBriefRecords(serviceUrl: string): Observable<any> {
+    const params = { serviceUrl: serviceUrl };
+    return this.vglGet<CSWRecordModel[]>('getCoverageOfferingBriefs.do', params);
+  }
+
+  public describeCoverage(serviceUrl: string, coverageName: string): Observable<any> {
+    const params = {
+      serviceUrl: serviceUrl,
+      coverageName: coverageName
+    };
+    return this.vglGet<DescribeCoverage[]>('describeCoverage.do', params);
+  }
+
+  public getWcsCapabilities(serviceUrl: string): Observable<any> {
+    const params = {
+      serviceUrl: serviceUrl
+    };
+    return this.vglGet<DescribeCoverage>('getWCSCapabilities.do', params);
   }
 }

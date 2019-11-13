@@ -7,15 +7,15 @@ import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
 import { ConfirmDatasetsModalComponent } from './confirm-datasets.modal.component';
 import { DownloadOptionsModalComponent } from './download-options.modal.component';
-import { NgbCollapseModule, NgbModalModule, NgbTypeaheadModule, NgbTabsetModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbModalModule, NgbTypeaheadModule, NgbTabsetModule, NgbActiveModal, NgbAccordionModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { CalendarModule } from 'primeng/calendar';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 import { DropdownModule } from 'primeng/dropdown';
 import { SliderModule } from 'primeng/slider';
-import { DatasetsDisplayComponent } from './datasets-display.component';
 import { AngularSplitModule } from 'angular-split';
 import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component';
+import { DatasetsRecordModule } from './datasets-record/datasets-record.module';
 
 
 @NgModule({
@@ -25,6 +25,7 @@ import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component'
     FormsModule,
     ReactiveFormsModule,
     PageHeaderModule,
+    DatasetsRecordModule,
     DatasetsRoutingModule,
     OlMapModule,
     CalendarModule,
@@ -32,13 +33,15 @@ import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component'
     TreeTableModule,
     DropdownModule,
     SliderModule,
+    NgbAccordionModule.forRoot(),
     NgbCollapseModule.forRoot(),
+    NgbDropdownModule.forRoot(),
     NgbModalModule.forRoot(),
     NgbTypeaheadModule.forRoot(),
     NgbTabsetModule.forRoot()
   ],
   providers: [NgbActiveModal],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, DatasetsDisplayComponent, RemoteDatasetsModalComponent ],
+  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ],
   entryComponents: [ ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ]
 })
 export class DatasetsModule { }

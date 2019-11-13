@@ -26,18 +26,11 @@
         }
     }
 
-    // Remove opacity Dropdown arrow
-    .dropdown-toggle::after {
-        display:none;
+    .row {
+        margin-bottom: 10px;
     }
-  
-    .dropdown-menu {
-        min-width: 25px;
+    li {
+    list-style-type: none;
     }
-  
-    p-slider {
-        display: flex;
-        justify-content: center;
-    }
-  
+
 }

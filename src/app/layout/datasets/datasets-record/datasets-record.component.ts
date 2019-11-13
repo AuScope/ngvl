@@ -1,30 +1,37 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { BookMark } from '../../shared/modules/vgl/models';
-import { RecordModalComponent } from './record.modal.component';
+import { BookMark } from '../../../shared/modules/vgl/models';
+import { RecordModalComponent } from '../record.modal.component';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
-import { CSWSearchService } from '../../shared/services/csw-search.service';
+import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Proj from 'ol/proj';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
-import { VglService } from '../../shared/modules/vgl/vgl.service';
+import { VglService } from '../../../shared/modules/vgl/vgl.service';
 
 
 // List of valid online resource types that can be added to the map
 const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 
 @Component({
-    selector: 'app-datasets-display',
-    templateUrl: './datasets-display.component.html',
-    styleUrls: ['./datasets-display.component.scss']
+    selector: 'app-datasets-record',
+    templateUrl: './datasets-record.component.html',
+    styleUrls: ['./datasets-record.component.scss']
 })
-export class DatasetsDisplayComponent {
+export class DatasetsRecordComponent {
 
     @Input() registries: any = [];
-    @Input() cswRecordList: CSWRecordModel[] = [];
+    //@Input() cswRecordList: CSWRecordModel[] = [];
+    @Input() cswRecord: CSWRecordModel;
     @Input() bookMarkList: BookMark[] = [];
-    @Input() validUser = false;
+    @Input() validUser: boolean = false;
+    // Map controls will not have an add layer button, and will have a transparency button
+    @Input() isMapControl: boolean = false;
+    @Input() isGskyLayer: boolean = false;
     @Output() bookMarkChoice = new EventEmitter();
+
+    // Layer opacity only relevant to map control layer list
+    layerOpacity: number = 100;
 
     // Keep track of GSKY (or other) layers that may currently be loading
     private layersLoading: Map<string, boolean> = new Map<string, boolean>();
@@ -192,6 +199,8 @@ export class DatasetsDisplayComponent {
     }
 
     /**
+     * Return true if a CSWRecordModel has child records.
+     * Currently the only indicator of GSKY records.
      * 
      * @param cswRecord 
      */
@@ -205,6 +214,7 @@ export class DatasetsDisplayComponent {
     }
 
     /**
+     * Remove all child records from a particular record
      * 
      * @param cswRecord 
      */
@@ -215,6 +225,7 @@ export class DatasetsDisplayComponent {
     }
 
     /**
+     * Parse a URL to determine if it is a GetCapabilities request
      * 
      * @param url URL to parse
      * @param serviceType service type ('wms' or 'wcs')
@@ -235,6 +246,7 @@ export class DatasetsDisplayComponent {
 
     /**
      * Parse the CSW record to see if it has a GetCapabilities request (WMS or WCS)
+     * 
      * @param url endpoint
      */
     public getCapabilitiesOnlineResource(record: CSWRecordModel, serviceType: string): OnlineResourceModel {
@@ -248,6 +260,11 @@ export class DatasetsDisplayComponent {
         return null;
     }
 
+    /**
+     * Retrieve a GSKY record's layers and add them to the record as child records
+     * 
+     * @param cswRecord 
+     */
     loadGskyLayers(cswRecord: CSWRecordModel) {
         this.layersLoading.set(cswRecord.id, true);
         const wmsGetCapResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
@@ -276,6 +293,18 @@ export class DatasetsDisplayComponent {
             });
         }
     }
+
+    /**
+     * 
+     * @param layerId 
+     * @param opacity 
+     */
+    public setLayerOpacity(e: any) {
+        this.layerOpacity = e.value;
+        this.olMapService.setLayerOpacity(this.cswRecord.id, e.value/100);
+    }
+
+    
 
     /*
     changeTime() {

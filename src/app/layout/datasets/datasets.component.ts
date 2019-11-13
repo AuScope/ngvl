@@ -12,6 +12,7 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import Proj from 'ol/proj';
 
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     
     // Search results
     cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
+    layerOpacities: Map<String, number> = new Map<String, number>();
 
     // BookMarks
     bookMarks: BookMark[] = [];
@@ -39,6 +41,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     pubDateIsCollapsed: boolean = true;
     registriesIsCollapsed: boolean = true;
     searchResultsIsCollapsed: boolean = true;
+
+    // Collapsable active layer panel
+    activeLayersIsCollapsed: boolean = true;
 
     // Faceted search parameters
     anyTextValue: string = "";
@@ -600,6 +605,42 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                 this.bookMarkCSWRecords.splice(pos, 1);
             }
         }
+    }
+
+    /**
+     * Return true if a CSWRecordModel has child records.
+     * Currently the only indicator of GSKY records.
+     * 
+     * @param cswRecord 
+     */
+    public hasChildRecords(cswRecord: CSWRecordModel): boolean {
+        if(cswRecord.hasOwnProperty('childRecords') &&
+           cswRecord.childRecords != null &&
+           cswRecord.childRecords.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * TODO: This is used elsewhere, should make a map service method
+     */
+    public getActiveLayerCount(): number {
+        return Object.keys(this.olMapService.getLayerModelList()).length;
+    }
+
+    /**
+     * Get active layers
+     */
+    public getActiveLayers(): LayerModel[] {
+        const layers: LayerModel[] = [];
+        const keys = Object.keys(this.olMapService.getLayerModelList());
+        for (let i = 0; i < keys.length; i++) {
+            let currentLayer = this.olMapService.getLayerModelList()[keys[i]];
+            layers.push(currentLayer);
+            this.layerOpacities.set(currentLayer.id, 100);
+        }
+        return layers;
     }
 
     /* on Dragging of the gutter between map and datasets search input area resize the map */

@@ -10,55 +10,29 @@
                 <div *ngIf="getActiveLayerCount()==0" style="padding:1.25rem;">
                     No layers have been added to the map.
                 </div>
+                <!--
                 <div *ngIf="getActiveLayerCount()>0">
                     <div *ngFor="let layer of getActiveLayers()" style="margin-bottom:2px;">
                         <div class="input-group input-group-sm" style="border:1px solid #ccc; padding: 0px;">
-                            <!-- TODO: Request status icon should show status (e.g. loading spinner, tick for complete etc.)
-                            <span class="input-group-prepend">
-                            <button *ngIf="!olMapService.layerLoading(layer.id)" class="btn btn-sm" data-toggle="tooltip" title="TODO: Request status">
-                                <i class="fa fa-check"></i>
-                            </button>
-                            <button *ngIf="olMapService.layerLoading(layer.id)" class="btn btn-sm" data-toggle="tooltip" title="TODO: Request status">
-                                <i class="fa fa-spinner"></i>
-                            </button>
-                                <button class="btn btn-sm">
-                                    <i class="fa fa-check" style="color:green;"></i>
-                                </button>
-                            </span>
-                            -->
-                            <input class="input-group-text text-truncate" style="width:100%;" data-toggle="tooltip" title="{{ layer.name }}" value="{{ layer.name }}"
-                                readonly>
-
-                            <span class="input-group-append">
-                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(layer)"
-                                    (dblclick)="zoomToCSWRecordBounds(layer)">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-
-                            <span class="input-group-append">
-                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(layer)">
-                                    <i class="fa fa-info-circle" style="color:blue;"></i>
-                                </button>
-                            </span>
-                            <span class="input-group-append">
-                                <div ngbDropdown>
-                                    <button ngbDropdownToggle class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Layer opacity">
-                                        <i class="fa fa-tint" style="color:blue;"></i>
-                                    </button>
-                                    <div ngbDropdownMenu>
-                                        <p-slider [ngModel]="layerOpacities.get(layer.id)" [min]="0" [max]="100" orientation="vertical" (onChange)="setLayerOpacity(layer.id, $event)"></p-slider>
-                                    </div>
-                                </div>
-                            </span>
-                            <span class="input-group-append">
-                                <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map" (click)="removeRecord(layer.id)">
-                                    <i class="fa fa-trash" style="color:red;"></i>
-                                </button>
-                            </span>
+                -->
+                <!--
+                <div *ngIf="getActiveLayerCount()>0">
+                    <div *ngFor="let layer of getActiveLayers()">
+                        <div class="input-group input-group-sm">
+                            <app-datasets-record [isMapControl]="true" [cswRecord]="layer.cswRecords[0]"></app-datasets-record>
                         </div>
                     </div>
                 </div>
+                -->
+
+                <div class="row">
+                    <div class="col" style="padding: 0px;">
+                        <li *ngFor="let layer of getActiveLayers()">
+                            <app-datasets-record [isMapControl]="true" [cswRecord]="layer.cswRecords[0]"></app-datasets-record>
+                        </li>
+                    </div>
+                </div>
+
             </ng-template>
         </ngb-panel>
     </ngb-accordion>

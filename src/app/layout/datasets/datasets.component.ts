@@ -240,7 +240,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-                    if(response.searchErrors != null) {
+                    if(response.hasOwnProperty('searchErrors') && response.searchErrors[registry.id] != null) {
                         registry.searchError = response.searchErrors[registry.id];
                     }
                     this.cswSearchResults.set(registry.id, response.records);

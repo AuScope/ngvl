@@ -5,12 +5,12 @@
         <!-- Don't display add layer buttons if this is a map control -->
         <div *ngIf="!isMapControl">
             <!-- Record can not be added -->
-            <button *ngIf="!canRecordBeAdded(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
-                title="Layer has no associated online resources and as such, cannot be added">
+            <button *ngIf="!isAddableRecord(cswRecord) && !isExpandableRecord(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
+                title="Layer has no appropriate online resources and as such, cannot be added">
                 <i class="fa fa-times"></i>
             </button>
             <!-- Add layer to map, or load child layers (GSKY) -->
-            <button *ngIf="canRecordBeAdded(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
+            <button *ngIf="(isAddableRecord(cswRecord) || isExpandableRecord(cswRecord)) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
                 class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map"
                 (click)="addCSWRecord(cswRecord)">
                 <i class="fa fa-plus-circle" style="color:green;"></i>

@@ -323,7 +323,8 @@ export class JobDatasetsComponent {
                 description: jobDownload.description,
                 version: "",
                 applicationProfile: "",
-                geographicElements: []
+                geographicElements: [],
+                protocolRequest: ""
             };
             jobDownload.onlineResource = onlineResource;
             this.addJobDownloadToTree(jobDownload);

@@ -1,4 +1,7 @@
 .olMapLayerPanel {
+
+    max-width: 20em;
+
     ::ng-deep { 
         .card {
             font-size: 0.875rem;
@@ -27,10 +30,11 @@
     }
 
     .row {
+        display: contents;
         margin-bottom: 10px;
     }
     li {
-    list-style-type: none;
+        list-style-type: none;
     }
 
 }

@@ -324,7 +324,8 @@ export class CSWSearchService {
                 if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                     dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
                 }
-                return this.vgl.makeErddapUrl(dlOptions).map(jobDownload => {
+                // Changed from ERDDAP, do we need a separate ERDDAP type?
+                return this.vgl.makeWcsUrl(dlOptions).map(jobDownload => {
                     jobDownload.cswRecord = cswRecord;
                     jobDownload.onlineResource = onlineResource;
                     return jobDownload;

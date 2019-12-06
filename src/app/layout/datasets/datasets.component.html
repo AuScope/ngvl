@@ -210,17 +210,17 @@
                                                                         <ng-template ngbTabContent>
                                                                             <!-- No results -->
                                                                             <div *ngIf="!registry.value.searching && registry.value.searchError==null && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
-                                                                                <div class="row">
-                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;">
-                                                                                        <label>No records match the current filter(s)</label>
+                                                                                <div class="row" style="padding:10px">
+                                                                                    <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;background:#EBF5FB;">
+                                                                                        <label>The current filter(s) returned no results for this registry</label>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
                                                                             <!-- Server error -->
-                                                                            <div *ngIf="!registry.value.searching && registry.value.searchError!==null && cswSearchResults.get(registry.key).length===0">
-                                                                                <div class="row">
-                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;word-break:break-all;">
-                                                                                        <label>The server reported a problem:<br><br>{{ registry.value.searchError }}</label>
+                                                                            <div *ngIf="!registry.value.searching && registry.value.searchError!==null">
+                                                                                <div class="row" style="padding:10px;">
+                                                                                    <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;word-break:break-all;background:#EBF5FB;">
+                                                                                        <label>This registry reported a problem:<br><br>{{ registry.value.searchError }}</label>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

@@ -64,7 +64,7 @@ export class DatasetsRecordComponent {
                     // TODO: Stricter URL rewriting
                     resource.url = resource.url.substring(0, resource.url.indexOf('?') + 1) + "service=WMS";
                 }
-                // WCS
+                // WCS/NetCDF
                 else if((this.isGetCapabilitiesUrl(resource.url, 'wcs') || resource.type.toLowerCase() == 'ncss') && resource.protocolRequest != "") {
                     resource.name = resource.protocolRequest;
                 }

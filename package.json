@@ -43,7 +43,7 @@
     "ng2-charts": "^1.6.0",
     "ng2-pdfjs-viewer": "^5.0.1",
     "ngx-monaco-editor": "^7.0.0",
-    "npm": "^6.10.2",
+    "npm": "^6.13.4",
     "ol": "^4.6.5",
     "portal-core-ui": "github:AuScope/portal-core-ui#master",
     "primeicons": "1.0.0",

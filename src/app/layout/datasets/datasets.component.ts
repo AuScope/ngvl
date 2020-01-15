@@ -334,7 +334,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             if((<CSWRecordModel[]>response.records).length > 0) {
                 this.cswSearchResults.set(registry.id, response.records);
             }
-            if(response.searchErrors != null) {
+            if(response.searchErrors && response.searchErrors.length > 0) {
                 registry.searchError = response.searchErrors[registry.id];
             }
             registry.searching = false;

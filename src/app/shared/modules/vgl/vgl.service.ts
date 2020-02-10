@@ -641,14 +641,14 @@ export class VglService {
    * Return true if providerId identifies a cloud compute service provider.
    */
   public isCloudProvider(providerId: string): boolean {
-    return providerId !== 'nci-raijin-compute';
+    return providerId !== 'nci-gadi-compute';
   }
 
   /**
    * Return true if providerId identifies an HPC compute service provider.
    */
   public isHPCProvider(providerId: string): boolean {
-    return providerId === 'nci-raijin-compute';
+    return providerId === 'nci-gadi-compute';
   }
 
   updateComputeTypeDescriptions(computeTypes: ComputeType[]): ComputeType[] {

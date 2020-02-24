@@ -103,6 +103,9 @@ export class JobObjectComponent implements OnDestroy, OnInit {
             this.toolboxChanged(toolbox.imageId);
           }
         });
+        if( this.isHPCProvider(computeServiceId)) {
+          this.useWalltime = true
+        }
     }
   }
 

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CustomFormsModule } from 'ng2-validation'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -24,6 +25,7 @@ import { JobDatasetsComponent } from './job-datasets.component';
   imports: [
     CommonModule,
     FormsModule,
+    CustomFormsModule,
     ReactiveFormsModule,
     NgbModule,
     MonacoEditorModule.forRoot(),

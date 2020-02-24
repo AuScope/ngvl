@@ -2,6 +2,10 @@
     margin-bottom: 10px;
 }
 
+.missing-info {
+    color: red;
+  }
+  
 label.required:after {
     color: #d00;
     content: "*";

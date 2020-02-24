@@ -80,8 +80,9 @@
                     </div>
                     <div class="col-lg-10">
                         <div class="input-group">
-                            <input type="number" [(ngModel)]="job.ncpus" name="ncpus" required>
+                            <input type="number" [(ngModel)]="job.ncpus" name="ncpus" #ncpus="ngModel" [min]="1" min="1" required>
                         </div>
+                        <p *ngIf="ncpus.errors?.min" class="missing-info">Memory needs to be 1GB or larger!</p>
                         <small>This will be the number of CPUs that the job scripts will request from the HPC.</small>
                     </div>
                 </div>
@@ -91,8 +92,9 @@
                     </div>
                     <div class="col-lg-10">
                         <div class="input-group">
-                            <input type="number" [(ngModel)]="job.mem" name="mem" required>
+                            <input type="number" [(ngModel)]="job.mem" name="mem" #mem="ngModel" [min]="1" min="1" required>
                         </div>
+                        <p *ngIf="mem.errors?.min" class="missing-info">Memory needs to be 1GB or larger!</p>
                         <small>How much memory (in GB) should be requested for the running job.</small>
                     </div>
                 </div>
@@ -102,8 +104,9 @@
                     </div>
                     <div class="col-lg-10">
                         <div class="input-group">
-                            <input type="number" [(ngModel)]="job.jobfs" name="diskspace" required>
+                            <input type="number" [(ngModel)]="job.jobfs" name="diskspace" #diskspace="ngModel" [min]="1" min="1" required>
                         </div>
+                        <p *ngIf="diskspace.errors?.min" class="missing-info">Disk Space needs to be 1GB or larger!</p>
                         <small>How much working disk space (in GB) should be requested for the running jobs.</small>
                     </div>
                 </div>
@@ -127,19 +130,22 @@
                 </div>
                 <div class="col-lg-10">
                     <div class="input-group">
-                        <input type="checkbox" [(ngModel)]="useWalltime" name="wallTimeOption">
+                        <input type="checkbox" [(ngModel)]="useWalltime" name="wallTimeOption" [disabled]="! isCloudProvider(job.computeServiceId)">
                     </div>
                     <small>Select to add an optional walltime (minutes) for your job.</small>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-2">
-                    <label>Walltime:</label>
+                    <label *ngIf="useWalltime" class="required">Walltime:</label>
+                    <label *ngIf="! useWalltime" >Walltime:</label>
                 </div>
                 <div class="col-lg-10">
                     <div class="input-group">
-                        <input type="text" style="width:100%;" [(ngModel)]="job.walltime" [disabled]="!useWalltime" name="wallTime">
+                        <input type="number" [(ngModel)]="job.walltime" [disabled]="!useWalltime" name="wallTime" #wallTime="ngModel" [min]="1" min="1" 
+                        [required]="useWalltime">
                     </div>
+                    <p *ngIf="wallTime.errors?.min" class="missing-info">Walltime needs to be 1 minute or larger!</p>
                     <small>The walltime (minutes) for your job.</small>
                 </div>
             </div>

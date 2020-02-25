@@ -412,8 +412,13 @@ export class VglService {
     return job;
   }
 
-  public getComputeServices(jobId?: number): Observable<ComputeService[]> {
-    const params: {jobId?: number} = {};
+  public getComputeServices(solutions: string[] = [], jobId?: number): Observable<ComputeService[]> {
+    const params: {
+      solutions?: string[],
+      jobId?: number
+    } = {
+      solutions: solutions
+    };
     if (jobId != null) {
       params.jobId = jobId;
     }
@@ -641,7 +646,7 @@ export class VglService {
    * Return true if providerId identifies a cloud compute service provider.
    */
   public isCloudProvider(providerId: string): boolean {
-    return providerId !== 'nci-gadi-compute';
+    return providerId && (providerId !== 'nci-gadi-compute');
   }
 
   /**

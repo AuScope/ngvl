@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import { UserStateService } from '../../shared';
 import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-
+import { Solution } from '../../shared/modules/vgl/models';
 
 @Component({
     selector: 'app-job-object',
@@ -25,6 +25,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   resources: ComputeType[] = [];
 
   private _jobSub;
+  private _solutionsSub;
 
   @ViewChild('jobObjectForm')
   form: NgForm;
@@ -36,25 +37,25 @@ export class JobObjectComponent implements OnDestroy, OnInit {
     this.job = this.userStateService.createEmptyJob();
   }
 
-
   /**
    * Load the compute options (providers, toolboxes andf resources) from the
    * server. Some options are only loaded when a previous option selection has
    * been made, so we check for this and load more options if required.
    */
   ngOnInit() {
+    // Update compute services list for new job.
+    this._solutionsSub = this.userStateService.selectedSolutions.subscribe(solutions => {
+      this.userStateService.updateJob(
+        {
+          ...this.job,
+          jobSolutions: solutions.map(s => s['@id'])
+        }
+        );
+    });
+
     this._jobSub = this.userStateService.job.subscribe(job => {
       Object.assign(this.job, job || {});
-
-      // Update compute services list for new job.
-      this.vgl.getComputeServices(this.job.id).subscribe(
-        computeServices => {
-          this.computeProviders = computeServices;
-
-          // Load toolboxes if the user had already selected one
-          this.computeProviderChanged(this.job.computeServiceId);
-        }
-      );
+      this.updateComputeServices();
     });
   }
 
@@ -62,6 +63,35 @@ export class JobObjectComponent implements OnDestroy, OnInit {
     if (this._jobSub) {
       this._jobSub.unsubscribe();
     }
+
+    if (this._solutionsSub) {
+      this._solutionsSub.unsubscribe();
+    }
+  }
+
+  updateComputeServices() {
+    this.vgl.getComputeServices(this.job.jobSolutions, null).subscribe(
+      computeServices => {
+        this.computeProviders = computeServices;
+
+        if( (! this.computeProviders) || this.computeProviders.length === 0) {
+          this.job.computeVmId = null;
+          this.job.computeServiceId = null;
+        } else {
+          //
+          // Reset this.job.computeServiceId if it is no longer a valid option
+          //
+          if(! this.computeProviders.find(p => p.id === this.job.computeServiceId) ) {
+            this.job.computeVmId = null;
+            this.job.computeServiceId = this.computeProviders[0].id;
+          }
+
+        }
+
+        // Load toolboxes if the user had already selected one
+        this.computeProviderChanged();
+      }
+    );
   }
 
   /**
@@ -82,31 +112,39 @@ export class JobObjectComponent implements OnDestroy, OnInit {
    *
    * @param computeServiceId the new compute provider id.
    */
-  public computeProviderChanged(computeServiceId): void {
+  public computeProviderChanged(): void {
+    const computeServiceId: string = this.job.computeServiceId;
+
     if (computeServiceId && computeServiceId !== "") {
       // If we have a list of solutions use that, otherwise use the job id if
       // one has been assigned. If neither is available, don't load any
       // toolboxes yet.
-      const solutions = this.userStateService.getSolutionsCart().map(s => s['@id']);
-      this.vgl.getMachineImages(computeServiceId, solutions, this.job.id)
+      this.vgl.getMachineImages(computeServiceId, this.job.jobSolutions, null)
         .subscribe(images => {
           this.toolboxes = images;
 
           // Select the first image in the list by default, and update resources accordingly.
-          if (this.toolboxes.length > 0) {
+          if (this.toolboxes && this.toolboxes.length > 0) {
             // TODO: Check if existing job already has a toolbox selected
             let toolbox: MachineImage = this.toolboxes.find(it => it.imageId === this.job.computeVmId);
             if(toolbox === undefined) {
               toolbox = this.toolboxes[0];
               this.job.computeVmId = toolbox.imageId;
             }
-            this.toolboxChanged(toolbox.imageId);
+          } else {
+            this.job.computeVmId = null;
           }
+          this.toolboxChanged();
         });
         if( this.isHPCProvider(computeServiceId)) {
           this.useWalltime = true
         }
+    } else {
+      this.toolboxes = [];
+      this.job.computeVmId = null;
+      this.toolboxChanged();
     }
+
   }
 
   /**
@@ -114,8 +152,13 @@ export class JobObjectComponent implements OnDestroy, OnInit {
    *
    * @param event the toolbox select change event
    */
-  public toolboxChanged(imageId): void {
-    const toolbox = this.toolboxes.find(it => it.imageId === imageId);
+  public toolboxChanged(): void {
+    let toolbox = null;
+    const imageId = this.job.computeVmId
+
+    if(imageId) {
+      toolbox= this.toolboxes.find(it => it.imageId === imageId);
+    }
 
     if (toolbox) {
       // Set the computeVmRunCommand on the job to match the new toolbox.
@@ -131,6 +174,9 @@ export class JobObjectComponent implements OnDestroy, OnInit {
             });
         }
       }
+    } else {
+      this.resources = [];
+      this.job.computeVmRunCommand = null;
     }
   }
 

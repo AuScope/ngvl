@@ -412,13 +412,21 @@ export class VglService {
     return job;
   }
 
-  public getComputeServices(solutions: string[] = [], jobId?: number): Observable<ComputeService[]> {
+  public getComputeServicesForSolutions(solutions: string[] = []): Observable<ComputeService[]> {
     const params: {
-      solutions?: string[],
-      jobId?: number
+      solutions?: string[]
     } = {
       solutions: solutions
     };
+
+    return this.vglGet('secure/getComputeServicesForSolutions.do', params);
+  }
+
+  public getComputeServices(jobId?: number): Observable<ComputeService[]> {
+    const params: {
+      solutions?: string[],
+      jobId?: number
+    } = {};
     if (jobId != null) {
       params.jobId = jobId;
     }

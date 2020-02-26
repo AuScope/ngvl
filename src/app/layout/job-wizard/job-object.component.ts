@@ -70,7 +70,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   }
 
   updateComputeServices() {
-    this.vgl.getComputeServices(this.job.jobSolutions, null).subscribe(
+    this.vgl.getComputeServicesForSolutions(this.job.jobSolutions).subscribe(
       computeServices => {
         this.computeProviders = computeServices;
 

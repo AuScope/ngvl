@@ -35,7 +35,7 @@
                 </div>
                 <div class="col-lg-10">
                     <div class="input-group">
-                        <select #computeProvider style="width:100%;" [(ngModel)]="job.computeServiceId" (change)="computeProviderChanged(computeProvider.value)"
+                        <select #computeProvider style="width:100%;" [(ngModel)]="job.computeServiceId" (change)="computeProviderChanged()"
                             name="computeProvider" required>
                             <option *ngFor="let provider of computeProviders" [value]="provider.id">{{ provider.name }}</option>
                         </select>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="col-lg-10">
                     <div class="input-group">
-                        <select #toolbox style="width:100%;" [(ngModel)]="job.computeVmId" (change)="toolboxChanged(toolbox.value)" name="computeVmId"
+                        <select #toolbox style="width:100%;" [(ngModel)]="job.computeVmId" (change)="toolboxChanged()" name="computeVmId"
                             required>
                             <option *ngFor="let toolbox of toolboxes" [value]="toolbox.imageId">{{ toolbox.name }}</option>
                         </select>

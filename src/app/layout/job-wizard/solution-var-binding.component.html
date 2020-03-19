@@ -4,10 +4,10 @@
   <div [ngSwitch]="binding.controlType">
 
     <input *ngSwitchCase="'textbox'" [formControlName]="binding.key"
-      [id]="binding.key" [type]="binding.formType">
+      [id]="binding.key" [type]="inputBindingFormType(binding)">
 
     <select [id]="binding.key" *ngSwitchCase="'dropdown'" [formControlName]="binding.key">
-      <option *ngFor="let opt of binding.options" [value]="opt.key">{{opt.value}}</option>
+      <option *ngFor="let opt of getBindingOptions(binding)" [value]="opt.key">{{opt.value}}</option>
     </select>
 
   </div>

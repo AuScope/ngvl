@@ -609,7 +609,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     /**
      * Return true if a CSWRecordModel has child records.
-     * Currently the only indicator of GSKY records.
+     * Currently the only indicator of GSKY parent records.
      * 
      * @param cswRecord 
      */

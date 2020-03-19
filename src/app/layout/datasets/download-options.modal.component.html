@@ -35,7 +35,7 @@
                 <div class="col-lg-10">
                     <div class="input-group input-group-sm">
                         <select class="form-control form-control-sm" formControlName="format" (focus)="hasFocus()">
-                            <option *ngFor="let dt of dataTypes" [value]="dt.urn">{{dt.label}}</option>
+                            <option *ngFor="let dt of dataTypes" [ngValue]="dt.urn">{{dt.label}}</option>
                         </select>
                     </div>
                     <small>The data format to request from the remote service.</small>

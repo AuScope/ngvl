@@ -260,7 +260,8 @@ export class CSWSearchService {
                 let coverageUrl = or.url.substring(0, or.url.indexOf("?")) + "?service=WCS&version=1.0.0&request=GetCoverage";
                 downloadOptions.serviceUrl = coverageUrl;
                 downloadOptions.crs = "EPSG:4326";
-                downloadOptions.format = "GeoTIFF";
+                // TODO: Should really also get from GetCap
+                downloadOptions.format = "geotiff";
                 downloadOptions.styles = "tc";
                 break;
             case 'WFS':

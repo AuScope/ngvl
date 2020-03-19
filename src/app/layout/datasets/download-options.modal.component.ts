@@ -97,13 +97,23 @@ export class DownloadOptionsModalComponent implements OnInit {
                                 this.dataTypes.push({ label: 'CSV', urn: 'csv'});
                             break;
                             case "netcdf":
+                                this.dataTypes.push({ label: 'NetCDF', urn: 'netcdf'});
+                            break;
+                            case "geotiff":
+                                this.dataTypes.push({ label: 'GeoTIFF', urn: 'geotiff'});
+                            break;
+                            /* XXX Was the ERDDAP?
+                            case "netcdf":
                                 this.dataTypes.push({ label: 'NetCDF', urn: 'nc'});
                             break;
                             case "geotiff":
                                 this.dataTypes.push({ label: 'GeoTIFF', urn: 'geotif'});
                             break;
+                            */
                         }
                     }
+                    //this.downloadOptionsForm.controls.format.setValue(this.dataTypes[0].urn, {onlySelf: true});
+                    //this.downloadOptionsForm.controls.format.updateValueAndValidity();
                 }
             }, error => {
                 // TODO: Deal with error
@@ -111,8 +121,13 @@ export class DownloadOptionsModalComponent implements OnInit {
                 if(this.dataTypes.length == 0) {
                     this.dataTypes = [
                         { label: 'CSV', urn: 'csv' },
+                        { label: 'GeoTIFF', urn: 'geotiff' },
+                        { label: 'NetCDF', urn: 'netcdf' }
+                        /*
+                        { label: 'CSV', urn: 'csv' },
                         { label: 'GeoTIFF', urn: 'geotif' },
                         { label: 'NetCDF', urn: 'nc' }
+                        */
                     ];
                 }
                 this.downloadOptionsForm.controls.format.updateValueAndValidity();

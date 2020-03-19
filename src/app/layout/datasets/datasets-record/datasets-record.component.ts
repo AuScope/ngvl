@@ -65,7 +65,7 @@ export class DatasetsRecordComponent {
                     resource.url = resource.url.substring(0, resource.url.indexOf('?') + 1) + "service=WMS";
                 }
                 // WCS/NetCDF
-                else if((this.isGetCapabilitiesUrl(resource.url, 'wcs') || resource.type.toLowerCase() == 'ncss') && resource.protocolRequest != "") {
+                else if((this.isGetCapabilitiesUrl(resource.url, 'wcs') /*|| resource.type.toLowerCase() == 'ncss'*/) && resource.protocolRequest != "") {
                     resource.name = resource.protocolRequest;
                 }
                 // TODO: WFS?
@@ -347,12 +347,5 @@ export class DatasetsRecordComponent {
         this.layerOpacity = e.value;
         this.olMapService.setLayerOpacity(this.cswRecord.id, e.value/100);
     }
-
-    /*
-    changeTime() {
-        console.log("Test change time...");
-        this.olMapService.setLayerSourceParam('unique-id-blend_sentinel2_landsat_nbart_daily_false_colour', 'TIME', '1991-03-20T00:00:00.000Z');
-    }
-    */
 
 }

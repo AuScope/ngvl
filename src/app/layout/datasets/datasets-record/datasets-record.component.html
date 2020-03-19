@@ -15,12 +15,12 @@
                 (click)="addCSWRecord(cswRecord)">
                 <i class="fa fa-plus-circle" style="color:green;"></i>
             </button>
-            <!-- Loading child layers (GSKY) -->
+            <!-- Loading child layers (GSKY parent) -->
             <button *ngIf="areLayersLoading(cswRecord.id)"
                 class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Loading layers...">
                 <i class="fa fa-spinner fa-spin"></i>
             </button>
-            <!-- Child layers (GSKY) are being displayed, button will collapse children -->
+            <!-- Child layers (GSKY children) are being displayed, button will collapse children -->
             <button *ngIf="hasChildRecords(cswRecord)"
                 class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Collapse layers"
                 (click)="removeChildRecords(cswRecord)">

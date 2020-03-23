@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatasetsRoutingModule } from './datasets-routing.module';
 import { DatasetsComponent } from './datasets.component';
+import { DatasetsDisplayComponent } from './datasets-display.component';
 import { PageHeaderModule } from '../../shared';
 import { OlMapModule } from './openlayermap/olmap.module';
 import { ConfirmDatasetsModalComponent } from './confirm-datasets.modal.component';
@@ -41,7 +42,7 @@ import { DatasetsRecordModule } from './datasets-record/datasets-record.module';
     NgbTabsetModule.forRoot()
   ],
   providers: [NgbActiveModal],
-  declarations: [ DatasetsComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ],
+  declarations: [ DatasetsComponent, DatasetsDisplayComponent, ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ],
   entryComponents: [ ConfirmDatasetsModalComponent, DownloadOptionsModalComponent, RemoteDatasetsModalComponent ]
 })
 export class DatasetsModule { }

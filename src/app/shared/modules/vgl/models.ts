@@ -306,13 +306,8 @@ export interface DownloadOptions {
     serviceUrl?: string;
     srsName?: string;
     featureType?: string;
-
     outputWidth?: number;
     outputHeight?: number;
-    //outputResolutionX: number;
-    //outputResolutionY: number;
-    styles?: string;
-
     id?: number;
     bookmarkId?: number;
     bookmarkOptionName?: string;

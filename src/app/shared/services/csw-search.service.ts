@@ -236,13 +236,9 @@ export class CSWSearchService {
             serviceUrl: undefined,
             srsName: undefined,
             featureType: undefined,
-
             // WCS
             outputWidth: undefined,
-            outputHeight: undefined,
-            //outputResolutionX: undefined,
-            //outputResolutionY: undefined,
-            styles: undefined
+            outputHeight: undefined
         };
 
         // Add/subtract info based on resource type
@@ -256,13 +252,12 @@ export class CSWSearchService {
                 downloadOptions.coverageName = or.name;
                 downloadOptions.outputWidth = 256;
                 downloadOptions.outputHeight = 256;
-                // TODO: Unhack (get from GetCap)
+                // TODO: Get from GetCap
                 let coverageUrl = or.url.substring(0, or.url.indexOf("?")) + "?service=WCS&version=1.0.0&request=GetCoverage";
                 downloadOptions.serviceUrl = coverageUrl;
                 downloadOptions.crs = "EPSG:4326";
-                // TODO: Should really also get from GetCap
+                // TODO: Also get from GetCap
                 downloadOptions.format = "geotiff";
-                downloadOptions.styles = "tc";
                 break;
             case 'WFS':
                 delete downloadOptions.url;

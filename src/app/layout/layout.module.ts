@@ -26,7 +26,7 @@ import { AngularSplitModule } from 'angular-split';
     FormsModule,
     LayoutRoutingModule,
     TranslateModule,
-    NgbModule.forRoot(),
+    NgbModule,
     AngularSplitModule.forRoot(),
     SolutionsModule,
     DatasetsModule,

@@ -5,9 +5,16 @@
             line-height: 1.5;
             border: 0px; 
         }
-        .card-header a {
+        .btn-link {
             color: #fff;
             background-color: #007bff;
+
+            font-size: 0.875rem;
+            line-height: 1.5;
+
+            height: 30px;
+            margin-top: -3px;
+
             text-decoration: none;
         }
         .card-header {
@@ -15,8 +22,12 @@
             background-color: #007bff;
             padding: 0.25rem 0.5rem;
             border-radius: 0.2rem;
+            /*
             padding-top: 4.5px;
             padding-bottom: 4.5px;
+            */
+            display: contents;
+            height: 30px;
         }
         .card-body {
             padding-top: 2px;

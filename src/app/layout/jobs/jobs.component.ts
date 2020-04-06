@@ -16,7 +16,7 @@ import { LogPreviewComponent } from './preview/log-preview.component';
 import { DataServicePreviewComponent } from './preview/data-service-preview.component';
 import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import Proj from 'ol/proj';
+import * as Proj from 'ol/proj';
 import { featureCollection, polygon } from '@turf/helpers';
 
 

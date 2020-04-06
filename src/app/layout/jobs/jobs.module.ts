@@ -31,7 +31,7 @@ import { JobStatusModalComponent} from './job-status.modal.component';
 import { CopyJobInputsModalComponent } from './copy-job-inputs.modal.component';
 import { AngularSplitModule } from 'angular-split';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
     imports: [
@@ -46,8 +46,8 @@ import { MessageService } from 'primeng/components/common/messageservice';
         TableModule,
         TreeTableModule,
         OlMapModule,
-        NgbDropdownModule.forRoot(),
-        NgbCollapseModule.forRoot(),
+        NgbDropdownModule,
+        NgbCollapseModule,
         MonacoEditorModule.forRoot(),
         PdfJsViewerModule,
         ToastModule

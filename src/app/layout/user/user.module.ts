@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { PageHeaderModule } from '../../shared';
 import { UserManagementComponent } from './user-management.component';
 import { UserRoutingModule } from './user-routing.module';
-import { NgbTabsetModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
 
 
 @NgModule({
@@ -15,7 +15,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
     FormsModule,
     PageHeaderModule,
     UserRoutingModule,
-    NgbTabsetModule.forRoot(),
+    NgbNavModule,
     ToastModule
   ],
   declarations: [ UserManagementComponent ],

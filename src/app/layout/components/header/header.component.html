@@ -100,24 +100,24 @@
                 </div>
             </li>
             -->
-            <li class="nav-item dropdown" ngbDropdown>
-                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+
+            <div class="d-inline-block userDropdown" ngbDropdown #userDrop="ngbDropdown">
+                <button class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="userDrop.open()">
                     <i class="fa fa-user"></i> {{ username$ | async }} <b class="caret"></b>
-                </a>
-                <div *ngIf="isLoggedIn" class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" routerLink="/user" routerLinkActive="active">
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" routerLink="/user" routerLinkActive="active">
                         <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
-                    </a>
-                    <button class="dropdown-item" (click)="onLogOut()">
+                    </button>
+                    <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" (click)="onLogOut()">
                         <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
                     </button>
+                    <button ngbDropdownItem class="userDropdownItem" *ngIf="!isLoggedIn" (click)="onLogIn()">
+                        <i class="fa fa-fw fa-power-on"></i> {{ 'Log In' | translate }}
+                    </button>
                 </div>
-                <div *ngIf="!isLoggedIn" class="dropdown-menu dropdown-menu-right">
-                  <button class="dropdown-item" (click)="onLogIn()">
-                    <i class="fa fa-fw fa-power-on"></i> {{ 'Log In' | translate }}
-                  </button>
-                </div>
-            </li>
+            </div>
+
         </ul>
     </div>
 </nav>

@@ -18,7 +18,7 @@
         <div class="form-group row" *ngIf="record.name && record.name!=''">
             <label for="csw-name" class="col-3 col-form-label">Title</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.name }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.name }}">{{ record.name }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="record.description && record.description!=''">
@@ -30,13 +30,13 @@
         <div class="form-group row" *ngIf="record.name && record.name!=''">
             <label for="csw-name" class="col-3 col-form-label">Keywords</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.descriptiveKeywords.join(", ") }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.descriptiveKeywords.join(', ') }}">{{ record.descriptiveKeywords.join(", ") }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="record.contactOrg && record.contactOrg!=''">
             <label for="csw-name" class="col-3 col-form-label">Contact Org</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.contactOrg }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.contactOrg }}">{{ record.contactOrg }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="(record.constraints && record.constraints!='') && (record.useLimitConstraints && record.useLimitConstraints=='')" >
@@ -55,7 +55,7 @@
                 <div class="col-9">
                     <label id="csw-name" class="form-control">
                             <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
-                                    <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
+                                <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
                             </div>                         
                     </label>              
                 </div>

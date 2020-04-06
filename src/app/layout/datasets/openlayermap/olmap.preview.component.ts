@@ -7,15 +7,15 @@ import { point, Geoms, polygon } from '@turf/helpers';
 import * as inside from '@turf/inside';
 import * as bbox from '@turf/bbox';
 
-import View from 'ol/view';
-import Stroke from 'ol/style/stroke';
-import Fill from 'ol/style/fill';
-import Style from 'ol/style/style';
-import GeoJSON from 'ol/format/geojson';
-import SourceVector from 'ol/source/vector';
-import LayerVector from 'ol/layer/vector';
-import LayerGroup from 'ol/layer/group';
-import Extent from 'ol/extent';
+import View from 'ol/View';
+import Stroke from 'ol/style/Stroke';
+import Fill from 'ol/style/Fill';
+import Style from 'ol/style/Style';
+import GeoJSON from 'ol/format/GeoJSON';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import GroupLayer from 'ol/layer/Group';
+import * as Extent from 'ol/extent';
 
 import { MapBrowserEvent } from 'openlayers';
 
@@ -35,7 +35,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     BBOX_HIGH_STROKE_COLOUR = '#ff33cc';
     BBOX_LOW_FILL_COLOUR = 'rgba(128,128,128,0.25)';
     BBOX_HIGH_FILL_COLOUR = 'rgba(255,179,236,0.4)';
-    layerVectorArr: { [key: string]: LayerVector } = {};
+    layerVectorArr: { [key: string]: VectorLayer } = {};
 
 
     constructor(private olMapService: OlMapService, @Inject('env') private env) {
@@ -101,10 +101,10 @@ export class OlMapPreviewComponent implements AfterViewInit {
                     color: this.BBOX_LOW_FILL_COLOUR
                 })
             });
-            const source = new SourceVector({
+            const source = new VectorSource({
                 features: (new GeoJSON()).readFeatures(bboxGeojsonObj[key])
             });
-            const layerVector = new LayerVector({
+            const layerVector = new VectorLayer({
                 source: source,
                 style: [rectStyle]
             });
@@ -169,13 +169,13 @@ export class OlMapPreviewComponent implements AfterViewInit {
         let extent = Extent.createEmpty();
         let map = this.olMapObject.getMap();
         map.getLayers().forEach(function (layer) {
-            if (layer instanceof LayerGroup) {
+            if (layer instanceof GroupLayer) {
                 layer.getLayers().forEach(function(groupLayer) {
-                    if (layer instanceof LayerVector) {
+                    if (layer instanceof VectorLayer) {
                         Extent.extend(extent, groupLayer.getExtent());
                     }
                 });
-            } else if (layer instanceof LayerVector) {
+            } else if (layer instanceof VectorLayer) {
                 Extent.extend(extent, layer.getSource().getExtent());
             }
         });

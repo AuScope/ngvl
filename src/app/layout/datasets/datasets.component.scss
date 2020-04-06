@@ -14,6 +14,11 @@
             cursor: pointer;
             background: #eee;
         }
+        /* Get rid of borders and grey background from checkboxes */
+        .input-group-text {
+            border: none;
+            background: none;
+        }
     }
 }
 

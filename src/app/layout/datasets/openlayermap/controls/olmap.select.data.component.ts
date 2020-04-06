@@ -7,8 +7,8 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { CSWSearchService } from '../../../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
-import Proj from 'ol/proj';
-import LayerVector from 'ol/layer/vector';
+import * as Proj from 'ol/proj';
+import VectorLayer from 'ol/layer/Vector';
 
 
 @Component({
@@ -122,7 +122,7 @@ export class OlMapDataSelectComponent {
      */
     public selectDataClick() {
         this.buttonText = 'Click on Map';
-        this.olMapService.drawBound().subscribe((vector: LayerVector) => {
+        this.olMapService.drawBound().subscribe((vector: VectorLayer) => {
             // Check for intersections with active layer CSW record extents
             let extent = vector.getSource().getExtent();
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);

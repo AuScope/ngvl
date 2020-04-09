@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 
 @Component({
     selector: 'app-layout',
@@ -14,21 +14,31 @@ export class LayoutComponent implements OnInit {
     constructor() { }
 
 
-    ngOnInit() { }
-
+    ngOnInit() {
+        if(window.innerWidth <= 992) {
+            this.isSidebarExpanded = false;
+        }
+    }
 
     /**
      * Set the style for the main container depending on whether the sidebar is
      * expanded
      */
     public setMainContainerStyle(): any {
+        let marginLeft = '0px';
+        if(window.innerWidth > 992) {
+            if(this.isSidebarExpanded) {
+                marginLeft = '200px';
+            } else {
+                marginLeft = '60px';
+            }
+        }
         let styles = {
-            'margin-left': this.isSidebarExpanded ? '280px' : '60px',
+            'margin-left': marginLeft,
             'margin-right': '12px'
         };
         return styles;
     }
-
 
     /**
      * Catch the sidebar expansion/contraction event fired in the sidebar
@@ -37,7 +47,20 @@ export class LayoutComponent implements OnInit {
      * @param event will be true or false depending on whether the sidebar is
      * expanded (true) or contracted (false)
      */
-    public setSidebarExpanded(event) {
+    public sidebarExpanded(event) {
         this.isSidebarExpanded = event;
+    }
+
+    /**
+     * Catch the inner width changing so we can programtically detect when the
+     * screen changes to media (<= 992)
+     * 
+     * @param event 
+     */
+    @HostListener('window:resize', ['$event'])
+    onResize(event) {
+        if(window.innerWidth <= 992) {
+            this.sidebarExpanded(false);
+        }
     }
 }

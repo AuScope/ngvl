@@ -74,7 +74,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
                     this.boundaryService.findFeatures(queryField, layer.name, layer.nameAttribute)
                         .subscribe(features => {
                             this.searchResults = [];
-                            console.log('found ' + features.length + ' matching features');
                             for (let i = 0; i < features.length; i++) {
                                 const properties = features[i].getProperties();
                                 this.searchResults.push({ 'id': features[i].getId(), 'name': properties[layer.nameAttribute] });
@@ -88,9 +87,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
 
 
     ngAfterViewInit() {
-
         const map = this.olMapObject.getMap();
-
         this.boundaryLayerSource = new ImageWMS({
             ratio: 1,
             url: environment.boundariesUrl + '/wms',
@@ -169,9 +166,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public handleClick(p: [number, number]) {
-
-        console.log("handleClick(" + p + ")");
-
         // Convert pixel coords to map coords
         const map = this.olMapObject.getMap();
         const clickCoord = map.getCoordinateFromPixel(p);
@@ -181,7 +175,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         const view = map.getView();
         const viewResolution = view.getResolution();
         const source = this.boundaryLayerSource;
-        console.log("got click event, coords = " + clickCoord);
         const url = source.getGetFeatureInfoUrl(clickCoord, viewResolution, view.getProjection(), { 'INFO_FORMAT': 'application/json' });
         this.boundaryService.getFeatures(url).subscribe(features => {
             // highlight it on the map and show info popup
@@ -214,11 +207,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public selectData(): boolean {
-
-        console.log("selctData()");
-
         let extent = this.highlightLayer.getSource().getExtent();
-        console.log("selecting data for " + this.highlightLayer.getSource().getExtent());
 
         // close popup
         this.overlay.setPosition(undefined);
@@ -266,7 +255,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < event.srcElement.options.length; i++) {
             if (event.srcElement.options[i].selected) {
                 const selectedOption = event.srcElement.options[i].value;
-                console.log('selected option: ' + selectedOption);
                 if (selectedOption === 'NONE') {
                     map.removeLayer(this.boundaryLayer);
                     this.boundaryLayer.setVisible(false);
@@ -293,7 +281,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public onClick(event): void {
-        console.log('selected region: ' + event.srcElement.id);
         this.boundaryService.getFeaturesById(event.srcElement.id, this.boundaryLayer.get('name')).subscribe(features => {
             // highlight it on the map and show info popup
             this.clearSearchResults();

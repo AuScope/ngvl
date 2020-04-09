@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
 import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
-import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry, DescribeCoverage } from './models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 
 import { environment } from '../../../../environments/environment';
@@ -102,7 +102,6 @@ export class VglService {
     }
 
     public setJobFolder(jobId: number[], seriesId: number): Observable<any> {
-
         const options = {
             params: {
                 jobIds: jobId.join(','),
@@ -299,12 +298,20 @@ export class VglService {
     const descriptions: string[] = [];
     const urls: string[] = [];
     const localPaths: string[] = [];
+    const northBoundLatitudes: number[] = [];
+    const eastBoundLongitudes: number[] = [];
+    const southBoundLatitudes: number[] = [];
+    const westBoundLongitudes: number[] = [];
 
     for (const download of downloads) {
       names.push(download.name);
       descriptions.push(download.description);
       urls.push(download.url);
       localPaths.push(download.localPath);
+      northBoundLatitudes.push(download.northBoundLatitude);
+      eastBoundLongitudes.push(download.eastBoundLongitude);
+      southBoundLatitudes.push(download.southBoundLatitude);
+      westBoundLongitudes.push(download.westBoundLongitude);
     }
 
     const params = {
@@ -313,7 +320,11 @@ export class VglService {
       name: names,
       description: descriptions,
       url: urls,
-      localPath: localPaths
+      localPath: localPaths,
+      northBoundLatitude: northBoundLatitudes,
+      eastBoundLongitude: eastBoundLongitudes,
+      southBoundLatitude: southBoundLatitudes,
+      westBoundLongitude: westBoundLongitudes
     };
 
     // Use a POST request since the download descriptions could get very large.
@@ -520,6 +531,13 @@ export class VglService {
         return this.vglRequest('makeWfsUrl.do', options);
     }
 
+    public makeWcsUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
+      const options = {
+        params: dlOptions
+      };
+      return this.vglRequest('makeWcsUrl.do', options);
+    }
+
     public makeNetcdfsubseserviceUrl(dlOptions: DownloadOptions): Observable<JobDownload> {
         const options = {
             params: dlOptions
@@ -669,5 +687,31 @@ export class VglService {
         description: description
       };
     });
+  }
+
+  // GSKY methods
+  public getCustomLayerRecords(serviceUrl: string): Observable<any> {
+    const params = { serviceUrl: serviceUrl };
+    return this.vglGet<CSWRecordModel[]>('getCustomLayers.do', params);
+  }
+
+  public getCustomCoverageOfferingBriefRecords(serviceUrl: string): Observable<any> {
+    const params = { serviceUrl: serviceUrl };
+    return this.vglGet<CSWRecordModel[]>('getCoverageOfferingBriefs.do', params);
+  }
+
+  public describeCoverage(serviceUrl: string, coverageName: string): Observable<any> {
+    const params = {
+      serviceUrl: serviceUrl,
+      coverageName: coverageName
+    };
+    return this.vglGet<DescribeCoverage[]>('describeCoverage.do', params);
+  }
+
+  public getWcsCapabilities(serviceUrl: string): Observable<any> {
+    const params = {
+      serviceUrl: serviceUrl
+    };
+    return this.vglGet<DescribeCoverage>('getWCSCapabilities.do', params);
   }
 }

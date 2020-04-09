@@ -25,14 +25,21 @@ export class SidebarComponent implements OnInit {
     constructor(private userStateService: UserStateService, private olMapService: OlMapService) {
     }
 
+    ngOnInit(): void {
+        // Listen for the current user view, and display the appropriate
+        // view-specific components.
+        this.userStateService.currentView
+            .subscribe(viewType => this.showComponentForView(viewType));
+    }
+
     /**
      * Set the sidebar style based on whether it is expanded or not
      */
     public setSidebarStyle(): any {
         let styles = {
-            'left': this.isSidebarExpanded ? '280px' : '60px',
-            'width': this.isSidebarExpanded ? '280px' : '60px',
-            'margin-left': this.isSidebarExpanded ? '-280px' : '-60px'
+            'left': this.isSidebarExpanded ? '200px' : '60px',
+            'width': this.isSidebarExpanded ? '200px' : '60px',
+            'margin-left': this.isSidebarExpanded ? '-200px' : '-60px'
         };
         return styles;
     }
@@ -48,13 +55,6 @@ export class SidebarComponent implements OnInit {
         setTimeout(() => {
             this.olMapService.updateSize();
         });
-    }
-
-    ngOnInit(): void {
-        // Listen for the current user view, and display the appropriate
-        // view-specific components.
-        this.userStateService.currentView
-            .subscribe(viewType => this.showComponentForView(viewType));
     }
 
     showComponentForView(viewType: ViewType) {
@@ -75,6 +75,10 @@ export class SidebarComponent implements OnInit {
         } else {
             this.showMenu = element;
         }
+    }
+
+    isMediaScreen(): boolean {
+        return window.innerWidth <= 992;
     }
 
 }

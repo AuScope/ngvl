@@ -12,6 +12,7 @@ import { NgbAccordionModule, NgbDropdownModule, NgbCollapseModule } from '@ng-bo
 import { OlMapBasemapComponent } from './controls/ol-map-basemap.component';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SliderModule } from 'primeng/slider';
+import { DatasetsRecordModule } from '../datasets-record/datasets-record.module';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { SliderModule } from 'primeng/slider';
     ReactiveFormsModule,
     FormsModule,
     RadioButtonModule,
-    SliderModule
+    SliderModule,
+    DatasetsRecordModule
   ],
   declarations: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],
   bootstrap: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],

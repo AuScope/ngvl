@@ -1,5 +1,3 @@
-<!-- TODO: Styles to CSS -->
-<!-- TODO: Translations -->
 <div class="modal-header" style="background: #EEE">
     <h5 class="modal-title">Confirm which datasets you wish to select</h5>
     <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
@@ -35,7 +33,7 @@
                     <button class="btn btn-sm btn-primary" *ngIf="rowData.leaf" (click)="downloadDataset(rowData.onlineResource, rowData.downloadOptions)">
                         <i class="fa fa-download" title="Download this data to your local machine"></i>
                     </button>
-                    <button class="btn btn-sm btn-primary" style="margin-left:4px;" *ngIf="rowData.leaf" (click)="editDownload($event, rowData, rowData.onlineResource, rowData.cswRecord,rowData.defaultOptions,rowData.downloadOptions)" title="Edit the download options">
+                    <button class="btn btn-sm btn-primary" style="margin-left:4px;" *ngIf="rowData.leaf" (click)="editDownload($event, rowData, rowData.onlineResource, rowData.cswRecord, rowData.defaultOptions, rowData.downloadOptions)" title="Edit the download options">
                         <i class="fa fa-edit"></i>
                     </button>
                 </td>

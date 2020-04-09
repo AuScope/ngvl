@@ -67,6 +67,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
         const map = this.olMapObject.getMap();
         map.setTarget(this.mapElement.nativeElement);
 
+        /*
         // Remove controls
         const contrColl = map.getControls();
         for (let i = 0; i < contrColl.getLength(); i++) {
@@ -78,6 +79,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
             const action = actionColl.item(i);
             action.setActive(false);
         }
+        */
     }
 
     /**

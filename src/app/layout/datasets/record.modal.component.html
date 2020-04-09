@@ -83,13 +83,15 @@
                         <div *ngFor="let resource of getOnlineResourcesByType(record, resourceType)" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
                             <div *ngIf="onlineResources[resourceType].expanded" class="container" style="margin: 2px;">
                                 <div class="row">
-                                    <strong class="text-truncate">{{ resource.name }}</strong>&nbsp;
+                                    <strong class="text-truncate">{{ resource.name }}</strong>
                                 </div>
                                 <div class="row">
                                     <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
-                                    <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
-                                        <i class="fa fa-plus-circle" style="color:green;"></i>
-                                    </button>
+                                    <div>
+                                        <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
+                                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <!-- TODO: WCS Describe Coverage, link to XML -->
                                 <!-- TODO: WMS layer preview -->

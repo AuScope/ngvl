@@ -12,6 +12,10 @@ split-area {
     overflow-y: hidden !important;
 }
 
+as-split-area {
+    overflow-y: hidden !important;
+}
+
 ::ng-deep {
     /* File input preview panel shouldn't have any y-overflow */
     split-area#preview-panel {

@@ -1,6 +1,6 @@
 .main-container {
     margin-top: 56px;
-    margin-left: 280px;
+    margin-left: 200px;
     padding: 15px;
     padding-bottom: 0px;
     padding-right: 0px;
@@ -12,7 +12,6 @@
 }
 @media screen and (max-width: 992px) {
     .main-container {
-        // Todo: this plays havoc with Sidebar on small screens
         margin-left: 0px !important;
     }
 }

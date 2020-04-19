@@ -7701,7 +7701,7 @@ pkg-up@^2.0.0:
 
 "portal-core-ui@github:AuScope/portal-core-ui#Angular-9-Upgrade":
   version "0.0.1"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/09de99f2a223d5c3f4de093238c948160f33dfaf"
+  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/cd691c920e6c3e78e02829485c56a58e7f61b1b5"
 
 portfinder@^1.0.25:
   version "1.0.25"

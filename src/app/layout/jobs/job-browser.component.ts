@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, Renderer, ViewChild } from "@angular/core";
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { TreeJobNode, TreeJobs, Job } from "../../shared/modules/vgl/models";
@@ -7,7 +7,7 @@ import { JobStatusModalComponent } from "./job-status.modal.component";
 import { ConfirmationService, TreeNode, SortEvent } from "primeng/api";
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
 import { TreeTable } from "primeng/treetable";
 
 
@@ -70,7 +70,6 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
     constructor(private jobsService: JobsService,
         private confirmationService: ConfirmationService,
         private modalService: NgbModal,
-        public renderer: Renderer,
         private messageService: MessageService,
         private router: Router) { }
 

@@ -1,4 +1,5 @@
 import { environment } from '../environments/environment';
+import { config } from '../environments/config';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
@@ -28,7 +29,7 @@ export function createTranslateLoader(http: HttpClient) {
 
 @NgModule({
   imports: [
-    PortalCoreModule.forRoot(environment),
+    PortalCoreModule.forRoot(environment, config),
     AngularSplitModule.forRoot(),
     CommonModule,
     BrowserModule,

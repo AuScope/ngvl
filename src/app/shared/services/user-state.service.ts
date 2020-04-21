@@ -605,7 +605,7 @@ export class UserStateService {
       b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
 
     } else if (v.type === "string") {
-      b = options.options ? new OptionsBinding<number>(options) : new StringEntryBinding(options);
+      b = options.options ? new OptionsBinding<string>(options) : new StringEntryBinding(options);
 
     } else if (v.type === "boolean") {
       b = new BooleanBinding(options);

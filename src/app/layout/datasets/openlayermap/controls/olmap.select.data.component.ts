@@ -7,8 +7,8 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { CSWSearchService } from '../../../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
-import Proj from 'ol/proj';
-import LayerVector from 'ol/layer/vector';
+import * as Proj from 'ol/proj';
+import VectorLayer from 'ol/layer/Vector';
 
 
 @Component({
@@ -28,8 +28,6 @@ export class OlMapDataSelectComponent {
         private modalService: NgbModal) {
         OlMapDataSelectComponent.cswSearchService = this.cswSearchService1;
     }
-
-
 
     /**
      * Builds TreeTable from supplied CSWRecords for display in the confirm
@@ -98,8 +96,8 @@ export class OlMapDataSelectComponent {
                             break;
                         }
                     } else {
-                        // TODO: REMOVE, but may want to report if no valid resource at all
-                        console.log("No " + resourceType + " resources found for record ");
+                        // TODO: Report if no valid resource at all
+                        //console.log("No " + resourceType + " resources found for record ");
                     }
                 }
             }
@@ -115,14 +113,12 @@ export class OlMapDataSelectComponent {
         return cswRecordTreeNodes;
     }
 
-
-
     /**
      * toggle on zoom to zoom into bbox
      */
     public selectDataClick() {
         this.buttonText = 'Click on Map';
-        this.olMapService.drawBound().subscribe((vector: LayerVector) => {
+        this.olMapService.drawBound().subscribe((vector: VectorLayer) => {
             // Check for intersections with active layer CSW record extents
             let extent = vector.getSource().getExtent();
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);
@@ -139,7 +135,6 @@ export class OlMapDataSelectComponent {
         });
     }
 
-
     /**
      * Return a count of the active layers on the map
      *
@@ -148,7 +143,5 @@ export class OlMapDataSelectComponent {
     public getActiveLayerCount(): number {
         return Object.keys(this.olMapService.getLayerModelList()).length;
     }
-
-
 
 }

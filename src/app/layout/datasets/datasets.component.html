@@ -5,9 +5,10 @@
             <as-split-area size="30" class="split-area-search">
                 <!-- Datasets -->
                 <div class="card">
-                    <ngb-tabset>
-                        <ngb-tab class="card-header" title="Datasets">
-                            <ng-template ngbTabContent>
+                    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+                        <li ngbNavItem>
+                            <a ngbNavLink>Datasets</a>
+                            <ng-template ngbNavContent>
                                 <div class="card-body">
                                     <!-- Any text search -->
                                     <div class="row">
@@ -22,7 +23,7 @@
                                                     <input type="text" data-toggle="tooltip" title="Apply text filter" class="form-control" placeholder="e.g. Geophysics" name="search"
                                                         [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">
                                                     <div class="input-group-btn input-group-apppend">
-                                                        <button class="btn btn-primary" type="button" (click)="resetFacetedSearch()">
+                                                        <button class="btn btn-primary btn-sm" type="button" (click)="resetFacetedSearch()">
                                                             <i class="fa fa-search"></i>
                                                         </button>
                                                     </div>
@@ -42,10 +43,10 @@
                                                 <div class="input-group input-group-sm">
                                                     <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
                                                     <div class="input-group-btn input-group-apppend">
-                                                        <button class="btn btn-primary" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
+                                                        <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
                                                             <i class="fa fa-eye"></i>
                                                         </button>
-                                                        <button class="btn btn-primary" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
+                                                        <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
                                                             <i class="fa fa-edit"></i>
                                                         </button>
                                                     </div>
@@ -68,11 +69,11 @@
                                                         <input #keyword type="text" class="form-control" [ngbTypeahead]="searchKeywords" [ngModel]="selectedKeywords[i]" (click)="click$.next($event.target.value)"
                                                             #instance="ngbTypeahead" (selectItem)="keywordSelected(i, $event)"/>
                                                         <div class="input-group-btn input-group-apppend">
-                                                            <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary"
+                                                            <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary btn-sm"
                                                                 type="button" (click)="addNewKeyword()" style="background-color:green;">
                                                                 <i class="fa fa-plus-circle"></i>
                                                             </button>
-                                                            <button *ngIf="selectedKeywords[i]!=''" class="btn btn-secondary" type="button" (click)="removeKeyword(i)" style="background-color:red;">
+                                                            <button *ngIf="selectedKeywords[i]!=''" class="btn btn-secondary btn-sm" type="button" (click)="removeKeyword(i)" style="background-color:red;">
                                                                 <i class="fa fa-minus-circle"></i>
                                                             </button>
                                                         </div>
@@ -199,72 +200,89 @@
                                             </div>
                                             <div [ngbCollapse]="searchResultsIsCollapsed" style="position:relative;border-style:solid;border-color:#eee">
                                                 <div class="container-fluid">
-                                                    <ngb-tabset type="pills">
-                                                        <div *ngFor="let registry of availableRegistries | keyvalue">
-                                                            <div *ngIf="registry.value.checked">
-                                                                <!--<ngb-tab [title]="getRegistryTabTitle(registry.key)">-->
-                                                                <ngb-tab>
-                                                                    <ng-template ngbTabTitle>
-                                                                        <div class="tab-text">{{ getRegistryTabTitle(registry.key) }}</div>
-                                                                    </ng-template>
-                                                                        <ng-template ngbTabContent>
-                                                                            <div *ngIf="!registry.value.searching && !cswSearchResults.get(registry.key)">
-                                                                                <div class="row">
-                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;">
-                                                                                        <label>There was a problem retrieving records from this registry</label>
+                                                    <ul ngbNav #nav="ngbNav" class="nav-pills">
+                                                        <li ngbNavItem *ngFor="let registry of availableRegistries | keyvalue">
+                                                            <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError==null">{{ getRegistryTabTitle(registry.key) }}</a>
+                                                            <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError!=null" title="{{ registry.value.searchError }}">{{ getRegistryTabTitle(registry.key) }}<i class="fa fa-exclamation-triangle" style="margin-left:10px;color:red;"></i></a>
+                                                            <ng-template ngbNavContent *ngIf="registry.value.checked">
+                                                                <!-- No results -->
+                                                                <div *ngIf="!registry.value.searching && registry.value.searchError==null && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
+                                                                    <div class="row" style="padding:10px">
+                                                                        <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;background:#EBF5FB;">
+                                                                            <label>The current filter(s) returned no results for this registry</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Server error -->
+                                                                <div *ngIf="!registry.value.searching && registry.value.searchError!==null">
+                                                                    <div class="row" style="padding:10px;">
+                                                                        <div class="col" style="padding:10px;border:solid 1px black;border-radius:8px;word-break:break-all;background:#EBF5FB;">
+                                                                            <label>This registry reported a problem:<br><br>{{ registry.value.searchError }}</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- CSWRecord results successfully returned-->
+                                                                <div *ngIf="cswSearchResults.get(registry.key)">
+                                                                    <div class="row">
+                                                                        <div class="col" style="padding: 0px;">
+                                                                            <li *ngFor="let cswRecord of cswSearchResults.get(registry.key)">
+                                                                                <app-datasets-record [validUser]="isValidUser()" [cswRecord]="cswRecord" 
+                                                                                    (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="false"></app-datasets-record>
+                                                                                <div *ngIf="hasChildRecords(cswRecord)">
+                                                                                    <div *ngFor="let layer of cswRecord.childRecords">
+                                                                                            <app-datasets-record [validUser]="isValidUser()" [cswRecord]="layer" 
+                                                                                            (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="true"></app-datasets-record>
                                                                                     </div>
                                                                                 </div>
-                                                                            </div>
-                                                                            <!-- TODO: This never appears -->
-                                                                            <div *ngIf="!registry.value.searching && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
-                                                                                <div class="row">
-                                                                                    <div class="col" style="border:1px solid #ccc;padding: 10px;">
-                                                                                        <label>No records match the current filter(s)</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div *ngIf="cswSearchResults.get(registry.key)">
-                                                                                <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="cswSearchResults.get(registry.key)" [registries]="availableRegistries" [bookMarkList]="bookMarks"
-                                                                                    (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
-                                                                                <div class="row" *ngIf="!registry.value.searching" style="bottom:0;right:0px;">
-                                                                                    <div class="col">
-                                                                                        <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
-                                                                                            (click)="nextResultsPage(registry.key)">
-                                                                                            <i class="fa fa-arrow-circle-right"></i>
-                                                                                        </button>
-                                                                                        <button [disabled]="registry.value.currentPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
-                                                                                            title="Previous page" (click)="previousResultsPage(registry.key)">
-                                                                                            <i class="fa fa-arrow-circle-left"></i>
-                                                                                        </button>
-                                                                                        <label class="pull-right">Page {{ registry.value.currentPage }}&nbsp;</label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </ng-template>      
-                                                                </ngb-tab>
-                                                            </div>
-                                                        </div>
-                                                    </ngb-tabset>
+                                                                            </li>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row" *ngIf="!registry.value.searching" style="bottom:0;right:0px;">
+                                                                        <div class="col">
+                                                                            <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
+                                                                                (click)="nextResultsPage(registry.key)">
+                                                                                <i class="fa fa-arrow-circle-right"></i>
+                                                                            </button>
+                                                                            <button [disabled]="registry.value.currentPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
+                                                                                title="Previous page" (click)="previousResultsPage(registry.key)">
+                                                                                <i class="fa fa-arrow-circle-left"></i>
+                                                                            </button>
+                                                                            <label class="pull-right" style="margin-top:4px;">Page {{ registry.value.currentPage }}&nbsp;</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </ng-template>
+                                                        </li>
+                                                    </ul>
+                                                    <div [ngbNavOutlet]="nav"></div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </ng-template>
-                        </ngb-tab>
+                        </li>
+
                         <!-- TODO: Should probably be paginated -->
-                        <ngb-tab *ngIf="isValidUser() && bookMarkCSWRecords.length>0" class="card-header" title="Bookmarks">
-                            <ng-template ngbTabContent>
+                        <li ngbNavItem *ngIf="isValidUser() && bookMarkCSWRecords.length>0">
+                            <a ngbNavLink>Bookmarks</a>
+                            <ng-template ngbNavContent>
                                 <div class="card-body bookmarks" style="padding-left:15px;padding-right:15px;">
                                     <!-- bookmarks -->
-                                    <div *ngIf="bookMarkCSWRecords.length>0">
-                                        <app-datasets-display [validUser]="isValidUser()" [cswRecordList]="bookMarkCSWRecords" [registries]="availableRegistries"
-                                            [bookMarkList]="bookMarks" (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-display>
+                                    <div class="row" *ngIf="bookMarkCSWRecords.length>0">
+                                        <div class="col" style="padding: 0px;">
+                                            <li *ngFor="let cswRecord of bookMarkCSWRecords">
+                                                <app-datasets-record [validUser]="isValidUser()" [cswRecord]="cswRecord" 
+                                                    (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="false"></app-datasets-record>
+                                            </li>
+                                        </div>
                                     </div>
                                 </div>
                             </ng-template>
-                        </ngb-tab>
-                    </ngb-tabset>
+                        </li>
+                    </ul>
+                    <div [ngbNavOutlet]="nav"></div>
                 </div>
             </as-split-area>
             <as-split-area size="70" class="split-area-map">
@@ -280,7 +298,7 @@
                     <app-ol-map-select-data></app-ol-map-select-data>
                 </div>
 
-                <div class="btn-group" style="position:absolute;z-index:1;margin-left:190px; margin-top:4px;width:250px;">
+                <div class="btn-group" style="position:absolute;z-index:1;margin-left:190px; margin-top:4px;">
                     <!-- Basemap drop down menu -->
                     <app-ol-map-basemap></app-ol-map-basemap>
                 </div>

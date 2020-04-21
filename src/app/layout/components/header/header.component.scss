@@ -35,4 +35,13 @@ $topnav-background-color: #222;
             }
         }
     }
+    .userDropdown {
+        background: $topnav-background-color;
+        button {
+            color: white;
+        }
+        .userDropdownItem {
+            color: black;
+        }
+    }
 }

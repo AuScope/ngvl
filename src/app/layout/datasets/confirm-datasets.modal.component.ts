@@ -44,8 +44,7 @@ export class ConfirmDatasetsModalComponent {
 
 
     /**
-     * TODO: This lazily opens the download URL in a new window, so this won't
-     * work on mobile devices
+     * TODO: Opens the download URL in a new window, confirm working on mobile devices
      *
      * @param onlineResource
      * @param dlOptions
@@ -67,6 +66,8 @@ export class ConfirmDatasetsModalComponent {
                 if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                     dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
                 }
+                // TODO: Find out if we still need ERDAP support
+                /*
                 this.vglService.makeErddapUrl(dlOptions).subscribe(
                     response => {
                         if (response.url) {
@@ -76,6 +77,15 @@ export class ConfirmDatasetsModalComponent {
                         console.log(error.message);
                     }
                 );
+                */
+               this.vglService.makeWcsUrl(dlOptions).subscribe(
+                   response => {
+                        if(response.url) {
+                            window.open(response.url);
+                        }
+                   }, error => {
+                    console.log(error.message);
+                   });
                 break;
             case 'WFS':
                 this.vglService.makeWfsUrl(dlOptions).subscribe(

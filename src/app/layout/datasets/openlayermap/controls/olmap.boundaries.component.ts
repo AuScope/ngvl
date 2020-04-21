@@ -5,16 +5,16 @@ import { FormControl } from '@angular/forms';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 
-import Overlay from 'ol/overlay';
-import Image from 'ol/layer/image';
-import VectorLayer from 'ol/layer/vector';
-import ImageWMS from 'ol/source/imagewms';
-import SourceVector from 'ol/source/vector';
-import Style from 'ol/style/style';
-import Fill from 'ol/style/fill';
-import Stroke from 'ol/style/stroke';
-import Extent from 'ol/extent';
-import Proj from 'ol/proj';
+import Overlay from 'ol/Overlay';
+import ImageLayer from 'ol/layer/Image';
+import VectorLayer from 'ol/layer/Vector';
+import ImageWMS from 'ol/source/ImageWMS';
+import VectorSource from 'ol/source/Vector';
+import Style from 'ol/style/Style';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import * as Extent from 'ol/extent';
+import * as Proj from 'ol/proj';
 
 import { BoundaryService } from '../../../../shared/services/boundary.service';
 import { environment } from '../../../../../environments/environment';
@@ -38,7 +38,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     @ViewChild('popupCloser') popupCloser: ElementRef;
     @ViewChild('popupFooter') popupFooter: ElementRef;
 
-    boundaryLayer: Image;
+    boundaryLayer: ImageLayer;
     boundaryLayerSource: ImageWMS;
     overlay: Overlay; // popup
     highlightLayer: VectorLayer;  // highlighted polygon
@@ -74,7 +74,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
                     this.boundaryService.findFeatures(queryField, layer.name, layer.nameAttribute)
                         .subscribe(features => {
                             this.searchResults = [];
-                            console.log('found ' + features.length + ' matching features');
                             for (let i = 0; i < features.length; i++) {
                                 const properties = features[i].getProperties();
                                 this.searchResults.push({ 'id': features[i].getId(), 'name': properties[layer.nameAttribute] });
@@ -88,9 +87,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
 
 
     ngAfterViewInit() {
-
         const map = this.olMapObject.getMap();
-
         this.boundaryLayerSource = new ImageWMS({
             ratio: 1,
             url: environment.boundariesUrl + '/wms',
@@ -103,7 +100,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         });
 
         // not sure if tiled or untiled is better!
-        this.boundaryLayer = new Image({
+        this.boundaryLayer = new ImageLayer({
             source: this.boundaryLayerSource
         });
         // const tiled = new Tile({
@@ -169,9 +166,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public handleClick(p: [number, number]) {
-
-        console.log("handleClick(" + p + ")");
-
         // Convert pixel coords to map coords
         const map = this.olMapObject.getMap();
         const clickCoord = map.getCoordinateFromPixel(p);
@@ -181,7 +175,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         const view = map.getView();
         const viewResolution = view.getResolution();
         const source = this.boundaryLayerSource;
-        console.log("got click event, coords = " + clickCoord);
         const url = source.getGetFeatureInfoUrl(clickCoord, viewResolution, view.getProjection(), { 'INFO_FORMAT': 'application/json' });
         this.boundaryService.getFeatures(url).subscribe(features => {
             // highlight it on the map and show info popup
@@ -193,7 +186,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
                 this.popupContent.nativeElement.innerHTML = html;
 
                 this.overlay.setPosition(clickCoord);
-                const highlightSource = new SourceVector({
+                const highlightSource = new VectorSource({
                     features: features
                 });
                 this.highlightLayer.setSource(highlightSource);
@@ -214,11 +207,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public selectData(): boolean {
-
-        console.log("selctData()");
-
         let extent = this.highlightLayer.getSource().getExtent();
-        console.log("selecting data for " + this.highlightLayer.getSource().getExtent());
 
         // close popup
         this.overlay.setPosition(undefined);
@@ -266,7 +255,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         for (let i = 0; i < event.srcElement.options.length; i++) {
             if (event.srcElement.options[i].selected) {
                 const selectedOption = event.srcElement.options[i].value;
-                console.log('selected option: ' + selectedOption);
                 if (selectedOption === 'NONE') {
                     map.removeLayer(this.boundaryLayer);
                     this.boundaryLayer.setVisible(false);
@@ -293,7 +281,6 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     }
 
     public onClick(event): void {
-        console.log('selected region: ' + event.srcElement.id);
         this.boundaryService.getFeaturesById(event.srcElement.id, this.boundaryLayer.get('name')).subscribe(features => {
             // highlight it on the map and show info popup
             this.clearSearchResults();
@@ -310,7 +297,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
                 html += 'Area: ' + (Math.round(properties[layer.areaAttribute] * 100.0) / 100.0).toFixed(2) + ' km<sup>2</sup>';
                 this.popupContent.nativeElement.innerHTML = html;
                 this.overlay.setPosition(point);
-                const highlightSource = new SourceVector({
+                const highlightSource = new VectorSource({
                     features: features
                 });
                 this.highlightLayer.setSource(highlightSource);

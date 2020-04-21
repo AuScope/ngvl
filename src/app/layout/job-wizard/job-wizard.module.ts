@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CustomFormsModule } from 'ng2-validation'
+import { CustomFormsModule } from 'ngx-custom-validators'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MonacoEditorModule } from 'ngx-monaco-editor';
 import { ContextMenuModule } from 'primeng/contextmenu';
+import { MessageModule } from 'primeng/message';
+import { MessagesModule } from 'primeng/messages';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
 import { ToastModule } from 'primeng/toast';
@@ -30,6 +32,8 @@ import { JobDatasetsComponent } from './job-datasets.component';
     NgbModule,
     MonacoEditorModule.forRoot(),
     ContextMenuModule,
+    MessageModule,
+    MessagesModule,
     TableModule,
     TreeTableModule,
     ToastModule,

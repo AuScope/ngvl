@@ -10,11 +10,11 @@
             <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
                 <button class="btn btn-primary btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
                     ngbDropdownToggle>
-                    <i class="fa fa-folder">&nbsp;Actions</i>
+                    <i class="fa fa-folder"></i>&nbsp;Actions
                 </button>
                 <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
                     <button class="dropdown-item" (click)="downloadSelectedFiles()">
-                        <i class="fa fa-download">&nbsp;Download file(s) to your machine</i>
+                        <i class="fa fa-download"></i>&nbsp;Download file(s) to your machine
                     </button>
                 </div>
             </div>

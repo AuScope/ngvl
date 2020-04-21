@@ -5,7 +5,7 @@ import { RecordModalComponent } from './record.modal.component';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import Proj from 'ol/proj';
+import * as Proj from 'ol/proj';
 
 
 // List of valid online resource types that can be added to the map

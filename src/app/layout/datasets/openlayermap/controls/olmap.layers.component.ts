@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RecordModalComponent } from '../../record.modal.component';
 
-import Proj from 'ol/proj';
+import * as Proj from 'ol/proj';
 
 
 @Component({

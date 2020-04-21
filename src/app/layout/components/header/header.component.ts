@@ -36,7 +36,11 @@ export class HeaderComponent implements OnInit {
     this.isUserConfigured$ = this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success);
   }
 
-    ngOnInit() {}
+    ngOnInit() {
+      if(window.innerWidth < 992) {
+        this.toggleSidebar();
+      }
+    }
 
     isToggled(): boolean {
         const dom: Element = document.querySelector('body');

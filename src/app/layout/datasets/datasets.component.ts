@@ -9,9 +9,10 @@ import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { BookMark, Registry } from '../../shared/modules/vgl/models';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
-import Proj from 'ol/proj';
+import * as Proj from 'ol/proj';
 
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     
     // Search results
     cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
+    layerOpacities: Map<String, number> = new Map<String, number>();
 
     // BookMarks
     bookMarks: BookMark[] = [];
@@ -39,6 +41,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     pubDateIsCollapsed: boolean = true;
     registriesIsCollapsed: boolean = true;
     searchResultsIsCollapsed: boolean = true;
+
+    // Collapsable active layer panel
+    activeLayersIsCollapsed: boolean = true;
 
     // Faceted search parameters
     anyTextValue: string = "";
@@ -229,20 +234,21 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
             if(registry.checked) {
                 registry.searching = true;
+                registry.searchError = null;
                 this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
                 .subscribe(response => {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-                    //if((<CSWRecordModel[]>response.records).length > 0) {
-                        this.cswSearchResults.set(registry.id, response.records);
-                    //}
+                    if(response.hasOwnProperty('searchErrors') && response.searchErrors[registry.id] != null) {
+                        registry.searchError = response.searchErrors[registry.id];
+                    }
+                    this.cswSearchResults.set(registry.id, response.records);
                     registry.searching = false;
+
                     this.searchResultsIsCollapsed = false;
                     //this.searchResultsElement.nativeElement.scrollIntoView(false);
                 }, error => {
-                    // TODO: proper error reporting
-                    console.log("Faceted search error: " + error.message);
                     this.cswSearchResults.set(serviceId, null);
                     registry.searching = false;
                 });
@@ -319,6 +325,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         }
 
         registry.searching = true;
+        registry.searchError = null;
 
         this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons).subscribe(response => {
             registry.prevIndices.push(registry.startIndex);
@@ -327,13 +334,15 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             if((<CSWRecordModel[]>response.records).length > 0) {
                 this.cswSearchResults.set(registry.id, response.records);
             }
+            if(response.searchErrors && response.searchErrors.length > 0) {
+                registry.searchError = response.searchErrors[registry.id];
+            }
             registry.searching = false;
             this.searchResultsIsCollapsed = false;
             //this.searchResultsElement.nativeElement.scrollIntoView(false);
         }, error => {
-            // TODO: proper error reporting
-            console.log("Faceted search error: " + error.message);
             this.cswSearchResults.set(registry.id, null);
+            registry.searchError = error.message;
             registry.searching = false;
         });
     }
@@ -596,6 +605,42 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                 this.bookMarkCSWRecords.splice(pos, 1);
             }
         }
+    }
+
+    /**
+     * Return true if a CSWRecordModel has child records.
+     * Currently the only indicator of GSKY parent records.
+     * 
+     * @param cswRecord 
+     */
+    public hasChildRecords(cswRecord: CSWRecordModel): boolean {
+        if(cswRecord.hasOwnProperty('childRecords') &&
+           cswRecord.childRecords != null &&
+           cswRecord.childRecords.length > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * TODO: This is used elsewhere, should make a map service method
+     */
+    public getActiveLayerCount(): number {
+        return Object.keys(this.olMapService.getLayerModelList()).length;
+    }
+
+    /**
+     * Get active layers
+     */
+    public getActiveLayers(): LayerModel[] {
+        const layers: LayerModel[] = [];
+        const keys = Object.keys(this.olMapService.getLayerModelList());
+        for (let i = 0; i < keys.length; i++) {
+            let currentLayer = this.olMapService.getLayerModelList()[keys[i]];
+            layers.push(currentLayer);
+            this.layerOpacities.set(currentLayer.id, 100);
+        }
+        return layers;
     }
 
     /* on Dragging of the gutter between map and datasets search input area resize the map */

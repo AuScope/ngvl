@@ -24,10 +24,10 @@ export class RecordModalComponent implements OnInit {
 
 
     constructor(private router: Router,
-                private userStateService: UserStateService,
-                private cswSearchService: CSWSearchService,
-                private modalService: NgbModal,
-                public activeModal: NgbActiveModal) { }
+        private userStateService: UserStateService,
+        private cswSearchService: CSWSearchService,
+        private modalService: NgbModal,
+        public activeModal: NgbActiveModal) { }
 
 
     ngOnInit() {
@@ -69,8 +69,8 @@ export class RecordModalComponent implements OnInit {
                     this.router.navigate(['/wizard']);
                     this.activeModal.close();
                 }
-            }, () => {});
-        }, () => {});
+            }, () => { });
+        }, () => { });
     }
 
     /*

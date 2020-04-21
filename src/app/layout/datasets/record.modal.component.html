@@ -18,7 +18,7 @@
         <div class="form-group row" *ngIf="record.name && record.name!=''">
             <label for="csw-name" class="col-3 col-form-label">Title</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.name }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.name }}">{{ record.name }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="record.description && record.description!=''">
@@ -30,13 +30,13 @@
         <div class="form-group row" *ngIf="record.name && record.name!=''">
             <label for="csw-name" class="col-3 col-form-label">Keywords</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.descriptiveKeywords.join(", ") }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.descriptiveKeywords.join(', ') }}">{{ record.descriptiveKeywords.join(", ") }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="record.contactOrg && record.contactOrg!=''">
             <label for="csw-name" class="col-3 col-form-label">Contact Org</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">{{ record.contactOrg }}</label>
+                <label id="csw-name" class="form-control text-truncate" title="{{ record.contactOrg }}">{{ record.contactOrg }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="(record.constraints && record.constraints!='') && (record.useLimitConstraints && record.useLimitConstraints=='')" >
@@ -55,7 +55,7 @@
                 <div class="col-9">
                     <label id="csw-name" class="form-control">
                             <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
-                                    <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
+                                <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
                             </div>                         
                     </label>              
                 </div>
@@ -83,13 +83,15 @@
                         <div *ngFor="let resource of getOnlineResourcesByType(record, resourceType)" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
                             <div *ngIf="onlineResources[resourceType].expanded" class="container" style="margin: 2px;">
                                 <div class="row">
-                                    <strong class="text-truncate">{{ resource.name }}</strong>&nbsp;
+                                    <strong class="text-truncate">{{ resource.name }}</strong>
                                 </div>
                                 <div class="row">
                                     <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
-                                    <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
-                                        <i class="fa fa-plus-circle" style="color:green;"></i>
-                                    </button>
+                                    <div>
+                                        <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
+                                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <!-- TODO: WCS Describe Coverage, link to XML -->
                                 <!-- TODO: WMS layer preview -->

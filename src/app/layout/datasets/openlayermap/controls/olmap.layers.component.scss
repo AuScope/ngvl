@@ -1,13 +1,21 @@
 .olMapLayerPanel {
+
+    max-width: 20em;
+
     ::ng-deep { 
         .card {
             font-size: 0.875rem;
             line-height: 1.5;
             border: 0px; 
+            display: inline;
         }
-        .card-header a {
+        .btn-link {
             color: #fff;
             background-color: #007bff;
+            font-size: 0.875rem;
+            line-height: 1.0;
+            height: 28px;
+            margin-top: -3px;
             text-decoration: none;
         }
         .card-header {
@@ -15,29 +23,24 @@
             background-color: #007bff;
             padding: 0.25rem 0.5rem;
             border-radius: 0.2rem;
-            padding-top: 4.5px;
-            padding-bottom: 4.5px;
+            display: grid;
+            height: 30px;
         }
         .card-body {
             padding-top: 2px;
             padding-left: 2px;
             padding-right: 2px;
             padding-bottom: 0px;
+            background: white;
         }
     }
 
-    // Remove opacity Dropdown arrow
-    .dropdown-toggle::after {
-        display:none;
+    .row {
+        display: contents;
+        margin-bottom: 10px;
     }
-  
-    .dropdown-menu {
-        min-width: 25px;
+    li {
+        list-style-type: none;
     }
-  
-    p-slider {
-        display: flex;
-        justify-content: center;
-    }
-  
+
 }

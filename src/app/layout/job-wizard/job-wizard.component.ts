@@ -33,14 +33,14 @@ export class JobWizardComponent implements OnInit, OnDestroy {
 
   private routeSub;
 
-  @ViewChild(JobObjectComponent)
-  private jobObject: JobObjectComponent;
+  @ViewChild(JobObjectComponent, {static: true})
+  private jobObject!: JobObjectComponent;
 
-  @ViewChild(JobSolutionsSummaryComponent)
-  private solutionsComponent: JobSolutionsSummaryComponent;
+  @ViewChild(JobSolutionsSummaryComponent, {static: true})
+  private solutionsComponent!: JobSolutionsSummaryComponent;
 
-  @ViewChild(JobDatasetsComponent)
-  private jobDatasetsComponent: JobDatasetsComponent;
+  @ViewChild(JobDatasetsComponent, {static: true})
+  private jobDatasetsComponent!: JobDatasetsComponent;
 
   constructor(private userStateService: UserStateService,
               private vglService: VglService,

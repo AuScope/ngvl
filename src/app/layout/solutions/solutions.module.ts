@@ -22,7 +22,7 @@ import { SolutionsDetailComponent } from './solutions-detail.component';
     PageHeaderModule,
     SharedSolutionsModule,
     SolutionsRoutingModule,
-    NgbModule.forRoot()
+    NgbModule
   ],
   declarations: [
     SolutionsComponent,

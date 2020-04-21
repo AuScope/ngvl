@@ -1,4 +1,3 @@
-
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
@@ -10,6 +9,7 @@ import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.mo
 import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
+import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 
 
 @Injectable({
@@ -18,7 +18,8 @@ import { UserStateService } from './user-state.service';
 export class CSWSearchService {
 
     constructor(private httpClient: HttpClient, @Inject('env') private env,
-        private vgl: VglService, private userStateService: UserStateService) { }
+        private vgl: VglService, private userStateService: UserStateService,
+        private layerHandlerService: LayerHandlerService) { }
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();
@@ -134,7 +135,7 @@ export class CSWSearchService {
             availableRegistries = data;
             for (let registry of availableRegistries) {
                 let matchingUrl = registry.url.substring(registry.url.lastIndexOf('//') + 2, registry.url.lastIndexOf('csw'));
-                if (cswRecord.recordInfoUrl.indexOf(matchingUrl) !== -1) {
+                if (cswRecord.recordInfoUrl != null && cswRecord.recordInfoUrl.indexOf(matchingUrl) !== -1) {
                     serviceId = registry.id;
                     break;
                 }
@@ -202,6 +203,8 @@ export class CSWSearchService {
 
     /**
      * Create default download options for a given online resource
+     * 
+     * TODO: Do we need to delete parameters if they're marked as optional ("?")
      *
      * @param or
      * @param cswRecord
@@ -232,25 +235,38 @@ export class CSWSearchService {
             coverageName: undefined,
             serviceUrl: undefined,
             srsName: undefined,
-            featureType: undefined
+            featureType: undefined,
+            // WCS
+            outputWidth: undefined,
+            outputHeight: undefined
         };
 
         // Add/subtract info based on resource type
         switch (or.type) {
             case 'WCS':
                 delete downloadOptions.url;
-                delete downloadOptions.serviceUrl;
                 delete downloadOptions.srsName;
                 delete downloadOptions.featureType;
-                downloadOptions.format = 'nc';
-                downloadOptions.layerName = or.name;
-                downloadOptions.coverageName = downloadOptions.layerName;
+                delete downloadOptions.layerName;
+                
+                downloadOptions.coverageName = or.name;
+                downloadOptions.outputWidth = 256;
+                downloadOptions.outputHeight = 256;
+                // TODO: Get from GetCap
+                let coverageUrl = or.url.substring(0, or.url.indexOf("?")) + "?service=WCS&version=1.0.0&request=GetCoverage";
+                downloadOptions.serviceUrl = coverageUrl;
+                downloadOptions.crs = "EPSG:4326";
+                // TODO: Also get from GetCap
+                downloadOptions.format = "geotiff";
                 break;
             case 'WFS':
                 delete downloadOptions.url;
                 delete downloadOptions.format;
                 delete downloadOptions.layerName;
                 delete downloadOptions.coverageName;
+                delete downloadOptions.outputWidth;
+                delete downloadOptions.outputHeight;
+
                 downloadOptions.serviceUrl = or.url;
                 downloadOptions.featureType = or.name;
                 downloadOptions.srsName = '';
@@ -260,6 +276,9 @@ export class CSWSearchService {
                 delete downloadOptions.serviceUrl;
                 delete downloadOptions.srsName;
                 delete downloadOptions.featureType;
+                delete downloadOptions.outputWidth;
+                delete downloadOptions.outputHeight;
+
                 downloadOptions.name = or.name;
                 downloadOptions.method = 'GET';
                 downloadOptions.layerName = or.name;
@@ -268,6 +287,8 @@ export class CSWSearchService {
             case 'WWW':
                 delete downloadOptions.format;
                 delete downloadOptions.srsName;
+                delete downloadOptions.outputWidth;
+                delete downloadOptions.outputHeight;
                 break;
             // We don't support EVERY type
             default:
@@ -299,7 +320,8 @@ export class CSWSearchService {
                 if (dlOptions.dsSouthBoundLatitude != null && (dlOptions.dsSouthBoundLatitude > dlOptions.southBoundLatitude)) {
                     dlOptions.southBoundLatitude = dlOptions.dsSouthBoundLatitude;
                 }
-                return this.vgl.makeErddapUrl(dlOptions).map(jobDownload => {
+                // Changed from ERDDAP, do we need a separate ERDDAP type?
+                return this.vgl.makeWcsUrl(dlOptions).map(jobDownload => {
                     jobDownload.cswRecord = cswRecord;
                     jobDownload.onlineResource = onlineResource;
                     return jobDownload;

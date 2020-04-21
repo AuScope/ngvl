@@ -3,7 +3,7 @@ import { ActivatedRoute } from "@angular/router";
 import { routerTransition } from "../../router.animations";
 import { UserStateService, AuthService } from "../../shared";
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from 'primeng/components/common/messageservice';
+import { MessageService } from 'primeng/api';
 import { User, NCIDetails } from "../../shared/modules/vgl/models";
 
 
@@ -16,10 +16,10 @@ import { User, NCIDetails } from "../../shared/modules/vgl/models";
 export class UserManagementComponent implements OnInit {
 
     // User object contains AWS information
-    private user: User = undefined;
+    public user: User = undefined;
 
     // User NCI fields
-    private nciDetails: NCIDetails = undefined;
+    public nciDetails: NCIDetails = undefined;
     private nciKeyfile: any = undefined;
 
     // T&C's dialog

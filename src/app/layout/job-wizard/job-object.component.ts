@@ -27,8 +27,8 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   private _jobSub;
   private _solutionsSub;
 
-  @ViewChild('jobObjectForm')
-  form: NgForm;
+  @ViewChild('jobObjectForm', {static: true})
+  form!: NgForm;
 
   constructor(private userStateService: UserStateService,
               private vgl: VglService) {

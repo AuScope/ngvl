@@ -3,10 +3,8 @@ import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service
 import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
 import { Constants } from 'portal-core-ui/utility/constants.service';
 import { AfterViewInit, Component, ElementRef, ViewChild, Inject } from '@angular/core';
-import { point, Geoms, polygon } from '@turf/helpers';
-import * as inside from '@turf/inside';
-import * as bbox from '@turf/bbox';
-
+import { point, polygon } from '@turf/helpers';
+import inside from '@turf/inside';
 import View from 'ol/View';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
@@ -16,7 +14,6 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import GroupLayer from 'ol/layer/Group';
 import * as Extent from 'ol/extent';
-
 import { MapBrowserEvent } from 'openlayers';
 
 
@@ -30,7 +27,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     iDiv: any = null;
     new_id: any = null;
     olMapObject: OlMapObject = null;
-    bboxGeojsonObjectArr: GeoJSON.FeatureCollection<Geoms>[] = [];
+    bboxGeojsonObjectArr: GeoJSON.FeatureCollection<any>[] = [];
     BBOX_LOW_STROKE_COLOUR = 'black';
     BBOX_HIGH_STROKE_COLOUR = '#ff33cc';
     BBOX_LOW_FILL_COLOUR = 'rgba(128,128,128,0.25)';
@@ -51,8 +48,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                     feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][2],
                     feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
                     if (inside(point(event.coordinate), poly)) {
-                        const bboxX: [number, number, number, number] = bbox(poly);
-                        me.olMapService.fitView(bboxX);
+                        me.olMapService.fitView([poly[0], poly[1], poly[2], poly[3]]);
                     }
                 }
             }
@@ -88,7 +84,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     * @param reCentrePt  Point to re-centre map
     * @param bboxGeojsonObj  Bounding boxes in GeoJSON format
     */
-    setupBBoxes(reCentrePt: [number, number], bboxGeojsonObj: { [key: string]: GeoJSON.FeatureCollection<Geoms> }) {
+    setupBBoxes(reCentrePt: [number, number], bboxGeojsonObj: { [key: string]: GeoJSON.FeatureCollection<any> }) {
         for (const key in bboxGeojsonObj) {
             // Store the BBOXes for making the main map's view fit to the BBOX when BBOX is clicked on in preview map
             this.bboxGeojsonObjectArr.push(bboxGeojsonObj[key]);

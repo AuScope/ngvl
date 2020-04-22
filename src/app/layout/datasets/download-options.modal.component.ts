@@ -102,7 +102,7 @@ export class DownloadOptionsModalComponent implements OnInit {
                             case "geotiff":
                                 this.dataTypes.push({ label: 'GeoTIFF', urn: 'geotiff'});
                             break;
-                            /* XXX Was the ERDDAP?
+                            /* XXX Was this ERDDAP?
                             case "netcdf":
                                 this.dataTypes.push({ label: 'NetCDF', urn: 'nc'});
                             break;
@@ -112,8 +112,6 @@ export class DownloadOptionsModalComponent implements OnInit {
                             */
                         }
                     }
-                    //this.downloadOptionsForm.controls.format.setValue(this.dataTypes[0].urn, {onlySelf: true});
-                    //this.downloadOptionsForm.controls.format.updateValueAndValidity();
                 }
             }, error => {
                 // TODO: Deal with error

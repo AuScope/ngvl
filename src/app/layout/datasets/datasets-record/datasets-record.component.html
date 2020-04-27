@@ -39,7 +39,7 @@
                 (click)="removeCSWRecord(cswRecord.id)">
                 <i class="fa fa-trash" style="color:red;"></i>
             </button>
-            <div *ngIf="!isMapControl">
+            <div *ngIf="!isMapControl && !isGskyLayer">
                 <button *ngIf="validUser && !isBookMark(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
                     <i class="fa fa-heart-o" style="color:red;"></i>
                 </button>

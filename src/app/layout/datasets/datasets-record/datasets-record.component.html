@@ -39,12 +39,33 @@
                 (click)="removeCSWRecord(cswRecord.id)">
                 <i class="fa fa-trash" style="color:red;"></i>
             </button>
-            <div *ngIf="!isMapControl && !isGskyLayer">
+            <!-- Time Dimension (if temporal extent is present in CSW record) -->
+            <div *ngIf="isMapControl">
+                <button *ngIf="olMapService.layerExists(cswRecord.id) && hasTemporalExtent() && timeExtentStatus!=='loading' && timeExtentStatus!=='loaded'" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Load times" (click)="loadTimes()">
+                    <i class="fa fa-calendar"></i>
+                </button>
+                <button *ngIf="timeExtentStatus=='loading'"
+                    class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Loading times...">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </button>
+                <div ngbDropdown #timeDropdown="ngbDropdown" *ngIf="timeExtentStatus=='loaded'">
+                    <button ngbDropdownToggle class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Choose time">
+                        <i class="fa fa-calendar" style="color:green;"></i>
+                    </button>
+                    <div ngbDropdownMenu style="padding:4px;">
+                        <div style="overflow-y:auto;max-height:100px;">
+                            <button class="btn btn-small text-truncate" *ngFor="let t of timeExtentList" (click)="timeDropdown.close();changeTime(t)" style="width:100%;min-width:100px;">{{ t | date }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bookmarks -->
+            <div *ngIf="!isMapControl">
                 <button *ngIf="validUser && !isBookMark(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
                     <i class="fa fa-heart-o" style="color:red;"></i>
                 </button>
                 <button *ngIf="validUser && isBookMark(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove as favourite" (click)="removeBookMark(cswRecord)">                                    
-                        <i class="fa fa-heart" style="color:red;"></i>
+                    <i class="fa fa-heart" style="color:red;"></i>
                 </button>
             </div>
         </span>

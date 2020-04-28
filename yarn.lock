@@ -7720,9 +7720,8 @@ pkg-up@^2.0.0:
   dependencies:
     find-up "^2.1.0"
 
-"portal-core-ui@github:AuScope/portal-core-ui#master":
+portal-core-ui@../portal-core-ui:
   version "0.0.1"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/94527a77d5218fedf2749dad2b2beaca92ec1f73"
 
 portfinder@^1.0.25:
   version "1.0.25"

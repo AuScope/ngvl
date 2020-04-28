@@ -35,6 +35,11 @@ export class DatasetsRecordComponent {
     // Keep track of GSKY (or other) layers that may currently be loading
     private layersLoading: Map<string, boolean> = new Map<string, boolean>();
 
+    // Keep track of time extents that may be loading via GetCap requests
+    public timeExtentStatus: string;
+    public timeExtentList: string[] = [];
+    public selectedTimeExtent = "";
+
 
     constructor(public olMapService: OlMapService,
                 public cswSearchService: CSWSearchService,
@@ -82,6 +87,8 @@ export class DatasetsRecordComponent {
      */
     public removeCSWRecord(recordId: string): void {
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
+        this.timeExtentList = [];
+        this.timeExtentStatus = "";
     }
 
     /**
@@ -344,6 +351,67 @@ export class DatasetsRecordComponent {
     public setLayerOpacity(e: any) {
         this.layerOpacity = e.value;
         this.olMapService.setLayerOpacity(this.cswRecord.id, e.value/100);
+    }
+
+    /**
+     * Does the CSWRecord have a temporal extent?
+     */
+    public hasTemporalExtent(): boolean {
+        if (this.cswRecord.temporalExtent && 
+            this.cswRecord.temporalExtent.beginPosition && 
+            this.cswRecord.temporalExtent.endPosition &&
+            this.cswRecord.temporalExtent.beginPosition != this.cswRecord.temporalExtent.endPosition) {
+                return true;
+            }
+    }
+
+    /**
+     * Get a list of times this record may have. Requires the CSWRecord to have
+     * a temporalExtent set and an associated WMS OnlineResource against which a
+     * GetCapabilities request can be made to retrieve times
+     */
+    public loadTimes() {
+        const wmsResource: OnlineResourceModel = this.cswRecord.onlineResources.find(
+            resource => resource.type.toLocaleLowerCase() == 'wms');
+        if(wmsResource) {
+            this.timeExtentList = [];
+            this.selectedTimeExtent = "";
+            this.timeExtentStatus = 'loading';
+            // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
+            this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
+                if(response && response.layers) {
+                    let layer = response.layers.find(l => l.name == wmsResource.name);
+                    // Name may not have matched due to being appended with "<workspace>:"
+                    if(!layer) {
+                        for(let wmsLayer of response.layers) {
+                            const colonIndex = wmsLayer.name.indexOf(':');
+                            if(colonIndex != -1) {
+                                const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
+                                if(layerName == wmsResource.name) {
+                                    layer = wmsLayer;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (layer && layer.timeExtent && layer.timeExtent.length > 0) {
+                        this.timeExtentList = layer.timeExtent;
+                    }
+                }
+                this.timeExtentStatus = 'loaded';
+            }, error => {
+                this.timeExtentStatus = 'error';
+            });
+        }
+    }
+
+    /**
+     * Change the time of the map layer
+     * 
+     * @param newTime the new time to display
+     */
+    changeTime(newTime: string) {
+        this.olMapService.setLayerSourceParam(this.cswRecord.id, 'TIME', newTime);
     }
 
 }

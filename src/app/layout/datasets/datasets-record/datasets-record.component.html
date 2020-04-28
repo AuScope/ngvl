@@ -11,10 +11,16 @@
                     <i class="fa fa-times"></i>
                 </button>
                 <!-- Add layer to map, or load child layers (GSKY) -->
-                <button *ngIf="(isAddableRecord(cswRecord) || isExpandableRecord(cswRecord)) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
+                <button *ngIf="isAddableRecord(cswRecord) && !isExpandableRecord(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
                     class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map"
                     (click)="addCSWRecord(cswRecord)">
                     <i class="fa fa-plus-circle" style="color:green;"></i>
+                </button>
+                <!-- Load child layers (GSKY) -->
+                <button *ngIf="isExpandableRecord(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
+                    class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Load layers"
+                    (click)="addCSWRecord(cswRecord)">
+                    <i class="fa fa-list-alt" style="color:green;"></i>
                 </button>
                 <!-- Loading child layers (GSKY parent) -->
                 <button *ngIf="areLayersLoading(cswRecord.id)"
@@ -25,7 +31,7 @@
                 <button *ngIf="hasChildRecords(cswRecord)"
                     class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Collapse layers"
                     (click)="removeChildRecords(cswRecord)">
-                    <i class="fa fa-minus-circle" style="color:red;"></i>
+                    <i class="fa fa-angle-double-up" style="color:red;"></i>
                 </button>
             </div>
             <!-- Layer (non-GSKY) displayed, button will remove from map -->
@@ -33,7 +39,7 @@
                 (click)="removeCSWRecord(cswRecord.id)">
                 <i class="fa fa-trash" style="color:red;"></i>
             </button>
-            <div *ngIf="!isMapControl">
+            <div *ngIf="!isMapControl && !isGskyLayer">
                 <button *ngIf="validUser && !isBookMark(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
                     <i class="fa fa-heart-o" style="color:red;"></i>
                 </button>

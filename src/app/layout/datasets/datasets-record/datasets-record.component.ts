@@ -21,7 +21,6 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
 export class DatasetsRecordComponent {
 
     @Input() registries: any = [];
-    //@Input() cswRecordList: CSWRecordModel[] = [];
     @Input() cswRecord: CSWRecordModel;
     @Input() bookMarkList: BookMark[] = [];
     @Input() validUser: boolean = false;
@@ -51,7 +50,6 @@ export class DatasetsRecordComponent {
         if(this.isExpandableRecord(cswRecord)) {
             this.loadExpandedLayers(cswRecord);
         } else try {
-
             // Clone the record before adding in case we need to modify details for GSKY records
             let clonedRecord = JSON.parse(JSON.stringify(cswRecord));
 

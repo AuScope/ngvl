@@ -104,6 +104,12 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             if (this.isValidUser()) {
                 this.getBookMarkCSWRecords();
             }
+
+            this.authService.userLoggedOut.subscribe(logOut => {
+                if (logOut) {
+                    this.activeNavId = 1;
+                }
+            });
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);

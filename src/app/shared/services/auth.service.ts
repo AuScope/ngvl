@@ -76,13 +76,13 @@ export class AuthService {
         // Check is User has accpeted T&C's
         if (user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
           // Load any layers and job downloads that may have been added pre-log in
-          if(localStorage.getItem('layers') && localStorage.getItem('layers').length > 0) {
+          if (localStorage.getItem('layers') && localStorage.getItem('layers').length > 0) {
             let layers: LayerModel[] = JSON.parse(localStorage.getItem('layers'));
             layers.forEach(layer => {
               this.olMapService.addLayer(layer, null);
             });
           }
-          if(localStorage.getItem('jobDownloads') && localStorage.getItem('jobDownloads').length > 0) {
+          if (localStorage.getItem('jobDownloads') && localStorage.getItem('jobDownloads').length > 0) {
             let jobDownloads: JobDownload[] = JSON.parse(localStorage.getItem('jobDownloads'));
             this.userStateService.setJobDownloads(jobDownloads);
           }

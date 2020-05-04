@@ -52,32 +52,32 @@ export class DatasetsRecordComponent {
      * @param cswRecord
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
-        if(this.isExpandableRecord(cswRecord)) {
+        if (this.isExpandableRecord(cswRecord)) {
             this.loadExpandedLayers(cswRecord);
-        } else try {
-            // Clone the record before adding in case we need to modify details for GSKY records
-            let clonedRecord = JSON.parse(JSON.stringify(cswRecord));
+        } else {
+            try {
+                // Clone the record before adding in case we need to modify details for GSKY records
+                let clonedRecord = JSON.parse(JSON.stringify(cswRecord));
 
-            // Check online resources to see if protocol request has been set
-            // denoting a specific layer of the WMS/WCS etc. and rebuild URL
-            for(let resource of clonedRecord.onlineResources) {
-                // WMS
-                if(this.isGetCapabilitiesUrl(resource.url, 'wms') && resource.protocolRequest != "") {
-                    resource.name = resource.protocolRequest;
-                    // TODO: Stricter URL rewriting
-                    resource.url = resource.url.substring(0, resource.url.indexOf('?') + 1) + "service=WMS";
-                }
-                // WCS/NetCDF
-                else if((this.isGetCapabilitiesUrl(resource.url, 'wcs') /*|| resource.type.toLowerCase() == 'ncss'*/) && resource.protocolRequest != "") {
-                    resource.name = resource.protocolRequest;
-                }
-                // TODO: WFS?
+                // Check online resources to see if protocol request has been set
+                // denoting a specific layer of the WMS/WCS etc. and rebuild URL
+                for (let resource of clonedRecord.onlineResources) {
+                    // WMS
+                    if (this.isGetCapabilitiesUrl(resource.url, 'wms') && resource.protocolRequest != "") {
+                        resource.name = resource.protocolRequest;
+                        // TODO: Stricter URL rewriting
+                        resource.url = resource.url.substring(0, resource.url.indexOf('?') + 1) + "service=WMS";
+                    } else if ((this.isGetCapabilitiesUrl(resource.url, 'wcs') /*|| resource.type.toLowerCase() == 'ncss'*/) && resource.protocolRequest != "") {
+                        resource.name = resource.protocolRequest;
+                    }
+                    // TODO: WFS?
 
+                }
+                this.olMapService.addCSWRecord(clonedRecord);
+            } catch (error) {
+                // TODO: Proper error reporting
+                alert(error.message);
             }
-            this.olMapService.addCSWRecord(clonedRecord);
-        } catch (error) {
-            // TODO: Proper error reporting
-            alert(error.message);
         }
     }
 
@@ -167,22 +167,22 @@ export class DatasetsRecordComponent {
 
     /**
      * Determine if a CSWRecord meets the criteria to be added to the map.
-     * 
+     *
      * For a standard layer:
      *
      *   1. Has online resource.
      *   2. Has at least one defined geographicElement.
      *   3. Layer does not already exist on map.
      *   4. One online resource is of type WMS, WFS, CSW or WWW.
-     * 
+     *
      * For a GSKY layer:
-     * 
+     *
      *   1. WMS endpoint exists as a GetCapabilities URL, and a protocolRequest
      *      value is present.
      *   2. Some other online resource that can be downloaded is present,
      *      currently one of:
      *      - WCS GetCapabilities with a protocolRequest value set.
-     *      - NetCDF endpoint with a protocolRequest value set. 
+     *      - NetCDF endpoint with a protocolRequest value set.
      *
      * @param cswRecord the CSWRecord to verify
      * @return true is CSWRecord can be added, false otherwise
@@ -190,7 +190,7 @@ export class DatasetsRecordComponent {
     public isAddableRecord(cswRecord: CSWRecordModel): boolean {
         let addable: boolean = false;
         // Basic checks
-        if(cswRecord.hasOwnProperty('onlineResources') &&
+        if (cswRecord.hasOwnProperty('onlineResources') &&
                 cswRecord.onlineResources != null &&
                 cswRecord.onlineResources.some(resource => VALID_ONLINE_RESOURCE_TYPES.indexOf(resource.type) > -1) &&
                 cswRecord.geographicElements.length > 0 &&
@@ -200,7 +200,7 @@ export class DatasetsRecordComponent {
             // protocol request must be present otherwise it's expandable, not
             // addable
             const wmsResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
-            if(wmsResource && this.isGetCapabilitiesUrl(wmsResource.url, "wms") && wmsResource.protocolRequest && wmsResource.protocolRequest == "") {
+            if (wmsResource && this.isGetCapabilitiesUrl(wmsResource.url, "wms") && wmsResource.protocolRequest && wmsResource.protocolRequest == "") {
                 addable = false;
             }
         }
@@ -211,14 +211,14 @@ export class DatasetsRecordComponent {
      * Determine if record is expandable. That is, instead of being added to
      * the map it's queried to display sub-layers (e.g. a WMS GetCapabilities
      * endpoint).
-     * 
+     *
      * TODO: stricter checks.
-     * 
+     *
      * If both conditions are met:
      *   - Has a WMS OnlineResourceModel with a GetCapabilities URL and NO protocolRequest value.
      *   - Has a WCS OnlineResourceModel with a GetCapabilities URL and NO protocolRequest value.
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public isExpandableRecord(cswRecord: CSWRecordModel): boolean {
         const wmsResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
@@ -228,8 +228,8 @@ export class DatasetsRecordComponent {
     }
 
     /**
-     * 
-     * @param layerId 
+     *
+     * @param layerId
      */
     public areLayersLoading(layerId: string): boolean {
         return this.layersLoading.get(layerId) == true;
@@ -237,7 +237,7 @@ export class DatasetsRecordComponent {
 
     /**
      * Check if a record has already been added to the map
-     * 
+     *
      * @param cswRecord the record to check
      */
     public isRecordAddedToMap(cswRecord: CSWRecordModel): boolean {
@@ -247,11 +247,11 @@ export class DatasetsRecordComponent {
     /**
      * Return true if a CSWRecordModel has child records.
      * Currently the only indicator of GSKY records.
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public hasChildRecords(cswRecord: CSWRecordModel): boolean {
-        if(cswRecord.hasOwnProperty('childRecords') &&
+        if (cswRecord.hasOwnProperty('childRecords') &&
            cswRecord.childRecords != null &&
            cswRecord.childRecords.length > 0) {
             return true;
@@ -261,18 +261,18 @@ export class DatasetsRecordComponent {
 
     /**
      * Remove all child records from a particular record
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public removeChildRecords(cswRecord: CSWRecordModel) {
-        if(cswRecord.hasOwnProperty('childRecords')) {
+        if (cswRecord.hasOwnProperty('childRecords')) {
             cswRecord.childRecords = [];
         }
     }
 
     /**
      * Parse a URL to determine if it is a GetCapabilities request
-     * 
+     *
      * @param url URL to parse
      * @param serviceType service type ('wms' or 'wcs')
      */
@@ -292,13 +292,13 @@ export class DatasetsRecordComponent {
 
     /**
      * Parse the CSW record to see if it has a GetCapabilities request (WMS or WCS)
-     * 
+     *
      * @param url endpoint
      */
     public getCapabilitiesOnlineResource(record: CSWRecordModel, serviceType: string): OnlineResourceModel {
-        if(record.onlineResources) {
+        if (record.onlineResources) {
             const onlineResource: OnlineResourceModel = record.onlineResources.find(i => i.type.toLowerCase() == serviceType.toLowerCase());
-            if(onlineResource && this.isGetCapabilitiesUrl(onlineResource.url, serviceType)) {
+            if (onlineResource && this.isGetCapabilitiesUrl(onlineResource.url, serviceType)) {
                 return onlineResource;
             }
         }
@@ -308,30 +308,30 @@ export class DatasetsRecordComponent {
 
     /**
      * Retrieve a GSKY record's layers and add them to the record as child records
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     loadExpandedLayers(cswRecord: CSWRecordModel) {
         this.layersLoading.set(cswRecord.id, true);
         const wmsGetCapResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
         const wcsGetCapResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wcs');
-        if(wmsGetCapResource != null && wcsGetCapResource != null) {
+        if (wmsGetCapResource != null && wcsGetCapResource != null) {
             // Construct a corresponding WCS record for each layer in the WMS
             this.vglService.getCustomLayerRecords(wmsGetCapResource.url).subscribe((response: CSWRecordModel[]) => {
-                for(let layer of response) {
+                for (let layer of response) {
                     let wcsOnlineResource: OnlineResourceModel = {
                         applicationProfile: layer.onlineResources[0].applicationProfile,
                         description: layer.onlineResources[0].description,
                         // TODO: Check custom layer response, use csw record bounds if none
                         geographicElements: layer.onlineResources[0].geographicElements,
-                        //geographicElements: cswRecord.geographicElements,
+                        // geographicElements: cswRecord.geographicElements,
                         name: layer.onlineResources[0].name,
                         type: 'WCS',
                         url: wcsGetCapResource.url,
                         // TODO: from GetCapabilities <WCS_Capabilities ... version="1.0.0"> OR DescribeCoverage <CoverageDescription ... version="1.0.0.">
                         version: '',
                         protocolRequest: layer.onlineResources[0].protocolRequest
-                    }
+                    };
                     layer.onlineResources.push(wcsOnlineResource);
                     cswRecord.childRecords.push(layer);
                 }
@@ -344,21 +344,21 @@ export class DatasetsRecordComponent {
     }
 
     /**
-     * 
-     * @param layerId 
-     * @param opacity 
+     *
+     * @param layerId
+     * @param opacity
      */
     public setLayerOpacity(e: any) {
         this.layerOpacity = e.value;
-        this.olMapService.setLayerOpacity(this.cswRecord.id, e.value/100);
+        this.olMapService.setLayerOpacity(this.cswRecord.id, e.value / 100);
     }
 
     /**
      * Does the CSWRecord have a temporal extent?
      */
     public hasTemporalExtent(): boolean {
-        if (this.cswRecord.temporalExtent && 
-            this.cswRecord.temporalExtent.beginPosition && 
+        if (this.cswRecord.temporalExtent &&
+            this.cswRecord.temporalExtent.beginPosition &&
             this.cswRecord.temporalExtent.endPosition &&
             this.cswRecord.temporalExtent.beginPosition != this.cswRecord.temporalExtent.endPosition) {
                 return true;
@@ -373,21 +373,21 @@ export class DatasetsRecordComponent {
     public loadTimes() {
         const wmsResource: OnlineResourceModel = this.cswRecord.onlineResources.find(
             resource => resource.type.toLocaleLowerCase() == 'wms');
-        if(wmsResource) {
+        if (wmsResource) {
             this.timeExtentList = [];
             this.selectedTimeExtent = "";
             this.timeExtentStatus = 'loading';
             // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
             this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
-                if(response && response.layers) {
+                if (response && response.layers) {
                     let layer = response.layers.find(l => l.name == wmsResource.name);
                     // Name may not have matched due to being appended with "<workspace>:"
-                    if(!layer) {
-                        for(let wmsLayer of response.layers) {
+                    if (!layer) {
+                        for (let wmsLayer of response.layers) {
                             const colonIndex = wmsLayer.name.indexOf(':');
-                            if(colonIndex != -1) {
+                            if (colonIndex != -1) {
                                 const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
-                                if(layerName == wmsResource.name) {
+                                if (layerName == wmsResource.name) {
                                     layer = wmsLayer;
                                     break;
                                 }
@@ -407,7 +407,7 @@ export class DatasetsRecordComponent {
 
     /**
      * Change the time of the map layer
-     * 
+     *
      * @param newTime the new time to display
      */
     changeTime(newTime: string) {

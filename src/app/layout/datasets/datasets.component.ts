@@ -572,19 +572,18 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     public getBookMarkCSWRecords() {
         this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
-            // empty the book marked csw record list before gettting updated list
-            this.bookMarkCSWRecords = [];
+            let newBookMarkCSWRecords: CSWRecordModel[] = [];
             this.bookMarks.forEach(bookMark => {
                 this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
                     if (response && response.length === 1) {
-                        this.bookMarkCSWRecords.push(response.pop());
+                        newBookMarkCSWRecords.push(response.pop());
                     }
                 });
             });
+            this.bookMarkCSWRecords = newBookMarkCSWRecords;
         }, error => {
             console.log(error.message);
         });
-
     }
 
     /**

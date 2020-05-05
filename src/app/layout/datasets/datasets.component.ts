@@ -24,7 +24,7 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 export class DatasetsComponent implements OnInit, AfterViewChecked {
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
-    
+
     // Search results
     cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
     layerOpacities: Map<String, number> = new Map<String, number>();
@@ -32,6 +32,9 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     // BookMarks
     bookMarks: BookMark[] = [];
     bookMarkCSWRecords: CSWRecordModel[] = [];
+
+    // Active tab (will initialize tab selection after bookmarks tab removed on logout)
+    activeNavId: number = 1;
 
     // Collapsable menus
     anyTextIsCollapsed: boolean = true;
@@ -81,7 +84,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         // Load available registries
         this.cswSearchService.updateRegistries().subscribe((data: Registry[]) => {
             // Update registries
-            for(let registry of data) {
+            for (let registry of data) {
                 registry.checked = true;
                 registry.startIndex = 1;
                 registry.prevIndices = [];
@@ -96,11 +99,17 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             // selecting a registry will populate results)
             this.getFacetedKeywords();
             this.facetedSearchAllRegistries();
-            
+
             // get bookmark data only if the user is logged in
             if (this.isValidUser()) {
                 this.getBookMarkCSWRecords();
             }
+
+            this.authService.userLoggedOut.subscribe(logOut => {
+                if (logOut) {
+                    this.activeNavId = 1;
+                }
+            });
         }, error => {
             // TODO: Proper error reporting
             console.log("Unable to retrieve registries: " + error.message);
@@ -123,21 +132,21 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
-     * 
-     * @param serviceId 
+     *
+     * @param serviceId
      */
     public getRegistryTabTitle(serviceId: String) {
         let title: String = this.availableRegistries.get(serviceId).title;
-        if(this.availableRegistries.get(serviceId).searching) {
+        if (this.availableRegistries.get(serviceId).searching) {
             title += " (Searching)";
-        } else if(this.availableRegistries.get(serviceId).recordsMatched) {
+        } else if (this.availableRegistries.get(serviceId).recordsMatched) {
             title += " (" + this.availableRegistries.get(serviceId).recordsMatched + ")";
         }
         return title;
     }
 
     /**
-     * 
+     *
      */
     public getTotalSearchResultCount(): number {
         let count: number = 0;
@@ -151,7 +160,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * Search all registries using current facets.
      */
     public facetedSearchAllRegistries(): void {
-
         // Available registries and start
         let serviceIds: string[] = [];
         let starts: number[] = [];
@@ -232,7 +240,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
         }
 
         this.availableRegistries.forEach((registry: Registry, serviceId: String) => {
-            if(registry.checked) {
+            if (registry.checked) {
                 registry.searching = true;
                 registry.searchError = null;
                 this.cswSearchService.getFacetedSearch(registry.id, registry.startIndex, this.CSW_RECORD_PAGE_LENGTH, fields, values, types, comparisons)
@@ -240,14 +248,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
                     registry.prevIndices.push(registry.startIndex);
                     registry.startIndex = response.nextIndexes[registry.id];
                     registry.recordsMatched = response.recordsMatched;
-                    if(response.hasOwnProperty('searchErrors') && response.searchErrors[registry.id] != null) {
+                    if (response.hasOwnProperty('searchErrors') && response.searchErrors[registry.id] != null) {
                         registry.searchError = response.searchErrors[registry.id];
                     }
                     this.cswSearchResults.set(registry.id, response.records);
                     registry.searching = false;
 
                     this.searchResultsIsCollapsed = false;
-                    //this.searchResultsElement.nativeElement.scrollIntoView(false);
+                    // this.searchResultsElement.nativeElement.scrollIntoView(false);
                 }, error => {
                     this.cswSearchResults.set(serviceId, null);
                     registry.searching = false;
@@ -261,7 +269,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      * @param registry the single registry to search
      */
     public facetedSearchSingleRegistry(registry: Registry): void {
-
         let fields: string[] = [];
         let values: string[] = [];
         let types: string[] = [];
@@ -331,15 +338,15 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
             registry.prevIndices.push(registry.startIndex);
             registry.startIndex = response.nextIndexes[registry.id];
             registry.recordsMatched = response.recordsMatched;
-            if((<CSWRecordModel[]>response.records).length > 0) {
+            if ((<CSWRecordModel[]>response.records).length > 0) {
                 this.cswSearchResults.set(registry.id, response.records);
             }
-            if(response.searchErrors && response.searchErrors.length > 0) {
+            if (response.searchErrors && response.searchErrors.length > 0) {
                 registry.searchError = response.searchErrors[registry.id];
             }
             registry.searching = false;
             this.searchResultsIsCollapsed = false;
-            //this.searchResultsElement.nativeElement.scrollIntoView(false);
+            // this.searchResultsElement.nativeElement.scrollIntoView(false);
         }, error => {
             this.cswSearchResults.set(registry.id, null);
             registry.searchError = error.message;
@@ -391,14 +398,14 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
      */
     public registryChanged(registry: Registry): void {
         this.getFacetedKeywords();
-        if(registry.checked) {
+        if (registry.checked) {
             this.facetedSearchSingleRegistry(registry);
         } else {
             registry.currentPage = 1;
             registry.startIndex = 1;
             registry.prevIndices = [];
             registry.recordsMatched = 0;
-            if(this.cswSearchResults.has(registry.id)) {
+            if (this.cswSearchResults.has(registry.id)) {
                 this.cswSearchResults.delete(registry.id);
             }
         }
@@ -512,7 +519,7 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     *          otherwise
     */
     public hasNextResultsPage(serviceId: String): boolean {
-        if(this.availableRegistries.get(serviceId).startIndex != 0 && this.availableRegistries.get(serviceId).startIndex != 1) {
+        if (this.availableRegistries.get(serviceId).startIndex !== 0 && this.availableRegistries.get(serviceId).startIndex !== 1) {
             return true;
         }
         return false;
@@ -565,19 +572,18 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     public getBookMarkCSWRecords() {
         this.userStateService.bookmarks.subscribe(data => {
             this.bookMarks = data;
-            // empty the book marked csw record list before gettting updated list
-            this.bookMarkCSWRecords = [];
+            let newBookMarkCSWRecords: CSWRecordModel[] = [];
             this.bookMarks.forEach(bookMark => {
                 this.cswSearchService.getFilteredCSWRecord(bookMark.fileIdentifier, bookMark.serviceId).subscribe(response => {
                     if (response && response.length === 1) {
-                        this.bookMarkCSWRecords.push(response.pop());
+                        newBookMarkCSWRecords.push(response.pop());
                     }
                 });
             });
+            this.bookMarkCSWRecords = newBookMarkCSWRecords;
         }, error => {
             console.log(error.message);
         });
-
     }
 
     /**
@@ -610,11 +616,11 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     /**
      * Return true if a CSWRecordModel has child records.
      * Currently the only indicator of GSKY parent records.
-     * 
-     * @param cswRecord 
+     *
+     * @param cswRecord
      */
     public hasChildRecords(cswRecord: CSWRecordModel): boolean {
-        if(cswRecord.hasOwnProperty('childRecords') &&
+        if (cswRecord.hasOwnProperty('childRecords') &&
            cswRecord.childRecords != null &&
            cswRecord.childRecords.length > 0) {
             return true;

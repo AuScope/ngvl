@@ -714,4 +714,13 @@ export class VglService {
     };
     return this.vglGet<DescribeCoverage>('getWCSCapabilities.do', params);
   }
+
+  public getWmsCapabilities(serviceUrl: string, version: string): Observable<any> {
+    const params = {
+      serviceUrl: serviceUrl,
+      version: version
+    };
+    return this.vglGet<any>('getWMSCapabilities.do', params);
+  }
+  
 }

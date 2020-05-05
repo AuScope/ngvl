@@ -7722,7 +7722,7 @@ pkg-up@^2.0.0:
 
 "portal-core-ui@github:AuScope/portal-core-ui#master":
   version "0.0.1"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/94527a77d5218fedf2749dad2b2beaca92ec1f73"
+  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/63a14584386d982c16d8ee170dfd39d7e50d4d1b"
 
 portfinder@^1.0.25:
   version "1.0.25"

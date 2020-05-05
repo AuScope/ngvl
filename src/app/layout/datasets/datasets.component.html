@@ -5,8 +5,8 @@
             <as-split-area size="30" class="split-area-search">
                 <!-- Datasets -->
                 <div class="card">
-                    <ul ngbNav #nav="ngbNav" class="nav-tabs">
-                        <li ngbNavItem>
+                    <ul ngbNav #nav="ngbNav" [(activeId)]="activeNavId" class="nav-tabs">
+                        <li [ngbNavItem]="1">
                             <a ngbNavLink>Datasets</a>
                             <ng-template ngbNavContent>
                                 <div class="card-body">
@@ -265,7 +265,7 @@
                         </li>
 
                         <!-- TODO: Should probably be paginated -->
-                        <li ngbNavItem *ngIf="isValidUser() && bookMarkCSWRecords.length>0">
+                        <li [ngbNavItem]="2" *ngIf="isValidUser() && bookMarkCSWRecords.length>0">
                             <a ngbNavLink>Bookmarks</a>
                             <ng-template ngbNavContent>
                                 <div class="card-body bookmarks" style="padding-left:15px;padding-right:15px;">

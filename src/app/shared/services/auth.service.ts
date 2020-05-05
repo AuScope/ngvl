@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -11,6 +11,9 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 @Injectable()
 export class AuthService {
+
+  // EventEmitter for User logout
+  userLoggedOut: EventEmitter<Boolean> = new EventEmitter();
 
   constructor(private userStateService: UserStateService,
               private olMapService: OlMapService,
@@ -26,6 +29,7 @@ export class AuthService {
     localStorage.removeItem('solutions');
     localStorage.removeItem('jobDownloads');
     localStorage.removeItem('layers');
+    this.userLoggedOut.emit(true);
     // Hit the VGL logout endpoint, then navigate to the dashboard.
     this.http.get('/VGL-Portal/logout')
       // VGL redirects from the spring logout to the old portal page, which 404's,
@@ -76,13 +80,13 @@ export class AuthService {
         // Check is User has accpeted T&C's
         if (user.acceptedTermsConditions && user.acceptedTermsConditions > 0) {
           // Load any layers and job downloads that may have been added pre-log in
-          if(localStorage.getItem('layers') && localStorage.getItem('layers').length > 0) {
+          if (localStorage.getItem('layers') && localStorage.getItem('layers').length > 0) {
             let layers: LayerModel[] = JSON.parse(localStorage.getItem('layers'));
             layers.forEach(layer => {
               this.olMapService.addLayer(layer, null);
             });
           }
-          if(localStorage.getItem('jobDownloads') && localStorage.getItem('jobDownloads').length > 0) {
+          if (localStorage.getItem('jobDownloads') && localStorage.getItem('jobDownloads').length > 0) {
             let jobDownloads: JobDownload[] = JSON.parse(localStorage.getItem('jobDownloads'));
             this.userStateService.setJobDownloads(jobDownloads);
           }

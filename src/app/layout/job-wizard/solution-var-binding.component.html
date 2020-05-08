@@ -3,11 +3,18 @@
 
   <div [ngSwitch]="binding.controlType">
 
-    <input *ngSwitchCase="'textbox'" [formControlName]="binding.key"
-      [id]="binding.key" [type]="inputBindingFormType(binding)">
+    <input *ngSwitchCase="'text'" [formControlName]="binding.key" [id]="binding.key" type="text" [required]="binding.required">
+
+    <input *ngSwitchCase="'number'" [formControlName]="binding.key"
+      type="number" [id]="binding.key" [required]="binding.required"
+      [min]="numberBinding(binding, 'min')"
+      [max]="numberBinding(binding, 'max')"
+      [step]="numberBinding(binding, 'step')">
+
+    <input *ngSwitchCase="'checkbox'" [formControlName]="binding.key" [id]="binding.key" type="checkbox" [required]="binding.required">
 
     <select [id]="binding.key" *ngSwitchCase="'dropdown'" [formControlName]="binding.key">
-      <option *ngFor="let opt of getBindingOptions(binding)" [value]="opt.key">{{opt.value}}</option>
+      <option *ngFor="let opt of getBindingOptions(binding)" [value]="opt">{{opt}}</option>
     </select>
 
   </div>

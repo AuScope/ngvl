@@ -18,7 +18,8 @@ import {
   StringEntryBinding,
   NumberEntryBinding,
   OptionsBinding,
-  BooleanBinding
+  BooleanBinding,
+  create_var_binding
 } from '../modules/solutions/models';
 
 export const DASHBOARD_VIEW = 'dashboard-view';
@@ -543,7 +544,7 @@ export class UserStateService {
             const name = `${prefix}-${v.name}`;
             return {...v, name: name};
           })
-          .map(this._createBinding);
+          .map(create_var_binding);
       }
     });
 
@@ -562,56 +563,56 @@ export class UserStateService {
     return this._solutionVarPrefixMap[solution.id];
   }
 
-  private _createBinding(v: Variable): VarBinding<any> {
-    let b: VarBinding<any>;
-    const options: VarBindingOptions<any> = {
-      key: v.name,
-      label: v.label,
-      description: v.description,
-      required: !v.optional
-    };
+  // private _createBinding(v: Variable): VarBinding<any> {
+  //   let b: VarBinding<any>;
+  //   const options: VarBindingOptions<any> = {
+  //     key: v.name,
+  //     label: v.label,
+  //     description: v.description,
+  //     required: !v.optional
+  //   };
 
-    if (v.default !== undefined) {
-      options.value = v.default;
-    }
+  //   if (v.default !== undefined) {
+  //     options.value = v.default;
+  //   }
 
-    if (v.values) {
-      options.options = v.values;
-    }
+  //   if (v.values.length > 0) {
+  //     options.options = v.values;
+  //   }
 
-    if (v.type === "file") {
-      // File inputs are always dropdowns, with options populated from the
-      // current set of selected downloads.
-      b = new OptionsBinding<string>(options);
+  //   if (v.type === "file") {
+  //     // File inputs are always dropdowns, with options populated from the
+  //     // current set of selected downloads.
+  //     b = new OptionsBinding<string>(options);
 
-    } else if (v.type === "int") {
-      options.step = v.step || 1;
-      if (v.min != null) {
-        options.min = v.min;
-      }
-      if (v.max != null)  {
-        options.max = v.max;
-      }
-      b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
+  //   } else if (v.type === "int") {
+  //     options.step = v.step || 1;
+  //     if (v.min != null) {
+  //       options.min = v.min;
+  //     }
+  //     if (v.max != null)  {
+  //       options.max = v.max;
+  //     }
+  //     b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
 
-    } else if (v.type === "double") {
-      options.step = v.step || 0.01;
-      if (v.min != null) {
-        options.min = v.min;
-      }
-      if (v.max != null)  {
-        options.max = v.max;
-      }
-      b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
+  //   } else if (v.type === "double") {
+  //     options.step = v.step || 0.01;
+  //     if (v.min != null) {
+  //       options.min = v.min;
+  //     }
+  //     if (v.max != null)  {
+  //       options.max = v.max;
+  //     }
+  //     b = options.options ? new OptionsBinding<number>(options) : new NumberEntryBinding(options);
 
-    } else if (v.type === "string") {
-      b = options.options ? new OptionsBinding<string>(options) : new StringEntryBinding(options);
+  //   } else if (v.type === "string") {
+  //     b = options.options ? new OptionsBinding<string>(options) : new StringEntryBinding(options);
 
-    } else if (v.type === "boolean") {
-      b = new BooleanBinding(options);
-    }
+  //   } else if (v.type === "boolean") {
+  //     b = new BooleanBinding(options);
+  //   }
 
-    return b;
-  }
+  //   return b;
+  // }
 
 }

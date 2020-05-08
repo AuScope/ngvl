@@ -62,9 +62,9 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {
     const values = [
-      ...downs.map(d => ({key: d.localPath, value: d.name})),
-      ...clouds.map(c => ({key: c.name, value: c.name})),
-      ...ups.map(u => ({key: u.name, value: u.name}))
+      ...downs.map(d => d.localPath),
+      ...clouds.map(c => c.name),
+      ...ups.map(u => u.name)
     ];
 
     this.bindings.forEach(b => {

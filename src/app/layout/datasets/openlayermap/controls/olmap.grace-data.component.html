@@ -1,0 +1,5 @@
+<div *ngIf="isGraceHostSet()">
+    <button type="button" class="btn btn-sm btn-primary" (click)='selectGraceData()' [disabled]="!isActiveGraceLayerPresent()">
+        {{ buttonText }}
+    </button>
+</div>

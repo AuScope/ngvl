@@ -61,18 +61,18 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   }
 
   updateInputFiles([downs, clouds, ups]: [JobDownload[], CloudFileInformation[], any[]]) {
-    const options = [
-      ...downs.map(d => ({key: d.localPath, value: d.name})),
-      ...clouds.map(c => ({key: c.name, value: c.name})),
-      ...ups.map(u => ({key: u.name, value: u.name}))
+    const values = [
+      ...downs.map(d => d.localPath),
+      ...clouds.map(c => c.name),
+      ...ups.map(u => u.name)
     ];
 
     this.bindings.forEach(b => {
       if (this.isInputFileBinding(b)) {
-        (b as OptionsBinding<any>).options = options;
+        (b as OptionsBinding<any>).values = values;
 
         // If the current value is in options then retain it, otherwise reset to no selection
-        const stillAnOption = options.find(o => o.key === b.value);
+        const stillAnOption = values.find(o => o.key === b.value);
         if (!stillAnOption) {
           b.value = null;
         }
@@ -81,6 +81,6 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
   }
 
   isInputFileBinding(binding: VarBinding<any>): boolean {
-    return binding && binding.controlType === 'dropdown';
+    return binding && binding.type === 'file';
   }
 }

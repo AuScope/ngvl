@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { VarBinding, StringEntryBinding, NumberEntryBinding, OptionsBinding } from '../../shared/modules/solutions/models';
+import { VarBinding, NumberEntryBinding, OptionsBinding } from '../../shared/modules/solutions/models';
+import { VarBindingType } from '../../shared/modules/vgl/models';
 
 @Component({
   selector: 'app-solution-var-binding',
@@ -28,12 +29,22 @@ export class SolutionVarBindingComponent implements OnInit {
     return "string";
   }
 
-getBindingOptions<T>(binding: VarBinding<T>): {key: string, value: T}[] {
-  if (binding instanceof OptionsBinding) {
-    return binding.options;
+  getBindingOptions<T extends VarBindingType>(binding: VarBinding<T>): T[] {
+    if (binding instanceof OptionsBinding) {
+      const b = binding as OptionsBinding<T>;
+      return b.values;
+    }
+
+    return [];
   }
 
-  return [];
-}
+  numberBinding<T extends VarBindingType>(binding: VarBinding<T>, property: string): number {
+    if (binding instanceof NumberEntryBinding) {
+      const b = binding as NumberEntryBinding;
+      return b[property];
+    }
+
+    return null;
+  }
 
 }

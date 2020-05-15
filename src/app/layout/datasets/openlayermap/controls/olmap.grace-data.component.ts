@@ -33,7 +33,7 @@ export class OlMapGraceDataComponent implements AfterViewInit {
             const map = this.olMapObject.getMap();
             const clickCoord = map.getCoordinateFromPixel(p);
             const modalRef = this.modalService.open(GraceGraphModalComponent, { size: 'lg' });
-            modalRef.componentInstance.parameter = "estimate";
+            modalRef.componentInstance.parameter = "Estimate";
             modalRef.componentInstance.x = clickCoord[0];
             modalRef.componentInstance.y = clickCoord[1];
             this.buttonText = 'GRACE';

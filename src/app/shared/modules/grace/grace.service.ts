@@ -8,7 +8,11 @@ export class GraceService {
 
     constructor(private http: HttpClient) {}
 
-    public getTimeSeriesData(parameter: string, x: number, y: number): Observable<any> {
-        return this.http.get(environment.graceHost + "/" + parameter + "/" + x + "/" + y);
+    public getTimeSeriesDataForParameter(parameter: string, x: number, y: number): Observable<any> {
+        return this.http.get(environment.graceHost + "/parameter/" + parameter + "/" + x + "/" + y);
+    }
+
+    public getAllTimeSeriesData(x: number, y: number): Observable<any> {
+        return this.http.get(environment.graceHost + "/all/" + x + "/" + y);
     }
 }

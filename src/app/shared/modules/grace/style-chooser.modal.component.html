@@ -1,0 +1,31 @@
+<form [formGroup]="styleGroup" (ngSubmit)="onSubmit()">
+    <div class="modal-header" style="background: #EEE">
+        <h5 class="modal-title">Style Chooser</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss('dismiss')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+     <!-- TODO: Check numeric values or restrict entry to numeric values -->
+    <div class="modal-body style-modal">
+
+        <div class="row">
+            <div class="col">Upper Bound<br>
+                <input id="maxValue" type="text" formControlName="maxValue"><p-colorPicker formControlName="maxColor"></p-colorPicker>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">Neutral<br>
+                <input id="neutralValue" type="text" formControlName="neutralValue"><p-colorPicker formControlName="neutralColor"></p-colorPicker>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">Lower Bound<br>
+                <input id="minValue" type="text" formControlName="minValue"><p-colorPicker formControlName="minColor"></p-colorPicker>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer" style="background: #EEE">
+        <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('dismiss')" >Cancel</button>
+        <button type="submit" class="btn btn-primary">Set</button>
+    </div>
+</form>

@@ -51,7 +51,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
         this.status = this.QueryStatus.querying;
         /*
         // Make call to GRACE service to get data for single parameter
-        this.querySubscription = this.graceService.getTimeSeriesDataForParameter(this.parameter, this.x, this.y).subscribe(data => {
+        this.querySubscription = this.graceService.getGraceTimeSeriesDataForParameter(this.parameter, this.x, this.y).subscribe(data => {
             // Plot graph
             this.graph.layout.title = '<b>' + this.parameter + '</b><br>' +
                 'Primary Mascon: ' + data.primary_mascon_id +
@@ -65,7 +65,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
         });
         */
         // Make call to GRACE service to get data for single parameter
-        this.querySubscription = this.graceService.getAllTimeSeriesData(this.x, this.y).subscribe(data => {
+        this.querySubscription = this.graceService.getGraceAllTimeSeriesData(this.x, this.y).subscribe(data => {
             this.queriedData = data;
             this.plotGraph();
             this.status = this.QueryStatus.loaded;
@@ -93,6 +93,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 errorPlot = {
                     type: 'data',
                     array: error_vals,
+                    color: 'purple',
                     visible: true
                 };
             }

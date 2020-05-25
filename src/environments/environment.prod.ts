@@ -32,5 +32,6 @@ export const environment = {
         { value: 'Aerial', viewValue: 'Bing Aerial', layerType: 'Bing' },
         { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', layerType: 'Bing' }
     ],
-    forceAddLayerViaProxy: []
+    forceAddLayerViaProxy: [],
+    graceHost: 'http://localhost:8001'
 };

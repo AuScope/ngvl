@@ -84,8 +84,8 @@ export class DatasetsRecordComponent {
 
 
                 }
-                this.olMapService.addCSWRecord(clonedRecord, {});
-                
+                this.olMapService.addCSWRecord(clonedRecord);
+
                 // Set a time if an extent exists
                 if (clonedRecord.temporalExtent && clonedRecord.temporalExtent.endPosition) {
                     console.log("Changing to end position: " + JSON.stringify(clonedRecord.temporalExtent.endPosition));

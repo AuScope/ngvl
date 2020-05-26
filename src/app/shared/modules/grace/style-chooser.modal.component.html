@@ -10,22 +10,22 @@
 
         <div class="row">
             <div class="col">Upper Bound<br>
-                <input id="maxValue" type="text" formControlName="maxValue"><p-colorPicker formControlName="maxColor"></p-colorPicker>
+                <input id="maxValue" type="text" formControlName="maxValue">&nbsp;(m)&nbsp;<p-colorPicker formControlName="maxColor"></p-colorPicker>
             </div>
         </div>
         <div class="row">
             <div class="col">Neutral<br>
-                <input id="neutralValue" type="text" formControlName="neutralValue"><p-colorPicker formControlName="neutralColor"></p-colorPicker>
+                <input id="neutralValue" type="text" formControlName="neutralValue">&nbsp;(m)&nbsp;<p-colorPicker formControlName="neutralColor"></p-colorPicker>
             </div>
         </div>
         <div class="row">
             <div class="col">Lower Bound<br>
-                <input id="minValue" type="text" formControlName="minValue"><p-colorPicker formControlName="minColor"></p-colorPicker>
+                <input id="minValue" type="text" formControlName="minValue">&nbsp;(m)&nbsp;<p-colorPicker formControlName="minColor"></p-colorPicker>
             </div>
         </div>
     </div>
     <div class="modal-footer" style="background: #EEE">
         <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('dismiss')" >Cancel</button>
-        <button type="submit" class="btn btn-primary">Set</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!styleGroup.valid">Set</button>
     </div>
 </form>

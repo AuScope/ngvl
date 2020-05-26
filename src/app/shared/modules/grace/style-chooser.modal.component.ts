@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { GraceStyleSettings } from './grace-graph.models';
 
 
@@ -22,11 +22,11 @@ export class StyleChooserModalComponent implements OnInit {
     ngOnInit() {
         this.styleGroup = this.formBuilder.group({
             minColor: this.graceStyleSettings.minColor,
-            minValue: this.graceStyleSettings.minValue,
+            minValue: [this.graceStyleSettings.minValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
             neutralColor: this.graceStyleSettings.neutralColor,
-            neutralValue: this.graceStyleSettings.neutralValue,
+            neutralValue: [this.graceStyleSettings.neutralValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
             maxColor: this.graceStyleSettings.maxColor,
-            maxValue: this.graceStyleSettings.maxValue,
+            maxValue: [this.graceStyleSettings.maxValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]]
         });
     }
 

@@ -1,8 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import * as Proj from 'ol/proj';
 import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
 import { environment } from '../../../../../environments/environment';
 import { GraceGraphModalComponent } from '../../../../shared/modules/grace/grace-graph.modal.component';
+import { GraceService } from '../../../../shared/modules/grace/grace.service';
 
 
 @Component({
@@ -16,7 +18,7 @@ export class OlMapGraceDataComponent implements AfterViewInit {
     buttonText = "GRACE";
 
 
-    constructor(public olMapObject: OlMapObject, private modalService: NgbModal) {}
+    constructor(public olMapObject: OlMapObject, private graceService: GraceService, private modalService: NgbModal) {}
 
 
     ngAfterViewInit() {
@@ -32,10 +34,10 @@ export class OlMapGraceDataComponent implements AfterViewInit {
         if (this.buttonText === 'Click on Mascon') {
             const map = this.olMapObject.getMap();
             const clickCoord = map.getCoordinateFromPixel(p);
+            const lonlat = Proj.transform(clickCoord, 'EPSG:3857', 'EPSG:4326');
             const modalRef = this.modalService.open(GraceGraphModalComponent, { size: 'lg' });
-            modalRef.componentInstance.parameter = "Estimate";
-            modalRef.componentInstance.x = clickCoord[0];
-            modalRef.componentInstance.y = clickCoord[1];
+            modalRef.componentInstance.x = lonlat[0];
+            modalRef.componentInstance.y = lonlat[1];
             this.buttonText = 'GRACE';
         }
     }

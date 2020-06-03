@@ -115,7 +115,7 @@ export class CSWSearchService {
             return response['data'];
         });
     }
-    
+
     /**
      * executes getFacetedCSWServices.do in vgl service
      */

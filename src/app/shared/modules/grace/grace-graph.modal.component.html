@@ -22,7 +22,8 @@
     <div style="text-align:center;" *ngIf="status===QueryStatus.error">
         Unable to retrieve GRACE data.
     </div>
-    <plotly-plot *ngIf="status===QueryStatus.loaded" [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+    <plotly-plot *ngIf="status===QueryStatus.loaded"
+        [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
 </div>
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-primary" (click)="activeModal.close()" >Close</button>

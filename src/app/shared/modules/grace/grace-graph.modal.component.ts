@@ -2,7 +2,10 @@ import { Component, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { GraceService } from './grace.service';
+import { saveAs } from 'file-saver';
 
+
+declare var Plotly: any;
 
 /**
  * TODO: Catch modal close (or dismiss) and cancel GRACE query Subscription
@@ -44,6 +47,19 @@ export class GraceGraphModalComponent implements AfterViewInit {
             yaxis: {
                 title: 'Height (m)'
             }
+        },
+        config: {
+            displaylogo: false,
+            modeBarButtonsToAdd: [{
+                name: 'Download JSON data',
+                icon: Plotly.Icons.disk,
+                click: function() {
+                    this.downloadData(this.queriedData);
+                }.bind(this)
+            }],
+            modeBarButtonsToRemove: [
+                'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'
+            ]
         }
     };
 
@@ -116,6 +132,11 @@ export class GraceGraphModalComponent implements AfterViewInit {
     public parameterChange(param: string) {
         this.parameter = param;
         this.plotGraph();
+    }
+
+    public downloadData(data: any) {
+        const blob = new Blob([JSON.stringify(data)], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, data.ternary_mascon_id + ".json");
     }
 
 }

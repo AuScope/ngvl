@@ -88,7 +88,6 @@ export class DatasetsRecordComponent {
 
                 // Set a time if an extent exists
                 if (clonedRecord.temporalExtent && clonedRecord.temporalExtent.endPosition) {
-                    console.log("Changing to end position: " + JSON.stringify(clonedRecord.temporalExtent.endPosition));
                     this.changeTime(clonedRecord.temporalExtent.endPosition);
                 }
             } catch (error) {
@@ -471,7 +470,6 @@ export class DatasetsRecordComponent {
      */
     changeGraceStyle(record: CSWRecordModel) {
         if (this.graceStyleSettings === undefined || this.graceStyleSettings === null) {
-            console.log("Settings defaults");
             this.graceStyleSettings = {
                 minColor: '#ff0000',
                 minValue: -8,

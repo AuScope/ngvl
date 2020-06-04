@@ -469,7 +469,8 @@ export class DatasetsRecordComponent {
                 neutralColor: '#ffffff',
                 neutralValue: 0,
                 maxColor: '#0000ff',
-                maxValue: 4
+                maxValue: 4,
+                transparentNeutralColor: false
             };
         }
         const modalRef = this.modalService.open(StyleChooserModalComponent, { size: 'sm' });
@@ -481,11 +482,12 @@ export class DatasetsRecordComponent {
                 neutralColor: newStyle.neutralColor,
                 neutralValue: newStyle.neutralValue,
                 maxColor: newStyle.maxColor,
-                maxValue: newStyle.maxValue
+                maxValue: newStyle.maxValue,
+                transparentNeutralColor: newStyle.transparentNeutralColor
             };
-          const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
-          this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
-          this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
+            const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
+            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
+            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
         }, () => {});
     }
 

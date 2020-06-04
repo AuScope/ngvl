@@ -5,4 +5,5 @@ export interface GraceStyleSettings {
     neutralValue: number;
     maxColor: string;
     maxValue: number;
+    transparentNeutralColor: boolean;
 }

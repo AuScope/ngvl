@@ -14,12 +14,7 @@ export class GraceStyleService {
      * @method getGraceSld
      * @param layerName - name of Geoserver WMS layer e.g.'mascons_stage4_V003a'
      * @param styleName - arbitrary name of style e.g. 'mascons_style'
-     * @param minValProperty - value property for the minimum bound
-     * @param minColProperty - colour code property for the minimum bound
-     * @param neutralValProperty - value property for the neutral bound
-     * @param neutralColProperty - colour code property for the neutral bound
-     * @param maxValProperty - value property for the maximum bound
-     * @param maxColProperty - colour code property for the maximum bound
+     * @param styleSettings - GRACE bounds and colours
      * @return style sheet in string form
      */
     public static getGraceSld(layerName: string, styleName: string,
@@ -36,9 +31,7 @@ export class GraceStyleService {
         const namedLayer = (body: string) => ['sld:NamedLayer', null, body];
         const name = (nameStr: string) => ['sld:Name', null, nameStr];
         const userStyle = (body: string) => ['sld:UserStyle', null, body];
-        const body1 = serialize(name(styleName)) + this.getFeatureTypeStyle(
-            styleSettings.minValue, styleSettings.minColor, styleSettings.neutralValue,
-            styleSettings.neutralColor, styleSettings.maxValue, styleSettings.maxColor);
+        const body1 = serialize(name(styleName)) + this.getFeatureTypeStyle(styleSettings);
         const body2 = serialize(name(layerName)) + serialize(userStyle(body1));
         return xmlHeader + serialize(styledLayerDesc(namedLayer(body2)));
     }
@@ -47,16 +40,12 @@ export class GraceStyleService {
      * Assembles 'sld:FeatureTypeStyle' component of SLD_BODY parameter
      *
      * @method getFeatureTypeStyle
-     * @param ccProperty - colour code property: either 'TenementType' or 'TenementStatus' or ''
+     * @param styleSettings - the GRACE style settings
      * @return XML 'sld:FeatureTypeStyle' string
      */
-    private static getFeatureTypeStyle(minValProperty: number, minColProperty: string,
-        neutralValProperty: number, neutralColProperty: string,
-        maxValProperty: number, maxColProperty: string): string {
+    private static getFeatureTypeStyle(styleSettings: GraceStyleSettings): string {
 
-        const polygonSymbolizer = this.getPolySymbolizer(
-            minValProperty, minColProperty, neutralValProperty, neutralColProperty,
-            maxValProperty, maxColProperty);
+        const polygonSymbolizer = this.getPolySymbolizer(styleSettings);
         const rule = ['sld:Rule', null, polygonSymbolizer];
         return serialize(['sld:FeatureTypeStyle', null, rule]);
     }
@@ -65,29 +54,42 @@ export class GraceStyleService {
      * Assembles 'sld:PolygonSymbolizer' component of SLD_BODY parameter
      *
      * @method getPolySymbolizer
-     * @param fillColour colour of fill in polygon e.g. '#AA4499'
-     * @param strokeColour colour of stroke in polygon e.g. '#AA4499'
+     * @param styleSettings - the GRACE style settings
      * @return XML 'sld:PolygonSymbolizer' string
      */
-    private static getPolySymbolizer(minValue: number, minColor: string,
-            neutralValue: number, neutralColor: string,
-            maxValue: number, maxColor: string): string {
+    private static getPolySymbolizer(styleSettings: GraceStyleSettings): string {
         const propertyName = ['ogc:PropertyName', null, 'estimate'];
-        const literalMinVal = ['ogc:Literal', null, minValue];
-        const literalMinCol = ['ogc:Literal', null, minColor];
-        const literalNeutralVal = ['ogc:Literal', null, neutralValue];
-        const literalNeutralCol = ['ogc:Literal', null, neutralColor];
-        const literalMaxVal = ['ogc:Literal', null, maxValue];
-        const literalMaxCol = ['ogc:Literal', null, maxColor];
-        const literalType = ['ogc:Literal', null, 'color'];
+        const literalMinVal = ['ogc:Literal', null, styleSettings.minValue];
+        const literalMinCol = ['ogc:Literal', null, styleSettings.minColor];
+        const literalNeutralVal = ['ogc:Literal', null, styleSettings.neutralValue];
+        const literalNeutralCol = ['ogc:Literal', null, styleSettings.neutralColor];
+        const literalMaxVal = ['ogc:Literal', null, styleSettings.maxValue];
+        const literalMaxCol = ['ogc:Literal', null, styleSettings.maxColor];
+        const literalColorType = ['ogc:Literal', null, 'color'];
         const func = ['ogc:Function', { 'name': 'Interpolate' },
             [propertyName, literalMinVal, literalMinCol, literalNeutralVal,
-                literalNeutralCol, literalMaxVal, literalMaxCol, literalType]];
+                literalNeutralCol, literalMaxVal, literalMaxCol, literalColorType]];
         const fillCss = ['sld:CssParameter', { 'name': 'fill' }, func];
-        const fill = ['sld:Fill', null, fillCss];
-        const strokeCss = ['sld:CssParameter', { 'name': 'stroke' }, func];
-        const strokeWidthCss = ['sld:CssParameter', { 'name': 'stroke-width' }, 1];
-        const stroke = ['sld:Stroke', null, [strokeCss, strokeWidthCss]];
+
+        let fillCssOpacity = [];
+        if (styleSettings.transparentNeutralColor) {
+            const literalOpaqueVal = ['ogc:Literal', null, 1];
+            const literalTransparentVal = ['ogc:Literal', null, 0];
+            const literalNumericType = ['ogc:Literal', null, 'numeric'];
+            const opacityFillFunc = ['ogc:Function', { 'name': 'Interpolate' },
+            [propertyName, literalMinVal, literalOpaqueVal, literalNeutralVal,
+                literalTransparentVal, literalMaxVal, literalOpaqueVal, literalNumericType]];
+            fillCssOpacity = ['sld:CssParameter', {'name': 'fill-opacity'}, opacityFillFunc];
+        }
+        const fill = ['sld:Fill', null, [fillCss, fillCssOpacity]];
+
+        let stroke = [];
+        if (styleSettings.transparentNeutralColor === false) {
+            const strokeCss = ['sld:CssParameter', { 'name': 'stroke' }, func];
+            const strokeWidthCss = ['sld:CssParameter', { 'name': 'stroke-width' }, 1];
+            stroke = ['sld:Stroke', null, [strokeCss, strokeWidthCss]];
+        }
+
         return serialize(['sld:PolygonSymbolizer', null, [fill, stroke]]);
     }
 

@@ -7,7 +7,6 @@
     </div>
      <!-- TODO: Check numeric values or restrict entry to numeric values -->
     <div class="modal-body style-modal">
-
         <div class="row">
             <div class="col">Upper Bound<br>
                 <input id="maxValue" type="text" formControlName="maxValue">&nbsp;(m)&nbsp;<p-colorPicker formControlName="maxColor"></p-colorPicker>
@@ -16,6 +15,16 @@
         <div class="row">
             <div class="col">Neutral<br>
                 <input id="neutralValue" type="text" formControlName="neutralValue">&nbsp;(m)&nbsp;<p-colorPicker formControlName="neutralColor"></p-colorPicker>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col" style="font-size:small">
+                <input type="checkbox" formControlName="transparentNeutralColor">&nbsp;Transparent neutral colour
+            </div>
+        </div>
+        <div class="row" *ngIf="styleGroup.controls.transparentNeutralColor.value===true">
+            <div class="col" style="font-size:smaller;color:red;">
+                Slight artefacting between mascons wil occur
             </div>
         </div>
         <div class="row">

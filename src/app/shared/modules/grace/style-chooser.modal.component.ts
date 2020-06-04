@@ -26,7 +26,8 @@ export class StyleChooserModalComponent implements OnInit {
             neutralColor: this.graceStyleSettings.neutralColor,
             neutralValue: [this.graceStyleSettings.neutralValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
             maxColor: this.graceStyleSettings.maxColor,
-            maxValue: [this.graceStyleSettings.maxValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]]
+            maxValue: [this.graceStyleSettings.maxValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
+            transparentNeutralColor: this.graceStyleSettings.transparentNeutralColor
         });
     }
 

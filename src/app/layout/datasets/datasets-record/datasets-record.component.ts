@@ -12,6 +12,7 @@ import { StyleChooserModalComponent } from '../../../shared/modules/grace/style-
 import { GraceStyleSettings } from '../../../shared/modules/grace/grace-graph.models';
 import { GraceService } from '../../../shared/modules/grace/grace.service';
 import { GraceStyleService } from '../../../shared/modules/grace/grace-style.service';
+import { environment } from '../../../../environments/environment';
 
 
 // List of valid online resource types that can be added to the map
@@ -445,20 +446,11 @@ export class DatasetsRecordComponent {
     }
 
     /**
-     * TODO: Restrict
-     *
-     * @param record CSW record
-     */
-    public allowGraceStyleChange(record: CSWRecordModel): boolean {
-        return true;
-    }
-
-    /**
      * TODO: Needs better check
-     * XXX
      */
     public isGraceRecord(): boolean {
-        if (this.cswRecord.id.toLowerCase().startsWith('mascons')) {
+        if (environment.grace && environment.grace.layers &&
+                environment.grace.layers.indexOf(this.cswRecord.id) >= 0) {
             return true;
         }
         return false;

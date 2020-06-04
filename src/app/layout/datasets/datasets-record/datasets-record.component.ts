@@ -11,6 +11,7 @@ import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { StyleChooserModalComponent } from '../../../shared/modules/grace/style-chooser.modal.component';
 import { GraceStyleSettings } from '../../../shared/modules/grace/grace-graph.models';
 import { GraceService } from '../../../shared/modules/grace/grace.service';
+import { GraceStyleService } from '../../../shared/modules/grace/grace-style.service';
 
 
 // List of valid online resource types that can be added to the map
@@ -490,16 +491,9 @@ export class DatasetsRecordComponent {
                 maxColor: newStyle.maxColor,
                 maxValue: newStyle.maxValue
             };
-           const sldUrl = 'http://localhost:8001/sld/' +
-                this.cswRecord.id + '/' +
-                this.graceStyleSettings.minValue + '/' +
-                this.graceStyleSettings.minColor.substr(1) + '/' +
-                this.graceStyleSettings.neutralValue + '/' +
-                this.graceStyleSettings.neutralColor.substr(1) + '/' +
-                this.graceStyleSettings.maxValue + '/' +
-                this.graceStyleSettings.maxColor.substr(1);
-           this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
-           this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD', sldUrl);
+          const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
+          this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
+          this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
         }, () => {});
     }
 

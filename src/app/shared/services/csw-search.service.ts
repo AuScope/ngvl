@@ -248,7 +248,7 @@ export class CSWSearchService {
                 delete downloadOptions.srsName;
                 delete downloadOptions.featureType;
                 delete downloadOptions.layerName;
-                
+
                 downloadOptions.coverageName = or.name;
                 downloadOptions.outputWidth = 256;
                 downloadOptions.outputHeight = 256;
@@ -267,9 +267,10 @@ export class CSWSearchService {
                 delete downloadOptions.outputWidth;
                 delete downloadOptions.outputHeight;
 
+                downloadOptions.crs = "EPSG:4326";
                 downloadOptions.serviceUrl = or.url;
                 downloadOptions.featureType = or.name;
-                downloadOptions.srsName = '';
+                downloadOptions.srsName = 'EPSG:4326';
                 break;
             case 'NCSS':
                 delete downloadOptions.format;

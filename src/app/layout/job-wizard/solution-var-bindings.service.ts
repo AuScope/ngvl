@@ -15,8 +15,8 @@ export class SolutionVarBindingsService {
 
     bindings.forEach(binding => {
       group[binding.key] = binding.required
-        ? new FormControl(binding.value || '', Validators.required)
-        : new FormControl(binding.value || '');
+        ? new FormControl(binding.value ?? '', Validators.required)
+        : new FormControl(binding.value ?? '');
     });
 
     return new FormGroup(group);

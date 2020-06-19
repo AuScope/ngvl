@@ -164,7 +164,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     } else {
       this.jobIncomplete = true;
     }
-    return this.jobIncomplete;
+    return !this.jobIncomplete;
   }
 
   validSolutionBindings(): boolean {

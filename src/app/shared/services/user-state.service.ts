@@ -422,7 +422,8 @@ export class UserStateService {
         jobParameters: [],
         jobDownloads: [],
         jobFiles: [],
-        jobSolutions: []
+        jobSolutions: [],
+        annotations: []
     };
     return Object.assign(job, initialValues);
   }

@@ -203,7 +203,7 @@ export class CSWSearchService {
 
     /**
      * Create default download options for a given online resource
-     * 
+     *
      * TODO: Do we need to delete parameters if they're marked as optional ("?")
      *
      * @param or
@@ -221,7 +221,7 @@ export class CSWSearchService {
             url: or.url,
             method: 'POST',
             localPath: './' + or.name,
-            crs: (defaultBbox ? defaultBbox.crs : ''),
+            crs: ((defaultBbox && defaultBbox.crs) ? defaultBbox.crs : 'EPSG:4326'), // Default to WGS84
             eastBoundLongitude: (defaultBbox ? defaultBbox.eastBoundLongitude : 0),
             northBoundLatitude: (defaultBbox ? defaultBbox.northBoundLatitude : 0),
             southBoundLatitude: (defaultBbox ? defaultBbox.southBoundLatitude : 0),

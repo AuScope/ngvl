@@ -44,15 +44,17 @@ export class OlMapGraceDataComponent implements AfterViewInit {
         }
     }
 
-    public isActiveGraceLayerPresent(): boolean {
+    public getActiveGraceLayer(): string {
+        let graceLayer;
         if (environment.grace && environment.grace.layers && environment.grace.layers.length > 0) {
             for (let layer of environment.grace.layers) {
                 if (this.olMapService.layerExists(layer)) {
-                    return true;
+                    graceLayer = layer;
+                    break;
                 }
             }
         }
-        return false;
+        return graceLayer;
     }
 
 }

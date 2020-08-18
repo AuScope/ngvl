@@ -614,21 +614,6 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     }
 
     /**
-     * Return true if a CSWRecordModel has child records.
-     * Currently the only indicator of GSKY parent records.
-     *
-     * @param cswRecord
-     */
-    public hasChildRecords(cswRecord: CSWRecordModel): boolean {
-        if (cswRecord.hasOwnProperty('childRecords') &&
-           cswRecord.childRecords != null &&
-           cswRecord.childRecords.length > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * TODO: This is used elsewhere, should make a map service method
      */
     public getActiveLayerCount(): number {

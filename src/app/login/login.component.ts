@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
 
   loginAaf() {
     this.selectedItemsToLocalStorage();
-    window.location.href = "/VGL-Portal/login/aaf";
+    window.location.href = environment.portalBaseUrl + "login/aaf";
   }
 
 }

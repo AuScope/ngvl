@@ -6,7 +6,7 @@
 export const environment = {
     production: false,
     getCSWRecordUrl: 'getKnownLayers.do',
-    portalBaseUrl: '/VGL-Portal/',
+    portalBaseUrl: '/api/',
     boundariesUrl: 'http://dcdpgeo.data61.csiro.au:8080/geoserver/boundaries',
     boundaryLayersEmpty: [],  // if no geoserver with ABS boundary layers is available, rename this to boundaryLayers and remove (or rename) the boundaryLayers definition below
     boundaryLayers: [

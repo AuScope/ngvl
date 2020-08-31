@@ -5,6 +5,9 @@ import { UserStateService } from '../shared';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
+import { environment } from '../../environments/environment';
+
+
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
@@ -30,12 +33,12 @@ export class LoginComponent implements OnInit {
 
   loginGoogle() {
     this.selectedItemsToLocalStorage();
-    window.location.href = "/VGL-Portal/login/google";
+    window.location.href = environment.portalBaseUrl + "oauth2/authorization/google";
   }
 
   loginAaf() {
     this.selectedItemsToLocalStorage();
-    window.location.href = "/VGL-Portal/login/aaf";
+    window.location.href = environment.portalBaseUrl + "login/aaf";
   }
 
 }

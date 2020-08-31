@@ -1,7 +1,7 @@
 export const environment = {
     production: true,
     getCSWRecordUrl: 'getKnownLayers.do',
-    portalBaseUrl: '/VGL-Portal/',
+    portalBaseUrl: '/api/',
     boundariesUrl: 'http://localhost:8080/geoserver/boundaries',
     boundaryLayersEmpty: [],   // if no geoserver with ABS boundary layers is available, rename this to boundaryLayers and remove (or rename) the boundaryLayers definition below
     boundaryLayers: [

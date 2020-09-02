@@ -4,10 +4,8 @@ import { routerTransition } from '../router.animations';
 import { UserStateService } from '../shared';
 import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { LayerModel } from 'portal-core-ui/model/data/layer.model';
-import { environment } from '../../environments/environment';
 
 import { environment } from '../../environments/environment';
-
 
 @Component({
     selector: 'app-login',

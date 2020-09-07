@@ -48,7 +48,7 @@
     "ng2-pdfjs-viewer": "^5.0.7",
     "ngx-custom-validators": "^9.1.0",
     "ngx-monaco-editor": "^7.0.0",
-    "npm": "^6.14.4",
+    "npm": "^6.14.6",
     "ol": "^6.3.1",
     "ol-geocoder": "^4.0.0",
     "plotly.js": "^1.47.4",

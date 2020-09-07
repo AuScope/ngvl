@@ -227,17 +227,10 @@
                                                                         <div class="col" style="padding: 0px;">
                                                                             <li *ngFor="let cswRecord of cswSearchResults.get(registry.key)">
                                                                                 <app-datasets-record [validUser]="isValidUser()" [cswRecord]="cswRecord" 
-                                                                                    (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="false"></app-datasets-record>
-                                                                                <div *ngIf="hasChildRecords(cswRecord)">
-                                                                                    <div *ngFor="let layer of cswRecord.childRecords">
-                                                                                            <app-datasets-record [validUser]="isValidUser()" [cswRecord]="layer" 
-                                                                                            (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="true"></app-datasets-record>
-                                                                                    </div>
-                                                                                </div>
+                                                                                    (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-record>
                                                                             </li>
                                                                         </div>
                                                                     </div>
-
                                                                     <div class="row" *ngIf="!registry.value.searching" style="bottom:0;right:0px;">
                                                                         <div class="col">
                                                                             <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
@@ -274,13 +267,7 @@
                                         <div class="col" style="padding: 0px;">
                                             <li *ngFor="let cswRecord of bookMarkCSWRecords">
                                                 <app-datasets-record [validUser]="isValidUser()" [cswRecord]="cswRecord" 
-                                                    (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="false"></app-datasets-record>
-                                                    <div *ngIf="hasChildRecords(cswRecord)">
-                                                        <div *ngFor="let layer of cswRecord.childRecords">
-                                                                <app-datasets-record [validUser]="isValidUser()" [cswRecord]="layer" 
-                                                                (bookMarkChoice)="onBookMarkChoice($event)" [isGskyLayer]="true"></app-datasets-record>
-                                                        </div>
-                                                    </div>
+                                                    (bookMarkChoice)="onBookMarkChoice($event)"></app-datasets-record>
                                             </li>
                                         </div>
                                     </div>

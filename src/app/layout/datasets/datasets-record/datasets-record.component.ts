@@ -8,6 +8,11 @@ import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
+import { StyleChooserModalComponent } from '../../../shared/modules/grace/style-chooser.modal.component';
+import { GraceStyleSettings } from '../../../shared/modules/grace/grace-graph.models';
+import { GraceService } from '../../../shared/modules/grace/grace.service';
+import { GraceStyleService } from '../../../shared/modules/grace/grace-style.service';
+import { environment } from '../../../../environments/environment';
 
 
 // List of valid online resource types that can be added to the map
@@ -40,10 +45,17 @@ export class DatasetsRecordComponent {
     public timeExtentList: string[] = [];
     public selectedTimeExtent = "";
 
+    // GRACE graph settings (optional)
+    private graceStyleSettings: GraceStyleSettings;
+
+    // Selected time period (optional)
+    private timePeriod: string;
+
 
     constructor(public olMapService: OlMapService,
                 public cswSearchService: CSWSearchService,
                 public vglService: VglService,
+                public graceService: GraceService,
                 public modalService: NgbModal,
                 public activeModal: NgbActiveModal) { }
 
@@ -63,17 +75,23 @@ export class DatasetsRecordComponent {
                 // denoting a specific layer of the WMS/WCS etc. and rebuild URL
                 for (let resource of clonedRecord.onlineResources) {
                     // WMS
-                    if (this.isGetCapabilitiesUrl(resource.url, 'wms') && resource.protocolRequest != "") {
+                    if (this.isGetCapabilitiesUrl(resource.url, 'wms') && resource.protocolRequest !== "") {
                         resource.name = resource.protocolRequest;
                         // TODO: Stricter URL rewriting
                         resource.url = resource.url.substring(0, resource.url.indexOf('?') + 1) + "service=WMS";
-                    } else if ((this.isGetCapabilitiesUrl(resource.url, 'wcs') /*|| resource.type.toLowerCase() == 'ncss'*/) && resource.protocolRequest != "") {
+                    } else if ((this.isGetCapabilitiesUrl(resource.url, 'wcs') /*|| resource.type.toLowerCase() == 'ncss'*/) && resource.protocolRequest !== "") {
                         resource.name = resource.protocolRequest;
                     }
                     // TODO: WFS?
 
+
                 }
                 this.olMapService.addCSWRecord(clonedRecord);
+
+                // Set a time if an extent exists
+                if (clonedRecord.temporalExtent && clonedRecord.temporalExtent.endPosition) {
+                    this.changeTime(clonedRecord.temporalExtent.endPosition);
+                }
             } catch (error) {
                 // TODO: Proper error reporting
                 alert(error.message);
@@ -200,7 +218,7 @@ export class DatasetsRecordComponent {
             // protocol request must be present otherwise it's expandable, not
             // addable
             const wmsResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
-            if (wmsResource && this.isGetCapabilitiesUrl(wmsResource.url, "wms") && wmsResource.protocolRequest && wmsResource.protocolRequest == "") {
+            if (wmsResource && this.isGetCapabilitiesUrl(wmsResource.url, "wms") && wmsResource.protocolRequest && wmsResource.protocolRequest === "") {
                 addable = false;
             }
         }
@@ -223,8 +241,8 @@ export class DatasetsRecordComponent {
     public isExpandableRecord(cswRecord: CSWRecordModel): boolean {
         const wmsResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wms');
         const wcsResource: OnlineResourceModel = this.getCapabilitiesOnlineResource(cswRecord, 'wcs');
-        return wmsResource != null && (wmsResource.protocolRequest == null || wmsResource.protocolRequest.trim() == "") &&
-               wcsResource != null && (wcsResource.protocolRequest == null || wcsResource.protocolRequest.trim() == "");
+        return wmsResource != null && (wmsResource.protocolRequest == null || wmsResource.protocolRequest.trim() === "") &&
+               wcsResource != null && (wcsResource.protocolRequest == null || wcsResource.protocolRequest.trim() === "");
     }
 
     /**
@@ -232,7 +250,7 @@ export class DatasetsRecordComponent {
      * @param layerId
      */
     public areLayersLoading(layerId: string): boolean {
-        return this.layersLoading.get(layerId) == true;
+        return this.layersLoading.get(layerId) === true;
     }
 
     /**
@@ -297,7 +315,7 @@ export class DatasetsRecordComponent {
      */
     public getCapabilitiesOnlineResource(record: CSWRecordModel, serviceType: string): OnlineResourceModel {
         if (record.onlineResources) {
-            const onlineResource: OnlineResourceModel = record.onlineResources.find(i => i.type.toLowerCase() == serviceType.toLowerCase());
+            const onlineResource: OnlineResourceModel = record.onlineResources.find(i => i.type.toLowerCase() === serviceType.toLowerCase());
             if (onlineResource && this.isGetCapabilitiesUrl(onlineResource.url, serviceType)) {
                 return onlineResource;
             }
@@ -360,7 +378,7 @@ export class DatasetsRecordComponent {
         if (this.cswRecord.temporalExtent &&
             this.cswRecord.temporalExtent.beginPosition &&
             this.cswRecord.temporalExtent.endPosition &&
-            this.cswRecord.temporalExtent.beginPosition != this.cswRecord.temporalExtent.endPosition) {
+            this.cswRecord.temporalExtent.beginPosition !== this.cswRecord.temporalExtent.endPosition) {
                 return true;
             }
     }
@@ -372,36 +390,49 @@ export class DatasetsRecordComponent {
      */
     public loadTimes() {
         const wmsResource: OnlineResourceModel = this.cswRecord.onlineResources.find(
-            resource => resource.type.toLocaleLowerCase() == 'wms');
+            resource => resource.type.toLocaleLowerCase() === 'wms');
         if (wmsResource) {
             this.timeExtentList = [];
             this.selectedTimeExtent = "";
             this.timeExtentStatus = 'loading';
-            // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
-            this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
-                if (response && response.layers) {
-                    let layer = response.layers.find(l => l.name == wmsResource.name);
-                    // Name may not have matched due to being appended with "<workspace>:"
-                    if (!layer) {
-                        for (let wmsLayer of response.layers) {
-                            const colonIndex = wmsLayer.name.indexOf(':');
-                            if (colonIndex != -1) {
-                                const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
-                                if (layerName == wmsResource.name) {
-                                    layer = wmsLayer;
-                                    break;
+            // GRACE times via a call to grace-api
+            if (this.isGraceRecord()) {
+                this.graceService.getGraceDates().subscribe(response => {
+                    if (response) {
+                        this.timeExtentList = response;
+                        this.timeExtentStatus = 'loaded';
+                    }
+                }, error => {
+                    this.timeExtentStatus = 'error';
+                });
+            } else {
+                // General WMS times via GetCapabilities request
+                // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
+                this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
+                    if (response && response.layers) {
+                        let layer = response.layers.find(l => l.name === wmsResource.name);
+                        // Name may not have matched due to being appended with "<workspace>:"
+                        if (!layer) {
+                            for (let wmsLayer of response.layers) {
+                                const colonIndex = wmsLayer.name.indexOf(':');
+                                if (colonIndex !== -1) {
+                                    const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
+                                    if (layerName === wmsResource.name) {
+                                        layer = wmsLayer;
+                                        break;
+                                    }
                                 }
                             }
                         }
+                        if (layer && layer.timeExtent && layer.timeExtent.length > 0) {
+                            this.timeExtentList = layer.timeExtent;
+                        }
                     }
-                    if (layer && layer.timeExtent && layer.timeExtent.length > 0) {
-                        this.timeExtentList = layer.timeExtent;
-                    }
-                }
-                this.timeExtentStatus = 'loaded';
-            }, error => {
-                this.timeExtentStatus = 'error';
-            });
+                    this.timeExtentStatus = 'loaded';
+                }, error => {
+                    this.timeExtentStatus = 'error';
+                });
+            }
         }
     }
 
@@ -412,6 +443,52 @@ export class DatasetsRecordComponent {
      */
     changeTime(newTime: string) {
         this.olMapService.setLayerSourceParam(this.cswRecord.id, 'TIME', newTime);
+    }
+
+    /**
+     * TODO: Needs better check
+     */
+    public isGraceRecord(): boolean {
+        if (environment.grace && environment.grace.layers &&
+                environment.grace.layers.indexOf(this.cswRecord.id) >= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Set the WMS style for the layer
+     *
+     * @param record CSW record
+     */
+    changeGraceStyle(record: CSWRecordModel) {
+        if (this.graceStyleSettings === undefined || this.graceStyleSettings === null) {
+            this.graceStyleSettings = {
+                minColor: '#ff0000',
+                minValue: -8,
+                neutralColor: '#ffffff',
+                neutralValue: 0,
+                maxColor: '#0000ff',
+                maxValue: 4,
+                transparentNeutralColor: false
+            };
+        }
+        const modalRef = this.modalService.open(StyleChooserModalComponent, { size: 'sm' });
+        modalRef.componentInstance.graceStyleSettings = this.graceStyleSettings;
+        modalRef.result.then(newStyle => {
+            this.graceStyleSettings = {
+                minColor: newStyle.minColor,
+                minValue: newStyle.minValue,
+                neutralColor: newStyle.neutralColor,
+                neutralValue: newStyle.neutralValue,
+                maxColor: newStyle.maxColor,
+                maxValue: newStyle.maxValue,
+                transparentNeutralColor: newStyle.transparentNeutralColor
+            };
+            const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
+            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
+            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
+        }, () => {});
     }
 
 }

@@ -7,7 +7,6 @@ import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 import { environment } from '../../environments/environment';
 
-
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',

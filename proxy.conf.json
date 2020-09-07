@@ -1,6 +1,9 @@
 [
   {
-    "context": ["/api/**"],
+    "context": [
+      "/VGL-Portal/**",
+      "/api/**"
+    ],
     "target": "http://localhost:8080/",
     "secure": false,
     "logLevel": "debug",

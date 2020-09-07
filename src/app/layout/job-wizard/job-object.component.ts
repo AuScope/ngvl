@@ -156,13 +156,15 @@ export class JobObjectComponent implements OnDestroy, OnInit {
     let toolbox = null;
     const imageId = this.job.computeVmId
 
-    if(imageId) {
-      toolbox= this.toolboxes.find(it => it.imageId === imageId);
+    if (imageId) {
+      toolbox = this.toolboxes.find(it => it.imageId === imageId);
     }
 
     if (toolbox) {
-      // Set the computeVmRunCommand on the job to match the new toolbox.
+      // Set the computeVmRunCommand and any annotations on the job to match the
+      // new toolbox.
       this.job.computeVmRunCommand = toolbox.runCommand;
+      this.job.annotations = toolbox.annotations;
 
       // When toolbox is changed and we're using a cloud compute provider, reload
       // the available cloud resources.

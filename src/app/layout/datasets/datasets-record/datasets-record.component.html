@@ -78,6 +78,11 @@
                 <i class="fa fa-search"></i>
             </button>
         </span>
+        <span class="input-group-append" *ngIf="isMapControl && isGraceRecord()">
+            <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to change layer style" (click)="changeGraceStyle(cswRecord)">
+                <i class="fa fa-paint-brush" style="color:blue;"></i>
+            </button>
+        </span>
         <span class="input-group-append">
             <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to display layer information" (click)="displayRecordInformation(cswRecord)">
                 <i class="fa fa-info-circle" style="color:blue;"></i>

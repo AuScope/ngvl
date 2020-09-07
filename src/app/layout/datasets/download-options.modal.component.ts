@@ -116,7 +116,7 @@ export class DownloadOptionsModalComponent implements OnInit {
             }, error => {
                 // TODO: Deal with error
             }, () => {
-                if(this.dataTypes.length == 0) {
+                if(this.dataTypes.length === 0) {
                     this.dataTypes = [
                         { label: 'CSV', urn: 'csv' },
                         { label: 'GeoTIFF', urn: 'geotiff' },

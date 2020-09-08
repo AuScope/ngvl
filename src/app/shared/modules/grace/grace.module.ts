@@ -13,8 +13,8 @@ import { PlotlyViaCDNModule } from 'angular-plotly.js';
 
 
 // Using CDN module to avoid bug https://github.com/plotly/angular-plotly.js/issues/75
-PlotlyViaCDNModule.plotlyVersion = '1.53.0';
-PlotlyViaCDNModule.plotlyBundle = 'basic';
+PlotlyViaCDNModule.setPlotlyVersion("1.55.1");
+PlotlyViaCDNModule.setPlotlyBundle("basic");
 
 
 @NgModule({

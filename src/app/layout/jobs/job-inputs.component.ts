@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, OnInit } from "@angular/core";
 import { CloudFileInformation, JobDownload, Job } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
-import { saveAs } from 'file-saver/FileSaver';
+import { saveAs } from 'file-saver';
 import { Subscription } from "rxjs";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
 

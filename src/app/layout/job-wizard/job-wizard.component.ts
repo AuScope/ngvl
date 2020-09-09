@@ -57,7 +57,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
         if (parts[0].path === 'new') {
           // Load a new, empty job object for the user to manage.
           return this.userStateService.newJob();
-
         } else if (parts[0].path === 'job' && params.has('id')) {
           // Load the specified job from the server
           const id = parseInt(params.get('id'), 10);
@@ -95,7 +94,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this.noSave = true;
     this.messageService.clear();
     this.messageService.add({severity: 'info', summary: 'Saving job...', detail: '', sticky: true});
-    //const oldId = this.getJobObject().id;
 
     this.doSave()
       .pipe(catchError((err, obs) => {

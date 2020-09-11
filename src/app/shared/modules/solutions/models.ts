@@ -43,6 +43,23 @@ export class VarBinding<T extends VarBindingType> {
     }
     this.order = options.order === undefined ? 1 : options.order;
   }
+
+  /**
+   * Return true if this binding is valid.
+   *
+   * For a generic binding, we can test that it is either optional, or required
+   * but has a defined value. More specific tests for different variable types
+   * need to be implemented in subclasses.
+   */
+  isValid(): boolean {
+    // A required variable must have a defined value
+    if (this.required) {
+      return this.value != null;
+    }
+
+    // An optional variable is always valid
+    return true;
+  }
 }
 
 export interface SolutionVarBindings {
@@ -55,6 +72,15 @@ export class InputBinding<T extends VarBindingType> extends VarBinding<T> {
 
 export class StringEntryBinding extends InputBinding<string> {
   controlType = 'text';
+
+  isValid() {
+    // A string value must be non-empty
+    if (this.required) {
+      return !!this.value;
+    }
+
+    return super.isValid();
+  }
 }
 
 export class NumberEntryBinding extends InputBinding<number> {
@@ -68,6 +94,15 @@ export class OptionsBinding<T extends VarBindingType> extends VarBinding<T> {
   constructor(options: VarBindingOptions<T>) {
     super(options);
     this.values = options.values ?? [];
+  }
+
+  isValid() {
+    // Need to check specific types to look for empty strings
+    if (this.required && (this.type === 'string' || this.type === 'file')) {
+      return !!this.value;
+    }
+
+    return super.isValid();
   }
 }
 

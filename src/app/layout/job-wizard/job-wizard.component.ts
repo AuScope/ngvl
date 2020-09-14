@@ -164,7 +164,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     const solutionvarBindings: SolutionVarBindings = this.userStateService.getSolutionBindings();
     for (const solution of this.solutions) {
       for (const bindings of solutionvarBindings[solution.id]) {
-        if (bindings.required && !bindings.value) {
+        if (!bindings.isValid()) {
           return false;
         }
       }

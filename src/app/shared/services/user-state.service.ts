@@ -185,7 +185,7 @@ export class UserStateService {
                 }
                 return cart;
             });
-            this.resetBindings(solution);
+            this._resetBindings(solution);
         }
     }
 
@@ -483,7 +483,7 @@ export class UserStateService {
    * Rest a Solution's bindings, primarily when the Solution is added to the cart
    * so the bindings are reset every time a new job is selected.
    */
-  public resetBindings(solution: Solution) {
+  private _resetBindings(solution: Solution) {
     let varBindings: SolutionVarBindings = {};
     const id = solution.id;
     const prefix = this._getVarPrefix(solution);

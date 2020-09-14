@@ -8,19 +8,15 @@ import { catchError, map, defaultIfEmpty } from 'rxjs/operators';
 import { ANONYMOUS_USER, Solution, SolutionQuery, User, NCIDetails, JobDownload, CloudFileInformation, BookMark, Job} from '../modules/vgl/models';
 
 import { VglService } from '../modules/vgl/vgl.service';
-import { isSolution, Variable } from '../modules/vgl/models';
+import { isSolution } from '../modules/vgl/models';
 import { saveAs } from 'file-saver';
 
 import {
   SolutionVarBindings,
   VarBinding,
-  VarBindingOptions,
-  StringEntryBinding,
-  NumberEntryBinding,
-  OptionsBinding,
-  BooleanBinding,
   create_var_binding
 } from '../modules/solutions/models';
+import { SolutionVarBindingComponent } from '../../layout/job-wizard/solution-var-binding.component';
 
 export const DASHBOARD_VIEW = 'dashboard-view';
 export const DATA_VIEW = 'data-view';
@@ -189,8 +185,8 @@ export class UserStateService {
                 }
                 return cart;
             });
+            this.resetBindings(solution);
         }
-
     }
 
     public removeSolutionFromCart(solution: Solution) {
@@ -481,6 +477,23 @@ export class UserStateService {
     const job = this.createEmptyJob({name: name});
 
     return of(this.updateJob(job));
+  }
+
+  /**
+   * Rest a Solution's bindings, primarily when the Solution is added to the cart
+   * so the bindings are reset every time a new job is selected.
+   */
+  public resetBindings(solution: Solution) {
+    let varBindings: SolutionVarBindings = {};
+    const id = solution.id;
+    const prefix = this._getVarPrefix(solution);
+    varBindings[id] = solution.variables
+      .map(v => {
+        const name = `${prefix}-${v.name}`;
+        return {...v, name: name};
+      })
+      .map(create_var_binding);
+    this.setSolutionBindings(varBindings);
   }
 
   private _subBindingsIntoTemplate(template) {

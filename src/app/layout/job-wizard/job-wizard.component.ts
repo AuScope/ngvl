@@ -13,7 +13,6 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { Job, Solution } from '../../shared/modules/vgl/models';
 import { SolutionVarBindings } from '../../shared/modules/solutions/models';
 import { JobObjectComponent } from './job-object.component';
-import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 import { JobDatasetsComponent } from './job-datasets.component';
 
 @Component({
@@ -35,9 +34,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
 
   @ViewChild(JobObjectComponent, {static: true})
   private jobObject!: JobObjectComponent;
-
-  @ViewChild(JobSolutionsSummaryComponent, {static: true})
-  private solutionsComponent!: JobSolutionsSummaryComponent;
 
   @ViewChild(JobDatasetsComponent, {static: true})
   private jobDatasetsComponent!: JobDatasetsComponent;
@@ -78,7 +74,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
         // Only load job downloads after job has loaded
         this.jobDatasetsComponent.loadJobInputs();
     });
-
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions
     );
@@ -157,7 +152,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   isJobComplete(): boolean {
-    if (this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid) {
+    if (this.solutions && this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid) {
       this.jobIncomplete = false;
     } else {
       this.jobIncomplete = true;
@@ -169,8 +164,7 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     const solutionvarBindings: SolutionVarBindings = this.userStateService.getSolutionBindings();
     for (const solution of this.solutions) {
       for (const bindings of solutionvarBindings[solution.id]) {
-        console.log("binding(" + bindings.label + " = '" + bindings.value + "')" + (bindings.required ? "*" : ""));
-        if (!bindings.isValid()) {
+        if (bindings.required && !bindings.value) {
           return false;
         }
       }

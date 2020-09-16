@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -21,7 +21,7 @@ import { JobDatasetsComponent } from './job-datasets.component';
   styleUrls: ['./job-wizard.component.scss'],
   animations: [routerTransition()]
 })
-export class JobWizardComponent implements OnInit, OnDestroy {
+export class JobWizardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   jobIncomplete: boolean = false;
   cancelled: boolean = false;
@@ -43,7 +43,8 @@ export class JobWizardComponent implements OnInit, OnDestroy {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private messageService: MessageService) {}
+              private messageService: MessageService,
+              private changeRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     // Check the URL and parameters to determine whether we're creating a new
@@ -77,6 +78,10 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions
     );
+  }
+
+  ngAfterViewInit() {
+    this.changeRef.detectChanges();
   }
 
   ngOnDestroy() {

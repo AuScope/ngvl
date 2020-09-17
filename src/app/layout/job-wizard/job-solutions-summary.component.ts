@@ -71,7 +71,6 @@ export class JobSolutionsSummaryComponent implements OnDestroy, OnInit {
   private bindingsSubscription;
 
   constructor(private userStateService: UserStateService,
-            //  private vbs: SolutionVarBindingsService,
               private modalService: NgbModal) {}
 
   ngOnInit() {

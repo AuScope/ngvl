@@ -10057,8 +10057,8 @@ polytope-closest-point@^1.0.0:
     numeric "^1.2.6"
 
 "portal-core-ui@github:AuScope/portal-core-ui#master":
-  version "0.0.1"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/d8dd6b04e0ccda0a9e95aa0e588a0f38c3adc215"
+  version "1.0.0"
+  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/768e4979b36d019191840a2acabffe0a0c3e35ea"
 
 portfinder@^1.0.26:
   version "1.0.28"

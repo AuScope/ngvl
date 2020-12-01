@@ -1,7 +1,7 @@
 export const environment = {
     production: true,
     getCSWRecordUrl: 'getKnownLayers.do',
-    portalBaseUrl: '/VGL-Portal/',
+    portalBaseUrl: '/api/',
     boundariesUrl: 'http://localhost:8080/geoserver/boundaries',
     boundaryLayersEmpty: [],   // if no geoserver with ABS boundary layers is available, rename this to boundaryLayers and remove (or rename) the boundaryLayers definition below
     boundaryLayers: [
@@ -32,5 +32,11 @@ export const environment = {
         { value: 'Aerial', viewValue: 'Bing Aerial', layerType: 'Bing' },
         { value: 'AerialWithLabels', viewValue: 'Bing Aerial With Labels', layerType: 'Bing' }
     ],
-    forceAddLayerViaProxy: []
+    forceAddLayerViaProxy: [],
+    grace: {
+        host: 'http://localhost:8001',
+        layers: [
+            'mascons_stage4_V003a'
+        ]
+    }
 };

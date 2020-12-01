@@ -18,6 +18,7 @@ import { UserStateService } from './shared';
 import { VglModule } from './shared';
 import { UserModule } from './layout/user/user.module';
 import { LandingpageModule } from './landingpage/landingpage.module';
+import { GraceModule } from './shared';
 import { AngularSplitModule } from 'angular-split';
 
 // AoT requires an exported function for factories
@@ -45,7 +46,8 @@ export function createTranslateLoader(http: HttpClient) {
     LandingpageModule,
     AppRoutingModule,
     VglModule,
-    UserModule
+    UserModule,
+    GraceModule
   ],
   declarations: [AppComponent],
   providers: [AuthGuard, AuthService, UserStateService, { provide: RouteReuseStrategy, useClass: CustomReuseStrategy }],

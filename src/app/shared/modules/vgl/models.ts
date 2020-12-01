@@ -190,6 +190,7 @@ export interface Job {
     jobDownloads: JobDownload[];
     jobFiles: JobFile[];
     jobSolutions: string[];
+    annotations: string[];
 
     // These are only required for an HPC job, and won't be populated by VGL
     ncpus?: number;
@@ -217,6 +218,8 @@ export interface MachineImage {
     runCommand: string;
     // Permissions
     permissions: string[];
+    // Annotations for this image, possibly provider specific.
+    annotations: string[];
 }
 
 export interface ComputeType {

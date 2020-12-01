@@ -1,4 +1,4 @@
-import { Component, Injectable } from '@angular/core';
+import { Component } from '@angular/core';
 import { ConfirmDatasetsModalComponent } from '../../confirm-datasets.modal.component';
 import { DownloadOptions } from '../../../../shared/modules/vgl/models';
 import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';

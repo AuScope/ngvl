@@ -72,7 +72,7 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
         (b as OptionsBinding<any>).values = values;
 
         // If the current value is in options then retain it, otherwise reset to no selection
-        const stillAnOption = values.find(o => o.key === b.value);
+        const stillAnOption = values.find(o => o === b.value);
         if (!stillAnOption) {
           b.value = null;
         }

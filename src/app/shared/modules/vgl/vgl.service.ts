@@ -382,7 +382,7 @@ export class VglService {
         delete params.computeServiceId;
     }
 
-    return this.vglGet('secure/updateOrCreateJob.do', params)
+    return this.vglPost('secure/updateOrCreateJob.do', params)
       .pipe(
         map((jobs: Job[]) => {
           // Should always be only 1 job.

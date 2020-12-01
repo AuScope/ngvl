@@ -1,40 +1,21 @@
 <div class="dataset-record">
     <div class="input-group input-group-sm" style="padding: 0px;border-bottom: 1px solid gray;">
         <span class="input-group-prepend" style="display:flex">
-            <!-- Indent GSKY layers -->
-            <div *ngIf="isGskyLayer" style="width:28px;"></div>
             <!-- Don't display add layer buttons if this is a map control -->
             <div *ngIf="!isMapControl">
                 <!-- Record can not be added -->
-                <button *ngIf="!isAddableRecord(cswRecord) && !isExpandableRecord(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
+                <button *ngIf="!isAddableRecord(cswRecord) && !olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip"
                     title="Layer has no appropriate online resources and as such, cannot be added">
                     <i class="fa fa-times"></i>
                 </button>
-                <!-- Add layer to map, or load child layers (GSKY) -->
-                <button *ngIf="isAddableRecord(cswRecord) && !isExpandableRecord(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
+                <!-- Add layer to map -->
+                <button *ngIf="isAddableRecord(cswRecord)"
                     class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Add layer to map"
                     (click)="addCSWRecord(cswRecord)">
                     <i class="fa fa-plus-circle" style="color:green;"></i>
                 </button>
-                <!-- Load child layers (GSKY) -->
-                <button *ngIf="isExpandableRecord(cswRecord) && !hasChildRecords(cswRecord) && !areLayersLoading(cswRecord.id)"
-                    class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Load layers"
-                    (click)="addCSWRecord(cswRecord)">
-                    <i class="fa fa-list-alt" style="color:green;"></i>
-                </button>
-                <!-- Loading child layers (GSKY parent) -->
-                <button *ngIf="areLayersLoading(cswRecord.id)"
-                    class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Loading layers...">
-                    <i class="fa fa-spinner fa-spin"></i>
-                </button>
-                <!-- Child layers (GSKY children) are being displayed, button will collapse children -->
-                <button *ngIf="hasChildRecords(cswRecord)"
-                    class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Collapse layers"
-                    (click)="removeChildRecords(cswRecord)">
-                    <i class="fa fa-angle-double-up" style="color:red;"></i>
-                </button>
             </div>
-            <!-- Layer (non-GSKY) displayed, button will remove from map -->
+            <!-- Layer displayed, button will remove from map -->
             <button *ngIf="olMapService.layerExists(cswRecord.id)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Remove layer from map"
                 (click)="removeCSWRecord(cswRecord.id)">
                 <i class="fa fa-trash" style="color:red;"></i>
@@ -60,7 +41,7 @@
                 </div>
             </div>
             <!-- Bookmarks -->
-            <div *ngIf="!isMapControl && !isGskyLayer">
+            <div *ngIf="!isMapControl">
                 <button *ngIf="validUser && !isBookMark(cswRecord)" class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Bookmark as favourite" (click)="addBookMark(cswRecord)">
                     <i class="fa fa-heart-o" style="color:red;"></i>
                 </button>
@@ -76,6 +57,11 @@
             <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Display layer bounds, double-click to zoom to bounds" (click)="showCSWRecordBounds(cswRecord)"
                 (dblclick)="zoomToCSWRecordBounds(cswRecord)">
                 <i class="fa fa-search"></i>
+            </button>
+        </span>
+        <span class="input-group-append" *ngIf="isMapControl && isGraceRecord()">
+            <button class="btn btn-sm btn-outline-secondary" data-toggle="tooltip" title="Click to change layer style" (click)="changeGraceStyle(cswRecord)">
+                <i class="fa fa-paint-brush" style="color:blue;"></i>
             </button>
         </span>
         <span class="input-group-append">

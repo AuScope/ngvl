@@ -4,7 +4,6 @@ import { NgForm } from '@angular/forms';
 import { UserStateService } from '../../shared';
 import { ComputeService, MachineImage, ComputeType, Job } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-import { Solution } from '../../shared/modules/vgl/models';
 
 @Component({
     selector: 'app-job-object',
@@ -45,16 +44,17 @@ export class JobObjectComponent implements OnDestroy, OnInit {
   ngOnInit() {
     // Update compute services list for new job.
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(solutions => {
-      this.userStateService.updateJob(
-        {
-          ...this.job,
-          jobSolutions: solutions.map(s => s['@id'])
-        }
-        );
+      this.userStateService.updateJob({
+        ...this.job,
+        jobSolutions: solutions.map(s => s['@id'])
+      });
     });
 
     this._jobSub = this.userStateService.job.subscribe(job => {
       Object.assign(this.job, job || {});
+      if (job.walltime !== null) {
+        this.useWalltime = true;
+      }
       this.updateComputeServices();
     });
   }
@@ -74,18 +74,17 @@ export class JobObjectComponent implements OnDestroy, OnInit {
       computeServices => {
         this.computeProviders = computeServices;
 
-        if( (! this.computeProviders) || this.computeProviders.length === 0) {
+        if (!this.computeProviders || this.computeProviders.length === 0) {
           this.job.computeVmId = null;
           this.job.computeServiceId = null;
         } else {
           //
           // Reset this.job.computeServiceId if it is no longer a valid option
           //
-          if(! this.computeProviders.find(p => p.id === this.job.computeServiceId) ) {
+          if (!this.computeProviders.find(p => p.id === this.job.computeServiceId)) {
             this.job.computeVmId = null;
             this.job.computeServiceId = this.computeProviders[0].id;
           }
-
         }
 
         // Load toolboxes if the user had already selected one
@@ -102,10 +101,8 @@ export class JobObjectComponent implements OnDestroy, OnInit {
     if (!this.useWalltime) {
       this.job.walltime = undefined;
     }
-
     return this.job;
   }
-
 
   /**
    * When compute provider is changed, load toolboxes
@@ -127,7 +124,7 @@ export class JobObjectComponent implements OnDestroy, OnInit {
           if (this.toolboxes && this.toolboxes.length > 0) {
             // TODO: Check if existing job already has a toolbox selected
             let toolbox: MachineImage = this.toolboxes.find(it => it.imageId === this.job.computeVmId);
-            if(toolbox === undefined) {
+            if (toolbox === undefined) {
               toolbox = this.toolboxes[0];
               this.job.computeVmId = toolbox.imageId;
             }
@@ -136,15 +133,14 @@ export class JobObjectComponent implements OnDestroy, OnInit {
           }
           this.toolboxChanged();
         });
-        if( this.isHPCProvider(computeServiceId)) {
-          this.useWalltime = true
+        if (this.isHPCProvider(computeServiceId)) {
+          this.useWalltime = true;
         }
     } else {
       this.toolboxes = [];
       this.job.computeVmId = null;
       this.toolboxChanged();
     }
-
   }
 
   /**
@@ -154,15 +150,17 @@ export class JobObjectComponent implements OnDestroy, OnInit {
    */
   public toolboxChanged(): void {
     let toolbox = null;
-    const imageId = this.job.computeVmId
+    const imageId = this.job.computeVmId;
 
-    if(imageId) {
-      toolbox= this.toolboxes.find(it => it.imageId === imageId);
+    if (imageId) {
+      toolbox = this.toolboxes.find(it => it.imageId === imageId);
     }
 
     if (toolbox) {
-      // Set the computeVmRunCommand on the job to match the new toolbox.
+      // Set the computeVmRunCommand and any annotations on the job to match the
+      // new toolbox.
       this.job.computeVmRunCommand = toolbox.runCommand;
+      this.job.annotations = toolbox.annotations;
 
       // When toolbox is changed and we're using a cloud compute provider, reload
       // the available cloud resources.

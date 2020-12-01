@@ -37,7 +37,7 @@
                     <div class="input-group">
                         <select #computeProvider style="width:100%;" [(ngModel)]="job.computeServiceId" (change)="computeProviderChanged()"
                             name="computeProvider" required>
-                            <option *ngFor="let provider of computeProviders" [value]="provider.id">{{ provider.name }}</option>
+                            <option *ngFor="let provider of computeProviders" [ngValue]="provider.id">{{ provider.name }}</option>
                         </select>
                     </div>
                     <small>Select a location where your data will be processed. Different locations will have different toolboxes.</small>
@@ -52,7 +52,7 @@
                     <div class="input-group">
                         <select #toolbox style="width:100%;" [(ngModel)]="job.computeVmId" (change)="toolboxChanged()" name="computeVmId"
                             required>
-                            <option *ngFor="let toolbox of toolboxes" [value]="toolbox.imageId">{{ toolbox.name }}</option>
+                            <option *ngFor="let toolbox of toolboxes" [ngValue]="toolbox.imageId">{{ toolbox.name }}</option>
                         </select>
                     </div>
                     <small>Select a toolbox that contains software that you would like to use to process your data.</small>
@@ -65,8 +65,8 @@
                 </div>
                 <div class="col-lg-10">
                     <div class="input-group">
-                        <select style="width:100%;" [(ngModel)]="job.computeTypeId" name="computeType" required>
-                            <option *ngFor="let resource of resources" [value]="resource.id">{{ resource.description }}</option>
+                        <select #computeType style="width:100%;" [(ngModel)]="job.computeTypeId" name="computeType" required>
+                            <option *ngFor="let resource of resources" [ngValue]="resource.id">{{ resource.description }}</option>
                         </select>
                     </div>
                     <small>Select a compute resource configuration that is sufficient for your needs.</small>

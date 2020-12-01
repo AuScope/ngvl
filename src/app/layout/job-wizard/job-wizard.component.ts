@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -13,7 +13,6 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { Job, Solution } from '../../shared/modules/vgl/models';
 import { SolutionVarBindings } from '../../shared/modules/solutions/models';
 import { JobObjectComponent } from './job-object.component';
-import { JobSolutionsSummaryComponent } from './job-solutions-summary.component';
 import { JobDatasetsComponent } from './job-datasets.component';
 
 @Component({
@@ -22,7 +21,7 @@ import { JobDatasetsComponent } from './job-datasets.component';
   styleUrls: ['./job-wizard.component.scss'],
   animations: [routerTransition()]
 })
-export class JobWizardComponent implements OnInit, OnDestroy {
+export class JobWizardComponent implements AfterViewInit, OnInit, OnDestroy {
 
   jobIncomplete: boolean = false;
   cancelled: boolean = false;
@@ -36,9 +35,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   @ViewChild(JobObjectComponent, {static: true})
   private jobObject!: JobObjectComponent;
 
-  @ViewChild(JobSolutionsSummaryComponent, {static: true})
-  private solutionsComponent!: JobSolutionsSummaryComponent;
-
   @ViewChild(JobDatasetsComponent, {static: true})
   private jobDatasetsComponent!: JobDatasetsComponent;
 
@@ -47,7 +43,8 @@ export class JobWizardComponent implements OnInit, OnDestroy {
               private location: Location,
               private router: Router,
               private route: ActivatedRoute,
-              private messageService: MessageService) {}
+              private messageService: MessageService,
+              private changeRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     // Check the URL and parameters to determine whether we're creating a new
@@ -57,7 +54,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
         if (parts[0].path === 'new') {
           // Load a new, empty job object for the user to manage.
           return this.userStateService.newJob();
-
         } else if (parts[0].path === 'job' && params.has('id')) {
           // Load the specified job from the server
           const id = parseInt(params.get('id'), 10);
@@ -79,10 +75,13 @@ export class JobWizardComponent implements OnInit, OnDestroy {
         // Only load job downloads after job has loaded
         this.jobDatasetsComponent.loadJobInputs();
     });
-
     this._solutionsSub = this.userStateService.selectedSolutions.subscribe(
       solutions => this.solutions = solutions
     );
+  }
+
+  ngAfterViewInit() {
+    this.changeRef.detectChanges();
   }
 
   ngOnDestroy() {
@@ -95,7 +94,6 @@ export class JobWizardComponent implements OnInit, OnDestroy {
     this.noSave = true;
     this.messageService.clear();
     this.messageService.add({severity: 'info', summary: 'Saving job...', detail: '', sticky: true});
-    //const oldId = this.getJobObject().id;
 
     this.doSave()
       .pipe(catchError((err, obs) => {
@@ -159,19 +157,19 @@ export class JobWizardComponent implements OnInit, OnDestroy {
   }
 
   isJobComplete(): boolean {
-    if (this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid) {
+    if (this.solutions && this.solutions.length > 0 && this.validSolutionBindings() && this.jobObject.form.valid) {
       this.jobIncomplete = false;
     } else {
       this.jobIncomplete = true;
     }
-    return this.jobIncomplete;
+    return !this.jobIncomplete;
   }
 
   validSolutionBindings(): boolean {
     const solutionvarBindings: SolutionVarBindings = this.userStateService.getSolutionBindings();
-    for (let solution of this.solutions) {
+    for (const solution of this.solutions) {
       for (const bindings of solutionvarBindings[solution.id]) {
-        if (bindings.required && !bindings.value) {
+        if (!bindings.isValid()) {
           return false;
         }
       }

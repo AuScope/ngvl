@@ -4,7 +4,7 @@ import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renders
 import { Constants } from 'portal-core-ui/utility/constants.service';
 import { AfterViewInit, Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { point, polygon } from '@turf/helpers';
-import inside from '@turf/inside';
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import View from 'ol/View';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
@@ -48,7 +48,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                     const poly = polygon([[feat.geometry.coordinates[0][0],
                     feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][2],
                     feat.geometry.coordinates[0][3], feat.geometry.coordinates[0][4]]]);
-                    if (inside(point(event.coordinate), poly)) {
+                    if (booleanPointInPolygon(point(event.coordinate), poly)) {
                         me.olMapService.fitView([poly[0], poly[1], poly[2], poly[3]]);
                     }
                 }

@@ -1,7 +1,4 @@
-import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
-import { RenderStatusService } from 'portal-core-ui/service/openlayermap/renderstatus/render-status.service';
-import { Constants } from 'portal-core-ui/utility/constants.service';
+import { Constants, OlMapObject, OlMapService, RenderStatusService } from 'portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { point, polygon } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';

@@ -4,12 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { CSWRecordModel, LayerHandlerService, OnlineResourceModel } from 'portal-core-ui';
 import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
-import { LayerHandlerService } from 'portal-core-ui/service/cswrecords/layer-handler.service';
 
 
 @Injectable({

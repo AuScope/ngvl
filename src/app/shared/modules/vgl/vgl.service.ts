@@ -5,7 +5,7 @@ import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
 import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
 import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry, DescribeCoverage } from './models';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui';
 
 import { environment } from '../../../../environments/environment';
 

@@ -1,11 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
-import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { OlMapObject, OlMapService } from 'portal-core-ui';
 import { environment } from '../../../../../environments/environment';
 import { GraceGraphModalComponent } from '../../../../shared/modules/grace/grace-graph.modal.component';
 import { GraceService } from '../../../../shared/modules/grace/grace.service';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 
 
 @Component({

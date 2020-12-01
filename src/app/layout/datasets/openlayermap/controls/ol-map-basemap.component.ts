@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
+import { OlMapService } from 'portal-core-ui';
 
 @Component({
   selector: 'app-ol-map-basemap',

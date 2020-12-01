@@ -1,4 +1,4 @@
-import { OlMapObject } from 'portal-core-ui/service/openlayermap/ol-map-object';
+import { CSWRecordModel, OlMapObject, OlMapService } from 'portal-core-ui';
 import { OnInit, AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 import { FormControl } from '@angular/forms';
@@ -18,9 +18,7 @@ import * as Proj from 'ol/proj';
 
 import { BoundaryService } from '../../../../shared/services/boundary.service';
 import { environment } from '../../../../../environments/environment';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
 import { ConfirmDatasetsModalComponent } from '../../confirm-datasets.modal.component';
 import { OlMapDataSelectComponent } from './olmap.select.data.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

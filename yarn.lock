@@ -10056,10 +10056,10 @@ polytope-closest-point@^1.0.0:
   dependencies:
     numeric "^1.2.6"
 
-portal-core-ui@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/portal-core-ui/-/portal-core-ui-1.0.2.tgz#6c58d588e54c89cb51f7a8db0b36d4ed5f7d3e01"
-  integrity sha512-agyLaXZUTFFFU5u8q6KUgYrw0gOk4KLTc+pJJUg8lhoSdcJ2qTDKg9vm+OVnTAo4n433qFtJ+MijTiWvRtSWGA==
+portal-core-ui@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/portal-core-ui/-/portal-core-ui-1.0.3.tgz#1a146d585b3550e61f69ec8866adf77e147e0bfc"
+  integrity sha512-ieaazWlF2ENv+ub6Ncsl7MeRv5gzgufGPxcwmbzX9oiCNNMGstTrZpomOXz6SfMrG5Na/CAJ4kfBMe5TzSx75w==
   dependencies:
     tslib "^1.10.0"
 

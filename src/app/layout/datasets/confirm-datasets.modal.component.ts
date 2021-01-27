@@ -4,7 +4,7 @@ import { DownloadOptionsModalComponent } from './download-options.modal.componen
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import { UserStateService } from '../../shared';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel } from 'portal-core-ui';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { forkJoin } from 'rxjs/observable/forkJoin';

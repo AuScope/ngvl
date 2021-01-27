@@ -1,11 +1,10 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel, OnlineResourceModel } from 'portal-core-ui';
 import { RemoteDatasetsModalComponent } from './remote-datasets.modal.component';
 import { UserStateService } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 
 
 @Component({

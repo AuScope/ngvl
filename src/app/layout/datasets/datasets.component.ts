@@ -6,13 +6,11 @@ import { routerTransition } from '../../router.animations';
 import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel, LayerModel, OlMapService } from 'portal-core-ui';
 import { BookMark, Registry } from '../../shared/modules/vgl/models';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import * as Proj from 'ol/proj';
 
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
-import { LayerModel } from 'portal-core-ui/model/data/layer.model';
 
 
 @Component({

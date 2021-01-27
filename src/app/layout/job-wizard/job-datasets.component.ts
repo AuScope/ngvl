@@ -10,7 +10,7 @@ import { saveAs } from 'file-saver';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 import { RemoteDatasetsModalComponent } from '../datasets/remote-datasets.modal.component';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
+import { OnlineResourceModel } from 'portal-core-ui';
 
 
 @Component({

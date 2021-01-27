@@ -1,12 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CSWRecordModel } from 'portal-core-ui/model/data/cswrecord.model';
+import { CSWRecordModel, OlMapService, OnlineResourceModel } from 'portal-core-ui';
 import { BookMark } from '../../../shared/modules/vgl/models';
 import { RecordModalComponent } from '../record.modal.component';
-import { OlMapService } from 'portal-core-ui/service/openlayermap/ol-map.service';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
-import { OnlineResourceModel } from 'portal-core-ui/model/data/onlineresource.model';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { StyleChooserModalComponent } from '../../../shared/modules/grace/style-chooser.modal.component';
 import { GraceStyleSettings } from '../../../shared/modules/grace/grace-graph.models';

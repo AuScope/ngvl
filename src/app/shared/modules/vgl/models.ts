@@ -1,5 +1,4 @@
-import { CSWRecordModel } from "portal-core-ui/model/data/cswrecord.model";
-import { OnlineResourceModel } from "portal-core-ui/model/data/onlineresource.model";
+import { CSWRecordModel, OnlineResourceModel } from "portal-core-ui";
 
 /*
  * User Models

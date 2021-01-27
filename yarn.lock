@@ -9902,9 +9902,12 @@ polytope-closest-point@^1.0.0:
   dependencies:
     numeric "^1.2.6"
 
-"portal-core-ui@github:AuScope/portal-core-ui#master":
-  version "1.0.0"
-  resolved "https://codeload.github.com/AuScope/portal-core-ui/tar.gz/768e4979b36d019191840a2acabffe0a0c3e35ea"
+portal-core-ui@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/portal-core-ui/-/portal-core-ui-1.0.3.tgz#1a146d585b3550e61f69ec8866adf77e147e0bfc"
+  integrity sha512-ieaazWlF2ENv+ub6Ncsl7MeRv5gzgufGPxcwmbzX9oiCNNMGstTrZpomOXz6SfMrG5Na/CAJ4kfBMe5TzSx75w==
+  dependencies:
+    tslib "^1.10.0"
 
 portfinder@^1.0.26:
   version "1.0.28"

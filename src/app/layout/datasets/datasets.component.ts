@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef, ComponentFactoryResolver, ViewContainerRef, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
@@ -11,6 +11,7 @@ import { BookMark, Registry } from '../../shared/modules/vgl/models';
 import * as Proj from 'ol/proj';
 
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
+import { KeywordComponentsService } from '../../shared/modules/keyword/keyword-components.service';
 
 
 @Component({
@@ -19,9 +20,12 @@ import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
     styleUrls: ['./datasets.component.scss'],
     animations: [routerTransition()]
 })
-export class DatasetsComponent implements OnInit, AfterViewChecked {
+export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecked {
 
     readonly CSW_RECORD_PAGE_LENGTH = 10;
+
+    // KeywordComponent map widgets
+    @ViewChild('mapWidgets', { static: true, read: ViewContainerRef }) mapWidgets: ViewContainerRef;
 
     // Search results
     cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
@@ -74,7 +78,8 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
     constructor(private olMapService: OlMapService,
         private userStateService: UserStateService,
         private cswSearchService: CSWSearchService,
-        private authService: AuthService) { }
+        private authService: AuthService,
+        private keywordComponentService: KeywordComponentsService) { }
 
     ngOnInit() {
         this.userStateService.setView(DATA_VIEW);
@@ -123,6 +128,10 @@ export class DatasetsComponent implements OnInit, AfterViewChecked {
 
         this.anyTextIsCollapsed = false;
         this.searchResultsIsCollapsed = false;
+    }
+
+    ngAfterViewInit() {
+        this.keywordComponentService.setMapWidgetViewContainerRef(this.mapWidgets);
     }
 
     ngAfterViewChecked() {

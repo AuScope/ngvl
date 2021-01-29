@@ -3,3 +3,4 @@ export * from './solutions/solutions.module';
 export * from './stat/stat.module';
 export * from './vgl/vgl.module';
 export * from './grace/grace.module';
+export * from './keyword/keyword-components.module';

@@ -189,7 +189,6 @@
                                     <div class="row" #searchResults>
                                         <div class="col">
                                             <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
-                                                <!--Search Results&nbsp;({{ cswDisplayResults.length }} of {{ cswSearchResultsMatched }})-->
                                                 Search Results ({{ getTotalSearchResultCount() }} Total)
                                                 <span>
                                                     <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
@@ -291,9 +290,9 @@
                     <app-ol-map-select-data></app-ol-map-select-data>
                 </div>
 
-                <div class="btn-group" style="position:absolute;z-index:1;margin-top:80px;margin-left:4px;">
-                    <!-- GRACE Data button -->
-                    <app-ol-map-grace-data></app-ol-map-grace-data>
+                <!-- KeywordComponent map widgets -->
+                <div class="btn-group" style="position:absolute;z-index:1;">
+                    <ng-template #mapWidgets></ng-template>
                 </div>
 
                 <div class="btn-group" style="position:absolute;z-index:1;margin-left:190px; margin-top:4px;">

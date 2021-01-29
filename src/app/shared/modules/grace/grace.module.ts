@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GraceService } from './grace.service';
+import { GraceStyleComponent } from './grace-style.component';
 import { GraceStyleService } from './grace-style.service';
 import { GraceGraphModalComponent } from './grace-graph.modal.component';
 import { StyleChooserModalComponent } from './style-chooser.modal.component';
@@ -26,8 +27,8 @@ PlotlyViaCDNModule.setPlotlyBundle("basic");
     PlotlyViaCDNModule,
     ColorPickerModule
   ],
-  declarations: [ GraceGraphModalComponent, StyleChooserModalComponent ],
-  entryComponents: [ GraceGraphModalComponent, StyleChooserModalComponent ],
+  declarations: [ GraceGraphModalComponent, StyleChooserModalComponent, GraceStyleComponent ],
+  entryComponents: [ GraceGraphModalComponent, StyleChooserModalComponent, GraceStyleComponent ],
   providers: [ GraceService, GraceStyleService ]
 })
 export class GraceModule { }

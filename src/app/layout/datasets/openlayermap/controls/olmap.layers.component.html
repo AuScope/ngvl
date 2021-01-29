@@ -10,21 +10,6 @@
                 <div *ngIf="getActiveLayerCount()==0" style="padding:1.25rem;">
                     No layers have been added to the map.
                 </div>
-                <!--
-                <div *ngIf="getActiveLayerCount()>0">
-                    <div *ngFor="let layer of getActiveLayers()" style="margin-bottom:2px;">
-                        <div class="input-group input-group-sm" style="border:1px solid #ccc; padding: 0px;">
-                -->
-                <!--
-                <div *ngIf="getActiveLayerCount()>0">
-                    <div *ngFor="let layer of getActiveLayers()">
-                        <div class="input-group input-group-sm">
-                            <app-datasets-record [isMapControl]="true" [cswRecord]="layer.cswRecords[0]"></app-datasets-record>
-                        </div>
-                    </div>
-                </div>
-                -->
-
                 <div class="row">
                     <div class="col" style="padding: 0px;">
                         <li *ngFor="let layer of getActiveLayers()">
@@ -32,7 +17,6 @@
                         </li>
                     </div>
                 </div>
-
             </ng-template>
         </ngb-panel>
     </ngb-accordion>

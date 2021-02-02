@@ -61,7 +61,6 @@ export const environment = {
     keywordComponents: [
         { keyword: 'vgl:keyword1', keywordComponent: OlMapKeyword1Component, keywordComponentType: KeywordComponentType.MapWidget },
         { keyword: 'vgl:keyword2', keywordComponent: OlMapKeyword2Component, keywordComponentType: KeywordComponentType.MapWidget },
-        // Fix keyword, too generic, just for testing ("vgl:grace")
         { keyword: 'grace', keywordComponent: OlMapGraceDataComponent, keywordComponentType: KeywordComponentType.MapWidget },
         { keyword: 'grace', keywordComponent: GraceStyleComponent, keywordComponentType: KeywordComponentType.RecordButton }
     ]

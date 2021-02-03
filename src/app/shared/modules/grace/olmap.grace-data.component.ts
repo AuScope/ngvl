@@ -2,7 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { OlMapObject } from 'portal-core-ui';
-import { GraceGraphModalComponent } from '../../../../shared/modules/grace/grace-graph.modal.component';
+import { GraceGraphModalComponent } from './grace-graph.modal.component';
 
 
 @Component({

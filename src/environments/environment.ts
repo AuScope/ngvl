@@ -6,7 +6,7 @@
 import { OlMapKeyword1Component } from "../app/shared/modules/keyword/test/ol-map.keyword1.component";
 import { OlMapKeyword2Component } from "../app/shared/modules/keyword/test/ol-map.keyword2.component";
 import { KeywordComponentType } from '../app/shared/modules/keyword/models';
-import { OlMapGraceDataComponent } from "../app/layout/datasets/openlayermap/controls/olmap.grace-data.component";
+import { OlMapGraceDataComponent } from "../app/shared/modules/grace/olmap.grace-data.component";
 import { GraceStyleComponent } from "../app/shared/modules/grace/grace-style.component";
 
 

@@ -60,6 +60,7 @@ export interface Variable {
   min?: number;
   step?: number;
   values?: VarBindingType[];
+  tags?: string[];
 }
 
 export interface FileVariable extends Variable {

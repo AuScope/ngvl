@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import { VarBinding, NumberEntryBinding, OptionsBinding } from '../../shared/modules/solutions/models';
 import { VarBindingType } from '../../shared/modules/vgl/models';
+import { UserStateService } from '../../shared';
 
 @Component({
   selector: 'app-solution-var-binding',
@@ -14,7 +15,7 @@ export class SolutionVarBindingComponent implements OnInit {
   @Input() binding: VarBinding<any>;
   @Input() form: FormGroup;
 
-  constructor() { }
+  constructor(private userStateService: UserStateService) {}
 
   ngOnInit() {
   }
@@ -45,6 +46,10 @@ export class SolutionVarBindingComponent implements OnInit {
     }
 
     return null;
+  }
+
+  updateBinding<T extends VarBindingType>(binding: VarBinding<T>, value: T) {
+    this.form.patchValue({[binding.key]: value});
   }
 
 }

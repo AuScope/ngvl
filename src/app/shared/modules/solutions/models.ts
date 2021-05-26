@@ -114,6 +114,10 @@ export class DateBinding extends InputBinding<string> {
   controlType = 'date';
 }
 
+export class BBoxBinding extends InputBinding<string> {
+  controlType = 'bbox';
+}
+
 export function create_var_binding(
   variable: Variable,
   options = {}
@@ -137,6 +141,8 @@ export function create_var_binding(
     // selection.
     if (variable.tags.includes('datetime') || variable.tags.includes('iso8601')) {
       return new DateBinding(opts);
+    } else if (variable.tags.includes('bbox')) {
+      return new BBoxBinding(opts);
     }
 
     switch (variable.type) {

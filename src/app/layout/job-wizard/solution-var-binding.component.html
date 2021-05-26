@@ -22,7 +22,18 @@
         [formControlName]="binding.key" [id]="binding.key" [required]="binding.required"
         [name]="binding.key" ngbDatepicker #d="ngbDatepicker">
       <div class="input-group-append">
-        <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+        <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+          <i class="fa fa-calendar"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="input-group" *ngSwitchCase="'bbox'">
+      <input type="text" class="form-control"
+        [formControlName]="binding.key" [id]="binding.key" [required]="binding.required"
+        placeholder="WestLon SouthLat EastLon NorthLat" #bbox>
+      <div class="input-group-append">
+        <app-selection-picker (picked)="updateBinding(binding, $event)"></app-selection-picker>
       </div>
     </div>
 

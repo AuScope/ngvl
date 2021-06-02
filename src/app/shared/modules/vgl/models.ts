@@ -1,4 +1,4 @@
-import { CSWRecordModel, OnlineResourceModel } from "portal-core-ui";
+import { CSWRecordModel, OnlineResourceModel } from "@auscope/portal-core-ui";
 
 /*
  * User Models

@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { UserStateService, ViewType } from '../../../shared';
-import { OlMapService } from 'portal-core-ui';
+import { OlMapService } from '@auscope/portal-core-ui';
 
 @Component({
     selector: 'app-sidebar',

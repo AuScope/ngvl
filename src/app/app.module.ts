@@ -13,7 +13,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CustomReuseStrategy } from './app-custom-reuse-strategy';
 import { AuthGuard, AuthService } from './shared';
-import { PortalCoreModule } from 'portal-core-ui';
+import { PortalCoreModule } from '@auscope/portal-core-ui';
 import { UserStateService } from './shared';
 import { VglModule } from './shared';
 import { UserModule } from './layout/user/user.module';

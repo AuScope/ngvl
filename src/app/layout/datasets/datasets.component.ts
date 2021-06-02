@@ -6,7 +6,7 @@ import { routerTransition } from '../../router.animations';
 import { AuthService, UserStateService, DATA_VIEW } from '../../shared';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
 
-import { CSWRecordModel, LayerModel, OlMapService } from 'portal-core-ui';
+import { CSWRecordModel, LayerModel, OlMapService } from '@auscope/portal-core-ui';
 import { BookMark, Registry } from '../../shared/modules/vgl/models';
 import * as Proj from 'ol/proj';
 

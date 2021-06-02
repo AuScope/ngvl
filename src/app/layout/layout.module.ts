@@ -1,4 +1,4 @@
-import { PortalCorePipesModule } from 'portal-core-ui';
+import { PortalCorePipesModule } from '@auscope/portal-core-ui';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';

@@ -1,4 +1,4 @@
-import { OlMapObject } from 'portal-core-ui';
+import { OlMapObject } from '@auscope/portal-core-ui';
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 /*

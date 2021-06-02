@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { UserStateService } from './user-state.service';
 import { ANONYMOUS_USER, JobDownload } from '../modules/vgl/models';
-import { LayerModel, OlMapService } from 'portal-core-ui';
+import { LayerModel, OlMapService } from '@auscope/portal-core-ui';
 import { environment } from '../../../environments/environment';
 
 @Injectable()

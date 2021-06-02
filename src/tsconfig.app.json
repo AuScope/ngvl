@@ -12,6 +12,6 @@
   ],
   "include": [
     "**/*.ts",
-    "../node_modules/portal-core-ui/**/*.ts"
+    "../node_modules/@auscope/portal-core-ui/**/*.ts"
   ]
 }

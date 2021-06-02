@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { routerTransition } from '../router.animations';
 
 import { UserStateService } from '../shared';
-import { LayerModel, OlMapService } from 'portal-core-ui';
+import { LayerModel, OlMapService } from '@auscope/portal-core-ui';
 
 import { environment } from '../../environments/environment';
 

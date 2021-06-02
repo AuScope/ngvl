@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CSWRecordModel, OlMapService, OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel, OlMapService, OnlineResourceModel } from '@auscope/portal-core-ui';
 import { BookMark } from '../../../shared/modules/vgl/models';
 import { RecordModalComponent } from '../record.modal.component';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';

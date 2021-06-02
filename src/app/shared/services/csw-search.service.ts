@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
-import { CSWRecordModel, LayerHandlerService, OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel, LayerHandlerService, OnlineResourceModel } from '@auscope/portal-core-ui';
 import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';

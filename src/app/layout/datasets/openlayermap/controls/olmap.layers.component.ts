@@ -1,4 +1,4 @@
-import { LayerModel, OlMapService } from 'portal-core-ui';
+import { LayerModel, OlMapService } from '@auscope/portal-core-ui';
 import { Component } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';

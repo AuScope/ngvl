@@ -1,4 +1,4 @@
-import { CSWRecordModel, OlMapObject, OlMapService } from 'portal-core-ui';
+import { CSWRecordModel, OlMapObject, OlMapService } from '@auscope/portal-core-ui';
 import { OnInit, AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 
 import { FormControl } from '@angular/forms';

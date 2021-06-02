@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ConfirmDatasetsModalComponent } from '../../confirm-datasets.modal.component';
 import { DownloadOptions } from '../../../../shared/modules/vgl/models';
-import { CSWRecordModel, OlMapService, OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel, OlMapService, OnlineResourceModel } from '@auscope/portal-core-ui';
 import { CSWSearchService } from '../../../../shared/services/csw-search.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';

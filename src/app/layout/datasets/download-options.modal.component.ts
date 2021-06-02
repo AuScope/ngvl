@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef } from '@angular/core';
-import { CSWRecordModel } from 'portal-core-ui';
+import { CSWRecordModel } from '@auscope/portal-core-ui';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { DownloadOptions, DescribeCoverage } from '../../shared/modules/vgl/models';

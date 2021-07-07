@@ -39,18 +39,18 @@ export class JobSolutionVarsComponent implements OnDestroy, OnInit {
       map(values => this.formBindings(values))
     ).subscribe(bindings => this.bindingsChange.emit(bindings));
 
-    this.subscription = combineLatest(
+    this.subscription = combineLatest([
       this.uss.jobDownloads,
       this.uss.jobCloudFiles,
       this.uss.uploadedFiles
-    ).subscribe(inputs => this.updateInputFiles(inputs));
+    ]).subscribe(inputs => this.updateInputFiles(inputs));
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  formBindings(values): VarBinding<any>[] {
+  formBindings(values: { [x: string]: any; }): VarBinding<any>[] {
     const bindings = [...this.bindings];
 
     for (const b of bindings) {

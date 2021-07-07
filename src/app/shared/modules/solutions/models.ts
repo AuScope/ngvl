@@ -74,7 +74,7 @@ export class StringEntryBinding extends InputBinding<string> {
   controlType = 'text';
 
   isValid() {
-    // A string value must be non-empty
+    // A required string value must be non-empty
     if (this.required) {
       return !!this.value;
     }

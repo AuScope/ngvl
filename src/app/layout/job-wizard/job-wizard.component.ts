@@ -49,7 +49,7 @@ export class JobWizardComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     // Check the URL and parameters to determine whether we're creating a new
     // job or loading an existing one.
-    this.routeSub = combineLatest(this.route.url, this.route.paramMap).pipe(
+    this.routeSub = combineLatest([this.route.url, this.route.paramMap]).pipe(
       switchMap(([parts, params]) => {
         if (parts[0].path === 'new') {
           // Load a new, empty job object for the user to manage.

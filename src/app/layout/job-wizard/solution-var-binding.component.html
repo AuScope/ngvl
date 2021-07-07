@@ -17,6 +17,13 @@
       <option *ngFor="let opt of getBindingOptions(binding)" [value]="opt">{{opt}}</option>
     </select>
 
+    <!-- Inline datepicker doesn't pick up values from existing bindings.-->
+<!--     <ngb-datepicker #d *ngSwitchCase="'date'"
+      [formControlName]="binding.key" 
+      [id]="binding.key" 
+      [required]="binding.required"></ngb-datepicker>
+ -->
+
     <div class="input-group" *ngSwitchCase="'date'">
       <input class="form-control" placeholder="yyyy-mm-dd"
         [formControlName]="binding.key" [id]="binding.key" [required]="binding.required"

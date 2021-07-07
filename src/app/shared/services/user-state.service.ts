@@ -517,7 +517,23 @@ public updateSolutionsCart(f: ((cart: Solution[]) => Solution[])): Solution[] {
     return template.replace(/\$\{([a-zA-Z0-9_-]+)\}/g,
                             (match, p1) => {
                               const value = lookup(p1);
-                              return (value !== undefined) ? value : match;
+                              // If the value is undefined it was not present 
+                              // in the job object, so do not replace the 
+                              // placeholder.
+                              if (value === undefined) {
+                                return match;
+                              }
+
+                              // If the value is defined but null, return an 
+                              // empty string for substitution into the 
+                              // template.
+                              if (value === null) {
+                                return "";
+                              }
+
+                              // Any other value is returned as is. 
+                              // NB This converts non-string values to string.
+                              return value;
                             });
   }
 

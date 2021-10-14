@@ -18,6 +18,7 @@ import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { featureCollection, polygon } from '@turf/helpers';
+import { GeoTiffPreviewComponent } from './preview/geotiff-preview.component';
 
 
 @Component({
@@ -51,8 +52,9 @@ export class JobsComponent implements OnInit {
         new PreviewItem("plaintext", PlainTextPreviewComponent, {}, ['txt', 'sh', 'log']),
         new PreviewItem("log", LogPreviewComponent, {}, ['.sh.log']),
         new PreviewItem("ttl", TtlPreviewComponent, {}, ['ttl']),
-        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif']),
-        new PreviewItem("pdf", PdfPreviewComponent, {}, ['pdf'])
+        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp']),
+        new PreviewItem("pdf", PdfPreviewComponent, {}, ['pdf']),
+        new PreviewItem("geotiff", GeoTiffPreviewComponent, {}, ['tif', 'tiff'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
@@ -283,7 +285,7 @@ export class JobsComponent implements OnInit {
         // saving previewItem for refresh
         this.currentPreviewItem = previewItem;
         // Preview image
-        if (previewItem && (previewItem.type === 'image' || previewItem.type === 'pdf')) {
+        if (previewItem && (previewItem.type === 'image' || previewItem.type === 'geotiff' || previewItem.type === 'pdf')) {
             this.currentPreviewObject = cloudFile;
             const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
             this.previewFile(previewItem, imageUrl);

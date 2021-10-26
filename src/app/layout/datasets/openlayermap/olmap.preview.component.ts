@@ -2,12 +2,14 @@ import { Constants, OlMapObject, OlMapService, RenderStatusService } from 'porta
 import { AfterViewInit, Component, ElementRef, ViewChild, Inject } from '@angular/core';
 import { point, polygon } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
+import Geometry from 'ol/geom/Geometry';
 import View from 'ol/View';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import Style from 'ol/style/Style';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorSource from 'ol/source/Vector';
+import VectorSourceType from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import GroupLayer from 'ol/layer/Group';
 import * as Extent from 'ol/extent';
@@ -30,7 +32,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
     BBOX_HIGH_STROKE_COLOUR = '#ff33cc';
     BBOX_LOW_FILL_COLOUR = 'rgba(128,128,128,0.25)';
     BBOX_HIGH_FILL_COLOUR = 'rgba(255,179,236,0.4)';
-    layerVectorArr: { [key: string]: VectorLayer } = {};
+    layerVectorArr: { [key: string]: VectorLayer<VectorSourceType<Geometry>> } = {};
 
 
     constructor(private olMapService: OlMapService, @Inject('env') private env) {
@@ -39,6 +41,8 @@ export class OlMapPreviewComponent implements AfterViewInit {
         const me = this;
 
         // When the user clicks on a rectangle in the preview, the main map zooms to the same area
+        // TODO: Re-instate, broken after OpenLayers upgrade but not currently used in ngvl
+        /*
         map.on('singleclick', function (event: MapBrowserEvent) {
             for (const featureColl of me.bboxGeojsonObjectArr) {
                 for (const feat of featureColl.features) {
@@ -51,6 +55,7 @@ export class OlMapPreviewComponent implements AfterViewInit {
                 }
             }
         });
+        */
     }
 
     /**

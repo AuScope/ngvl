@@ -98,7 +98,7 @@ export class OlMapLayersComponent {
                     const bbox: [number, number, number, number] =
                         [bounds.westBoundLongitude, bounds.southBoundLatitude, bounds.eastBoundLongitude, bounds.northBoundLatitude];
                     const extent = Proj.transformExtent(bbox, 'EPSG:4326', 'EPSG:3857');
-                    this.olMapService.fitView(extent);
+                    this.olMapService.fitView([extent[0], extent[1], extent[2], extent[3]]);//this.olMapService.fitView(extent);
                     return;
                 }
             }

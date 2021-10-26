@@ -74,7 +74,7 @@ export class StringEntryBinding extends InputBinding<string> {
   controlType = 'text';
 
   isValid() {
-    // A string value must be non-empty
+    // A required string value must be non-empty
     if (this.required) {
       return !!this.value;
     }
@@ -110,6 +110,14 @@ export class BooleanBinding extends InputBinding<boolean> {
   controlType = 'checkbox';
 }
 
+export class DateBinding extends InputBinding<string> {
+  controlType = 'date';
+}
+
+export class BBoxBinding extends InputBinding<string> {
+  controlType = 'bbox';
+}
+
 export function create_var_binding(
   variable: Variable,
   options = {}
@@ -129,6 +137,14 @@ export function create_var_binding(
     opts.values = variable.values;
     return variable.type === 'string' ? new OptionsBinding<string>(opts) : new OptionsBinding<number>(opts);
   } else {
+    // Check for annotations first, then fall back on simple type-based
+    // selection.
+    if (variable.tags.includes('datetime') || variable.tags.includes('iso8601')) {
+      return new DateBinding(opts);
+    } else if (variable.tags.includes('bbox')) {
+      return new BBoxBinding(opts);
+    }
+
     switch (variable.type) {
       case 'int':
         return new NumberEntryBinding({

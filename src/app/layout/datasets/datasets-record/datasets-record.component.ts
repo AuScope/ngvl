@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
 import { CSWRecordModel, OlMapService, OnlineResourceModel } from 'portal-core-ui';
 import { BookMark } from '../../../shared/modules/vgl/models';
 import { RecordModalComponent } from '../record.modal.component';
@@ -6,11 +6,7 @@ import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
-import { StyleChooserModalComponent } from '../../../shared/modules/grace/style-chooser.modal.component';
-import { GraceStyleSettings } from '../../../shared/modules/grace/grace-graph.models';
-import { GraceService } from '../../../shared/modules/grace/grace.service';
-import { GraceStyleService } from '../../../shared/modules/grace/grace-style.service';
-import { environment } from '../../../../environments/environment';
+import { KeywordComponentsService } from '../../../shared/modules/keyword/keyword-components.service';
 
 
 // List of valid online resource types that can be added to the map
@@ -21,7 +17,10 @@ const VALID_ONLINE_RESOURCE_TYPES: string[] = ['WMS', 'WFS', 'CSW', 'WWW'];
     templateUrl: './datasets-record.component.html',
     styleUrls: ['./datasets-record.component.scss']
 })
-export class DatasetsRecordComponent {
+export class DatasetsRecordComponent implements OnInit {
+
+    // KeywordComponent record buttons
+    @ViewChild('recordButtons', { static: true, read: ViewContainerRef }) recordButtons: ViewContainerRef;
 
     @Input() registries: any = [];
     @Input() cswRecord: CSWRecordModel;
@@ -39,19 +38,22 @@ export class DatasetsRecordComponent {
     public timeExtentList: string[] = [];
     public selectedTimeExtent = "";
 
-    // GRACE graph settings (optional)
-    private graceStyleSettings: GraceStyleSettings;
-
-    // Selected time period (optional)
-    private timePeriod: string;
-
 
     constructor(public olMapService: OlMapService,
                 public cswSearchService: CSWSearchService,
                 public vglService: VglService,
-                public graceService: GraceService,
+                public keywordComponentService: KeywordComponentsService,
                 public modalService: NgbModal,
                 public activeModal: NgbActiveModal) { }
+
+    /**
+     * On init deal with KeywordComponents that are needed
+     */
+    ngOnInit() {
+      if (this.isMapControl) {
+        this.keywordComponentService.addRecordButtonKeywordComponents(this.cswRecord, this.recordButtons);
+      }
+    }
 
     /**
      * Add CSW record layer to the map
@@ -60,6 +62,8 @@ export class DatasetsRecordComponent {
      */
     public addCSWRecord(cswRecord: CSWRecordModel): void {
         this.olMapService.addCSWRecord(cswRecord);
+        // Keyword components will be added if the necessary keyword is present
+        this.keywordComponentService.addMapWidgetKeywordComponents(cswRecord);
     }
 
     /**
@@ -68,6 +72,7 @@ export class DatasetsRecordComponent {
      * @param recordId ID of CSW record to remove
      */
     public removeCSWRecord(recordId: string): void {
+        this.keywordComponentService.removeKeywordComponents(recordId);
         this.olMapService.removeLayer(this.olMapService.getLayerModel(recordId));
         this.timeExtentList = [];
         this.timeExtentStatus = "";
@@ -248,6 +253,8 @@ export class DatasetsRecordComponent {
      * Get a list of times this record may have. Requires the CSWRecord to have
      * a temporalExtent set and an associated WMS OnlineResource against which a
      * GetCapabilities request can be made to retrieve times
+     *
+     * TODO FIX so not GRACE specific functionality, or move to KeywordComponent
      */
     public loadTimes() {
         const wmsResource: OnlineResourceModel = this.cswRecord.onlineResources.find(
@@ -256,44 +263,32 @@ export class DatasetsRecordComponent {
             this.timeExtentList = [];
             this.selectedTimeExtent = "";
             this.timeExtentStatus = 'loading';
-            // GRACE times via a call to grace-api
-            if (this.isGraceRecord()) {
-                this.graceService.getGraceDates().subscribe(response => {
-                    if (response) {
-                        this.timeExtentList = response;
-                        this.timeExtentStatus = 'loaded';
-                    }
-                }, error => {
-                    this.timeExtentStatus = 'error';
-                });
-            } else {
-                // General WMS times via GetCapabilities request
-                // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
-                this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
-                    if (response && response.layers) {
-                        let layer = response.layers.find(l => l.name === wmsResource.name);
-                        // Name may not have matched due to being appended with "<workspace>:"
-                        if (!layer) {
-                            for (let wmsLayer of response.layers) {
-                                const colonIndex = wmsLayer.name.indexOf(':');
-                                if (colonIndex !== -1) {
-                                    const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
-                                    if (layerName === wmsResource.name) {
-                                        layer = wmsLayer;
-                                        break;
-                                    }
+            // General WMS times via GetCapabilities request
+            // TODO: Currently must be 1.1.1, perhaps due to Geoserver configuration
+            this.vglService.getWmsCapabilities(wmsResource.url, "1.1.1").subscribe(response => {
+                if (response && response.layers) {
+                    let layer = response.layers.find(l => l.name === wmsResource.name);
+                    // Name may not have matched due to being appended with "<workspace>:"
+                    if (!layer) {
+                        for (let wmsLayer of response.layers) {
+                            const colonIndex = wmsLayer.name.indexOf(':');
+                            if (colonIndex !== -1) {
+                                const layerName: string = wmsLayer.name.substring(colonIndex + 1, wmsLayer.name.length + 1);
+                                if (layerName === wmsResource.name) {
+                                    layer = wmsLayer;
+                                    break;
                                 }
                             }
                         }
-                        if (layer && layer.timeExtent && layer.timeExtent.length > 0) {
-                            this.timeExtentList = layer.timeExtent;
-                        }
                     }
-                    this.timeExtentStatus = 'loaded';
-                }, error => {
-                    this.timeExtentStatus = 'error';
-                });
-            }
+                    if (layer && layer.timeExtent && layer.timeExtent.length > 0) {
+                        this.timeExtentList = layer.timeExtent;
+                    }
+                }
+                this.timeExtentStatus = 'loaded';
+            }, error => {
+                this.timeExtentStatus = 'error';
+            });
         }
     }
 
@@ -304,52 +299,6 @@ export class DatasetsRecordComponent {
      */
     changeTime(newTime: string) {
         this.olMapService.setLayerSourceParam(this.cswRecord.id, 'TIME', newTime);
-    }
-
-    /**
-     * TODO: Needs better check
-     */
-    public isGraceRecord(): boolean {
-        if (environment.grace && environment.grace.layers &&
-                environment.grace.layers.indexOf(this.cswRecord.id) >= 0) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Set the WMS style for the layer
-     *
-     * @param record CSW record
-     */
-    changeGraceStyle(record: CSWRecordModel) {
-        if (this.graceStyleSettings === undefined || this.graceStyleSettings === null) {
-            this.graceStyleSettings = {
-                minColor: '#ff0000',
-                minValue: -8,
-                neutralColor: '#ffffff',
-                neutralValue: 0,
-                maxColor: '#0000ff',
-                maxValue: 4,
-                transparentNeutralColor: false
-            };
-        }
-        const modalRef = this.modalService.open(StyleChooserModalComponent, { size: 'sm' });
-        modalRef.componentInstance.graceStyleSettings = this.graceStyleSettings;
-        modalRef.result.then(newStyle => {
-            this.graceStyleSettings = {
-                minColor: newStyle.minColor,
-                minValue: newStyle.minValue,
-                neutralColor: newStyle.neutralColor,
-                neutralValue: newStyle.neutralValue,
-                maxColor: newStyle.maxColor,
-                maxValue: newStyle.maxValue,
-                transparentNeutralColor: newStyle.transparentNeutralColor
-            };
-            const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
-            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
-            this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
-        }, () => {});
     }
 
 }

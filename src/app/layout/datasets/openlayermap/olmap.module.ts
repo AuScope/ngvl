@@ -6,7 +6,6 @@ import { OlMapComponent } from './olmap.component';
 import { OlMapPreviewComponent } from './olmap.preview.component';
 import { OlMapZoomComponent } from './controls/olmap.zoom.component';
 import { OlMapDataSelectComponent } from './controls/olmap.select.data.component';
-import { OlMapGraceDataComponent } from './controls/olmap.grace-data.component';
 import { OlMapLayersComponent } from './controls/olmap.layers.component';
 import { OlMapBoundariesComponent } from './controls/olmap.boundaries.component';
 import { NgbAccordionModule, NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -28,8 +27,8 @@ import { DatasetsRecordModule } from '../datasets-record/datasets-record.module'
     SliderModule,
     DatasetsRecordModule
   ],
-  declarations: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent, OlMapGraceDataComponent ],
-  bootstrap: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent, OlMapGraceDataComponent ],
-  exports: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent, OlMapGraceDataComponent ]
+  declarations: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],
+  bootstrap: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ],
+  exports: [ OlMapComponent, OlMapPreviewComponent, OlMapZoomComponent, OlMapDataSelectComponent, OlMapLayersComponent, OlMapBoundariesComponent, OlMapBasemapComponent ]
 })
 export class OlMapModule { }

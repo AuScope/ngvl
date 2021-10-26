@@ -1,10 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
-import { OlMapObject, OlMapService } from 'portal-core-ui';
-import { environment } from '../../../../../environments/environment';
-import { GraceGraphModalComponent } from '../../../../shared/modules/grace/grace-graph.modal.component';
-import { GraceService } from '../../../../shared/modules/grace/grace.service';
+import { OlMapObject } from 'portal-core-ui';
+import { GraceGraphModalComponent } from './grace-graph.modal.component';
 
 
 @Component({
@@ -18,8 +16,7 @@ export class OlMapGraceDataComponent implements AfterViewInit {
     buttonText = "GRACE";
 
 
-    constructor(public olMapObject: OlMapObject, private olMapService: OlMapService,
-        private graceService: GraceService, private modalService: NgbModal) {}
+    constructor(public olMapObject: OlMapObject, private modalService: NgbModal) {}
 
 
     ngAfterViewInit() {
@@ -41,19 +38,6 @@ export class OlMapGraceDataComponent implements AfterViewInit {
             modalRef.componentInstance.y = lonlat[1];
             this.buttonText = 'GRACE';
         }
-    }
-
-    public getActiveGraceLayer(): string {
-        let graceLayer;
-        if (environment.grace && environment.grace.layers && environment.grace.layers.length > 0) {
-            for (let layer of environment.grace.layers) {
-                if (this.olMapService.layerExists(layer)) {
-                    graceLayer = layer;
-                    break;
-                }
-            }
-        }
-        return graceLayer;
     }
 
 }

@@ -34,9 +34,12 @@ export const environment = {
     ],
     forceAddLayerViaProxy: [],
     grace: {
-        host: 'http://localhost:8001',
+        host: 'http://localhost:8001'/*,
         layers: [
             'mascons_stage4_V003a'
         ]
-    }
+        */
+    },
+
+    keywordComponents: []
 };

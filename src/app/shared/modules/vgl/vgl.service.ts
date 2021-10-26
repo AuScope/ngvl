@@ -722,5 +722,5 @@ export class VglService {
     };
     return this.vglGet<any>('getWMSCapabilities.do', params);
   }
-  
+
 }

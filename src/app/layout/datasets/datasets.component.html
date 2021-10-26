@@ -189,7 +189,6 @@
                                     <div class="row" #searchResults>
                                         <div class="col">
                                             <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
-                                                <!--Search Results&nbsp;({{ cswDisplayResults.length }} of {{ cswSearchResultsMatched }})-->
                                                 Search Results ({{ getTotalSearchResultCount() }} Total)
                                                 <span>
                                                     <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
@@ -280,28 +279,28 @@
             </as-split-area>
             <as-split-area size="70" class="split-area-map">
                 <!-- Map -->
-                <div class="btn-group" style="position:absolute;z-index:1;margin-top:4px;margin-left:4px;">
+                <div class="btn-group" style="position:absolute;z-index:2;margin-top:4px;margin-left:4px;">
                     <!-- Zoom buttons -->
                     <app-ol-map-zoom></app-ol-map-zoom>
                     <app-ol-boundary-select></app-ol-boundary-select>
                 </div>
 
-                <div class="btn-group" style="position:absolute;z-index:1;margin-top:40px;margin-left:4px;">
+                <div class="btn-group" style="position:absolute;z-index:2;margin-top:40px;margin-left:4px;">
                     <!-- Select Data button -->
                     <app-ol-map-select-data></app-ol-map-select-data>
                 </div>
 
-                <div class="btn-group" style="position:absolute;z-index:1;margin-top:80px;margin-left:4px;">
-                    <!-- GRACE Data button -->
-                    <app-ol-map-grace-data></app-ol-map-grace-data>
+                <!-- KeywordComponent map widgets -->
+                <div class="btn-group" style="position:absolute;z-index:1;">
+                    <ng-template #mapWidgets></ng-template>
                 </div>
 
-                <div class="btn-group" style="position:absolute;z-index:1;margin-left:190px; margin-top:4px;">
+                <div class="btn-group" style="position:absolute;z-index:2;margin-left:190px; margin-top:4px;">
                     <!-- Basemap drop down menu -->
                     <app-ol-map-basemap></app-ol-map-basemap>
                 </div>
 
-                <div style="position:absolute;z-index:1;margin-top:4px;right:10px;">
+                <div style="position:absolute;z-index:2;margin-top:4px;right:10px;">
                     <!-- Active Layers drop down menu -->
                     <app-ol-map-layers></app-ol-map-layers>
                 </div>

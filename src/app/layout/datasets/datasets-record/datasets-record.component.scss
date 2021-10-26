@@ -1,25 +1,16 @@
-.dataset-record {
-
+:host {
   .btn {
-      cursor: pointer;
-      border: none;
-      height: 24px;
-      width: 24px;
-      line-height: 14px;
-  }
-
-  // Shrink input components a little
-  /*
-  .input-group-sm {
+    cursor: pointer;
+    border: none;
     height: 24px;
+    width: 24px;
     line-height: 14px;
   }
-  */
 
   label {
     width: 100%;
     margin-left: 4px;
-    margin-right:4px;
+    margin-right: 4px;
     height: 24px;
     line-height: 24px;
   }
@@ -39,18 +30,17 @@
     }
   }
 
-    // Remove opacity Dropdown arrow
-    .dropdown-toggle::after {
-        display:none;
-    }
-
-    .dropdown-menu {
-        min-width: 25px;
-    }
-
-    p-slider {
-        display: flex;
-        justify-content: center;
-    }
-    
+  // Remove opacity Dropdown arrow
+  .dropdown-toggle::after {
+    display: none;
   }
+
+  .dropdown-menu {
+    min-width: 25px;
+  }
+
+  p-slider {
+    display: flex;
+    justify-content: center;
+  }
+}

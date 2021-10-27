@@ -1,0 +1,48 @@
+<form [formGroup]="animationGroup" (ngSubmit)="onSubmit()">
+    <div class="modal-header" style="background: #EEE">
+        <h5 class="modal-title">Create Animation</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss('dismiss')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col">Start Date</div>
+            <div class="col">
+                <select class="form-control" id="startdate" formControlName="startdate">
+                    <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="i >= dates.indexOf(animationGroup.value.enddate)">{{d | date}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">End Date</div>
+            <div class="col">
+                <select class="form-control" id="enddate" formControlName="enddate">
+                    <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="i < dates.indexOf(animationGroup.value.startdate) + 1">{{d | date}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">Frames Per Second (FPS)</div>
+            <div class="col"><input class="form-control" id="fps" type="text" formControlName="fps"></div>
+        </div>
+        <div class="row">
+            <div class="col">Frames Width (px)</div>
+            <div class="col"><input class="form-control" id="framewidth" type="text" formControlName="framewidth"></div>
+        </div>
+        <div class="row">
+            <div class="col">Frames Height (px)</div>
+            <div class="col"><input class="form-control" id="frameheight" type="text" formControlName="frameheight"></div>
+        </div>
+        <!--
+        <div class="row">
+            <div class="col">Change Style</div>
+            <div class="col"><button class="btn btn-primary" (click)="changeStyle()"><em class="fas fa-brush" style="color:white;"></em></button></div>
+        </div>
+        -->
+    </div>
+    <div class="modal-footer" style="background: #EEE">
+        <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('dismiss')">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!animationGroup.valid">Create Animation</button>
+    </div>
+</form>

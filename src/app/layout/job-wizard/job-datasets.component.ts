@@ -65,13 +65,13 @@ export class JobDatasetsComponent {
 
     downloadContextMenuAction = {
         label: 'Download to your machine',
-        icon: 'fa fa-download',
+        icon: 'fas fa-download',
         command: (event) => this.downloadSelectedInput()
     };
 
     deleteContextMenuAction = {
         label: 'Delete this input',
-        icon: 'fa fa-times',
+        icon: 'fas fa-times',
         command: (event) => this.deleteSelectedInput()
     };
 

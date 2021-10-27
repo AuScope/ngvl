@@ -1,7 +1,7 @@
 <div [@routerTransition]>
 
   <a role="button" (click)="location.back()">
-    <i class="fa fa-arrow-left"></i>
+    <i class="fas fa-arrow-left"></i>
   </a>
 
   <div *ngIf="(solution$ | async) as solution; else loading">

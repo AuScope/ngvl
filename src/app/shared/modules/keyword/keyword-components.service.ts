@@ -2,7 +2,7 @@ import { ComponentFactoryResolver, ComponentRef, Injectable, ViewContainerRef } 
 import { KeywordComponent } from "./keyword.component";
 import { AddedKeywordComponent, KeywordComponentType } from "./models";
 import { CSWRecordModel } from "portal-core-ui";
-import { environment } from "../../../../environments/environment";
+import { keywordComponents } from "../../../../environments/keyword-components";
 
 @Injectable({ providedIn: "root" })
 export class KeywordComponentsService {
@@ -30,9 +30,9 @@ export class KeywordComponentsService {
    * @param cswRecord the CSW record
    */
   public addMapWidgetKeywordComponents(cswRecord: CSWRecordModel) {
-    if (environment.hasOwnProperty("keywordComponents")) {
+    if (keywordComponents.hasOwnProperty("keywordComponents")) {
       for (const keyword of cswRecord.descriptiveKeywords) {
-        const componentsForKeyword: KeywordComponent[] = environment[
+        const componentsForKeyword: KeywordComponent[] = keywordComponents[
           "keywordComponents"
         ].filter((c) => c.keyword === keyword);
         for (const keywordComponentItem of componentsForKeyword) {
@@ -78,9 +78,9 @@ export class KeywordComponentsService {
    * @param recordButtonsViewContainerRef the ViewContainerRef for the DatasetsRecordComponent
    */
   public addRecordButtonKeywordComponents(cswRecord: CSWRecordModel, recordButtonsViewContainerRef: ViewContainerRef) {
-    if (environment.hasOwnProperty("keywordComponents")) {
+    if (keywordComponents.hasOwnProperty("keywordComponents")) {
       for (const keyword of cswRecord.descriptiveKeywords) {
-        const componentsForKeyword: KeywordComponent[] = environment[
+        const componentsForKeyword: KeywordComponent[] = keywordComponents[
           "keywordComponents"
         ].filter((c) => c.keyword === keyword);
         for (const keywordComponentItem of componentsForKeyword) {

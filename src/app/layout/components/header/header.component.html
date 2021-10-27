@@ -5,7 +5,7 @@
     </div>
     <button class="navbar-toggler" type="button" (click)="toggleSidebar()">
         <!-- <span class="navbar-toggler-icon"></span> -->
-        <i class="fa fa-bars text-muted" aria-hidden="true"></i>
+        <i class="fas fa-bars text-muted" aria-hidden="true"></i>
     </button>
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
@@ -20,7 +20,7 @@
             </li> &nbsp;
             <li class="nav-item dropdown" ngbDropdown>
                 <a class="nav-link" href="javascript:void(0)" ngbDropdownToggle>
-                    <i class="fa fa-envelope"></i> <b class="caret"></b><span class="sr-only">(current)</span>
+                    <i class="fas fa-envelope"></i> <b class="caret"></b><span class="sr-only">(current)</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right messages">
                     <li class="media">
@@ -29,7 +29,7 @@
                         >
                         <div class="media-body">
                             <h5 class="mt-0 mb-1">John Smith</h5>
-                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="small text-muted"><i class="far fa-clock"></i> Yesterday at 4:32 PM</p>
                             <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
                         </div>
                     </li>
@@ -40,7 +40,7 @@
                         >
                         <div class="media-body">
                             <h5 class="mt-0 mb-1">John Smith</h5>
-                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="small text-muted"><i class="far fa-clock"></i> Yesterday at 4:32 PM</p>
                             <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
                         </div>
                     </li>
@@ -51,7 +51,7 @@
                         />
                         <div class="media-body">
                             <h5 class="mt-0 mb-1">John Smith</h5>
-                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="small text-muted"><i class="far fa-clock"></i> Yesterday at 4:32 PM</p>
                             <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
                         </div>
                     </li>
@@ -60,20 +60,20 @@
             -->
             <li class="nav-item dropdown" ngbDropdown *ngIf="!(isUserConfigured$)">
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
-                    <i class="fa fa-bell"></i>
+                    <i class="fas fa-bell"></i>
                     <span class="badge badge-info" style="margin-left:2px;transform:translateY(-2px);">1</span>
                     <b class="caret"></b><span class="sr-only">(current)</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
                     <div class="dropdown-item" (click)="configureComputeServices()">
-                        <i class="fa fa-exclamation-triangle"></i>&nbsp;Compute Services Unconfigured <!--<span *ngIf="notification.notificationNumber != undefined" class="badge badge-info">{{ notification.notificationCount }}</span>-->
+                        <i class="fas fa-exclamation-triangle"></i>&nbsp;Compute Services Unconfigured <!--<span *ngIf="notification.notificationNumber != undefined" class="badge badge-info">{{ notification.notificationCount }}</span>-->
                     </div>
                 </ul>
             </li>
             <!--
             <li class="nav-item dropdown" ngbDropdown>
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
-                    <i class="fa fa-language"></i> {{ 'Language' | translate }} <b class="caret"></b>
+                    <i class="fas fa-language"></i> {{ 'Language' | translate }} <b class="caret"></b>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('en')">
@@ -103,17 +103,17 @@
 
             <div class="d-inline-block userDropdown" ngbDropdown #userDrop="ngbDropdown">
                 <button class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="userDrop.open()">
-                    <i class="fa fa-user"></i> {{ username$ | async }} <b class="caret"></b>
+                    <i class="fas fa-user"></i> {{ username$ | async }} <b class="caret"></b>
                 </button>
                 <div ngbDropdownMenu aria-labelledby="dropdownManual">
                     <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" routerLink="/user" routerLinkActive="active">
-                        <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
+                        <i class="fas fa-fw fa-user"></i> {{ 'Profile' | translate }}
                     </button>
                     <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" (click)="onLogOut()">
-                        <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
+                        <i class="fas fa-fw fa-sign-out-alt"></i> {{ 'Log Out' | translate }}
                     </button>
                     <button ngbDropdownItem class="userDropdownItem" *ngIf="!isLoggedIn" (click)="onLogIn()">
-                        <i class="fa fa-fw fa-power-on"></i> {{ 'Log In' | translate }}
+                        <i class="fas fa-fw fa-sign-in-alt"></i> {{ 'Log In' | translate }}
                     </button>
                 </div>
             </div>

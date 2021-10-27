@@ -15,8 +15,8 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="anyTextIsCollapsed = !anyTextIsCollapsed">
                                                 <span>Any Text</span>
-                                                <i *ngIf="anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!anyTextIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="anyTextIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!anyTextIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="anyTextIsCollapsed">
                                                 <div class="input-group input-group-sm">
@@ -24,7 +24,7 @@
                                                         [(ngModel)]="anyTextValue" (keyup.enter)="resetFacetedSearch()">
                                                     <div class="input-group-btn input-group-apppend">
                                                         <button class="btn btn-primary btn-sm" type="button" (click)="resetFacetedSearch()">
-                                                            <i class="fa fa-search"></i>
+                                                            <i class="fas fa-search"></i>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -36,18 +36,18 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="spatialBoundsIsCollapsed = !spatialBoundsIsCollapsed">
                                                 <span>Spatial Bounds</span>
-                                                <i *ngIf="spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!spatialBoundsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="spatialBoundsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!spatialBoundsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="spatialBoundsIsCollapsed">
                                                 <div class="input-group input-group-sm">
                                                     <input type="text" class="form-control" placeholder="Use buttons to enter bounds" [value]="spatialBoundsText" readonly>
                                                     <div class="input-group-btn input-group-apppend">
                                                         <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Use current map bounds" (click)="spatialBoundsFromMap()">
-                                                            <i class="fa fa-eye"></i>
+                                                            <i class="fas fa-eye"></i>
                                                         </button>
                                                         <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Draw bounds" (click)="drawSpatialBounds()">
-                                                            <i class="fa fa-edit"></i>
+                                                            <i class="fas fa-edit"></i>
                                                         </button>
                                                     </div>
                                                 </div>
@@ -59,8 +59,8 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="keywordsIsCollapsed = !keywordsIsCollapsed">
                                                 <span>Keywords</span>
-                                                <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="keywordsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!keywordsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="keywordsIsCollapsed">
                                                 <li *ngFor="let keyword of selectedKeywords; index as i">
@@ -71,10 +71,10 @@
                                                         <div class="input-group-btn input-group-apppend">
                                                             <button *ngIf="i==selectedKeywords.length-1 && selectedKeywords[selectedKeywords.length-1]!==''" class="btn btn-secondary btn-sm"
                                                                 type="button" (click)="addNewKeyword()" style="background-color:green;">
-                                                                <i class="fa fa-plus-circle"></i>
+                                                                <i class="fas fa-plus-circle"></i>
                                                             </button>
                                                             <button *ngIf="selectedKeywords[i]!=''" class="btn btn-secondary btn-sm" type="button" (click)="removeKeyword(i)" style="background-color:red;">
-                                                                <i class="fa fa-minus-circle"></i>
+                                                                <i class="fas fa-minus-circle"></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -87,8 +87,8 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="servicesIsCollapsed = !servicesIsCollapsed">
                                                 <span>Available Services</span>
-                                                <i *ngIf="servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="servicesIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!servicesIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="servicesIsCollapsed">
                                                 <fieldset style="border: 1px solid #eee;margin-right:4px;">
@@ -148,8 +148,8 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="pubDateIsCollapsed = !pubDateIsCollapsed">
                                                 <span>Publication Date</span>
-                                                <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="pubDateIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!pubDateIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="pubDateIsCollapsed">
                                                 <div class="input-group input-group-sm" style="margin-top:4px;">
@@ -168,8 +168,8 @@
                                         <div class="col">
                                             <div class="submenu-header" (click)="registriesIsCollapsed = !registriesIsCollapsed">
                                                 <span>Available Registries</span>
-                                                <i *ngIf="registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-                                                <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                <i *ngIf="registriesIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
+                                                <i *ngIf="!registriesIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                             </div>
                                             <div [ngbCollapse]="registriesIsCollapsed">
                                                 <li *ngFor="let registry of availableRegistries | keyvalue">
@@ -191,10 +191,10 @@
                                             <div class="submenu-header" (click)="searchResultsIsCollapsed = !searchResultsIsCollapsed">
                                                 Search Results ({{ getTotalSearchResultCount() }} Total)
                                                 <span>
-                                                    <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
+                                                    <i *ngIf="searchResultsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-down fa-pull-right"></i>
                                                 </span>
                                                 <span>
-                                                    <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+                                                    <i *ngIf="!searchResultsIsCollapsed" style="line-height:inherit;" class="fas fa-caret-up fa-pull-right"></i>
                                                 </span>
                                             </div>
                                             <div [ngbCollapse]="searchResultsIsCollapsed" style="position:relative;border-style:solid;border-color:#eee">
@@ -202,7 +202,7 @@
                                                     <ul ngbNav #nav="ngbNav" class="nav-pills">
                                                         <li ngbNavItem *ngFor="let registry of availableRegistries | keyvalue">
                                                             <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError==null">{{ getRegistryTabTitle(registry.key) }}</a>
-                                                            <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError!=null" title="{{ registry.value.searchError }}">{{ getRegistryTabTitle(registry.key) }}<i class="fa fa-exclamation-triangle" style="margin-left:10px;color:red;"></i></a>
+                                                            <a ngbNavLink *ngIf="registry.value.checked && registry.value.searchError!=null" title="{{ registry.value.searchError }}">{{ getRegistryTabTitle(registry.key) }}<i class="fas fa-exclamation-triangle" style="margin-left:10px;color:red;"></i></a>
                                                             <ng-template ngbNavContent *ngIf="registry.value.checked">
                                                                 <!-- No results -->
                                                                 <div *ngIf="!registry.value.searching && registry.value.searchError==null && cswSearchResults.get(registry.key) && cswSearchResults.get(registry.key).length===0">
@@ -232,13 +232,13 @@
                                                                     </div>
                                                                     <div class="row" *ngIf="!registry.value.searching" style="bottom:0;right:0px;">
                                                                         <div class="col">
-                                                                            <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
+                                                                            <button [disabled]="!hasNextResultsPage(registry.key)" class="btn btn-sm fa-pull-right" style="margin-left:2px;" data-toggle="tooltip" title="Next page"
                                                                                 (click)="nextResultsPage(registry.key)">
-                                                                                <i class="fa fa-arrow-circle-right"></i>
+                                                                                <i class="fas fa-arrow-circle-right"></i>
                                                                             </button>
-                                                                            <button [disabled]="registry.value.currentPage==1" class="btn btn-sm pull-right" style="margin-left:2px;" data-toggle="tooltip"
+                                                                            <button [disabled]="registry.value.currentPage==1" class="btn btn-sm fa-pull-right" style="margin-left:2px;" data-toggle="tooltip"
                                                                                 title="Previous page" (click)="previousResultsPage(registry.key)">
-                                                                                <i class="fa fa-arrow-circle-left"></i>
+                                                                                <i class="fas fa-arrow-circle-left"></i>
                                                                             </button>
                                                                             <label class="pull-right" style="margin-top:4px;">Page {{ registry.value.currentPage }}&nbsp;</label>
                                                                         </div>

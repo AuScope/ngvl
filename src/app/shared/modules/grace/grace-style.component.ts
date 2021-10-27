@@ -21,11 +21,26 @@ export class GraceStyleComponent extends KeywordComponentClass {
     }
 
     /**
+     * Get the layer name of the first WMS resource for this component's CSW record
+     */
+    private getWMSLayerName(): string {
+        let wmsLayerName = '';
+        for (const onlineResource of this.cswRecord.onlineResources) {
+            if (onlineResource.type.toLowerCase() === 'wms') {
+                wmsLayerName = onlineResource.name;
+                break;
+            }
+        }
+        return wmsLayerName;
+    }
+
+    /**
      * Set the WMS style for the layer
      *
      * @param record CSW record
      */
     changeGraceStyle() {
+        const layerName = this.getWMSLayerName();
         if (this.graceStyleSettings === undefined || this.graceStyleSettings === null) {
             this.graceStyleSettings = {
                 minColor: '#ff0000',
@@ -49,9 +64,10 @@ export class GraceStyleComponent extends KeywordComponentClass {
                 maxValue: newStyle.maxValue,
                 transparentNeutralColor: newStyle.transparentNeutralColor
             };
-            const sld = GraceStyleService.getGraceSld('mascons_stage4_V003a', 'mascon_style', this.graceStyleSettings);
+            const sld = GraceStyleService.getGraceSld(layerName, 'mascon_style', this.graceStyleSettings);
             this.olMapService.setLayerSourceParam(this.cswRecord.id, 'LAYERS', undefined);
             this.olMapService.setLayerSourceParam(this.cswRecord.id, 'SLD_BODY', sld);
         }, () => {});
     }
+
 }

@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 declare var Plotly: any;
 
 /**
+ * DEPRECATED: Replaced with GraceGraphModelComponent2 which remains to facilitate porting of old data
  * TODO: Catch modal close (or dismiss) and cancel GRACE query Subscription
  */
 @Component({
@@ -25,9 +26,10 @@ export class GraceGraphModalComponent implements AfterViewInit {
 
     availableParameters = ['Estimate (with uncertainty)', 'Estimate'];
 
-    // Inputs
+    // Lat/Lon inputs
     x: number;
     y: number;
+    coords: any[];
     parameter: string = this.availableParameters[0];
 
     querySubscription: Subscription;
@@ -75,13 +77,23 @@ export class GraceGraphModalComponent implements AfterViewInit {
         }
         this.status = this.QueryStatus.querying;
         // Make call to GRACE service to get data for single parameter
-        this.querySubscription = this.graceService.getGraceAllTimeSeriesData(this.x, this.y).subscribe(data => {
-            this.queriedData = data;
-            this.plotGraph();
-            this.status = this.QueryStatus.loaded;
-        }, error => {
-            this.status = this.QueryStatus.error;
-        });
+        if (this.x !== undefined && this.y !== undefined) {
+            this.querySubscription = this.graceService.getGraceAllTimeSeriesData(this.x, this.y).subscribe(data => {
+                this.queriedData = data;
+                this.plotGraph();
+                this.status = this.QueryStatus.loaded;
+            }, error => {
+                this.status = this.QueryStatus.error;
+            });
+        } else if (this.coords !== undefined && this.coords.length > 0) {
+            // TODO: Remove hard-coding... will need to be a record keyword component
+            this.querySubscription = this.graceService.getGraceAllTimeSeriesDataForPolygon(this.coords).subscribe(data => {
+                this.queriedData = data;
+                this.status = this.QueryStatus.loaded;
+            }, error => {
+                this.status = this.QueryStatus.error;
+            });
+        }
     }
 
     private plotGraph() {
@@ -95,7 +107,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 error_vals.push(row['uncertainty']);
             }
         }
-        let errorPlot;
+        let errorPlot = {};
         if (error_vals && error_vals.length > 0) {
             errorPlot = {
                 type: 'data',

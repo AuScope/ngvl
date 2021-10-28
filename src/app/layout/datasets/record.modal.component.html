@@ -77,8 +77,8 @@
                     <div style="border: 1px solid; background-color: lightgray;">
                         <a (click)="onlineResources[resourceType].expanded=!onlineResources[resourceType].expanded" class="panel-header" style="cursor:pointer; margin: 2px;">
                             <span>&nbsp;{{ onlineResources[resourceType].name }}&nbsp;({{ getOnlineResourcesByType(record, resourceType).length }}&nbsp;item<span *ngIf="getOnlineResourcesByType(record, resourceType).length>1">s</span>)</span>
-                            <i *ngIf="!onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-down pull-right"></i>
-                            <i *ngIf="onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fa fa-toggle-up pull-right"></i>
+                            <i *ngIf="!onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fas fa-caret-down fa-pull-right"></i>
+                            <i *ngIf="onlineResources[resourceType].expanded" style="line-height:inherit; margin-right: 2px;" class="fas fa-caret-up fa-pull-right"></i>
                         </a>
                         <div *ngFor="let resource of getOnlineResourcesByType(record, resourceType)" style="border-top: 1px solid; background-color: white; word-wrap: break-word;">
                             <div *ngIf="onlineResources[resourceType].expanded" class="container" style="margin: 2px;">
@@ -89,7 +89,7 @@
                                     <a href="{{ resource.url }}" title="{{ resource.url }}" class="text-truncate" target="_blank" style="width:95%;">{{ resource.url }}</a>
                                     <div>
                                         <button class="btn btn-sm" *ngIf="resourceType=='WWW'" data-toggle="tooltip" title="Add dataset to job" (click)="addDatasetToJob(record, resource)" style="background-color:transparent;float:right;">
-                                            <i class="fa fa-plus-circle" style="color:green;"></i>
+                                            <i class="fas fa-plus-circle" style="color:green;"></i>
                                         </button>
                                     </div>
                                 </div>

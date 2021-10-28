@@ -1,0 +1,46 @@
+<div class="modal-header" style="background: #EEE">
+    <h5 class="modal-title">GRACE</h5>
+    <div ngbDropdown class="d-inline-block" style="margin-left:40px;">
+        <div *ngIf="status===QueryStatus.loaded">
+            <!-- Uncertainty, mascon/basin selection
+            Show Uncertainty
+            <input type="checkbox" [(ngModel)]="showUncertainty" (change)="plotGraph()" style="margin-right:10px;">
+            Primary Mascon
+            <select style="margin-right:10px;">
+                <option *ngFor="let mascon of primaryMascons" [ngValue]="selectedPrimaryMascon">{{mascon}}</option>
+            </select>
+            Drainage Basin
+            <select>
+                <option *ngFor="let basin of drainageBasins" [ngValue]="selectedBasin">{{basin}}</option>
+            </select>
+            -->
+            <!-- Original parameter dropdown
+            <button class="btn btn-outline-primary" id="graceDropdown" ngbDropdownToggle [disabled]="status===QueryStatus.querying">Select Parameter</button>
+            <div ngbDropdownMenu aria-labelledby="graceDropdown">
+                <button *ngFor="let param of availableParameters" ngbDropdownItem (click)="parameterChange(param)">{{ param }}</button>
+            </div>
+            -->
+        </div>
+    </div>
+    <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div style="text-align:center;" *ngIf="status===QueryStatus.querying">
+        Querying...
+        <div class="spinner" style="position:relative;margin-top:100px;">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
+    <div style="text-align:center;" *ngIf="status===QueryStatus.error">
+        Unable to retrieve GRACE data.
+    </div>
+    <plotly-plot #gracePlot id="gracePlot" [divId]="gracePlot" *ngIf="status===QueryStatus.loaded" [updateOnDataChange]="true"
+        [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+</div>
+<div class="modal-footer" style="background: #EEE">
+    <button type="button" class="btn btn-primary" (click)="activeModal.close()" >Close</button>
+</div>

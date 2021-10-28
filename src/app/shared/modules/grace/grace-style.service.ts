@@ -44,7 +44,6 @@ export class GraceStyleService {
      * @return XML 'sld:FeatureTypeStyle' string
      */
     private static getFeatureTypeStyle(styleSettings: GraceStyleSettings): string {
-
         const polygonSymbolizer = this.getPolySymbolizer(styleSettings);
         const rule = ['sld:Rule', null, polygonSymbolizer];
         return serialize(['sld:FeatureTypeStyle', null, rule]);
@@ -58,7 +57,7 @@ export class GraceStyleService {
      * @return XML 'sld:PolygonSymbolizer' string
      */
     private static getPolySymbolizer(styleSettings: GraceStyleSettings): string {
-        const propertyName = ['ogc:PropertyName', null, 'estimate'];
+        const propertyName = ['ogc:PropertyName', null, 'ewh'];
         const literalMinVal = ['ogc:Literal', null, styleSettings.minValue];
         const literalMinCol = ['ogc:Literal', null, styleSettings.minColor];
         const literalNeutralVal = ['ogc:Literal', null, styleSettings.neutralValue];

@@ -1,7 +1,7 @@
 <div class="olMapBasemapPanel">
     <button type="button" class="btn btn-sm btn-primary" title="Select base map" (click)="baseMapIsCollapsed=!baseMapIsCollapsed"
         [attr.aria-expanded]="!baseMapIsCollapsed" aria-controls="baseMapCollapse">
-        <span class="fa fa-globe" aria-hidden="true"></span>
+        <span class="fas fa-globe" aria-hidden="true"></span>
     </button>
     <div id="baseMapCollapse" [ngbCollapse]="baseMapIsCollapsed">
         <div class="card" style="position:fixed;max-height:calc(100vh - 200px);overflow-y:auto;background-color:white;">

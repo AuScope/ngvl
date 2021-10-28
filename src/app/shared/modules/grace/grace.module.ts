@@ -2,14 +2,18 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { BasinChooserModalComponent } from './basin-chooser.modal.component';
 import { GraceService } from './grace.service';
 import { GraceStyleComponent } from './grace-style.component';
 import { GraceStyleService } from './grace-style.service';
 import { GraceGraphModalComponent } from './grace-graph.modal.component';
+import { GraceGraphModalComponent2 } from './grace-graph.modal.component2';
 import { OlMapGraceDataComponent } from './olmap.grace-data.component';
 import { StyleChooserModalComponent } from './style-chooser.modal.component';
+import { CreateAnimationModalComponent } from './create-animation.modal.component';
 
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { PlotlyViaCDNModule } from 'angular-plotly.js';
 
@@ -25,11 +29,12 @@ PlotlyViaCDNModule.setPlotlyBundle("basic");
     FormsModule,
     ReactiveFormsModule,
     NgbDropdownModule,
+    NgbTypeaheadModule,
     PlotlyViaCDNModule,
     ColorPickerModule
   ],
-  declarations: [ GraceGraphModalComponent, StyleChooserModalComponent, GraceStyleComponent, OlMapGraceDataComponent ],
-  entryComponents: [ GraceGraphModalComponent, StyleChooserModalComponent, GraceStyleComponent, OlMapGraceDataComponent ],
+  declarations: [ BasinChooserModalComponent, GraceGraphModalComponent, GraceGraphModalComponent2, StyleChooserModalComponent, GraceStyleComponent, OlMapGraceDataComponent, CreateAnimationModalComponent ],
+  entryComponents: [ BasinChooserModalComponent, GraceGraphModalComponent, GraceGraphModalComponent2, StyleChooserModalComponent, GraceStyleComponent, OlMapGraceDataComponent, CreateAnimationModalComponent ],
   providers: [ GraceService, GraceStyleService ]
 })
 export class GraceModule { }

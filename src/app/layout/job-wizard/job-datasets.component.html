@@ -29,8 +29,8 @@
                         </span>
                         <!-- Online resource check prevents copied jobs from being edited, as these currently have no associated online resource -->
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='remote' && rowData.input.onlineResource">
-                            <button class="btn btn-sm btn-primary pull-right" title="Edit the download options" (click)="editDownload($event, rowData.input)">
-                                <i class="fa fa-edit"></i>
+                            <button class="btn btn-sm btn-primary fa-pull-right" title="Edit the download options" (click)="editDownload($event, rowData.input)">
+                                <i class="fas fa-fw fa-edit"></i>
                             </button>
                         </span>
                         <span *ngIf="rowData.leaf && rowNode.parent.data.id==='upload'" title="{{ rowData.details }}">{{ rowData.details }}</span>
@@ -41,13 +41,13 @@
     </div>
     <div class="card-footer">
         <input class="inputfile" id="fileinput" type="file" multiple="multiple" (change)="uploadFile($event)">
-        <label style="margin-left:8px;" for="fileinput" class="btn btn-sm btn-primary pull-right">
-            <i class="fa fa-upload"></i>&nbsp;Upload File(s)
+        <label style="margin-left:8px;" for="fileinput" class="btn btn-sm btn-primary fa-pull-right">
+            <i class="fas fa-upload"></i>&nbsp;Upload File(s)
         </label>
-        <button style="margin-left:8px;" class="btn btn-sm btn-primary pull-right" (click)="showAddRemoteDownloadDialog()">
-            <i class="fa fa-download"></i>&nbsp;Remote Download</button>
-        <button type="button" class="btn btn-sm btn-primary pull-right" (click)="copyFromJob()">
-            <i class="fa fa-copy"></i>&nbsp;Copy From Job</button>
+        <button style="margin-left:8px;" class="btn btn-sm btn-primary fa-pull-right" (click)="showAddRemoteDownloadDialog()">
+            <i class="fas fa-download"></i>&nbsp;Remote Download</button>
+        <button type="button" class="btn btn-sm btn-primary fa-pull-right" (click)="copyFromJob()">
+            <i class="fas fa-copy"></i>&nbsp;Copy From Job</button>
     </div>
 </div>
 

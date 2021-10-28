@@ -11,6 +11,8 @@ import { GraceStyleSettings } from './grace-graph.models';
 })
 export class StyleChooserModalComponent implements OnInit {
 
+    DECIMAL_REGEX = "^-?\\d*\.{0,1}\\d+$";
+
     @Input() graceStyleSettings: GraceStyleSettings;
 
     styleGroup: FormGroup;
@@ -22,11 +24,11 @@ export class StyleChooserModalComponent implements OnInit {
     ngOnInit() {
         this.styleGroup = this.formBuilder.group({
             minColor: this.graceStyleSettings.minColor,
-            minValue: [this.graceStyleSettings.minValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
+            minValue: [this.graceStyleSettings.minValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             neutralColor: this.graceStyleSettings.neutralColor,
-            neutralValue: [this.graceStyleSettings.neutralValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
+            neutralValue: [this.graceStyleSettings.neutralValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             maxColor: this.graceStyleSettings.maxColor,
-            maxValue: [this.graceStyleSettings.maxValue, [Validators.required, Validators.pattern("^-?[0-9]*$")]],
+            maxValue: [this.graceStyleSettings.maxValue, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             transparentNeutralColor: this.graceStyleSettings.transparentNeutralColor
         });
     }

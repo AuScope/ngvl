@@ -5,8 +5,8 @@
       <div class="col">
         <div class="submenu-header" (click)="problemIsCollapsed = !problemIsCollapsed">
           <span>Problem</span>
-          <i *ngIf="problemIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-down pull-right"></i>
-          <i *ngIf="!problemIsCollapsed" style="line-height:inherit;" class="fa fa-toggle-up pull-right"></i>
+          <i *ngIf="problemIsCollapsed" style="line-height:inherit;" class="fa fa-caret-down fa-pull-right"></i>
+          <i *ngIf="!problemIsCollapsed" style="line-height:inherit;" class="fa fa-caret-up fa-pull-right"></i>
         </div>
         <div [ngbCollapse]="problemIsCollapsed">
           <div ngbRadioGroup

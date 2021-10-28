@@ -2,14 +2,6 @@
 // The build system defaults to the dev environment which uses `environment.ts`, but if you do
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
-
-import { OlMapKeyword1Component } from "../app/shared/modules/keyword/test/ol-map.keyword1.component";
-import { OlMapKeyword2Component } from "../app/shared/modules/keyword/test/ol-map.keyword2.component";
-import { KeywordComponentType } from '../app/shared/modules/keyword/models';
-import { OlMapGraceDataComponent } from "../app/shared/modules/grace/olmap.grace-data.component";
-import { GraceStyleComponent } from "../app/shared/modules/grace/grace-style.component";
-
-
 export const environment = {
     production: false,
     getCSWRecordUrl: 'getKnownLayers.do',
@@ -46,22 +38,6 @@ export const environment = {
     ],
     forceAddLayerViaProxy: [],
     grace: {
-        host: 'https://insargrace.geoanalytics.csiro.au/grace'/*,
-        layers: [
-            'mascons_stage4_V003a'
-        ]
-        */
-    },
-
-    /**
-     * Components defined here will be loaded onto either the map or
-     * dataset-record component as a KeywordComponent provided the keyword
-     * name is found within the CSW record keyword list of an active layer.
-     */
-    keywordComponents: [
-        { keyword: 'vgl:keyword1', keywordComponent: OlMapKeyword1Component, keywordComponentType: KeywordComponentType.MapWidget },
-        { keyword: 'vgl:keyword2', keywordComponent: OlMapKeyword2Component, keywordComponentType: KeywordComponentType.MapWidget },
-        { keyword: 'grace', keywordComponent: OlMapGraceDataComponent, keywordComponentType: KeywordComponentType.MapWidget },
-        { keyword: 'grace', keywordComponent: GraceStyleComponent, keywordComponentType: KeywordComponentType.RecordButton }
-    ]
+        host: 'https://insargrace.geoanalytics.csiro.au/grace'
+    }
 };

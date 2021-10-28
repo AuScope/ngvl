@@ -10,11 +10,11 @@
                         <app-job-browser #jobBrowser [selectionMode]="'multiple'" [showContextMenu]="true" (jobSelectionChanged)="jobSelected($event)"></app-job-browser>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-sm btn-primary pull-right" (click)="refreshJobs()" style="margin-left:4px;">
-                            <i class="fa fa-refresh"></i>&nbsp;Refresh
+                        <button class="btn btn-sm btn-primary fa-pull-right" (click)="refreshJobs()" style="margin-left:4px;">
+                            <i class="fas fa-sync"></i>&nbsp;Refresh
                         </button>
-                        <button class="btn btn-sm btn-primary pull-right" (click)="showAddFolderModal(addFolderModal)">
-                            <i class="fa fa-folder"></i>&nbsp;Add Folder
+                        <button class="btn btn-sm btn-primary fa-pull-right" (click)="showAddFolderModal(addFolderModal)">
+                            <i class="fas fa-folder"></i>&nbsp;Add Folder
                         </button>
                     </div>
                 </div>

@@ -22,8 +22,8 @@
                     (dragstart)="handleDragstart(rowNode.node,$event)">
                     <td>
                         <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
-                        <i *ngIf="!rowNode.node.leaf && !rowNode.node.expanded" class="fa fa-folder">&nbsp;</i>                       
-                        <i *ngIf="!rowNode.node.leaf && rowNode.node.expanded" class="fa fa-folder-open">&nbsp;</i>                       
+                        <i *ngIf="!rowNode.node.leaf && !rowNode.node.expanded" class="fas fa-folder">&nbsp;</i>                       
+                        <i *ngIf="!rowNode.node.leaf && rowNode.node.expanded" class="fas fa-folder-open">&nbsp;</i>                       
                         <span title="{{ rowData.name }}">{{ rowData.name }}</span>
                     </td>
                     <td>{{ rowData.submitDate | date:'medium' }}</td>

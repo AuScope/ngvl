@@ -5,7 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { DownloadOptions, DescribeCoverage } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { CSWSearchService } from '../../shared/services/csw-search.service';
-import { Dropdown } from "primeng/dropdown";
+import { Dropdown } from 'primeng/dropdown';
 import { SelectItem } from 'primeng/api';
 
 

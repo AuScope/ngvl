@@ -1,0 +1,23 @@
+<div>
+    <div class="modal-header" style="background: #EEE">
+        <h5 class="modal-title">Drainage Basin</h5>
+        <button type="button" class="close" (click)="activeModal.dismiss('dismiss')" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <!-- TODO: Check numeric values or restrict entry to numeric values -->
+    <div class="modal-body style-modal">
+        <div class="row">
+            <label style="margin-left:4px;">Select Drainage Basin&nbsp;</label>
+            <!--<input style="margin-left:4px;margin-right:4px;" id="typeahead-basic" type="text" class="form-control" [(ngModel)]="selectedBasin" [ngbTypeahead]="search"/>-->
+            <select style="flex:auto;margin-right:4px;" [(ngModel)]="selectedBasin">
+                <option *ngFor="let basin of drainageBasins" [value]="basin">{{ basin }}</option>
+            </select>
+            
+        </div>
+    </div>
+    <div class="modal-footer" style="background: #EEE">
+        <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('dismiss')">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!validSelection()" (click)="selectBasin()">Select</button>
+    </div>
+</div>

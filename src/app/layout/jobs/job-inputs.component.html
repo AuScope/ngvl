@@ -10,11 +10,11 @@
             <div ngbDropdown class="d-inline-block" style="margin-top:8px; margin-left:4px;margin-bottom:10px;">
                 <button class="btn btn-primary btn-sm" id="actionDropwdown" [disabled]="selectedJobDownloads.length===0 && selectedCloudFiles.length===0"
                     ngbDropdownToggle>
-                    <i class="fa fa-folder"></i>&nbsp;Actions
+                    <i class="fas fa-folder"></i>&nbsp;Actions
                 </button>
                 <div aria-labelledBy="actionDropdown" ngbDropdownMenu>
                     <button class="dropdown-item" (click)="downloadSelectedFiles()">
-                        <i class="fa fa-download"></i>&nbsp;Download file(s) to your machine
+                        <i class="fas fa-download"></i>&nbsp;Download file(s) to your machine
                     </button>
                 </div>
             </div>
@@ -25,8 +25,8 @@
         <div class="col">
             <div *ngIf="selectedJob && selectedJob.jobDownloads.length > 0">
                 <a (click)="jobDownloadsIsCollapsed = !jobDownloadsIsCollapsed">
-                    <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
-                    <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                    <i *ngIf="jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fas fa-caret-down"></i>
+                    <i *ngIf="!jobDownloadsIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fas fa-caret-up"></i>
                     <!-- TODO: Dynamic name showing count -->
                     <span>Data service downloads</span>
                 </a>
@@ -60,8 +60,8 @@
 
             <div *ngIf="cloudFiles.length > 0" style="margin-top: 15px;">
                 <a (click)="cloudFilesIsCollapsed = !cloudFilesIsCollapsed">
-                    <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-down"></i>
-                    <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fa fa-toggle-up"></i>
+                    <i *ngIf="cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fas fa-caret-down"></i>
+                    <i *ngIf="!cloudFilesIsCollapsed" style="line-height:inherit;margin-left:4px;" class="fas fa-caret-up"></i>
                     <!-- TODO: Dynamic name showing count -->
                     <span>Files in cloud storage</span>
                 </a>

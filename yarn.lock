@@ -1062,6 +1062,11 @@
   dependencies:
     commander "^2.15.1"
 
+"@fortawesome/fontawesome-free@^5.15.3":
+  version "5.15.4"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.15.4.tgz#ecda5712b61ac852c760d8b3c79c96adca5554e5"
+  integrity sha512-eYm8vijH/hpzr/6/1CJ/V/Eb1xQFW2nnUKArb3z+yUWv7HTwj6M7SP957oMjfZjAHU6qpoNc2wQvIxBLWYa/Jg==
+
 "@iarna/cli@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@iarna/cli/-/cli-1.2.0.tgz#0f7af5e851afe895104583c4ca07377a8094d641"
@@ -1849,10 +1854,10 @@ angular-ide@^0.9.74:
     winston "2.3.1"
     ws "1.1.5"
 
-angular-plotly.js@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/angular-plotly.js/-/angular-plotly.js-3.0.0.tgz#9462da6247152346000294abe6955d80a2897765"
-  integrity sha512-xN82jUgJ/43+1a90k6uomr7gpbHK2SuuhhSfMKKKVAL6hDJFptjdQZzradg6qvHA3icV5uVe9FQHtaQJh3RMhQ==
+angular-plotly.js@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/angular-plotly.js/-/angular-plotly.js-3.1.0.tgz#6140492920a4ae02facd4d9ea4dd38040dd7e249"
+  integrity sha512-EpVaiPrJyIZMIMdfZ/JNoKcDe6iVEliB+lQn3dBz53diX0IDyuiEf7l/HuBzNAl0QZ9sgO3f7iFrAFMUT4yQQg==
   dependencies:
     tslib "^2.0.0"
 
@@ -5239,11 +5244,6 @@ font-atlas@^2.1.0:
   dependencies:
     css-font "^1.0.0"
 
-font-awesome@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
-  integrity sha1-j6jPBBGhoxr9B7BtKQK7n8gVoTM=
-
 font-measure@^1.2.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/font-measure/-/font-measure-1.2.2.tgz#41dbdac5d230dbf4db08865f54da28a475e83026"
@@ -5685,7 +5685,7 @@ gl-plot2d@^1.4.5:
     glslify "^7.0.0"
     text-cache "^4.2.2"
 
-gl-plot3d@^2.4.6:
+gl-plot3d@^2.4.7:
   version "2.4.7"
   resolved "https://registry.yarnpkg.com/gl-plot3d/-/gl-plot3d-2.4.7.tgz#b66e18c5affdd664f42c884acf7b82c60b41ee78"
   integrity sha512-mLDVWrl4Dj0O0druWyHUK5l7cBQrRIJRn2oROEgrRuOgbbrLAzsREKefwMO0bA0YqkiZMFMnV5VvPA9j57X5Xg==
@@ -9750,15 +9750,15 @@ planar-graph-to-polyline@^1.0.0:
     two-product "^1.0.0"
     uniq "^1.0.0"
 
-plotly.js-basic-dist@^1.55.1:
-  version "1.57.1"
-  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-1.57.1.tgz#cf88c41821c7788270c8a2f7ffddbe67462fae4a"
-  integrity sha512-uHInpEaOfG4zKGT2pV4Jpl0n6CaGW6RlYkRWQlfHaJ2h1+fUYeELVY0qvqfqMstducw/Dp5g6ga1j7FwsM/AGg==
+plotly.js-basic-dist@^1.58.4:
+  version "1.58.5"
+  resolved "https://registry.yarnpkg.com/plotly.js-basic-dist/-/plotly.js-basic-dist-1.58.5.tgz#13f52eb93a989899f288dec342048f0dafcb1da1"
+  integrity sha512-Srbt1ACLknY2r655udWwc8cxEan0FvhQUDkX/VW9NATNs5g38mc+OTLmZIRmUrJu2Sr/jDXqZ4EqFnzN9dOXvQ==
 
-plotly.js@^1.55.1:
-  version "1.57.1"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.57.1.tgz#95754814ad57bf9b4ddbc9acc58337582e3bdf6a"
-  integrity sha512-23GlzClmOGT1lE86Ys0DLuxBM/fgRNzJqH9y7ZylO4VPwstPAlQd12DklXsuqOgCNSxnnWUaP+J7BaUOFplsUg==
+plotly.js@^1.58.4:
+  version "1.58.5"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-1.58.5.tgz#8f98ddce32c8333fe1e51d22b926324be059db95"
+  integrity sha512-ChTlnFXB4tB0CzcG1mqgUKYnrJsZ8REDGox8BHAa/ltsd48MOAhOmFgjyDxwsXyjjgwOI296GeYDft8g4ftLHQ==
   dependencies:
     "@plotly/d3-sankey" "0.7.2"
     "@plotly/d3-sankey-circular" "0.33.1"
@@ -9790,7 +9790,7 @@ plotly.js@^1.55.1:
     gl-mat4 "^1.2.0"
     gl-mesh3d "^2.3.1"
     gl-plot2d "^1.4.5"
-    gl-plot3d "^2.4.6"
+    gl-plot3d "^2.4.7"
     gl-pointcloud2d "^1.0.3"
     gl-scatter3d "^1.2.3"
     gl-select-box "^1.0.4"

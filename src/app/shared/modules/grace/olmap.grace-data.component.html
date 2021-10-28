@@ -1,3 +1,14 @@
-<button type="button" class="btn btn-sm btn-primary" (click)="selectGraceData()">
-    <i class="fa fa-globe"></i>&nbsp;{{ buttonText }}
-</button>
+<div ngbDropdown class="d-inline-block">
+    <button class="btn btn-sm btn-primary" id="dropdownButton" ngbDropdownToggle><em class="fas fa-satellite"></em>&nbsp;{{ buttonText }}</button>
+    <div ngbDropdownMenu aria-labelledby="dropdownButton">
+        <button ngbDropdownItem type="button" class="btn btn-sm btn-primary" (click)="selectGraceDataPoint()">
+            <em class="fas fa-map-marker"></em>&nbsp;Select Mascon Point
+        </button>
+        <button ngbDropdownItem type="button" class="btn btn-sm btn-primary" (click)="selectGraceDataPolygon()">
+            <em class="fas fa-draw-polygon"></em>&nbsp;Select Mascon Region
+        </button>
+        <button ngbDropdownItem type="button" class="btn btn-sm btn-primary" (click)="selectDrainageBasin()">
+            <em class="fas fa-water"></em>&nbsp;Select Drainage Basin
+        </button>
+    </div>
+</div>

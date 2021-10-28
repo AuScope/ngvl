@@ -59,7 +59,7 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
     deleteJobAction = { label: 'Delete', icon: 'fa-trash', command: () => this.deleteSelectedJobsAndFolders() };
     submitJobAction = { label: 'Submit', icon: 'fa-share-square', command: () => this.submitSelectedJob() };
     editJobAction = { label: 'Edit', icon: 'fa-edit', command: () => this.editSelectedJob() };
-    moveJobAction = { label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: () => this.moveSelectedJob() };
+    moveJobAction = { label: 'Move to Top Level', icon: 'fas fa-arrow-up', command: () => this.moveSelectedJob() };
 
     // Initial multiple sort meta, order by reverse submitDate
     multiSortMeta = [
@@ -242,32 +242,32 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
         let items: any[] = [];
         // one or more job nodes are selected to move to top level
         if (this.selectedJobNodes.length === 1 && (this.nodeHasParent(node))) {
-            items.push({ label: 'Move to Top Level', icon: 'fa fa-arrow-up', command: () => this.moveSelectedJob() });
+            items.push({ label: 'Move to Top Level', icon: 'fas fa-arrow-up', command: () => this.moveSelectedJob() });
         }
         // If more than 1 item is selected, or only a series is selected, delete is only action
         if (this.selectedJobNodes.length > 1 || !node.leaf) {
-            items.push({ label: 'Delete', icon: 'fa fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
+            items.push({ label: 'Delete', icon: 'fas fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
 
         // Otherwise available actions are specific to job status
         } else if (this.selectedJobNodes.length === 1 && node.leaf) {
             const selectedJob: Job = this.jobs.find(j => j.id === this.selectedJobNodes[0].data.id);
             if (selectedJob.status.toLowerCase() === 'active') {
-                items.push({ label: 'Cancel', icon: 'fa fa-cross', command: () => this.cancelSelectedJob() });
-                // items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Cancel', icon: 'fas fa-times', command: () => this.cancelSelectedJob() });
+                // items.push({ label: 'Duplicate', icon: 'fas fa-edit', command: (event) => this.duplicateSelectedJob() });
                 // TODO: Confirm on active jobs
-                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: () => this.showSelectedJobStatus() });
+                items.push({ label: 'Status', icon: 'fas fa-info-circle', command: () => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'saved') {
-                items.push({ label: 'Delete', icon: 'fa fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
-                items.push({ label: 'Submit', icon: 'fa fa-share-square', command: () => this.submitSelectedJob() });
-                items.push({ label: 'Edit', icon: 'fa fa-edit', command: () => this.editSelectedJob() });
-                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: () => this.showSelectedJobStatus() });
+                items.push({ label: 'Delete', icon: 'fas fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
+                items.push({ label: 'Submit', icon: 'fas fa-share-square', command: () => this.submitSelectedJob() });
+                items.push({ label: 'Edit', icon: 'fas fa-edit', command: () => this.editSelectedJob() });
+                items.push({ label: 'Status', icon: 'fas fa-info-circle', command: () => this.showSelectedJobStatus() });
             } else if (selectedJob.status.toLowerCase() === 'done' || selectedJob.status.toLowerCase() === 'error') {
-                items.push({ label: 'Delete', icon: 'fa fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
-                // items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
-                items.push({ label: 'Status', icon: 'fa fa-info-circle', command: () => this.showSelectedJobStatus() });
+                items.push({ label: 'Delete', icon: 'fas fa-trash', command: () => this.deleteSelectedJobsAndFolders() });
+                // items.push({ label: 'Duplicate', icon: 'fas fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Status', icon: 'fas fa-info-circle', command: () => this.showSelectedJobStatus() });
             } else {
-                items.push({ label: 'Cancel', icon: 'fa fa-cross', command: () => this.cancelSelectedJob() });
-                // items.push({ label: 'Duplicate', icon: 'fa fa-edit', command: (event) => this.duplicateSelectedJob() });
+                items.push({ label: 'Cancel', icon: 'fas fa-times', command: () => this.cancelSelectedJob() });
+                // items.push({ label: 'Duplicate', icon: 'fas fa-edit', command: (event) => this.duplicateSelectedJob() });
             }
         }
         return items;
@@ -423,7 +423,7 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
         this.confirmationService.confirm({
             header: confirmTitle,
             message: confirmMessage,
-            icon: 'fa fa-trash',
+            icon: 'fas fa-trash',
             accept: () => {
                 // this.cancelCurrentSubscription();
                 for (let node of this.selectedJobNodes) {
@@ -494,7 +494,7 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
             this.confirmationService.confirm({
                 message: message,
                 header: 'Cancel Job',
-                icon: 'fa fa-times',
+                icon: 'fas fa-times',
                 accept: () => {
                     this.jobsService.cancelJob(this.selectedJob.id).subscribe(
                         () => {
@@ -568,7 +568,7 @@ export class JobBrowserComponent implements OnInit, OnDestroy {
             this.confirmationService.confirm({
                 message: message,
                 header: 'Submit Job',
-                icon: 'fa fa-times',
+                icon: 'fas fa-times',
                 accept: () => {
                     this.jobsService.submitJob(this.selectedJob).subscribe(
                         () => {

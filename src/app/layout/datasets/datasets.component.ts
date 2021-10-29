@@ -13,6 +13,8 @@ import * as Proj from 'ol/proj';
 import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { KeywordComponentsService } from '../../shared/modules/keyword/keyword-components.service';
 
+import { SplitComponent } from 'angular-split';
+
 
 @Component({
     selector: 'app-datasets',
@@ -26,6 +28,8 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
 
     // KeywordComponent map widgets
     @ViewChild('mapWidgets', { static: true, read: ViewContainerRef }) mapWidgets: ViewContainerRef;
+
+    @ViewChild('mapSplit') mapSplit: SplitComponent;
 
     // Search results
     cswSearchResults: Map<String, CSWRecordModel[]> = new Map<String, CSWRecordModel[]>();
@@ -132,6 +136,10 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
 
     ngAfterViewInit() {
         this.keywordComponentService.setMapWidgetViewContainerRef(this.mapWidgets);
+
+        this.mapSplit.dragProgress$.subscribe(() => {
+            this.olMapService.updateSize();
+        });
     }
 
     ngAfterViewChecked() {
@@ -639,11 +647,6 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
             this.layerOpacities.set(currentLayer.id, 100);
         }
         return layers;
-    }
-
-    /* on Dragging of the gutter between map and datasets search input area resize the map */
-    onDrag() {
-          this.olMapService.updateSize();
     }
 
 }

@@ -1,7 +1,7 @@
 <div [@routerTransition]>
     <app-page-header [heading]="'Data Explorer'" [icon]="'fa-map'"></app-page-header>
     <div class="row" style="margin-left:0px;overflow-y:auto;padding:0px;height:calc(100vh - 130px);width:100%;">
-        <as-split class="datasets-split" (dragProgress)="onDrag()" style="border: 1px solid #ddd;">
+        <as-split #mapSplit class="datasets-split" style="border: 1px solid #ddd;">
             <as-split-area size="30" class="split-area-search">
                 <!-- Datasets -->
                 <div class="card">

@@ -140,6 +140,7 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
         this.mapSplit.dragProgress$.subscribe(() => {
             this.olMapService.updateSize();
         });
+        this.olMapService.updateSize();
     }
 
     ngAfterViewChecked() {

@@ -15,16 +15,17 @@ export class OlMapBasemapComponent implements OnInit {
 
   constructor(private olMapService: OlMapService, @Inject('env') private env) {
   }
-  
+
   ngOnInit() {
-    if(this.env.baseMapLayers) {
+    if (this.env.baseMapLayers) {
       this.baseMaps = this.env.baseMapLayers;
-      this.selectedBaseMap = this.baseMaps[0].value;
+      this.selectedBaseMap = this.baseMaps[1].value;
+      this.olMapService.switchBaseMap(this.selectedBaseMap);
     }
   }
 
   onBaseMapSelection() {
-    if(this.selectedBaseMap) {
+    if (this.selectedBaseMap) {
       this.olMapService.switchBaseMap(this.selectedBaseMap);
       this.baseMapIsCollapsed = true;
     }

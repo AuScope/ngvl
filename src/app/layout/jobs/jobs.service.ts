@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
-import { Job, TreeJobs, Series, CloudFileInformation, ComputeService, MachineImage, ComputeType } from '../../shared/modules/vgl/models';
+import { Job, TreeJobs, Series, CloudDirectoryInformation, CloudFileInformation,
+         ComputeService, MachineImage, ComputeType } from '../../shared/modules/vgl/models';
 
 
 @Injectable()
@@ -21,6 +22,10 @@ export class JobsService {
 
     public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
         return this.vgl.getJobCloudFiles(jobId);
+    }
+
+    public getJobCloudDirectoriesAndFiles(jobId: number): Observable<CloudDirectoryInformation> {
+        return this.vgl.getJobCloudDirectoriesAndFiles(jobId);
     }
 
     public downloadFile(jobId: number, filename: string, key: string): Observable<any> {
@@ -82,4 +87,5 @@ export class JobsService {
     public getJobStatuses(): Observable<any> {
         return this.vgl.getJobStatuses();
     }
+
 }

@@ -4,7 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError, forkJoin, EMPTY } from 'rxjs';
 import { switchMap, map, defaultIfEmpty } from 'rxjs/operators';
 
-import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudFileInformation, DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry, DescribeCoverage } from './models';
+import { Job, Problem, Problems, Solution, User, TreeJobs, Series, CloudDirectoryInformation, CloudFileInformation,
+         DownloadOptions, JobDownload, NCIDetails, BookMark, ComputeService, MachineImage, ComputeType, Entry, DescribeCoverage } from './models';
 import { CSWRecordModel } from 'portal-core-ui';
 
 import { environment } from '../../../../environments/environment';
@@ -120,6 +121,11 @@ export class VglService {
     public getJobCloudFiles(jobId: number): Observable<CloudFileInformation[]> {
         const options = { params: { jobId: jobId.toString() } };
         return this.vglRequest('secure/jobCloudFiles.do', options);
+    }
+
+    public getJobCloudDirectoriesAndFiles(jobId: number): Observable<CloudDirectoryInformation> {
+      const options = { params: { jobId: jobId.toString() } };
+      return this.vglRequest('secure/jobCloudDirectoriesAndFiles.do', options);
     }
 
     public get nciDetails(): Observable<NCIDetails> {

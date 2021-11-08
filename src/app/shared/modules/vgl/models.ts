@@ -247,6 +247,13 @@ export interface CloudFileInformation {
     jobId: number;
 }
 
+export interface CloudDirectoryInformation {
+    name: string;
+    path: string;
+    files: CloudFileInformation[];
+    directories: CloudDirectoryInformation[];
+}
+
 export interface Series {
     id: number;
     user: string;

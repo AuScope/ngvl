@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, OnChanges, OnDestroy, OnInit } from "@angular/core";
-import { CloudFileInformation, JobDownload, Job } from "../../shared/modules/vgl/models";
+import { CloudFileInformation, JobDownload, Job, CloudDirectoryInformation } from "../../shared/modules/vgl/models";
 import { JobsService } from "./jobs.service";
 import { saveAs } from 'file-saver';
 import { Subscription } from "rxjs";
+import { TreeNode } from "primeng/api";
 import { TimerObservable } from "rxjs/observable/TimerObservable";
 
 @Component({
@@ -25,14 +26,15 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
     // file size change event
     @Output() inputSizeChanged = new EventEmitter();
 
-    // HttpCLient request (for cancelling)
+    // HttpClient request (for cancelling)
     httpSubscription: Subscription;
 
-    // Job cloud files (downloads are retrieved with Jobs)
-    cloudFiles: CloudFileInformation[] = [];
+    // Job cloud files as treetable nodes (downloads are retrieved with Jobs)
+    cloudFileTreeTableData: TreeNode[];
 
     // Selected files
     selectedJobDownloads: JobDownload[] = [];
+    selectedCloudFileTreeNodes: TreeNode[] = [];
     selectedCloudFiles: CloudFileInformation[] = [];
 
     // Cloud file loading for spinner flag
@@ -48,9 +50,10 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         { field: 'url', header: 'Details' }
     ];
 
-    cloudFileTableColumns = [
-        { field: 'name', header: 'Name' },
-        { field: 'size', header: 'Details' }
+    // Cloud file treetable columns
+    cloudFileTreeTableColumns: any[] = [
+        { field: 'name', header: 'Name', colStyle: { 'width': '70%' } },
+        { field: 'size', header: 'Details', colStyle: { 'width': '30%' } }
     ];
 
     private fileUpdateSubscription: Subscription;
@@ -59,43 +62,17 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
 
 
     ngOnInit() {
-        let timer = TimerObservable.create(0, 60000);
+        let timer = TimerObservable.create(60000, 60000);
         this.fileUpdateSubscription = timer.subscribe(timer => {
             if (this.selectedJob) {
-                this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
-                    // TODO: VGL seems to filter some files
-                    newFileDetails => {
-                        if (newFileDetails) {
-                            // check for new files or updates to existing files
-                            newFileDetails.forEach(newFile => {
-                                let existingFile: CloudFileInformation = this.cloudFiles.find(oldFile => oldFile.name === newFile.name);
-                                if (!existingFile) {
-                                    this.cloudFiles.push(newFile); // not found so add as a new element
-                                } else {
-                                    // found, so update by comparing existing details
-                                    if ((existingFile.name === newFile.name) && (existingFile.size !== newFile.size)) {
-                                        // update the size
-                                        existingFile.size = newFile.size;
-                                        if (this.selectedCloudFiles.find(selectedFile => selectedFile.name === existingFile.name)) {
-                                            this.inputSizeChanged.emit(existingFile);
-                                        }
-                                    }
-                                }
-                            });
-                            // check for deleted files
-                            this.cloudFiles.forEach((oldFile, index, cloudFilesArray) => {
-                                let fileIndex: number = newFileDetails.findIndex(file => file.name === oldFile.name);
-                                if (fileIndex === -1) {
-                                    cloudFilesArray.splice(index, 1);
-                                }
-                            });
-                        }
-                    },
-                    // TODO: Proper error reporting
-                    error => {
-                        console.log(error.message);
+                this.httpSubscription = this.jobsService.getJobCloudDirectoriesAndFiles(this.selectedJob.id).subscribe(rootOutputDirectory => {
+                    if (rootOutputDirectory) {
+                        this.cloudFileTreeTableData = this.createCloudDirectoryTreeNodes(rootOutputDirectory);
                     }
-                );
+                }, error => {
+                    // TODO: Proper error reporting
+                    console.log(error.message);
+                });
             }
         });
     }
@@ -111,6 +88,37 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         this.resetInputsForSelectedJob();
     }
 
+
+    /**
+     * Connstruct an array of TreeNodes for a specified cloud directory from which to build a TreeTabel from.
+     *
+     * @param cloudDirectory the CloudDirectoryInformation object to build the TreeTable from
+     */
+    private createCloudDirectoryTreeNodes(cloudDirectory: CloudDirectoryInformation): TreeNode[] {
+        const nodes: TreeNode[] = [];
+        for (const cloudFile of cloudDirectory.files) {
+            const fileNode = {
+                "data": {
+                    "cloudObject": cloudFile
+                },
+                "leaf": true
+            };
+            nodes.push(fileNode);
+        }
+        if (cloudDirectory.directories.length > 0) {
+            for (const childDir of cloudDirectory.directories) {
+                const dirNode = {
+                    "data": {
+                        "cloudObject": childDir,
+                    },
+                    "leaf": false,
+                    "children": this.createCloudDirectoryTreeNodes(childDir)
+                };
+                nodes.push(dirNode);
+            }
+        }
+        return nodes;
+    }
 
     /**
      * Return the selected job downloads
@@ -142,34 +150,27 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
      * When a new job is selected, reset inputs
      */
     public resetInputsForSelectedJob(): void {
+        this.cancelCurrentSubscription();
+
         // Reset file selections
         this.selectedJobDownloads = [];
+        this.selectedCloudFileTreeNodes = [];
         this.selectedCloudFiles = [];
 
         // Request job cloud files
-        this.cloudFiles = [];
-
-        this.cancelCurrentSubscription();
-
+        this.cloudFileTreeTableData = [];
         if (this.selectedJob) {
             this.cloudFilesLoading = true;
-            this.httpSubscription = this.jobsService.getJobCloudFiles(this.selectedJob.id).subscribe(
-                // TODO: VGL seems to filter some files
-                fileDetails => {
-                    // XXX Server was not returning error when the associated S3 bucket didn't exist
-                    if (!fileDetails) {
-                        this.cloudFiles = [];
-                    } else {
-                        this.cloudFiles = fileDetails;
-                    }
+            this.httpSubscription = this.jobsService.getJobCloudDirectoriesAndFiles(this.selectedJob.id).subscribe(rootOutputDirectory => {
+                if (rootOutputDirectory) {
+                    this.cloudFileTreeTableData = this.createCloudDirectoryTreeNodes(rootOutputDirectory);
                     this.cloudFilesLoading = false;
-                },
-                // TODO: Proper error reporting
-                error => {
-                    this.cloudFilesLoading = false;
-                    console.log(error.message);
                 }
-            );
+            }, error => {
+                // TODO: Proper error reporting
+                this.cloudFilesLoading = false;
+                console.log(error.message);
+            });
         }
     }
 
@@ -186,6 +187,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         // used
         if (!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedCloudFiles = [];
+            this.selectedCloudFileTreeNodes = [];
         }
         const jobDownload: JobDownload = this.selectedJobDownloads[this.selectedJobDownloads.length - 1];
         this.inputSelectionChanged.emit(jobDownload);
@@ -206,13 +208,30 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
         if (!this.showCheckboxes && !event.originalEvent.ctrlKey) {
             this.selectedJobDownloads = [];
         }
-        let cloudFile: CloudFileInformation = this.selectedCloudFiles[this.selectedCloudFiles.length - 1];
-        this.inputSelectionChanged.emit(cloudFile);
+
+        if (event.node.leaf) {
+            const cloudFile = { ...event.node.data.cloudObject };
+            // If this leaf has a parent (directory) then we need to prepend the full path to the name of the file
+            if (event.node.parent) {
+                cloudFile.name = event.node.parent.data.cloudObject.path + cloudFile.name;
+            }
+           this.inputSelectionChanged.emit(cloudFile);
+        }
+
+        // Build selectedCloudFiles array from selectedCloudFileTreeNodes
+        this.selectedCloudFiles = [];
+        for (const treeNode of this.selectedCloudFileTreeNodes) {
+            let cloudFile: CloudFileInformation = { ...treeNode.data.cloudObject };
+            if (treeNode.parent) {
+                cloudFile.name = treeNode.parent.data.cloudObject.path + treeNode.data.cloudObject.name;
+            }
+            this.selectedCloudFiles.push(cloudFile);
+        }
     }
 
 
     /**
-     * XXX This is specific to cloud files, may need to make general
+     * TODO: This is specific to cloud files, may need to make general
      *
      * TODO: Cache selected jobs so we don't need to re-download?
      */
@@ -230,7 +249,8 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
 
 
     /**
-     * XXX This is specific to cloud files, may need to make general
+     * Download selected files as a zip file
+     * TODO: This is specific to cloud files, may need to make general
      */
     public downloadFilesAsZip(): void {
         let files: string[] = [];
@@ -254,7 +274,7 @@ export class JobInputsComponent implements OnInit, OnChanges, OnDestroy {
      * files are downloaded in their native format, multiple files will be
      * zipped
      *
-     * TODO: Figure out how to do data service downloads XXX
+     * TODO: Figure out how to do data service downloads
      * TODO: Report any errors
      */
     public downloadSelectedFiles(): void {

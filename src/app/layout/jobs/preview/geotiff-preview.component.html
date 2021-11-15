@@ -1,0 +1,7 @@
+<!-- GeoTIFF in preview panel -->
+<div #previewMapElement id="previewMap" class="map-container height-full width-full" >
+    <div class="opacitySlider">
+        <label>Opacity</label><p-slider [ngModel]="layerOpacity" [min]="0" [max]="100" (onChange)="setLayerOpacity($event)"></p-slider>
+    </div>
+    
+</div>

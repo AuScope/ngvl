@@ -5,11 +5,14 @@ import { FormControl } from '@angular/forms';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 
+import Geometry from 'ol/geom/Geometry';
 import Overlay from 'ol/Overlay';
 import ImageLayer from 'ol/layer/Image';
 import VectorLayer from 'ol/layer/Vector';
+import ImageSourceType from 'ol/source/Image';
 import ImageWMS from 'ol/source/ImageWMS';
 import VectorSource from 'ol/source/Vector';
+import VectorSourceType from 'ol/source/Vector';
 import Style from 'ol/style/Style';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
@@ -36,10 +39,10 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
     @ViewChild('popupCloser') popupCloser: ElementRef;
     @ViewChild('popupFooter') popupFooter: ElementRef;
 
-    boundaryLayer: ImageLayer;
+    boundaryLayer: ImageLayer<ImageSourceType>;
     boundaryLayerSource: ImageWMS;
     overlay: Overlay; // popup
-    highlightLayer: VectorLayer;  // highlighted polygon
+    highlightLayer: VectorLayer<VectorSourceType<Geometry>>;  // highlighted polygon
     boundaryLayers;
     boundaryLayerMapping = {};
 
@@ -173,7 +176,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         const view = map.getView();
         const viewResolution = view.getResolution();
         const source = this.boundaryLayerSource;
-        const url = source.getGetFeatureInfoUrl(clickCoord, viewResolution, view.getProjection(), { 'INFO_FORMAT': 'application/json' });
+        const url = source.getFeatureInfoUrl(clickCoord, viewResolution, view.getProjection(), { 'INFO_FORMAT': 'application/json' });
         this.boundaryService.getFeatures(url).subscribe(features => {
             // highlight it on the map and show info popup
             if (features.length > 0) {
@@ -219,7 +222,7 @@ export class OlMapBoundariesComponent implements OnInit, AfterViewInit {
         // Display confirm datasets modal
         if (cswRecords.length > 0) {
             const modelRef = this.modalService.open(ConfirmDatasetsModalComponent, { size: 'lg' });
-            modelRef.componentInstance.cswRecordTreeData = OlMapDataSelectComponent.buildTreeData(cswRecords, extent);
+            modelRef.componentInstance.cswRecordTreeData = OlMapDataSelectComponent.buildTreeData(cswRecords, [extent[0], extent[1], extent[2], extent[3]]);
         }
 
         return false;

@@ -447,7 +447,8 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
      */
     public drawSpatialBounds(): void {
         this.olMapService.drawBound().subscribe((vector) => {
-            this.spatialBounds = Proj.transformExtent(vector.getSource().getExtent(), 'EPSG:3857', 'EPSG:4326');
+            const extent = Proj.transformExtent(vector.getSource().getExtent(), 'EPSG:3857', 'EPSG:4326');
+            this.spatialBounds = [extent[0], extent[1], extent[2], extent[3]];//Proj.transformExtent(vector.getSource().getExtent(), 'EPSG:3857', 'EPSG:4326');
             this.updateSpatialBoundsText(this.spatialBounds);
             this.resetFacetedSearch();
         });
@@ -457,7 +458,8 @@ export class DatasetsComponent implements OnInit, AfterViewInit, AfterViewChecke
      *
      */
     public spatialBoundsFromMap(): void {
-        this.spatialBounds = Proj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
+        const extent =  Proj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
+        this.spatialBounds = [extent[0], extent[1], extent[2], extent[3]];//Proj.transformExtent(this.olMapService.getMapExtent(), 'EPSG:3857', 'EPSG:4326');
         this.updateSpatialBoundsText(this.spatialBounds);
         this.resetFacetedSearch();
     }

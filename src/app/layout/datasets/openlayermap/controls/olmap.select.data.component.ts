@@ -6,7 +6,9 @@ import { CSWSearchService } from '../../../../shared/services/csw-search.service
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TreeNode } from 'primeng/api';
 import * as Proj from 'ol/proj';
+import Geometry from 'ol/geom/Geometry';
 import VectorLayer from 'ol/layer/Vector';
+import VectorSourceType from 'ol/layer/Vector';
 
 
 @Component({
@@ -116,7 +118,7 @@ export class OlMapDataSelectComponent {
      */
     public selectDataClick() {
         this.buttonText = 'Click on Map';
-        this.olMapService.drawBound().subscribe((vector: VectorLayer) => {
+        this.olMapService.drawBound().subscribe((vector: VectorLayer<any>) => {
             // Check for intersections with active layer CSW record extents
             let extent = vector.getSource().getExtent();
             const cswRecords: CSWRecordModel[] = this.olMapService.getCSWRecordsForExtent(extent);
@@ -127,7 +129,7 @@ export class OlMapDataSelectComponent {
             // Display confirm datasets modal
             if (cswRecords.length > 0) {
                 const modelRef = this.modalService.open(ConfirmDatasetsModalComponent, { size: 'lg' });
-                modelRef.componentInstance.cswRecordTreeData = OlMapDataSelectComponent.buildTreeData(cswRecords, extent);
+                modelRef.componentInstance.cswRecordTreeData = OlMapDataSelectComponent.buildTreeData(cswRecords, [extent[0], extent[1], extent[2], extent[3]]);
             }
             this.buttonText = 'Select Data';
         });

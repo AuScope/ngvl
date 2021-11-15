@@ -1,13 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-
 import { Observable, Subscription } from 'rxjs';
-
 import { SolutionsService } from '../solutions.service';
-
 import { UserStateService } from '../../../shared';
-
 import { Problem, Solution, SolutionQuery } from '../../../shared/modules/vgl/models';
-
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -22,6 +17,8 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
 
   problemIsCollapsed: boolean = false;
 
+  solutionsLoading = false;
+
   private _solutionSub: Subscription;
   private _querySub: Subscription;
 
@@ -31,9 +28,17 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
   ) {}
 
   ngOnInit() {
+    this.solutionsLoading = true;
+    console.log("Preload: " + this.solutionsLoading);
     this._solutionSub = this.solutionsService
       .getSolutions()
-      .subscribe(problems => this.problems = problems);
+      .subscribe(problems => {
+        this.problems = problems;
+        this.solutionsLoading = false;
+      }, error => {
+        this.solutionsLoading = false;
+        console.log(error.message)
+      });
 
     this._querySub = this.userStateService.solutionQuery
       .subscribe((query: SolutionQuery) => {

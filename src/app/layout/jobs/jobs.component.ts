@@ -18,6 +18,7 @@ import { environment } from '../../../environments/environment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { featureCollection, polygon } from '@turf/helpers';
+import { GeoTiffPreviewComponent } from './preview/geotiff-preview.component';
 
 
 @Component({
@@ -51,8 +52,9 @@ export class JobsComponent implements OnInit {
         new PreviewItem("plaintext", PlainTextPreviewComponent, {}, ['txt', 'sh', 'log']),
         new PreviewItem("log", LogPreviewComponent, {}, ['.sh.log']),
         new PreviewItem("ttl", TtlPreviewComponent, {}, ['ttl']),
-        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'tif']),
-        new PreviewItem("pdf", PdfPreviewComponent, {}, ['pdf'])
+        new PreviewItem("image", ImagePreviewComponent, {}, ['jpg', 'jpeg', 'gif', 'png', 'bmp']),
+        new PreviewItem("pdf", PdfPreviewComponent, {}, ['pdf']),
+        new PreviewItem("geotiff", GeoTiffPreviewComponent, {}, ['tif', 'tiff'])
     ];
     @ViewChild(PreviewDirective) previewHost: PreviewDirective;
 
@@ -91,7 +93,6 @@ export class JobsComponent implements OnInit {
         }
     }
 
-
     /**
      * Refresh the job panel based on any/all faceted search elements
      */
@@ -99,7 +100,6 @@ export class JobsComponent implements OnInit {
         this.currentPreviewObject = null;
         this.jobBrowser.refreshJobStatus();
     }
-
 
     /**
      * Job selection event from job browser
@@ -117,7 +117,6 @@ export class JobsComponent implements OnInit {
             }
         }
     }
-
 
     /**
      * Event fired when an input (JobDownload or CloudFileInformation) is selected
@@ -137,7 +136,6 @@ export class JobsComponent implements OnInit {
     }
 
     public inputSizeUpdate(cloudFile) {
-
         if (this.currentPreviewItem) {
             if (this.currentPreviewItem && this.currentPreviewItem.type === 'image') {
                 this.currentPreviewObject = cloudFile;
@@ -185,7 +183,6 @@ export class JobsComponent implements OnInit {
                 );
             }
         }
-
     }
 
     scrollToBottom() {
@@ -203,18 +200,19 @@ export class JobsComponent implements OnInit {
      * @param data
      */
     private previewFile(previewItem: PreviewItem, data: any, options?: any) {
-        previewItem.data = data;
-        if (options) {
-            previewItem.options = options;
-        }
-        let viewContainerRef = this.previewHost.viewContainerRef;
-        viewContainerRef.clear();
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        this.componentRef = viewContainerRef.createComponent(componentFactory);
-        (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
-        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
+        setTimeout(() => {
+            previewItem.data = data;
+            if (options) {
+                previewItem.options = options;
+            }
+            let viewContainerRef = this.previewHost.viewContainerRef;
+            viewContainerRef.clear();
+            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+            this.componentRef = viewContainerRef.createComponent(componentFactory);
+            (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
+            (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
+        }, 50);
     }
-
 
     /**
      * Preview a JobDownload object
@@ -254,7 +252,6 @@ export class JobsComponent implements OnInit {
         this.currentPreviewObject = jobDownload;
     }
 
-
     /**
      * Preview a CloudFileInformation object
      *
@@ -283,7 +280,7 @@ export class JobsComponent implements OnInit {
         // saving previewItem for refresh
         this.currentPreviewItem = previewItem;
         // Preview image
-        if (previewItem && (previewItem.type === 'image' || previewItem.type === 'pdf')) {
+        if (previewItem && (previewItem.type === 'image' || previewItem.type === 'geotiff' || previewItem.type === 'pdf')) {
             this.currentPreviewObject = cloudFile;
             const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
             this.previewFile(previewItem, imageUrl);
@@ -334,7 +331,6 @@ export class JobsComponent implements OnInit {
         }
     }
 
-
     /**
      * Refresh the preview panel
      */
@@ -348,7 +344,6 @@ export class JobsComponent implements OnInit {
             }
         }
     }
-
 
     /**
      * Add a folder to the Job tree new Jobs can be added to
@@ -366,7 +361,6 @@ export class JobsComponent implements OnInit {
             }
         );
     }
-
 
     /**
      * Show a dialog for adding a folder to the Job tree

@@ -5,7 +5,8 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import GeoJSON from 'ol/format/GeoJSON';
-import Feature from 'ol';
+import Feature from 'ol/Feature';
+import Geometry from 'ol/geom/Geometry';
 
 import { environment } from '../../../environments/environment';
 
@@ -17,12 +18,12 @@ export class BoundaryService {
 
     constructor(private http: HttpClient) { }
 
-    public getFeatures(url: string): Observable<Feature[]> {
+    public getFeatures(url: string): Observable<Feature<Geometry>[]> {
         console.log('getFeatures(), url = ' + url);
         const geojson = new GeoJSON();
         return this.http.get(url).pipe(
-            map((json: any) => <Feature[]>geojson.readFeatures(json)),
-            catchError(this.handleError<Feature[]>('getFeatures'))
+            map((json: any) => <Feature<Geometry>[]>geojson.readFeatures(json)),
+            catchError(this.handleError<Feature<Geometry>[]>('getFeatures'))
         );
     }
 
@@ -32,7 +33,7 @@ export class BoundaryService {
     // &propertyName=LGA_NAME_2018,LGA_CODE_2018&sortBy=LGA_NAME_2018
 
     // uses the WFS to find features starting with "name"
-    public findFeatures(name: string, layer: string, nameAttribute: string): Observable<Feature[]> {
+    public findFeatures(name: string, layer: string, nameAttribute: string): Observable<Feature<Geometry>[]> {
         const url = environment.boundariesUrl + '/wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature'
             + '&COUNT=10&outputformat=application/json'
             + '&TYPENAMES=' + layer
@@ -42,12 +43,12 @@ export class BoundaryService {
         console.log('findFeatures(), url = ' + url);
         const geojson = new GeoJSON();
         return this.http.get(url).pipe(
-            map((json: any) => <Feature[]>geojson.readFeatures(json)),
-            catchError(this.handleError<Feature[]>('getFeatures'))
+            map((json: any) => <Feature<Geometry>[]>geojson.readFeatures(json)),
+            catchError(this.handleError<Feature<Geometry>[]>('getFeatures'))
         );
     }
 
-    public getFeaturesById(id: string, layer: string): Observable<Feature[]> {
+    public getFeaturesById(id: string, layer: string): Observable<Feature<Geometry>[]> {
         const url = environment.boundariesUrl + '/wfs?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature'
             + '&COUNT=1&outputformat=application/json'
             + '&TYPENAMES=' + layer
@@ -56,8 +57,8 @@ export class BoundaryService {
         console.log('getFeatureById(), url = ' + url);
         const geojson = new GeoJSON();
         return this.http.get(url).pipe(
-            map((json: any) => <Feature[]>geojson.readFeatures(json)),
-            catchError(this.handleError<Feature[]>('getFeatureById'))
+            map((json: any) => <Feature<Geometry>[]>geojson.readFeatures(json)),
+            catchError(this.handleError<Feature<Geometry>[]>('getFeatureById'))
         );
     }
 

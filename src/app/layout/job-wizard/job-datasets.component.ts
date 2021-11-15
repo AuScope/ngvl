@@ -102,13 +102,17 @@ export class JobDatasetsComponent {
                 leaf: true
             }
         };
-        this.rootRemoteWebServiceDownloads.children.push(jobDownloadTreeNode);
-        this.rootRemoteWebServiceDownloads.expanded = true;
-
-        // Add remote download root node to tree if it isn't already
-        if (this.jobInputNodes.find(j => j.data.id === 'remote') === undefined) {
+        // Looking at name to avoid duplication, may need to improve
+        const n = this.rootRemoteWebServiceDownloads.children.find(j => j.data.name === jobDownloadTreeNode.data.name);
+        if (n === undefined) {
+            this.rootRemoteWebServiceDownloads.children.push(jobDownloadTreeNode);
             this.rootRemoteWebServiceDownloads.expanded = true;
-            this.jobInputNodes.push(this.rootRemoteWebServiceDownloads);
+
+            // Add remote download root node to tree if it isn't already
+            if (this.jobInputNodes.find(j => j.data.id === 'remote') === undefined) {
+                this.rootRemoteWebServiceDownloads.expanded = true;
+                this.jobInputNodes.push(this.rootRemoteWebServiceDownloads);
+            }
         }
     }
 
@@ -129,13 +133,17 @@ export class JobDatasetsComponent {
                 leaf: true
             }
         };
-        this.rootFileDownloads.children.push(jobFileNode);
-        this.rootFileDownloads.expanded = true;
-
-        // Add job file root node to tree if it isn't already
-        if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+        // Looking at name to avoid duplication, may need to improve
+        const n = this.rootRemoteWebServiceDownloads.children.find(j => j.data.name === jobFileNode.data.name);
+        if (n === undefined) {
+            this.rootFileDownloads.children.push(jobFileNode);
             this.rootFileDownloads.expanded = true;
-            this.jobInputNodes.push(this.rootFileDownloads);
+
+            // Add job file root node to tree if it isn't already
+            if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+                this.rootFileDownloads.expanded = true;
+                this.jobInputNodes.push(this.rootFileDownloads);
+            }
         }
     }
 
@@ -156,13 +164,17 @@ export class JobDatasetsComponent {
                 leaf: true
             }
         };
-        this.rootFileDownloads.children.push(jobFileNode);
-        this.rootFileDownloads.expanded = true;
-
-        // Add job file root node to tree if it isn't already
-        if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+        // Looking at name to avoid duplication, may need to improve
+        const n = this.rootFileDownloads.children.find(j => j.data.name === jobFileNode.data.name);
+        if (n === undefined) {
+            this.rootFileDownloads.children.push(jobFileNode);
             this.rootFileDownloads.expanded = true;
-            this.jobInputNodes.push(this.rootFileDownloads);
+
+            // Add job file root node to tree if it isn't already
+            if (this.jobInputNodes.find(j => j.data.id === 'upload') === undefined) {
+                this.rootFileDownloads.expanded = true;
+                this.jobInputNodes.push(this.rootFileDownloads);
+            }
         }
     }
 

@@ -19,7 +19,7 @@ export class OlMapBasemapComponent implements OnInit {
   ngOnInit() {
     if (this.env.baseMapLayers) {
       this.baseMaps = this.env.baseMapLayers;
-      this.selectedBaseMap = this.baseMaps[1].value;
+      this.selectedBaseMap = this.baseMaps[3].value;
       this.olMapService.switchBaseMap(this.selectedBaseMap);
     }
   }

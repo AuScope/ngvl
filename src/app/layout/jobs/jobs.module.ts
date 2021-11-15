@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { SliderModule } from 'primeng/slider';
 import { TabViewModule } from 'primeng/tabview';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
@@ -24,6 +25,7 @@ import { PdfPreviewComponent } from './preview/pdf-preview.component';
 import { PreviewDirective } from './preview/preview.directive';
 import { TtlPreviewComponent } from './preview/ttl-preview.component';
 import { LogPreviewComponent } from './preview/log-preview.component';
+import { GeoTiffPreviewComponent } from './preview/geotiff-preview.component';
 import { OlMapModule } from '../datasets/openlayermap/olmap.module';
 import { JobBrowserComponent } from './job-browser.component';
 import { JobInputsComponent } from './job-inputs.component';
@@ -42,6 +44,7 @@ import { MessageService } from 'primeng/api';
         PageHeaderModule,
         ConfirmDialogModule,
         ContextMenuModule,
+        SliderModule,
         TabViewModule,
         TableModule,
         TreeTableModule,
@@ -55,12 +58,12 @@ import { MessageService } from 'primeng/api';
     declarations: [
         JobsComponent, JobBrowserComponent, JobInputsComponent, CopyJobInputsModalComponent,
         PreviewDirective, DataServicePreviewComponent, ImagePreviewComponent, PdfPreviewComponent,
-        PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent, JobStatusModalComponent
+        PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent, GeoTiffPreviewComponent, JobStatusModalComponent
     ],
     entryComponents: [
         DataServicePreviewComponent, ImagePreviewComponent,
         PlainTextPreviewComponent, TtlPreviewComponent, LogPreviewComponent,
-        JobStatusModalComponent, CopyJobInputsModalComponent,
+        GeoTiffPreviewComponent, JobStatusModalComponent, CopyJobInputsModalComponent,
         PdfPreviewComponent
     ],
     providers: [ JobsService, ConfirmationService, MessageService ]

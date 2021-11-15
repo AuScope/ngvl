@@ -1,28 +1,15 @@
-import { Component, ViewChild, ElementRef, OnInit, AfterViewInit, NgZone } from "@angular/core";
+import { Component, OnInit, AfterViewInit } from "@angular/core";
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
-
-import GeoTIFF, { fromUrl, fromUrls, fromArrayBuffer, fromBlob } from 'geotiff';
-import { environment } from '../../../../environments/environment';
-
+import { fromArrayBuffer } from 'geotiff';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import ImageLayer from 'ol/layer/Image';
-
-import { getCenter } from 'ol/extent';
-
+import { fromLonLat } from 'ol/proj';
 import WebGLTileLayer from 'ol/layer/WebGLTile';   // GeoTIFF
 import TileLayer from 'ol/layer/Tile';
-
 import Static from 'ol/source/ImageStatic';
 import XYZ from 'ol/source/XYZ';
-//import OSM from 'ol/source/OSM';
-
-//import { GeoTIFF as olGeoTIFF } from 'ol/source/GeoTIFF';
 import { GeoTIFF as olGeoTIFF } from 'ol/source';
-
-
-import { Constants } from "portal-core-ui";
-
 
 
 @Component({
@@ -36,42 +23,48 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
 
     // Data will be a URL to the server's getImagePreview endpoint
     data: any;
-
-    // Image modal is hidden by default
-    //showingImageModal: boolean = false;
     atBottom: boolean = false;
-    //@ViewChild('imageModal') scrollElement: ElementRef;
-
-
-    //@ViewChild('previewMapElement') previewMapElement: ElementRef;
     previewMap: Map;
+    layer: ImageLayer<Static>;
+    layerOpacity: number;
 
 
-    constructor(/*private zone: NgZone*/) {
-    }
+    constructor() { }
 
     ngOnInit() {
-        const mapSource = new XYZ({
-            url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        this.layerOpacity = 100;
+        const mapImagerySource = new XYZ({
+            attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">ArcGIS</a>',
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            maxZoom: 18
         });
-
+        const mapBoundariesSource = new XYZ({
+            attributions: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer">ArcGIS</a>',
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+            maxZoom: 18
+        });
+        const nswVicLonLat = [146.345960, -33.247876];
+        const nswVicWebMercator = fromLonLat(nswVicLonLat);
         this.previewMap = new Map({
             target: 'previewMap',
             controls: [],
             layers: [
-                // Baselayer
+                // Baselayers
                 new TileLayer({
-                    //preload: Infinity,
-                    source: mapSource
+                    preload: Infinity,
+                    source: mapImagerySource
+                }),
+                new TileLayer({
+                    preload: Infinity,
+                    source: mapBoundariesSource
                 })
             ],
             view: new View({
                 //projection: "EPSG:4326",
-                center: Constants.CENTRE_COORD,
-                zoom: 4
+                center: nswVicWebMercator,
+                zoom: 5
             })
         });
-        console.log("Base proj: " + mapSource.getProjection().getCode());
     }
 
     ngAfterViewInit() {
@@ -102,7 +95,10 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
         const width = image.getWidth();
         const height = image.getHeight();
         const bbox = image.getBoundingBox();
+
         /*
+        // Left for revisiting
+        console.log(bbox);
         const tileWidth = image.getTileWidth();
         const tileHeight = image.getTileHeight();
         const samplesPerPixel = image.getSamplesPerPixel();
@@ -121,8 +117,6 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
         */
 
         const rgb = await image.readRasters({ interleave: true });
-
-        //console.log("Length: " + rgb.length);
 
         const canvas = document.createElement("canvas");
         canvas.width = width;
@@ -157,12 +151,26 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
             projection: "EPSG:4326",    // default is view projection, can also get from code above
             imageExtent: bbox
         });
-        console.log("Adding layer");
-        const layer = new ImageLayer({
+        this.layer = new ImageLayer({
             source: source
         });
+        this.previewMap.addLayer(this.layer);
+        const layerCenterLonLat = [ (bbox[2] - ((bbox[2] - bbox[0])/2)), (bbox[3] - ((bbox[3] - bbox[1])/2))];
+        const layerWebMercator = fromLonLat(layerCenterLonLat);
+        this.previewMap.getView().animate({
+            zoom: 8,
+            center: layerWebMercator,
+            duration: 250
+        });
+    }
 
-        this.previewMap.addLayer(layer);
+    /**
+     * 
+     * @param e 
+     */
+    public setLayerOpacity(e: any) {
+        this.layerOpacity = e.value;
+        this.layer.setOpacity(e.value / 100);
     }
 
 }

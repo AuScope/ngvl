@@ -20,9 +20,7 @@
                         text-overflow:ellipsis" *ngFor="let problem of problems; let i = index">
               <input ngbButton type="radio" [value]="problem['@id']" title="{{ problem.name }}"> {{ problem.name }}
             </label>
-
           </div>
-
           <div class="problem-info" *ngIf="selectedProblem">
             <h3>{{ selectedProblem.name }}</h3>
             <p>{{ selectedProblem.description }}</p>
@@ -32,9 +30,16 @@
       </div>
     </div>
   </div>
-  <div *ngIf="problems.length === 0" style="padding:10px;">
+  <div *ngIf="problems.length === 0 && !solutionsLoading" style="padding:10px;">
     No problems could be found.<br>Make sure you have at least one service configured in <a [routerLink]="['/user']">your profile</a>.
   </div>
+  <div class="col" *ngIf="solutionsLoading">
+    Retrieving Solutions...
+    <div class="spinner" style="position:relative;margin-top:100px;">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+  </div>
 </div>
-
 <!-- class="input-group input-group-sm" -->

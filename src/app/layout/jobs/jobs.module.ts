@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { SliderModule } from 'primeng/slider';
 import { TabViewModule } from 'primeng/tabview';
 import { TableModule } from 'primeng/table';
 import { TreeTableModule } from 'primeng/treetable';
@@ -43,6 +44,7 @@ import { MessageService } from 'primeng/api';
         PageHeaderModule,
         ConfirmDialogModule,
         ContextMenuModule,
+        SliderModule,
         TabViewModule,
         TableModule,
         TreeTableModule,

@@ -93,7 +93,6 @@ export class JobsComponent implements OnInit {
         }
     }
 
-
     /**
      * Refresh the job panel based on any/all faceted search elements
      */
@@ -101,7 +100,6 @@ export class JobsComponent implements OnInit {
         this.currentPreviewObject = null;
         this.jobBrowser.refreshJobStatus();
     }
-
 
     /**
      * Job selection event from job browser
@@ -119,7 +117,6 @@ export class JobsComponent implements OnInit {
             }
         }
     }
-
 
     /**
      * Event fired when an input (JobDownload or CloudFileInformation) is selected
@@ -139,7 +136,6 @@ export class JobsComponent implements OnInit {
     }
 
     public inputSizeUpdate(cloudFile) {
-
         if (this.currentPreviewItem) {
             if (this.currentPreviewItem && this.currentPreviewItem.type === 'image') {
                 this.currentPreviewObject = cloudFile;
@@ -187,7 +183,6 @@ export class JobsComponent implements OnInit {
                 );
             }
         }
-
     }
 
     scrollToBottom() {
@@ -205,18 +200,19 @@ export class JobsComponent implements OnInit {
      * @param data
      */
     private previewFile(previewItem: PreviewItem, data: any, options?: any) {
-        previewItem.data = data;
-        if (options) {
-            previewItem.options = options;
-        }
-        let viewContainerRef = this.previewHost.viewContainerRef;
-        viewContainerRef.clear();
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
-        this.componentRef = viewContainerRef.createComponent(componentFactory);
-        (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
-        (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
+        setTimeout(() => {
+            previewItem.data = data;
+            if (options) {
+                previewItem.options = options;
+            }
+            let viewContainerRef = this.previewHost.viewContainerRef;
+            viewContainerRef.clear();
+            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(previewItem.component);
+            this.componentRef = viewContainerRef.createComponent(componentFactory);
+            (<PreviewComponent>this.componentRef.instance).data = previewItem.data;
+            (<PreviewComponent>this.componentRef.instance).options = previewItem.options;
+        }, 50);
     }
-
 
     /**
      * Preview a JobDownload object
@@ -255,7 +251,6 @@ export class JobsComponent implements OnInit {
         this.filePreviewLoading = false;
         this.currentPreviewObject = jobDownload;
     }
-
 
     /**
      * Preview a CloudFileInformation object
@@ -336,7 +331,6 @@ export class JobsComponent implements OnInit {
         }
     }
 
-
     /**
      * Refresh the preview panel
      */
@@ -350,7 +344,6 @@ export class JobsComponent implements OnInit {
             }
         }
     }
-
 
     /**
      * Add a folder to the Job tree new Jobs can be added to
@@ -368,7 +361,6 @@ export class JobsComponent implements OnInit {
             }
         );
     }
-
 
     /**
      * Show a dialog for adding a folder to the Job tree

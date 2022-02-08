@@ -38,6 +38,8 @@ export const environment = {
     ],
     forceAddLayerViaProxy: [],
     grace: {
-        host: 'https://insargrace.geoanalytics.csiro.au/grace'
+        host: 'http://localhost/grace/grace',
+        attributionText: 'GRACE data ©ANU 2021',
+        attributionLink: 'https://anu.edu.au'
     }
 };

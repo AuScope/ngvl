@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, Input } from "@angular/core";
+import { Component, ViewChild, Input } from "@angular/core";
 
 import { PreviewComponent } from '../../../shared/modules/vgl/models';
 

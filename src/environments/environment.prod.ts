@@ -34,11 +34,9 @@ export const environment = {
     ],
     forceAddLayerViaProxy: [],
     grace: {
-        host: 'http://localhost:8001'/*,
-        layers: [
-            'mascons_stage4_V003a'
-        ]
-        */
+        host: 'https://insargrace.geoanalytics.csiro.au/grace/grace',
+        attributionText: 'GRACE data ©ANU 2021',
+        attributionLink: 'https://anu.edu.au'
     },
 
     keywordComponents: []

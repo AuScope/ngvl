@@ -1,19 +1,33 @@
 import { environment } from '../../../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { GraceStyleSettings } from './grace-graph.models';
 
 @Injectable()
 export class GraceService {
 
-    constructor(private http: HttpClient) {}
+    private _graceStyleSettings: BehaviorSubject<GraceStyleSettings> = new BehaviorSubject({
+        minColor: '#ff0000',
+        minValue: -1,
+        neutralColor: '#ffffff',
+        neutralValue: 0,
+        maxColor: '#0000ff',
+        maxValue: 1,
+        transparentNeutralColor: false
+    });
+    public readonly graceStyleSettings: Observable<GraceStyleSettings> = this._graceStyleSettings.asObservable();
+    private _graceDate: BehaviorSubject<any> = new BehaviorSubject({ undefined });
+    public readonly graceDate: Observable<Date> = this._graceDate.asObservable();
 
-    public getGraceTimeSeriesDataForParameter(parameter: string, x: number, y: number): Observable<any> {
-        return this.http.get(environment.grace.host + "/parameter/" + parameter + "/" + x + "/" + y);
+    constructor(private http: HttpClient) {
+        this.getGraceDates().subscribe(dates => {
+            this._graceDate.next(dates[0]);
+        });
     }
 
-    public getGraceAllTimeSeriesData(x: number, y: number): Observable<any> {
-        return this.http.get(environment.grace.host + "/all/coord/" + x + "/" + y);
+    public getGraceTimeSeriesDataForPoint(x: number, y: number): Observable<any> {
+        return this.http.get(environment.grace.host + "/graph/coord/" + x + "/" + y);
     }
 
     private coordinateListToQueryString(coordinateList: string[]): string {
@@ -27,18 +41,17 @@ export class GraceService {
         return coordinateQueryString;
     }
 
-    public getGraceAllTimeSeriesDataForPolygon(coordinateList: any[]): Observable<any> {
+    public getGraceTimeSeriesDataForPolygon(coordinateList: any[]): Observable<any> {
         const coordinateQueryList: string = this.coordinateListToQueryString(coordinateList);
-        return this.http.get(environment.grace.host + "/all/poly?" + coordinateQueryList);
+        return this.http.get(environment.grace.host + "/graph/poly?" + coordinateQueryList);
     }
 
-    public getGraceAllTimeSeriesDataForDrainageBasin(basin: string): Observable<any> {
-        // TODO: Encode? Will depend on basin IDs, not currently needed
-        return this.http.get(environment.grace.host + "/all/basin/" + basin);
+    public getGraceDates(): Observable<Date[]> {
+        return this.http.get<Date[]>(environment.grace.host + "/dates");
     }
 
-    public getGraceDates(): Observable<any> {
-        return this.http.get(environment.grace.host + "/dates");
+    public setGraceDate(d: Date) {
+        this._graceDate.next(d);
     }
 
     public createAnimation(animationOptions: any) {
@@ -47,8 +60,8 @@ export class GraceService {
         });
     }
 
-    public getDrainageBasins(): Observable<any> {
-        return this.http.get(environment.grace.host + "/drainage_basins/");
+    public setGraceStyleSettings(graceStyleSettings: GraceStyleSettings) {//: Observable<ViewType> {
+        this._graceStyleSettings.next(graceStyleSettings);
     }
-
+  
 }

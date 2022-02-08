@@ -78,7 +78,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
         this.status = this.QueryStatus.querying;
         // Make call to GRACE service to get data for single parameter
         if (this.x !== undefined && this.y !== undefined) {
-            this.querySubscription = this.graceService.getGraceAllTimeSeriesData(this.x, this.y).subscribe(data => {
+            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPoint(this.x, this.y).subscribe(data => {
                 this.queriedData = data;
                 this.plotGraph();
                 this.status = this.QueryStatus.loaded;
@@ -87,7 +87,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
             });
         } else if (this.coords !== undefined && this.coords.length > 0) {
             // TODO: Remove hard-coding... will need to be a record keyword component
-            this.querySubscription = this.graceService.getGraceAllTimeSeriesDataForPolygon(this.coords).subscribe(data => {
+            this.querySubscription = this.graceService.getGraceTimeSeriesDataForPolygon(this.coords).subscribe(data => {
                 this.queriedData = data;
                 this.status = this.QueryStatus.loaded;
             }, error => {
@@ -127,8 +127,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
             type: 'scatter' }
         ];
         const title = '<b>' + this.parameter + '</b><br>' +
-            'Primary Mascon: ' + this.queriedData.primary_mascon_id +
-            ', Ternary Mascon: ' + this.queriedData.ternary_mascon_id;
+            'Primary Mascon: ' + this.queriedData.primary_mascon_id;
         this.graph.layout = {
             autosize: true,
             title: title,
@@ -148,7 +147,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
 
     public downloadData(data: any) {
         const blob = new Blob([JSON.stringify(data)], {type: "text/plain;charset=utf-8"});
-        saveAs(blob, data.ternary_mascon_id + ".json");
+        saveAs(blob, data.primary_mascon_id + ".json");
     }
 
 }

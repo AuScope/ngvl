@@ -215,6 +215,18 @@ export class VglService {
         return this.vglRequest('secure/getPlaintextPreview.do', options);
     }
 
+    public getJSONPreview(jobId: number, file: string, arrayPosition: number, zip: boolean): Observable<string> {
+      const options = {
+          params: {
+              jobId: jobId.toString(),
+              file: file,
+              arrayPosition: arrayPosition,
+              zip: zip
+          }
+      };
+      return this.vglRequest('secure/getJSONPreview.do', options);
+  }
+
     public getSectionedLogs(jobId: number): Observable<any> {
         const options = {
             params: {

@@ -7,6 +7,7 @@ import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { KeywordComponentsService } from '../../../shared/modules/keyword/keyword-components.service';
+import { GraceService } from '../../../shared/modules/grace/grace.service';
 
 
 // List of valid online resource types that can be added to the map
@@ -43,6 +44,7 @@ export class DatasetsRecordComponent implements OnInit {
                 public cswSearchService: CSWSearchService,
                 public vglService: VglService,
                 public keywordComponentService: KeywordComponentsService,
+                private graceService: GraceService,
                 public modalService: NgbModal,
                 public activeModal: NgbActiveModal) { }
 
@@ -299,6 +301,9 @@ export class DatasetsRecordComponent implements OnInit {
      */
     changeTime(newTime: string) {
         this.olMapService.setLayerSourceParam(this.cswRecord.id, 'TIME', newTime);
+        if (this.cswRecord.descriptiveKeywords.findIndex(k => {return k.toLowerCase() === 'grace'}) !== -1) {
+            this.graceService.setGraceDate(new Date(newTime));
+        }
     }
 
 }

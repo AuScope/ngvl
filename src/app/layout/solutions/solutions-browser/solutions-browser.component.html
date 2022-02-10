@@ -31,7 +31,7 @@
     </div>
   </div>
   <div *ngIf="problems.length === 0 && !solutionsLoading" style="padding:10px;">
-    No problems could be found.<br>Make sure you have at least one service configured in <a [routerLink]="['/user']">your profile</a>.
+    No problems could be found.<br>Make sure you have at least one service (AWS and/or NCI) configured in <a [routerLink]="['/user']">your profile</a>.
   </div>
   <div class="col" *ngIf="solutionsLoading">
     Retrieving Solutions...

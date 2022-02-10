@@ -4,8 +4,10 @@
     <!-- Header -->
     <app-page-header [heading]="'User Profile'" [icon]="'fa-user'"></app-page-header>
     <div class="row" style="margin-left:0px;width:100%;">
+        Note that to be able to run jobs in VGL you will need to configure at least one compute service below.
+        <!--<br><b>Any charges incurred will be billed to the account associated with the compute service credentials provided.</b>-->
         <!-- User Management -->
-        <ul ngbNav #nav="ngbNav" class="nav-tabs" style="width: 100%;">
+        <ul ngbNav #nav="ngbNav" class="nav-tabs" style="width:100%;margin-top:20px;">
             <!-- AWS Configuration -->
             <li ngbNavItem>
                 <a ngbNavLink>AWS</a>

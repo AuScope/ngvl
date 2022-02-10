@@ -17,6 +17,7 @@ import { UserModule } from './user/user.module';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { JobWizardModule } from './job-wizard/job-wizard.module';
 import { AngularSplitModule } from 'angular-split';
+import { HelpModule } from './help/help.module';
 
 
 @NgModule({
@@ -32,6 +33,7 @@ import { AngularSplitModule } from 'angular-split';
     DatasetsModule,
     JobsModule,
     UserModule,
+    HelpModule,
     OverlayPanelModule,
     JobWizardModule
   ],

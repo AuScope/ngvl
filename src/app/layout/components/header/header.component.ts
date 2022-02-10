@@ -34,6 +34,9 @@ export class HeaderComponent implements OnInit {
 
     this.username$ = this.userStateService.user.map(user => user.fullName);
     this.isUserConfigured$ = this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success);
+    this.isUserConfigured$.subscribe(isUC => {
+      console.log("Is? " + isUC);
+    });
   }
 
     ngOnInit() {

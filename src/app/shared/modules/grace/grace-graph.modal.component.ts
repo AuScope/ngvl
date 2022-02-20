@@ -47,7 +47,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 title: 'Date'
             },
             yaxis: {
-                title: 'Height (m)'
+                title: 'Equivalent Water Height (m)'
             }
         },
         config: {
@@ -135,7 +135,7 @@ export class GraceGraphModalComponent implements AfterViewInit {
                 title: 'Date'
             },
             yaxis: {
-                title: 'Height (m)'
+                title: 'Equivalent Water Height (m)'
             }
         };
     }

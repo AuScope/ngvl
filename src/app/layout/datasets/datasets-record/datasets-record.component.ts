@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
-import { CSWRecordModel, OlMapService, OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel, OlMapObject, OlMapService, OnlineResourceModel } from 'portal-core-ui';
 import { BookMark } from '../../../shared/modules/vgl/models';
 import { RecordModalComponent } from '../record.modal.component';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
+import TileLayer from 'ol/layer/Tile';
+import Tile from 'ol/layer/Tile';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { KeywordComponentsService } from '../../../shared/modules/keyword/keyword-components.service';
 import { GraceService } from '../../../shared/modules/grace/grace.service';
@@ -41,6 +43,9 @@ export class DatasetsRecordComponent implements OnInit {
 
 
     constructor(public olMapService: OlMapService,
+
+                public olMap: OlMapObject,
+
                 public cswSearchService: CSWSearchService,
                 public vglService: VglService,
                 public keywordComponentService: KeywordComponentsService,
@@ -66,6 +71,12 @@ export class DatasetsRecordComponent implements OnInit {
         this.olMapService.addCSWRecord(cswRecord);
         // Keyword components will be added if the necessary keyword is present
         this.keywordComponentService.addMapWidgetKeywordComponents(cswRecord);
+        // Disable extent for some layers so they wrap around meridian (TODO: move to config or make CSW parameter)
+        const nullExtentLayers = ["grace_mascons", "Countries_WSG84"];
+        if (nullExtentLayers.indexOf(cswRecord.id) !== -1) {
+            const layer: Tile<any> = this.olMap.getLayerById(cswRecord.id)[0];
+            layer.setExtent(null);
+        }
     }
 
     /**

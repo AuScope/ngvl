@@ -51,12 +51,12 @@ export class GraceGraphModalComponent2 implements AfterViewInit {
         }],
         layout: {
             autosize: true,
-            title: "Estimated Water Height (EWH)",
+            title: "Equivalent Water Height (EWH)",
             xaxis: {
                 title: 'Date'
             },
             yaxis: {
-                title: 'Height (m)'
+                title: 'Equivalent Water Height (m)'
             }
         },
         config: {
@@ -97,7 +97,7 @@ export class GraceGraphModalComponent2 implements AfterViewInit {
             this.querySubscription = this.graceService.getGraceTimeSeriesDataForPoint(this.x, this.y).subscribe(data => {
                 this.queriedData = data;
                 const centroid = this.parseCentroid(data.response.centroid);
-                const title = '<b>Estimated Water Height (EWH)</b><br>' +
+                const title = '<b>Equivalent Water Height (EWH)</b><br>' +
                     'Primary Mascon: ' + data.response.primary_mascon_id + ' (' + centroid +')<br>' +
                     'Area: ' + (data.response.total_area / 1000000).toFixed(3) + 'km<sup>2</sup>';
                 this.plotGraph(title, data.response);
@@ -109,7 +109,7 @@ export class GraceGraphModalComponent2 implements AfterViewInit {
             // TODO: Remove hard-coding... will need to be a record keyword component
             this.querySubscription = this.graceService.getGraceTimeSeriesDataForPolygon(this.coords).subscribe(data => {
                 this.queriedData = data;
-                const title = '<b>Estimated Water Height (EWH) for Region</b><br>' +
+                const title = '<b>Equivalent Water Height (EWH) for Region</b><br>' +
                     'Primary Mascons: ' + data.response.primary_mascons + '<br>' +
                     'Total Area: ' + (data.response.total_area / 1000000).toFixed(3) + 'km<sup>2</sup>';
                 // TODO: New plot for multiple mascons
@@ -151,7 +151,7 @@ export class GraceGraphModalComponent2 implements AfterViewInit {
                 title: 'Date'
             },
             yaxis: {
-                title: 'Height (m)'
+                title: 'Equivalent Water Height (m)'
             }
         };
     }

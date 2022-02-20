@@ -38,5 +38,10 @@ export class LoginComponent implements OnInit {
     this.selectedItemsToLocalStorage();
     window.location.href = environment.portalBaseUrl + "login/aaf";
   }
+  
+  loginGithub() {
+    this.selectedItemsToLocalStorage();
+    window.location.href = environment.portalBaseUrl + "oauth2/authorization/github";
+  }
 
 }

@@ -5,10 +5,31 @@
     <h2 id="add_credentials">Add AWS/NCI Credentials</h2>
     To run a job in VGL you will need to enter either AWS or NCI credentials in your <a routerLink="/user">User Profile</a>. You only need to do this once.<br>
     Solutions will not appear until the credentials for at least one cloud service have been provided.<br><br>
-    If you have not configured any services you will see this notificaiton in the header panel. Click it and select "Configure Compute Services" to visit the&nbsp;
+    If you have not configured any services you will see a notificaiton in the header panel. Click it and select "Configure Compute Services" to visit the&nbsp;
     <a routerLink="/user">User Profile</a> screen to add your credentials.<br>
     You do not need to enter cloud credentials if you do not intend to run jobs.<br><br>
     <img src="/assets/images/help/help_configure_services.jpg" style="max-width:800px;" alt="Configure Services Notification"><br><br>
+    <b>Gadi users:</b><br><br>
+    When setting up an SSH key on Gadi, we recommend using a terminal program (such as Putty or MobaXterm) located on the machine you will be accessing VGL from.<br>
+    To set up a key, use the following commands in a local terminal:<br><br>
+    <ul>
+        <li>
+            Create a key by typing the following, making sure the output path exists:<br>
+            <code>ssh-keygen -f [output_file_path]</code><br><br>
+            For example:<br>
+            <code>ssh-keygen -f /Users/my_id/.ssh/id_rsa</code><br><br>
+            <b>Do not enter a passphrase when prompted, just press ENTER and leave blank, and do the same for the confirmation.</b><br>
+            This will create 2 files in the output directory, id_rsa (the private key) and id_rsa.pub (the public key).<br>
+        </li>
+        <br>
+        <li>
+            Upload the private key to Gadi by typing:<br>
+            <code>ssh-copy-id -i [path_to_private_key] [gadi_id]@gadi.nci.org.au</code><br><br>
+            For example:<br>
+            <code>ssh-copy-id -i /User/my_id/.ssh/id_rsa me001@gadi.nci.org.au</code>
+        </li>
+    </ul>
+    Note that the key you upload in your VGL profile is the <b>public key</b> (id_rsa.pub).<br><br>
     <img src="/assets/images/help/help_profile.jpg" style="max-width:800px;" alt="Data Explorer"><br><br>
     <h2>Select Data</h2>
     Data can be selected from the <a routerLink="/data">Data Explorer</a> screen.<br><br>

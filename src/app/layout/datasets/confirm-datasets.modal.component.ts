@@ -80,7 +80,7 @@ export class ConfirmDatasetsModalComponent {
                 */
                this.vglService.makeWcsUrl(dlOptions).subscribe(
                    response => {
-                        if(response.url) {
+                        if (response.url) {
                             window.open(response.url);
                         }
                    }, error => {

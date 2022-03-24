@@ -91,7 +91,7 @@ export class InsarGraphModalComponent implements AfterViewInit {
         for (let d = 0; d < this.queriedData.cx.length; d++) {
             this.queriedData.cx[d] = this.stringToDate(this.queriedData.cx[d]);
         }
-        this.graph.data = [{ 
+        this.graph.data = [{
             x: this.queriedData.x,
             y: this.queriedData.y[0],
             mode: 'lines',
@@ -117,12 +117,12 @@ export class InsarGraphModalComponent implements AfterViewInit {
             name: 'Annual+Q model'
         }, {
             x: this.queriedData.cx,
-            y: this.queriedData.cy[0],
+            y: this.queriedData.cy,
             mode: 'scatter',
             marker: {color: 'blue'},
             name: 'tscuml'
-        }]
-        const title = '<b>Velocity = ' + this.queriedData.v + ' +/- ' + this.queriedData.e + ' [mm/yr] @(' +
+        }];
+        const title = '<b>Velocity = ' + this.queriedData.v + ' +/- ' + this.queriedData.e + ' [mm/yr] @ (' +
                 this.pixelX + ', ' + this.pixelY + ')';
         this.graph.layout = {
             autosize: true,
@@ -131,7 +131,7 @@ export class InsarGraphModalComponent implements AfterViewInit {
                 title: 'Date'
             },
             yaxis: {
-                title: 'Height (m)'
+                title: 'Height (mm)'
             }
         };
     }

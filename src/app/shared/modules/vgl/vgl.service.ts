@@ -20,7 +20,6 @@ interface VglResponse<T> {
 function vglData<T>(response: VglResponse<T>): Observable<T> {
   // Convert a VGL error into an Observable error
   if (!response.success) {
-    console.log('VGL response error: ' + JSON.stringify(response));
     return throwError(response.msg);
   }
 

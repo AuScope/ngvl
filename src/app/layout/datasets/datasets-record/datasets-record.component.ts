@@ -5,7 +5,6 @@ import { RecordModalComponent } from '../record.modal.component';
 import { CSWSearchService } from '../../../shared/services/csw-search.service';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import * as Proj from 'ol/proj';
-import TileLayer from 'ol/layer/Tile';
 import Tile from 'ol/layer/Tile';
 import { VglService } from '../../../shared/modules/vgl/vgl.service';
 import { KeywordComponentsService } from '../../../shared/modules/keyword/keyword-components.service';
@@ -60,6 +59,7 @@ export class DatasetsRecordComponent implements OnInit {
       if (this.isMapControl) {
         this.keywordComponentService.addRecordButtonKeywordComponents(this.cswRecord, this.recordButtons);
       }
+      this.loadTimes();
     }
 
     /**
@@ -253,6 +253,7 @@ export class DatasetsRecordComponent implements OnInit {
     /**
      * Does the CSWRecord have a temporal extent?
      */
+    /*
     public hasTemporalExtent(): boolean {
         if (this.cswRecord.temporalExtent &&
             this.cswRecord.temporalExtent.beginPosition &&
@@ -261,6 +262,7 @@ export class DatasetsRecordComponent implements OnInit {
                 return true;
             }
     }
+    */
 
     /**
      * Get a list of times this record may have. Requires the CSWRecord to have
@@ -298,7 +300,11 @@ export class DatasetsRecordComponent implements OnInit {
                         this.timeExtentList = layer.timeExtent;
                     }
                 }
-                this.timeExtentStatus = 'loaded';
+                if (this.timeExtentList.length > 0) {
+                    this.timeExtentStatus = 'loaded';
+                } else {
+                    this.timeExtentStatus = '';
+                }
             }, error => {
                 this.timeExtentStatus = 'error';
             });

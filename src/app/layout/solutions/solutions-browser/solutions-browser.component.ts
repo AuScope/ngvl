@@ -29,7 +29,6 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.solutionsLoading = true;
-    console.log("Preload: " + this.solutionsLoading);
     this._solutionSub = this.solutionsService
       .getSolutions()
       .subscribe(problems => {
@@ -37,7 +36,7 @@ export class SolutionsBrowserComponent implements OnDestroy, OnInit {
         this.solutionsLoading = false;
       }, error => {
         this.solutionsLoading = false;
-        console.log(error.message)
+        console.log(error.message);
       });
 
     this._querySub = this.userStateService.solutionQuery

@@ -4,6 +4,10 @@
     white-space: nowrap;
 }
 
+.form-control {
+    height: 100%;
+}
+
 // This is necessary to keep the dialog scrollable after calling then closing
 // a second dialog (add remote dataset) from this one
 ::ng-deep ngb-modal-window {

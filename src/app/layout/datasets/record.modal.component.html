@@ -50,18 +50,6 @@
                 </div>
             </div>
         </div>
-        <!--
-        <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''" >
-                <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>
-                <div class="col-9">
-                    <label id="csw-uselimit" class="form-control">
-                            <div id="csw-uselimit" *ngFor="let useLimitConstraints of record.useLimitConstraints">
-                                <div class="text-truncate"> <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>
-                            </div>
-                    </label>
-                </div>
-        </div>
-        -->
         <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''" >
             <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>
             <div class="col-9">
@@ -72,18 +60,6 @@
                 </div>
             </div>
         </div>
-        <!--
-        <div class="form-group row" *ngIf="record.accessConstraints && record.accessConstraints!=''" >
-            <label for="csw-access" class="col-3 col-form-label" >Access Constraints </label>
-            <div class="col-9">
-                <label id="csw-name" class="form-control">
-                    <div *ngFor="let accessConstraints of record.accessConstraints">
-                            <div class="text-truncate"> <a href="{{ accessConstraints }}" target="_blank" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>
-                    </div>
-                </label>
-            </div>
-        </div>
-        -->
         <div class="form-group row" *ngIf="record.accessConstraints && record.accessConstraints!=''" >
             <label for="csw-access" class="col-3 col-form-label" >Access Constraints </label>
             <div class="col-9">

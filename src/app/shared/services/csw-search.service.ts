@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/Rx';
 
-import { CSWRecordModel, LayerHandlerService, OnlineResourceModel } from 'portal-core-ui';
+import { CSWRecordModel, OnlineResourceModel } from 'portal-core-ui';
 import { BookMark, Registry, DownloadOptions, JobDownload } from '../../shared/modules/vgl/models';
 import { VglService } from '../../shared/modules/vgl/vgl.service';
 import { UserStateService } from './user-state.service';
@@ -16,8 +16,7 @@ import { UserStateService } from './user-state.service';
 export class CSWSearchService {
 
     constructor(private httpClient: HttpClient, @Inject('env') private env,
-        private vgl: VglService, private userStateService: UserStateService,
-        private layerHandlerService: LayerHandlerService) { }
+        private vgl: VglService, private userStateService: UserStateService) { }
 
     private _registries: BehaviorSubject<Registry[]> = new BehaviorSubject([]);
     public readonly registries: Observable<Registry[]> = this._registries.asObservable();

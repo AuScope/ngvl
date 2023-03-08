@@ -607,7 +607,7 @@ export class VglService {
                 serviceId: serviceId
             }
         };
-        return this.vglRequest('addBookMark.do', options);
+        return this.vglRequest('secure/addBookMark.do', options);
     }
 
     // remove book mark information from database
@@ -617,12 +617,12 @@ export class VglService {
                 id: id.toString()
             }
         };
-        return this.vglRequest('deleteBookMark.do', options);
+        return this.vglRequest('secure/deleteBookMark.do', options);
     }
 
     // get list of bookmarks for a user
     public getBookMarks(): Observable<BookMark[]> {
-        return this.vglRequest('getBookMarks.do');
+        return this.vglRequest('secure/getBookMarks.do');
     }
 
     /**
@@ -634,7 +634,7 @@ export class VglService {
                 bookmarkId: bookmarkId.toString()
             }
         };
-        return this.vglRequest('getDownloadOptions.do', options);
+        return this.vglRequest('secure/getDownloadOptions.do', options);
     }
 
     /**
@@ -655,7 +655,7 @@ export class VglService {
                 westBoundLongitude: downloadOptions.westBoundLongitude
             }
         };
-        return this.vglRequest('saveDownloadOptions.do', options);
+        return this.vglRequest('secure/saveDownloadOptions.do', options);
     }
 
     /**
@@ -663,7 +663,7 @@ export class VglService {
      */
     public deleteDownloadOptions(optionsId: number): Observable<any> {
         const options = { params: { id: optionsId } };
-        return this.vglRequest('deleteDownloadOptions.do', options);
+        return this.vglRequest('secure/deleteDownloadOptions.do', options);
     }
 
     // gets csw record information based on fileter parameters such as file identifier and service id

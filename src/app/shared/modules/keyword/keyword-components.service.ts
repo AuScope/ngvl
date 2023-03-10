@@ -34,7 +34,7 @@ export class KeywordComponentsService {
       for (const keyword of cswRecord.descriptiveKeywords) {
         const componentsForKeyword: KeywordComponent[] = keywordComponents[
           "keywordComponents"
-        ].filter((c) => c.keyword === keyword);
+        ].filter((c) => c.keyword.toLowerCase() === keyword.toLowerCase());
         for (const keywordComponentItem of componentsForKeyword) {
           if (
             keywordComponentItem.keywordComponentType ===

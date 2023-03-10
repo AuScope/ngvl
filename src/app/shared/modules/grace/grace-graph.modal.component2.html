@@ -2,24 +2,6 @@
     <h5 class="modal-title">GRACE</h5>
     <div ngbDropdown class="d-inline-block" style="margin-left:40px;">
         <div *ngIf="status===QueryStatus.loaded">
-            <!-- Uncertainty, mascon/basin selection
-            Show Uncertainty
-            <input type="checkbox" [(ngModel)]="showUncertainty" (change)="plotGraph()" style="margin-right:10px;">
-            Primary Mascon
-            <select style="margin-right:10px;">
-                <option *ngFor="let mascon of primaryMascons" [ngValue]="selectedPrimaryMascon">{{mascon}}</option>
-            </select>
-            Drainage Basin
-            <select>
-                <option *ngFor="let basin of drainageBasins" [ngValue]="selectedBasin">{{basin}}</option>
-            </select>
-            -->
-            <!-- Original parameter dropdown
-            <button class="btn btn-outline-primary" id="graceDropdown" ngbDropdownToggle [disabled]="status===QueryStatus.querying">Select Parameter</button>
-            <div ngbDropdownMenu aria-labelledby="graceDropdown">
-                <button *ngFor="let param of availableParameters" ngbDropdownItem (click)="parameterChange(param)">{{ param }}</button>
-            </div>
-            -->
         </div>
     </div>
     <button type="button" class="close" (click)="activeModal.dismiss('Cross click')" aria-label="Close">
@@ -40,6 +22,13 @@
     </div>
     <plotly-plot #gracePlot id="gracePlot" [divId]="gracePlot" *ngIf="status===QueryStatus.loaded" [updateOnDataChange]="true"
         [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+</div>
+<div class="citations" *ngIf="status===QueryStatus.loaded">
+    If you use these data, please cite the following articles:<br>
+    Allgeyer, S., P Tregoning, H. McQueen, S.C. McClusky, E.-K. Potter, J. Pfeffer, R. McGirr, A.P. Purcell, T.A. Herring and J.-P. Montillet , ANU GRACE data analysis: Orbit modelling, regularisation and inter-satellite range acceleration observations, Journal of Geophysical Research,&nbsp;
+    <a href="https://doi.org/10.1029/2021JB022489" target="_blank">https://doi.org/10.1029/2021JB022489</a><br>
+    Tregoning, P., R. McGirr, J. Pfeffer, A.P. Purcell, H. McQueen, S. Allgeyer and S.C. McClusky, ANU GRACE data analysis: Characteristics and benefits of using irregularly shaped mascons, Journal of Geophysical Research,&nbsp;
+    <a href="https://doi.org/10.1029/2021JB022412" target="_blank">https://doi.org/10.1029/2021JB022412</a>
 </div>
 <div class="modal-footer" style="background: #EEE">
     <button type="button" class="btn btn-primary" (click)="activeModal.close()" >Close</button>

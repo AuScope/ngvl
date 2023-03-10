@@ -36,8 +36,12 @@ export class JobsService {
         return this.vgl.downloadFilesAsZip(jobId, filenames);
     }
 
-    public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<String> {
+    public getPlaintextPreview(jobId: number, file: string, maxSize: number): Observable<string> {
         return this.vgl.getPlaintextPreview(jobId, file, maxSize);
+    }
+
+    public getJSONPreview(jobId: number, file: string, arrayPosition: number, zip: boolean): Observable<string> {
+        return this.vgl.getJSONPreview(jobId, file, arrayPosition, zip);
     }
 
     public getSectionedLogs(jobId: number): Observable<any> {

@@ -3,5 +3,7 @@
     <div class="opacitySlider">
         <label>Opacity</label><p-slider [ngModel]="layerOpacity" [min]="0" [max]="100" (onChange)="setLayerOpacity($event)"></p-slider>
     </div>
-    
+    <div class="xyCoords" *ngIf="imageLoaded && currentPixelX !== undefined && currentPixelY !== undefined">
+        <label>X=</label><label>{{ currentPixelX }},</label><label>&nbsp;Y=</label><label>{{ currentPixelY }}</label>
+    </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -33,7 +34,7 @@ export class HeaderComponent implements OnInit {
     });
 
     this.username$ = this.userStateService.user.map(user => user.fullName);
-    this.isUserConfigured$ = this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success);
+    this.isUserConfigured$ = this.authService.isLoggedIn ? this.userStateService.getHasConfiguredComputeServices().map(hasConfigured => hasConfigured.success) : new BehaviorSubject<boolean>(false);
   }
 
     ngOnInit() {

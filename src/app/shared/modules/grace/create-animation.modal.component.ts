@@ -14,7 +14,7 @@ import { saveAs } from 'file-saver';
 export class CreateAnimationModalComponent implements OnInit {
 
     @Input() graceStyleSettings: GraceStyleSettings;
-    @Input() dates: Date[];
+    @Input() dates: Date[] = [];
 
     AnimationStatus = {
         None: 0,
@@ -28,6 +28,15 @@ export class CreateAnimationModalComponent implements OnInit {
     animationGroup: FormGroup;
     animationStatus: number;
 
+    loadingDates = true;
+    creatingVideo = false;
+
+    // Bounds (Aus defaults)
+    westBound = 113.338953078;
+    southBound = -43.6345972634;
+    eastBound = 153.569469029;
+    northBound = -10.6681857235;
+
 
     constructor(private graceService: GraceService, public activeModal: NgbActiveModal, private formBuilder: FormBuilder) {}
 
@@ -35,13 +44,25 @@ export class CreateAnimationModalComponent implements OnInit {
     ngOnInit() {
         this.animationGroup = this.formBuilder.group({
             layer: "",
-            startdate: [this.dates[0], [Validators.required]],
-            enddate: [this.dates[this.dates.length - 1], [Validators.required]],
+            startdate: [null, [Validators.required]],
+            enddate: [null, [Validators.required]],
+            westBound: [this.westBound, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            southBound: [this.southBound, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            eastBound: [this.eastBound, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
+            northBound: [this.northBound, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             fps: [1, [Validators.required, Validators.pattern(this.INTEGER_REGEX)]],
             framewidth: [600, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]],
             frameheight: [450, [Validators.required, Validators.pattern(this.DECIMAL_REGEX)]]
         });
         this.animationStatus = this.AnimationStatus.None;
+        this.graceService.getGraceDates().subscribe(dates => {
+            this.dates = dates;
+            this.loadingDates = false;
+            this.animationGroup.value.startDate = dates[0];
+            this.animationGroup.value.endDate = this.dates[this.dates.length - 1];
+        }, error => {
+            console.log('Error loading dates: ' + error.message);
+        });
     }
 
     /*
@@ -53,12 +74,10 @@ export class CreateAnimationModalComponent implements OnInit {
 
     onSubmit() {
         // TODO: Remove hard-coding
-        this.animationGroup.value.layer = "grace:test_mascons";
-        //this.animationGroup.value.layer = "grace:mascons_stage4_V003a";
+        this.animationGroup.value.layer = "grace:grace_view";
         this.animationGroup.value.dates = this.dates.slice(this.dates.indexOf(this.animationGroup.value.startdate), this.dates.indexOf(this.animationGroup.value.enddate) + 1);
         this.animationStatus = this.AnimationStatus.Loading;
         this.graceService.createAnimation(this.animationGroup.value).subscribe( (data: any) => {
-            //console.log(JSON.stringify(data));
             saveAs(data, "mascons.mp4");
             this.animationStatus = this.AnimationStatus.Loaded;
         }, error => {

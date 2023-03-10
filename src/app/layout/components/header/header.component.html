@@ -58,18 +58,18 @@
                 </ul>
             </li>
             -->
-            <li class="nav-item dropdown" ngbDropdown *ngIf="!(isUserConfigured$)">
-                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
-                    <i class="fas fa-bell"></i>
-                    <span class="badge badge-info" style="margin-left:2px;transform:translateY(-2px);">1</span>
-                    <b class="caret"></b><span class="sr-only">(current)</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-item" (click)="configureComputeServices()">
-                        <i class="fas fa-exclamation-triangle"></i>&nbsp;Compute Services Unconfigured <!--<span *ngIf="notification.notificationNumber != undefined" class="badge badge-info">{{ notification.notificationCount }}</span>-->
-                    </div>
-                </ul>
-            </li>
+
+            <div *ngIf="!(isUserConfigured$ | async) && isLoggedIn" class="d-inline-block userDropdown" ngbDropdown display="dynamic" #configDrop="ngbDropdown">
+                <button class="btn" id="dropdownManual" ngbDropdownAnchor (focus)="configDrop.open()">
+                    <i class="fas fa-bell"></i><sup>&nbsp;1&nbsp;</sup><b class="caret"></b>
+                </button>
+                <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <button ngbDropdownItem class="userDropdownItem" routerLink="/user" routerLinkActive="active">
+                        <i class="fas fa-fw fa-exclamation-triangle" style="color:orange;"></i>&nbsp;Compute Services Unconfigured
+                    </button>
+                </div>
+            </div>
+
             <!--
             <li class="nav-item dropdown" ngbDropdown>
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
@@ -106,14 +106,22 @@
                     <i class="fas fa-user"></i> {{ username$ | async }} <b class="caret"></b>
                 </button>
                 <div ngbDropdownMenu aria-labelledby="dropdownManual">
+                    <!--
+                    <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn && !(isUserConfigured$)" routerLink="/user">
+                        <i class="fas fa-fw fa-exclamation-triangle"></i>&nbsp;Configure Compute Services
+                    </button>
+                    -->
                     <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" routerLink="/user" routerLinkActive="active">
                         <i class="fas fa-fw fa-user"></i> {{ 'Profile' | translate }}
                     </button>
-                    <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" (click)="onLogOut()">
-                        <i class="fas fa-fw fa-sign-out-alt"></i> {{ 'Log Out' | translate }}
+                    <button ngbDropdownItem class="userDropdownItem" routerLink="/help" routerLinkActive="active">
+                        <i class="fas fa-fw fa-question"></i> {{ 'Help' | translate }}
                     </button>
                     <button ngbDropdownItem class="userDropdownItem" *ngIf="!isLoggedIn" (click)="onLogIn()">
                         <i class="fas fa-fw fa-sign-in-alt"></i> {{ 'Log In' | translate }}
+                    </button>
+                    <button ngbDropdownItem class="userDropdownItem" *ngIf="isLoggedIn" (click)="onLogOut()">
+                        <i class="fas fa-fw fa-sign-out-alt"></i> {{ 'Log Out' | translate }}
                     </button>
                 </div>
             </div>

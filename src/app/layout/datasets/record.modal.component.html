@@ -16,9 +16,9 @@
             </div>
         </div>
         <div class="form-group row" *ngIf="record.name && record.name!=''">
-            <label for="csw-name" class="col-3 col-form-label">Title</label>
+            <label for="csw-title" class="col-3 col-form-label">Title</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control text-truncate" title="{{ record.name }}">{{ record.name }}</label>
+                <label id="csw-title" class="form-control text-truncate" title="{{ record.name }}">{{ record.name }}</label>
             </div>
         </div>
         <div class="form-group row" *ngIf="record.description && record.description!=''">
@@ -34,40 +34,42 @@
             </div>
         </div>
         <div class="form-group row" *ngIf="record.contactOrg && record.contactOrg!=''">
-            <label for="csw-name" class="col-3 col-form-label">Contact Org</label>
+            <label for="csw-contact" class="col-3 col-form-label">Contact Org</label>
             <div class="col-9">
-                <label id="csw-name" class="form-control text-truncate" title="{{ record.contactOrg }}">{{ record.contactOrg }}</label>
+                <label id="csw-contact" class="form-control text-truncate" title="{{ record.contactOrg }}">{{ record.contactOrg }}</label>
             </div>
         </div>
-        <div class="form-group row" *ngIf="(record.constraints && record.constraints!='') && (record.useLimitConstraints && record.useLimitConstraints=='')" >
-            <label for="csw-name" class="col-3 col-form-label">Constraints</label>            
+        <div class="form-group row" *ngIf="(record.constraints && record.constraints!='')">
+            <label for="csw-constraints" class="col-3 col-form-label">Constraints</label>            
             <div class="col-9">
-                <label id="csw-name" class="form-control">
-                        <div *ngFor="let constraint of record.constraints">                            
-                            <div *ngIf="!(constraint.startsWith('http'))" >{{ constraint }}</div>                                                           
-                            <div class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" target="_blank" title="{{ constraint }}" >{{ constraint }}</a></div>  
-                        </div>
-                </label>              
-            </div>
-        </div>
-        <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''" >
-                <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>                
-                <div class="col-9">
-                    <label id="csw-name" class="form-control">
-                            <div *ngFor="let useLimitConstraints of record.useLimitConstraints">                             
-                                <div class="text-truncate" > <a href="{{ useLimitConstraints }}" target="_blank" title="{{ useLimitConstraints }}">{{ useLimitConstraints }}</a></div>                                      
-                            </div>                         
-                    </label>              
+                <div id="csw-constraints" class="form-control">
+                    <div id="csw-constraints" *ngFor="let constraint of record.constraints">
+                        <label class="text-truncate" *ngIf="!(constraint.startsWith('http'))" >{{ constraint }}</label>
+                        <label class="text-truncate" *ngIf="(constraint.startsWith('http'))"><a href="{{ constraint }}" target="_blank" title="{{ constraint }}" >{{ constraint }}</a></label>
+                    </div>
                 </div>
+            </div>
+        </div>
+        <div class="form-group row" *ngIf="record.useLimitConstraints && record.useLimitConstraints!=''">
+            <label for="csw-name" class="col-3 col-form-label">Use Limitation</label>
+            <div class="col-9">
+                <div id="csw-uselimit" class="form-control">
+                    <div id="csw-uselimit" *ngFor="let useLimitConstraint of record.useLimitConstraints">
+                        <label class="text-truncate" *ngIf="!(useLimitConstraint.startsWith('http'))">{{ useLimitConstraint }}</label>
+                        <label class="text-truncate" *ngIf="useLimitConstraint.startsWith('http')"> <a href="{{ useLimitConstraint }}" target="_blank" title="{{ useLimitConstraint }}">{{ useLimitConstraint }}</a></label>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="form-group row" *ngIf="record.accessConstraints && record.accessConstraints!=''" >
-            <label for="csw-name" class="col-3 col-form-label" >Access Constraints </label>
+            <label for="csw-access" class="col-3 col-form-label" >Access Constraints </label>
             <div class="col-9">
-                <label id="csw-name" class="form-control">
-                        <div *ngFor="let accessConstraints of record.accessConstraints">
-                                <div class="text-truncate"> <a href="{{ accessConstraints }}" target="_blank" title="{{ accessConstraints }}" >{{ accessConstraints }}</a></div>
-                        </div>
-                </label>
+                <div id="csw-access" class="form-control">
+                    <div *ngFor="let accessConstraint of record.accessConstraints">
+                        <label class="text-truncate" *ngIf="!(accessConstraint.startsWith('http'))">{{ accessConstraint }}</label>
+                        <label class="text-truncate" *ngIf="accessConstraint.startsWith('http')"> <a href="{{ accessConstraint }}" target="_blank" title="{{ accessConstraint }}" >{{ accessConstraint }}</a></label>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Services -->

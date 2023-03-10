@@ -90,6 +90,10 @@ export class JobWizardComponent implements AfterViewInit, OnInit, OnDestroy {
     this.routeSub.unsubscribe();
   }
 
+  hasSolutions(): boolean {
+    return this.solutions && this.solutions.length > 0;
+  }
+
   save() {
     this.noSave = true;
     this.messageService.clear();

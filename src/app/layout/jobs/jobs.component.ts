@@ -283,8 +283,7 @@ export class JobsComponent implements OnInit {
         if (previewItem && (previewItem.type === 'image' || previewItem.type === 'geotiff' || previewItem.type === 'pdf')) {
             this.currentPreviewObject = cloudFile;
             const imageUrl = environment.portalBaseUrl + "secure/getImagePreview.do?jobId=" + this.jobBrowser.selectedJob.id + "&file=" + cloudFile.name + "&_dc=" + Math.random();
-            this.previewFile(previewItem, imageUrl);
-
+            this.previewFile(previewItem, imageUrl, this.jobBrowser.selectedJob.id);
         // Log files currently displayed as plain text, but this class will
         // allow us to make imporvements to display later (e.g. display
         // sectioned logs in tabs per section)

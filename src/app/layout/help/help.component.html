@@ -1,0 +1,122 @@
+<div class="help-page" [@routerTransition]>
+    <h1>VGL Job Help</h1>
+    The following informatoin should help you get started with running jobs on VGL.
+    <br><br>
+    <h2 id="add_credentials">Add AWS/NCI Credentials</h2>
+    To run a job in VGL you will need to enter either AWS or NCI credentials in your <a routerLink="/user">User Profile</a>. You only need to do this once.<br>
+    Solutions will not appear until the credentials for at least one cloud service have been provided.<br><br>
+    If you have not configured any services you will see a notificaiton in the header panel. Click it and select "Configure Compute Services" to visit the&nbsp;
+    <a routerLink="/user">User Profile</a> screen to add your credentials.<br>
+    You do not need to enter cloud credentials if you do not intend to run jobs.<br><br>
+    <img src="/assets/images/help/help_configure_services.jpg" style="max-width:800px;" alt="Configure Services Notification"><br><br>
+    <b>Gadi users:</b><br><br>
+    When setting up an SSH key on Gadi, we recommend using a terminal program (such as Putty or MobaXterm) located on the machine you will be accessing VGL from.<br>
+    To set up a key, use the following commands in a local terminal:<br><br>
+    <ul>
+        <li>
+            Create a key by typing the following, making sure the output path exists:<br>
+            <code>ssh-keygen -f [output_file_path]</code><br><br>
+            For example:<br>
+            <code>ssh-keygen -f /Users/my_id/.ssh/id_rsa</code><br><br>
+            <b>Do not enter a passphrase when prompted, just press ENTER and leave blank, and do the same for the confirmation.</b><br>
+            This will create 2 files in the output directory, id_rsa (the private key) and id_rsa.pub (the public key).<br>
+        </li>
+        <br>
+        <li>
+            Upload the private key to Gadi by typing:<br>
+            <code>ssh-copy-id -i [path_to_private_key] [gadi_id]@gadi.nci.org.au</code><br><br>
+            For example:<br>
+            <code>ssh-copy-id -i /User/my_id/.ssh/id_rsa me001@gadi.nci.org.au</code>
+        </li>
+    </ul>
+    Note that the key you upload in your VGL profile is the <b>public key</b> (id_rsa.pub).<br><br>
+    <img src="/assets/images/help/help_profile.jpg" style="max-width:800px;" alt="Data Explorer"><br><br>
+    <h2>Select Data</h2>
+    Data can be selected from the <a routerLink="/data">Data Explorer</a> screen.<br><br>
+    <img src="/assets/images/help/help_data_explorer.jpg" style="max-width:800px;" alt="Data Explorer"><br><br>
+    To do this, search for layers using the faceted search facility on the left and add the required layers with the green "+" button.&nbsp;
+    Data can then be selected via the "Select Data" button on the map and drawing a rectangular border containing the area of interest. Select&nbsp;
+    the desired dataset(s) necessary for the job using the dialog that appears and select "Capture Data".<br><br>
+    <img src="/assets/images/help/help_select_datasets.jpg" style="max-width:800px;" alt="Choose Data"><br>
+    <br><br>
+    <h2>Choose a Solution</h2>
+    Depending on which cloud providers you have suppllied credentials for you will find a number of solutions on the <a routerLink="/solutions">Solutions</a> screen.<br>
+    Choose the desired solution from the list and click "Select" to add the solution to the cart and make it available to your job.<br><br>
+    <img src="/assets/images/help/help_solutions.jpg" style="max-width:800px;" alt="Solutions"><br>
+    <br><br>
+    <h2>Create a Job</h2>
+    A job can be created by navigating to the <a routerLink="/wizard/new">Create Job</a> page. To create a job you must have first selected&nbsp;
+    the required data from the <a routerLink="/data">Data Explorer</a> and at least one solution from <a routerLink="/solutions">Solutions</a>.
+    On the Create Job screen you can:<br>
+    <ul>
+        <li>
+            <h4>Manage Input Data</h4>
+            The Input Data panel will show you the selected datasets available to the solution. At least one dataset must be present.<br><br>
+            <img src="/assets/images/help/help_wizard_input.jpg" style="max-width:800px;" alt="New Job Inputs"><br><br>
+        </li>
+        <li>
+            <h4>Manage Solutions</h4>
+            The chosen solutions for the job will appear in the Solutions panel. Here you can view the templates for each solution&nbsp;
+            and make any changes to the template that may be required to further fine-tune the job.<br><br>
+            <img src="/assets/images/help/help_wizard_solutions.jpg" style="max-width:800px;" alt="New Job Solutions"><br><br>
+        </li>
+        <li>
+            <h4>Enter Job Details</h4>
+            This includes information for you to be able to identify your job, as well as compute service parameters to run the job.<br><br>
+            <ul>
+                <li>
+                    <h5>Job Name</h5>
+                    A name for the job.
+                </li><br>
+                <li>
+                    <h5>Job Description (Optional)</h5>
+                    A brief description of the job.
+                </li><br>
+                <li>
+                    <h5>Compute Provider</h5>
+                    The compute provider (AWS or NCI) that will run the job. This will be limited to providers you have supplied credentials for,&nbsp;
+                    and some solutions may be restricted to certain providers.
+                </li><br>
+                <li>
+                    <h5>Toolbox</h5>
+                    The solution toolbox to use. There will normally only be one option abailable here.
+                </li><br>
+                <li>
+                    <h5>Number of CPUs</h5>
+                    The number of CPUs to utilise when computing the job (e.g. 16).
+                </li><br>
+                <li>
+                    <h5>Memory (GB)</h5>
+                    The amount of memory (GB) to use when computing the job (e.g. 64).
+                </li><br>
+                <li>
+                    <h5>Disk Space (GB)</h5>
+                    The disk space to utilise when computing the job (e.g. 16).
+                </li><br>
+                <li>
+                    <h5>Email Notification</h5>
+                    Check this box if you would like to receive an email notification when the job is complete.
+                </li><br>
+                <li>
+                    <h5>Set Job Walltime</h5>
+                    Check this box if you would like to apply a walltime to the job.
+                </li><br>
+                <li>
+                    <h5>Walltime</h5>
+                    If the Set Job Walltime box has been checked, the walltime (in minutes) can be set here. The job will be cancelled if it exceeds the walltime.
+                </li><br>
+            </ul>
+            <img src="/assets/images/help/help_wizard_job.jpg" style="max-width:800px;" alt="New Job Details"><br><br>
+        </li>
+        <li>
+            <h4>Submit Job</h4>
+            When all the necessary solution parameters and job details have been entered, the "Submit" button can be clicked to send the job to the associated cloud provider&nbsp;
+            for processing.<br>
+            You can view the status of the job or details of the job if it has completed from the <a routerLink="/jobs">Jobs</a> screen.
+        </li>
+    </ul>
+    <br>
+    <h2>View Job Results</h2>
+    Jobs that are running or that have been run previously can be viewed on the <a routerLink="/jobs">Jobs</a> screen.<br><br>
+    <img src="/assets/images/help/help_jobs.jpg" style="max-width:800px;" alt="View Jobs"><br>
+</div>

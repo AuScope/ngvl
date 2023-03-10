@@ -4,12 +4,14 @@ import { fromArrayBuffer } from 'geotiff';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import ImageLayer from 'ol/layer/Image';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, transformExtent } from 'ol/proj';
 import WebGLTileLayer from 'ol/layer/WebGLTile';   // GeoTIFF
 import TileLayer from 'ol/layer/Tile';
 import Static from 'ol/source/ImageStatic';
 import XYZ from 'ol/source/XYZ';
 import { GeoTIFF as olGeoTIFF } from 'ol/source';
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { InsarGraphModalComponent } from "../../../shared/modules/grace/insar-graph.modal.component";
 
 
 @Component({
@@ -23,13 +25,22 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
 
     // Data will be a URL to the server's getImagePreview endpoint
     data: any;
+    options: any;   // This will be used to get the job ID
     atBottom: boolean = false;
     previewMap: Map;
     layer: ImageLayer<Static>;
     layerOpacity: number;
 
+    imageLoaded: boolean = false;
+    imageHeight: number;
+    imageWidth: number;
+    imageProjectedBoundingBox = []
+    // Current pixel for mouseover image
+    currentPixelX: number;
+    currentPixelY: number;
 
-    constructor() { }
+
+    constructor(private modalService: NgbModal) { }
 
     ngOnInit() {
         this.layerOpacity = 100;
@@ -84,21 +95,38 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
         this.previewMap.setView(source.getView());
     }
 
+    getImagePixelCoordinate(evt) {
+        const pixel = this.previewMap.getEventPixel(evt.originalEvent);
+            const topLeftImagePixel = this.previewMap.getPixelFromCoordinate([this.imageProjectedBoundingBox[0], this.imageProjectedBoundingBox[3]]);
+            const bottomRightImagePixel = this.previewMap.getPixelFromCoordinate([this.imageProjectedBoundingBox[2], this.imageProjectedBoundingBox[1]]);
+            if(pixel[0] > topLeftImagePixel[0] && pixel[0] < bottomRightImagePixel[0] &&
+               pixel[1] > topLeftImagePixel[1] && pixel[1] < bottomRightImagePixel[1]) {
+                // Work out how far the point is along the dislayed image
+                const adjustedPixel = [(pixel[0] - topLeftImagePixel[0]), (pixel[1] - topLeftImagePixel[1])]
+                const pixelImageWidth = bottomRightImagePixel[0] - topLeftImagePixel[0];
+                const pixelImageHeight = bottomRightImagePixel[1] - topLeftImagePixel[1];
+                // Create a percentage multiplier and apply it to the original tif width/height to get XY value
+                const xMultiplier = adjustedPixel[0] / pixelImageWidth;
+                const yMultiplier = adjustedPixel[1] / pixelImageHeight;
+                const x = Math.floor(this.imageWidth * xMultiplier);
+                const y = Math.floor(this.imageHeight * yMultiplier);
+                return [x, y];
+            }
+            return undefined;
+    }
+
     async loadImage() {
         const url = this.data;
-
         const response = await fetch(url);
         const arrayBuffer = await response.arrayBuffer();
         const tiff = await fromArrayBuffer(arrayBuffer);
-
         const image = await tiff.getImage(); // by default, the first image is read.
-        const width = image.getWidth();
-        const height = image.getHeight();
+        this.imageWidth = image.getWidth();
+        this.imageHeight = image.getHeight();
         const bbox = image.getBoundingBox();
-
+        this.imageProjectedBoundingBox = transformExtent(bbox, "EPSG:4326", "EPSG:3857");
+        
         /*
-        // Left for revisiting
-        console.log(bbox);
         const tileWidth = image.getTileWidth();
         const tileHeight = image.getTileHeight();
         const samplesPerPixel = image.getSamplesPerPixel();
@@ -117,15 +145,14 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
         */
 
         const rgb = await image.readRasters({ interleave: true });
-
         const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = this.imageWidth;
+        canvas.height = this.imageHeight;
         const context = canvas.getContext("2d");
-        const data = context.getImageData(0, 0, width, height);
+        const data = context.getImageData(0, 0, this.imageWidth, this.imageHeight);
         const rgba = data.data;
         let j = 0;
-        if (rgb.length === (width * height * 3)) {
+        if (rgb.length === (this.imageWidth * this.imageHeight * 3)) {
             for (let i = 0; i < rgb.length; i += 3) {
                 rgba[j] = rgb[i];
                 rgba[j + 1] = rgb[i + 1];
@@ -133,7 +160,7 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
                 rgba[j + 3] = 255;
                 j += 4;
             }
-        } else if (rgb.length === (width * height)) {
+        } else if (rgb.length === (this.imageWidth * this.imageHeight)) {
             for (let i = 0; i < rgb.length; i ++) {
                 rgba[j] = rgb[i];
                 rgba[j + 1] = rgb[i];
@@ -162,6 +189,31 @@ export class GeoTiffPreviewComponent implements AfterViewInit, OnInit, PreviewCo
             center: layerWebMercator,
             duration: 250
         });
+
+        // Image clicks will display linear time series graph
+        this.previewMap.on('click', (evt) => {
+            const pixel = this.getImagePixelCoordinate(evt);
+            if (pixel !== undefined) {
+                const modalRef = this.modalService.open(InsarGraphModalComponent, { size: 'lg' });
+                modalRef.componentInstance.pixelX = pixel[0];
+                modalRef.componentInstance.pixelY = pixel[1];
+                modalRef.componentInstance.jobId = this.options;
+            }
+        });
+
+        // Mouse move over image will update XY display
+        this.previewMap.on('pointermove', (evt) => {
+            const pixel = this.getImagePixelCoordinate(evt);
+            if (pixel !== undefined) {
+                this.currentPixelX = pixel[0];
+                this.currentPixelY = pixel[1];
+            } else {
+                this.currentPixelX = undefined;
+                this.currentPixelY = undefined;
+            }
+        });
+
+        this.imageLoaded = true;
     }
 
     /**

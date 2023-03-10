@@ -6,43 +6,70 @@
         </button>
     </div>
     <div class="modal-body">
-        <div class="row">
-            <div class="col">Start Date</div>
-            <div class="col">
-                <select class="form-control" id="startdate" formControlName="startdate">
-                    <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="i >= dates.indexOf(animationGroup.value.enddate)">{{d | date}}</option>
-                </select>
+        <div *ngIf="loadingDates" style="text-align: center;">
+            Loading dates...
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div *ngIf="animationStatus==AnimationStatus.Loading" style="text-align: center;">
+            Creating video...
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div *ngIf="!loadingDates">
+            <div class="row">
+                <div class="col">Start Date</div>
+                <div class="col">
+                    <select class="form-control" id="startdate" formControlName="startdate">
+                        <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="animationGroup.value.enddate && i >= dates.indexOf(animationGroup.value.enddate)">{{d | date}}</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col">End Date</div>
-            <div class="col">
-                <select class="form-control" id="enddate" formControlName="enddate">
-                    <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="i < dates.indexOf(animationGroup.value.startdate) + 1">{{d | date}}</option>
-                </select>
+            <div class="row">
+                <div class="col">End Date</div>
+                <div class="col">
+                    <select class="form-control" id="enddate" formControlName="enddate">
+                        <option *ngFor="let d of dates; let i = index" [value]="d" [disabled]="i < dates.indexOf(animationGroup.value.startdate) + 1">{{d | date}}</option>
+                    </select>
+                </div>
             </div>
+            <div class="row">
+                <div class="col">West Bound</div>
+                <div class="col"><input class="form-control" id="westBound" type="text" formControlName="westBound"></div>
+            </div>
+            <div class="row">
+                <div class="col">South Bound</div>
+                <div class="col"><input class="form-control" id="southBound" type="text" formControlName="southBound"></div>
+            </div>
+            <div class="row">
+                <div class="col">East Bound</div>
+                <div class="col"><input class="form-control" id="eastBound" type="text" formControlName="eastBound"></div>
+            </div>
+            <div class="row">
+                <div class="col">North Bound</div>
+                <div class="col"><input class="form-control" id="northBound" type="text" formControlName="northBound"></div>
+            </div>
+            <div class="row">
+                <div class="col">Frames Per Second (FPS)</div>
+                <div class="col"><input class="form-control" id="fps" type="text" formControlName="fps"></div>
+            </div>
+            <div class="row">
+                <div class="col">Frames Width (px)</div>
+                <div class="col"><input class="form-control" id="framewidth" type="text" formControlName="framewidth"></div>
+            </div>
+            <div class="row">
+                <div class="col">Frames Height (px)</div>
+                <div class="col"><input class="form-control" id="frameheight" type="text" formControlName="frameheight"></div>
+            </div>
+            <!--
+            <div class="row">
+                <div class="col">Change Style</div>
+                <div class="col"><button class="btn btn-primary" (click)="changeStyle()"><em class="fas fa-brush" style="color:white;"></em></button></div>
+            </div>
+            -->
         </div>
-        <div class="row">
-            <div class="col">Frames Per Second (FPS)</div>
-            <div class="col"><input class="form-control" id="fps" type="text" formControlName="fps"></div>
-        </div>
-        <div class="row">
-            <div class="col">Frames Width (px)</div>
-            <div class="col"><input class="form-control" id="framewidth" type="text" formControlName="framewidth"></div>
-        </div>
-        <div class="row">
-            <div class="col">Frames Height (px)</div>
-            <div class="col"><input class="form-control" id="frameheight" type="text" formControlName="frameheight"></div>
-        </div>
-        <!--
-        <div class="row">
-            <div class="col">Change Style</div>
-            <div class="col"><button class="btn btn-primary" (click)="changeStyle()"><em class="fas fa-brush" style="color:white;"></em></button></div>
-        </div>
-        -->
     </div>
+
     <div class="modal-footer" style="background: #EEE">
         <button type="button" class="btn btn-primary" (click)="activeModal.dismiss('dismiss')">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="!animationGroup.valid">Create Animation</button>
+        <button type="submit" class="btn btn-primary" [disabled]="!animationGroup.valid || animationStatus==AnimationStatus.Loading">Create Animation</button>
     </div>
 </form>
